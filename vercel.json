@@ -1,0 +1,16 @@
+{
+  "buildCommand": "pnpm run build",
+  "outputDirectory": "dist/public",
+  "framework": "vite",
+  "env": {
+    "VITE_APP_TITLE": "@VITE_APP_TITLE",
+    "VITE_APP_LOGO": "@VITE_APP_LOGO",
+    "VITE_APP_ID": "@VITE_APP_ID"
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
