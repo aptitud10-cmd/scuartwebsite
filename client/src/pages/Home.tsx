@@ -109,15 +109,15 @@ export default function Home() {
         <div
           className="absolute inset-0 z-0"
           style={{
-            backgroundImage: "url('https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/BgCjugAjtjOXkddU.webp')",
+            backgroundImage: "url('https://private-us-east-1.manuscdn.com/sessionFile/rBxqvmd5YxjDs7mNttwRQX/sandbox/Xh30elooOx2vbHNU5P7kJM-img-1_1770901063000_na1fn_c2N1YXJ0LWhlcm8tYmc.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvckJ4cXZtZDVZeGpEczdtTnR0d1JRWC9zYW5kYm94L1hoMzBlbG9vT3gydmJITlU1UDdrSk0taW1nLTFfMTc3MDkwMTA2MzAwMF9uYTFmbl9jMk4xWVhKMExXaGxjbTh0WW1jLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE5MjAsaF8xOTIwL2Zvcm1hdCx3ZWJwL3F1YWxpdHkscV84MCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5ODc2MTYwMH19fV19&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=bkMZSpepMaePzph4piKLbn1zXvHARvoKIQvFmwMrMVWPDlwK5KQhME62wpStm4ov1gLMlnHnYfDgm3hzfRmEzck-2F-3tNcqaV9XqoHB0sgGDIcUjnIZkDcmBFw6EeKPztSiM4Jg6ucTHuwNGzp-JQBDPPawDhPUVLlOmx~GHKKCTTmsF3wCNJvXxZiu5IAdFLL-kXwsLEo8ngugzRolAjfUs--rsyIKvJq6NR-rbC5Ghg2XpVdj4Idex-qkGku1UzaAkJClH6peRMqJtbeZcBrdDlCEfsluD4XR~QvhLMD52kjTYD4TStYbWwUJ6dJEJRo8S9sBoXyexijh0CG6ZA__')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            opacity: 0.3,
+            opacity: 0.7,
           }}
         />
 
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black z-1" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-1" />
 
         {/* Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 text-center">
@@ -242,7 +242,7 @@ export default function Home() {
               className="relative h-96 rounded-lg overflow-hidden"
             >
               <img
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/fqYqZQVVYEZqUuDT.webp"
+                src="https://private-us-east-1.manuscdn.com/sessionFile/rBxqvmd5YxjDs7mNttwRQX/sandbox/Xh30elooOx2vbHNU5P7kJM-img-2_1770901061000_na1fn_c2N1YXJ0LXBoaWxvc29waHktdmlzdWFs.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvckJ4cXZtZDVZeGpEczdtTnR0d1JRWC9zYW5kYm94L1hoMzBlbG9vT3gydmJITlU1UDdrSk0taW1nLTJfMTc3MDkwMTA2MTAwMF9uYTFmbl9jMk4xWVhKMExYQm9hV3h2YzI5d2FIa3RkbWx6ZFdGcy5wbmc~eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsd18xOTIwLGhfMTkyMC9mb3JtYXQsd2VicC9xdWFsaXR5LHFfODAiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3OTg3NjE2MDB9fX1dfQ__&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=oDll75L12NcJd0w2UtrVzfbjsRqgdAPZkizGWUe80-KKtrdU~PGzMf5GNJJfXe67SiuK4SLu5aWL7JNncYuVK~McUOih9H6p5OTlg5nIO9Md-OFA0UH80czro0X7djqMqnhkZyM1QnyQu2LKPx0tkrX~YRy0MQh2Avczhsw6zagvGbRdywXLg41CC6kMDK0uZtEN34OhY7uTUK1gLQ~YeUIgLCiXsP3Tz6xnElfwwJfuUK4EYwcLEC31bjtw~MuKlRiDn67cRzWzTCUJkTUm~eVel9X9axMvqzk7AmLbTMJ2~xwzD~HKeAblk11wjuJ8JiHAeB858J1p7Dmy7r4IAQ__"
                 alt="Design + Technology Philosophy"
                 className="w-full h-full object-cover"
               />
@@ -426,7 +426,94 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ==================== BLOG/INSIGHTS SECTION ==================== */}
+      <section id="insights" className="relative py-32 px-4 bg-black">
+        <div className="max-w-6xl mx-auto">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mb-20 text-center"
+          >
+            <h2 className="text-5xl md:text-6xl font-light mb-6">
+              Latest Insights
+            </h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              Thoughts on design, technology, and building products that matter.
+            </p>
+          </motion.div>
 
+          {/* Blog Grid */}
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                title: "Systems Thinking in Product Design",
+                excerpt: "How interconnected systems create better user experiences and scalable products.",
+                date: "Feb 10, 2026",
+                readTime: "5 min read",
+                category: "Design",
+              },
+              {
+                title: "AI Integration: Beyond the Hype",
+                excerpt: "Practical approaches to implementing AI that actually solve real business problems.",
+                date: "Feb 5, 2026",
+                readTime: "7 min read",
+                category: "Technology",
+              },
+              {
+                title: "Building SaaS Products That Scale",
+                excerpt: "Lessons learned from scaling products from 0 to 10k users and beyond.",
+                date: "Jan 28, 2026",
+                readTime: "6 min read",
+                category: "Business",
+              },
+            ].map((article, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="group p-6 rounded-lg border border-gray-800 hover:border-cyan-500/50 transition-colors cursor-pointer"
+              >
+                <div className="mb-4">
+                  <span className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-light tracking-widest">
+                    {article.category}
+                  </span>
+                </div>
+                <h3 className="text-xl font-light mb-3 group-hover:text-cyan-400 transition-colors">
+                  {article.title}
+                </h3>
+                <p className="text-gray-400 text-sm mb-4 leading-relaxed">
+                  {article.excerpt}
+                </p>
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span>{article.date}</span>
+                  <span>{article.readTime}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* View All Button */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            viewport={{ once: true }}
+            className="text-center mt-12"
+          >
+            <Link to="/blog">
+              <Button variant="outline" className="border-gray-600 hover:bg-gray-900 px-8 py-6">
+                View All Articles
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Contact Modal */}
       <ContactFormModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
