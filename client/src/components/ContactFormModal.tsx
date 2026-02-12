@@ -131,29 +131,29 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
             transition={{ type: "spring", damping: 20, stiffness: 300 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-black border border-gray-800 rounded-lg shadow-2xl">
+            <div className="w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-black border border-gray-800 rounded-lg shadow-2xl md:rounded-xl">
               {/* Header */}
-              <div className="sticky top-0 relative p-4 sm:p-8 border-b border-gray-800 bg-gradient-to-r from-black to-gray-900/50 z-10">
+              <div className="sticky top-0 relative p-3 sm:p-6 border-b border-gray-800 bg-gradient-to-r from-black to-gray-900/50 z-10">
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-white transition-colors"
+                  className="absolute top-3 right-3 sm:top-5 sm:right-5 text-gray-400 hover:text-white transition-colors"
                   aria-label="Close"
                 >
-                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
 
-                <h2 className="text-2xl sm:text-3xl font-light pr-8">Let's Talk</h2>
-                <p className="text-gray-400 mt-2 font-light text-sm sm:text-base">
+                <h2 className="text-xl sm:text-2xl font-light pr-8">Let's Talk</h2>
+                <p className="text-gray-400 mt-1 sm:mt-2 font-light text-xs sm:text-sm">
                   Tell us about your project. We'll get back to you within 24 hours.
                 </p>
               </div>
 
               {/* Content */}
               {!isSuccess ? (
-                <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-4 sm:space-y-6">
+                <form onSubmit={handleSubmit} className="p-3 sm:p-6 space-y-3 sm:space-y-4">
                   {/* Name */}
                   <div>
-                    <label className="block text-xs sm:text-sm font-light text-gray-300 mb-2">
+                    <label className="block text-xs font-light text-gray-300 mb-1">
                       Full Name *
                     </label>
                     <input
@@ -162,13 +162,13 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="Your name"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-xs sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
                     />
                   </div>
 
                   {/* Email */}
                   <div>
-                    <label className="block text-xs sm:text-sm font-light text-gray-300 mb-2">
+                    <label className="block text-xs font-light text-gray-300 mb-1">
                       Email Address *
                     </label>
                     <input
@@ -177,13 +177,13 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="your@email.com"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-xs sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
                     />
                   </div>
 
                   {/* Company */}
                   <div>
-                    <label className="block text-xs sm:text-sm font-light text-gray-300 mb-2">
+                    <label className="block text-xs font-light text-gray-300 mb-1">
                       Company (Optional)
                     </label>
                     <input
@@ -192,20 +192,20 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
                       value={formData.company}
                       onChange={handleChange}
                       placeholder="Your company name"
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-xs sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
                     />
                   </div>
 
                   {/* Project Type */}
                   <div>
-                    <label className="block text-xs sm:text-sm font-light text-gray-300 mb-2">
+                    <label className="block text-xs font-light text-gray-300 mb-1">
                       Project Type *
                     </label>
                     <select
                       name="projectType"
                       value={formData.projectType}
                       onChange={handleChange}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 border border-gray-800 rounded-lg text-white text-sm sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-900 border border-gray-800 rounded-lg text-white text-xs sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
                     >
                       <option value="">Select a project type</option>
                       {projectTypes.map((type) => (
@@ -218,7 +218,7 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
 
                   {/* Message */}
                   <div>
-                    <label className="block text-xs sm:text-sm font-light text-gray-300 mb-2">
+                    <label className="block text-xs font-light text-gray-300 mb-1">
                       Message *
                     </label>
                     <textarea
@@ -226,8 +226,8 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
                       value={formData.message}
                       onChange={handleChange}
                       placeholder="Tell us about your project, goals, and timeline..."
-                      rows={4}
-                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-500 transition-colors resize-none"
+                      rows={3}
+                      className="w-full px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-xs sm:text-base focus:outline-none focus:border-cyan-500 transition-colors resize-none"
                     />
                   </div>
 
@@ -235,7 +235,7 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-cyan-500 hover:bg-cyan-600 disabled:bg-gray-700 text-black font-semibold py-2 sm:py-3 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+                    className="w-full bg-cyan-500 hover:bg-cyan-600 disabled:bg-gray-700 text-black font-semibold py-1.5 sm:py-2 rounded-lg transition-colors flex items-center justify-center gap-2 text-xs sm:text-base"
                   >
                     {isSubmitting ? (
                       <>

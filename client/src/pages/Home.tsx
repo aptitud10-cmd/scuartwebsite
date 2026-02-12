@@ -150,12 +150,12 @@ export default function Home() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-              <Link href="#case-studies">
+              <a href="#case-studies">
                 <Button className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-8 py-6 text-base">
                   Explore Our Work
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
-              </Link>
+              </a>
               <button
                 onClick={() => setIsContactModalOpen(true)}
                 className="px-8 py-6 border border-gray-600 rounded-lg text-white hover:bg-gray-900 transition-colors font-light"
@@ -479,9 +479,11 @@ export default function Home() {
                 className="group p-6 rounded-lg border border-gray-800 hover:border-cyan-500/50 transition-colors cursor-pointer"
               >
                 <div className="mb-4">
-                  <span className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-light tracking-widest">
-                    {article.category}
-                  </span>
+                  <Link to={`/blog?category=${article.category.toLowerCase()}`}>
+                    <span className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-light tracking-widest hover:bg-cyan-500/20 transition-colors cursor-pointer">
+                      {article.category}
+                    </span>
+                  </Link>
                 </div>
                 <h3 className="text-xl font-light mb-3 group-hover:text-cyan-400 transition-colors">
                   {article.title}
