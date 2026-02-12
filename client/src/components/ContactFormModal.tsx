@@ -131,29 +131,29 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
             transition={{ type: "spring", damping: 20, stiffness: 300 }}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
-            <div className="w-full max-w-2xl bg-black border border-gray-800 rounded-lg shadow-2xl overflow-hidden">
+            <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-black border border-gray-800 rounded-lg shadow-2xl">
               {/* Header */}
-              <div className="relative p-8 border-b border-gray-800 bg-gradient-to-r from-black to-gray-900/50">
+              <div className="sticky top-0 relative p-4 sm:p-8 border-b border-gray-800 bg-gradient-to-r from-black to-gray-900/50 z-10">
                 <button
                   onClick={onClose}
-                  className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors"
+                  className="absolute top-4 right-4 sm:top-6 sm:right-6 text-gray-400 hover:text-white transition-colors"
                   aria-label="Close"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>
 
-                <h2 className="text-3xl font-light">Let's Talk</h2>
-                <p className="text-gray-400 mt-2 font-light">
+                <h2 className="text-2xl sm:text-3xl font-light pr-8">Let's Talk</h2>
+                <p className="text-gray-400 mt-2 font-light text-sm sm:text-base">
                   Tell us about your project. We'll get back to you within 24 hours.
                 </p>
               </div>
 
               {/* Content */}
               {!isSuccess ? (
-                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                <form onSubmit={handleSubmit} className="p-4 sm:p-8 space-y-4 sm:space-y-6">
                   {/* Name */}
                   <div>
-                    <label className="block text-sm font-light text-gray-300 mb-2">
+                    <label className="block text-xs sm:text-sm font-light text-gray-300 mb-2">
                       Full Name *
                     </label>
                     <input
@@ -162,13 +162,13 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
                       value={formData.name}
                       onChange={handleChange}
                       placeholder="Your name"
-                      className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
                     />
                   </div>
 
                   {/* Email */}
                   <div>
-                    <label className="block text-sm font-light text-gray-300 mb-2">
+                    <label className="block text-xs sm:text-sm font-light text-gray-300 mb-2">
                       Email Address *
                     </label>
                     <input
@@ -177,13 +177,13 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
                       value={formData.email}
                       onChange={handleChange}
                       placeholder="your@email.com"
-                      className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
                     />
                   </div>
 
                   {/* Company */}
                   <div>
-                    <label className="block text-sm font-light text-gray-300 mb-2">
+                    <label className="block text-xs sm:text-sm font-light text-gray-300 mb-2">
                       Company (Optional)
                     </label>
                     <input
@@ -192,20 +192,20 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
                       value={formData.company}
                       onChange={handleChange}
                       placeholder="Your company name"
-                      className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
                     />
                   </div>
 
                   {/* Project Type */}
                   <div>
-                    <label className="block text-sm font-light text-gray-300 mb-2">
+                    <label className="block text-xs sm:text-sm font-light text-gray-300 mb-2">
                       Project Type *
                     </label>
                     <select
                       name="projectType"
                       value={formData.projectType}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 border border-gray-800 rounded-lg text-white text-sm sm:text-base focus:outline-none focus:border-cyan-500 transition-colors"
                     >
                       <option value="">Select a project type</option>
                       {projectTypes.map((type) => (
@@ -218,7 +218,7 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
 
                   {/* Message */}
                   <div>
-                    <label className="block text-sm font-light text-gray-300 mb-2">
+                    <label className="block text-xs sm:text-sm font-light text-gray-300 mb-2">
                       Message *
                     </label>
                     <textarea
@@ -226,8 +226,8 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
                       value={formData.message}
                       onChange={handleChange}
                       placeholder="Tell us about your project, goals, and timeline..."
-                      rows={5}
-                      className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors resize-none"
+                      rows={4}
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 text-sm sm:text-base focus:outline-none focus:border-cyan-500 transition-colors resize-none"
                     />
                   </div>
 
@@ -235,7 +235,7 @@ export default function ContactFormModal({ isOpen, onClose }: ContactFormModalPr
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-cyan-500 hover:bg-cyan-600 disabled:bg-gray-700 text-black font-semibold py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-cyan-500 hover:bg-cyan-600 disabled:bg-gray-700 text-black font-semibold py-2 sm:py-3 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                   >
                     {isSubmitting ? (
                       <>

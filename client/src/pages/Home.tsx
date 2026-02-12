@@ -19,8 +19,7 @@ import { toast } from "sonner";
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
-  const [email, setEmail] = useState("");
-  const [isSubscribing, setIsSubscribing] = useState(false);
+
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   useEffect(() => {
@@ -29,36 +28,7 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      toast.error("Please enter a valid email");
-      return;
-    }
 
-    setIsSubscribing(true);
-    try {
-      const response = await fetch("https://formspree.io/f/xgovelga", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, type: "newsletter" }),
-      });
-
-      if (response.ok) {
-        toast.success("Thanks for subscribing!");
-        setEmail("");
-      } else {
-        toast.error("Subscription failed. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("Subscription failed. Please try again.");
-    } finally {
-      setIsSubscribing(false);
-    }
-  };
 
   // Systems/Pillars
   const systems = [
@@ -456,42 +426,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ==================== NEWSLETTER SECTION ==================== */}
-      <section className="relative py-24 px-4 bg-gradient-to-b from-black to-gray-950 border-t border-gray-800">
-        <div className="max-w-2xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="space-y-6"
-          >
-            <h3 className="text-3xl font-light">
-              Stay Updated
-            </h3>
-            <p className="text-gray-400">
-              Insights on AI, automation, and digital product design.
-            </p>
 
-            <form onSubmit={handleSubscribe} className="flex gap-3">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 px-4 py-3 rounded-lg bg-gray-900 border border-gray-800 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500"
-              />
-              <Button
-                type="submit"
-                disabled={isSubscribing}
-                className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold"
-              >
-                {isSubscribing ? "..." : "Subscribe"}
-              </Button>
-            </form>
-          </motion.div>
-        </div>
-      </section>
 
       {/* Contact Modal */}
       <ContactFormModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
