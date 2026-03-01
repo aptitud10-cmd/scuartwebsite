@@ -4,6 +4,7 @@
  */
 
 import { Button } from "@/components/ui/button";
+import MagneticButton from "@/components/MagneticButton";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
@@ -84,12 +85,14 @@ export default function Navigation({ onContactClick }: NavigationProps) {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <Button
-              onClick={handleContactClick}
-              className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-6 py-2 cursor-pointer"
-            >
-              Start a Project
-            </Button>
+            <MagneticButton strength={0.25}>
+              <Button
+                onClick={handleContactClick}
+                className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-6 py-2 cursor-pointer"
+              >
+                Start a Project
+              </Button>
+            </MagneticButton>
           </div>
 
           {/* Mobile Menu Button */}

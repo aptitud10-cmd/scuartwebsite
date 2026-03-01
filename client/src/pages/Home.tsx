@@ -11,6 +11,7 @@ import ContactFormModal from "@/components/ContactFormModal";
 import Footer from "@/components/Footer";
 import PageTransition from "@/components/PageTransition";
 import SplitText from "@/components/SplitText";
+import MagneticButton from "@/components/MagneticButton";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
@@ -241,18 +242,22 @@ export default function Home() {
               transition={{ duration: 0.6, delay: 1.5 }}
               className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
             >
-              <a href="#case-studies">
-                <Button className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-8 py-6 text-base">
-                  Explore Our Work
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </a>
-              <button
-                onClick={() => setIsContactModalOpen(true)}
-                className="px-8 py-6 border border-gray-600 rounded-lg text-white hover:bg-gray-900 transition-colors font-light"
-              >
-                Start a Conversation
-              </button>
+              <MagneticButton strength={0.2}>
+                <a href="#case-studies">
+                  <Button className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-8 py-6 text-base">
+                    Explore Our Work
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </a>
+              </MagneticButton>
+              <MagneticButton strength={0.2}>
+                <button
+                  onClick={() => setIsContactModalOpen(true)}
+                  className="px-8 py-6 border border-gray-600 rounded-lg text-white hover:bg-gray-900 transition-colors font-light"
+                >
+                  Start a Conversation
+                </button>
+              </MagneticButton>
             </motion.div>
           </div>
         </div>
@@ -335,6 +340,7 @@ export default function Home() {
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
+                whileHover={{ y: -2, boxShadow: "0 0 20px oklch(0.85 0.18 195 / 0.15)" }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
                 className="group relative p-8 rounded-lg border border-gray-800 hover:border-cyan-500/50 bg-gradient-to-br from-gray-900/50 to-black hover:from-gray-900/80 transition-all duration-300"
@@ -539,6 +545,7 @@ export default function Home() {
                   whileInView={{ opacity: 1, clipPath: "inset(0% 0 0% 0)" }}
                   transition={{ duration: 0.8, delay: index * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
                   viewport={{ once: true }}
+                  whileHover={{ y: -4, boxShadow: "0 8px 30px oklch(0.8 0.15 195 / 0.2)" }}
                   className="group relative overflow-hidden rounded-lg h-96 cursor-pointer"
                 >
                   {/* Background Image */}
@@ -638,6 +645,7 @@ export default function Home() {
                 key={index}
                 initial={{ opacity: 0, y: 30, scale: 0.95 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                whileHover={{ y: -3, boxShadow: "0 8px 25px oklch(0.85 0.18 195 / 0.12)" }}
                 transition={{ duration: 0.7, delay: index * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
                 viewport={{ once: true }}
                 className="p-8 rounded-lg border border-gray-800 hover:border-cyan-500/50 bg-gradient-to-br from-gray-900/50 to-black transition-all duration-300"
@@ -693,25 +701,29 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-              <button
-                onClick={() => setIsContactModalOpen(true)}
-                className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-8 py-6 text-base rounded-lg flex items-center justify-center gap-2 transition-colors"
-              >
-                Start a Project
-                <ArrowRight className="w-4 h-4" />
-              </button>
-              <a
-                href="https://wa.me/13478489720?text=Hi%20SCUART%2C%20I%27m%20interested%20in%20discussing%20a%20project"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button
-                  variant="outline"
+              <MagneticButton strength={0.2}>
+                <button
+                  onClick={() => setIsContactModalOpen(true)}
+                  className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-8 py-6 text-base rounded-lg flex items-center justify-center gap-2 transition-colors"
+                >
+                  Start a Project
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </MagneticButton>
+              <MagneticButton strength={0.2}>
+                <a
+                  href="https://wa.me/13478489720?text=Hi%20SCUART%2C%20I%27m%20interested%20in%20discussing%20a%20project"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button
+                    variant="outline"
                   className="border-gray-600 hover:bg-gray-900 px-8 py-6 text-base"
                 >
                   WhatsApp
                 </Button>
               </a>
+              </MagneticButton>
             </div>
           </motion.div>
         </div>

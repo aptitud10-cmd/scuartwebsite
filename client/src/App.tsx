@@ -17,7 +17,9 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import CookieConsent from "./components/CookieConsent";
+import CustomCursor from "./components/CustomCursor";
 import { useLenis } from "./hooks/useLenis";
+import { useEffect, useState } from "react";
 
 function Router() {
   return (
@@ -39,6 +41,11 @@ function Router() {
 
 function App() {
   useLenis();
+  const [hasFinePointer, setHasFinePointer] = useState(false);
+
+  useEffect(() => {
+    setHasFinePointer(window.matchMedia("(pointer: fine)").matches);
+  }, []);
 
   return (
     <ErrorBoundary>
@@ -47,9 +54,12 @@ function App() {
         // switchable
       >
         <TooltipProvider>
-          <Toaster />
-          <CookieConsent />
-          <Router />
+          {hasFinePointer && <CustomCursor />}
+          <div className={hasFinePointer ? "cursor-none-global" : ""}>
+            <Toaster />
+            <CookieConsent />
+            <Router />
+          </div>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
