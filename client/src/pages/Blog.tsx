@@ -22,7 +22,7 @@ const blogPosts = [
     date: "2026-01-15",
     readTime: "12 min",
     category: "AI",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/dlkWTFFehciIHlvZ.webp",
+    image: "/images/blog-ai-automation-clean.webp",
   },
   {
     id: 2,
@@ -32,7 +32,7 @@ const blogPosts = [
     date: "2026-01-10",
     readTime: "10 min",
     category: "Product",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/QIzNlIkvPEJtGCnp.webp",
+    image: "/images/blog-saas-products-clean.webp",
   },
   {
     id: 3,
@@ -42,7 +42,7 @@ const blogPosts = [
     date: "2026-01-05",
     readTime: "8 min",
     category: "Development",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/zLTvOMcJuAafIhtG.webp",
+    image: "/images/blog-web-performance-clean.webp",
   },
   {
     id: 4,
@@ -52,7 +52,7 @@ const blogPosts = [
     date: "2025-12-28",
     readTime: "11 min",
     category: "Design",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/TmDOHJsEIOxuhcGf.webp",
+    image: "/images/blog-design-systems-clean.webp",
   },
   {
     id: 5,
@@ -62,7 +62,7 @@ const blogPosts = [
     date: "2025-12-20",
     readTime: "9 min",
     category: "Automation",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/dlkWTFFehciIHlvZ.webp",
+    image: "/images/systems-ai-automation.webp",
   },
   {
     id: 6,
@@ -72,7 +72,7 @@ const blogPosts = [
     date: "2025-12-15",
     readTime: "13 min",
     category: "Strategy",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/rSIuevWDPSGIkBES.webp",
+    image: "/images/saas-products-showcase.webp",
   },
 ];
 
@@ -90,7 +90,7 @@ export default function Blog() {
         {/* Background */}
         <div className="absolute inset-0 opacity-10">
           <img
-            src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/fqYqZQVVYEZqUuDT.webp"
+            src="/images/hero-bg.webp"
             alt="Background"
             className="w-full h-full object-cover"
           />

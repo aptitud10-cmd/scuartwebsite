@@ -25,12 +25,12 @@ export default function Footer({ onContactClick }: FooterProps) {
             </h5>
             <ul className="space-y-2 text-sm text-gray-500">
               <li>
-                <a
-                  href="/#systems"
+                <Link
+                  to="/services"
                   className="hover:text-cyan-400 transition-colors"
                 >
-                  Our Systems
-                </a>
+                  Services
+                </Link>
               </li>
               <li>
                 <a

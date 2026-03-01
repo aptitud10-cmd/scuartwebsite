@@ -17,8 +17,8 @@ export default function Navigation({ onContactClick }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { href: "/#systems", label: "Systems", isHash: true, isContact: false },
-    { href: "/#case-studies", label: "Case Studies", isHash: true, isContact: false },
+    { href: "/services", label: "Services", isHash: false, isContact: false },
+    { href: "/#case-studies", label: "Work", isHash: true, isContact: false },
     { href: "/blog", label: "Insights", isHash: false, isContact: false },
     { href: "#", label: "Contact", isHash: false, isContact: true },
   ];

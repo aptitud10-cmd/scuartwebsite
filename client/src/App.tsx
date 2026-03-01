@@ -11,6 +11,7 @@ import Terms from "@/pages/Terms";
 import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
 import CaseStudy from "@/pages/CaseStudy";
+import Services from "@/pages/Services";
 import { Route, Switch } from "wouter";
 import { AnimatePresence } from "framer-motion";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -28,6 +29,7 @@ function Router() {
         <Route path={"/"} component={Home} />
         <Route path={"/privacy"} component={Privacy} />
         <Route path={"/terms"} component={Terms} />
+        <Route path="/services" component={Services} />
         <Route path="/blog" component={Blog} />
         <Route path="/blog/:slug" component={BlogPost} />
         <Route path="/case-study/:slug" component={CaseStudy} />

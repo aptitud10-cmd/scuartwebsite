@@ -22,7 +22,7 @@ export default function BlogPost() {
     date: "2026-01-15",
     readTime: "12 min",
     category: "AI",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/rQsPILdApRkFAize.webp",
+    image: "/images/blog-ai-automation-clean.webp",
     author: "SCUART Team",
     content: `
       <p>Artificial intelligence and automation are no longer futuristic concepts—they're reshaping how businesses operate today. This article explores the practical applications and strategic considerations for implementing AI-powered automation systems.</p>
