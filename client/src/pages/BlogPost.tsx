@@ -6,6 +6,7 @@
 import Navigation from "@/components/Navigation";
 import ContactFormModal from "@/components/ContactFormModal";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, ArrowLeft, Share2 } from "lucide-react";
 import { Link } from "wouter";
@@ -49,6 +50,7 @@ export default function BlogPost() {
   };
 
   return (
+    <PageTransition>
     <div className="min-h-screen bg-black text-white">
       <Navigation onContactClick={() => setIsContactModalOpen(true)} />
 
@@ -239,5 +241,6 @@ export default function BlogPost() {
       {/* Footer */}
       <Footer onContactClick={() => setIsContactModalOpen(true)} />
     </div>
+    </PageTransition>
   );
 }

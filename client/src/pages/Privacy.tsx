@@ -3,12 +3,14 @@
  */
 
 import Navigation from "@/components/Navigation";
+import PageTransition from "@/components/PageTransition";
 import { Link } from "wouter";
 
 
 export default function Privacy() {
 
   return (
+    <PageTransition>
     <div className="min-h-screen bg-background text-foreground">
       <Navigation />
 
@@ -188,5 +190,6 @@ export default function Privacy() {
 
 
     </div>
+    </PageTransition>
   );
 }

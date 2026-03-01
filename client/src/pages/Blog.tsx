@@ -6,6 +6,7 @@
 import Navigation from "@/components/Navigation";
 import ContactFormModal from "@/components/ContactFormModal";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
@@ -80,6 +81,7 @@ const categories = ["All", "AI", "Automation", "Product", "Design", "Development
 export default function Blog() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   return (
+    <PageTransition>
     <div className="min-h-screen bg-black text-white">
       <Navigation onContactClick={() => setIsContactModalOpen(true)} />
 
@@ -239,5 +241,6 @@ export default function Blog() {
       {/* Footer */}
       <Footer onContactClick={() => setIsContactModalOpen(true)} />
     </div>
+    </PageTransition>
   );
 }

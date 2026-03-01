@@ -9,9 +9,11 @@ import FloatingParticles from "@/components/FloatingParticles";
 import Navigation from "@/components/Navigation";
 import ContactFormModal from "@/components/ContactFormModal";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
+import SplitText from "@/components/SplitText";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRight,
   ExternalLink,
@@ -154,61 +156,91 @@ const processSteps = [
 export default function Home() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
+  // Parallax for hero background
+  const { scrollY } = useScroll();
+  const heroY = useTransform(scrollY, [0, 600], [0, 200]);
+  const heroOpacity = useTransform(scrollY, [0, 500], [0.7, 0]);
+
   return (
+    <PageTransition>
     <div className="min-h-screen bg-black text-white overflow-hidden">
       <Navigation onContactClick={() => setIsContactModalOpen(true)} />
       <FloatingParticles />
 
       {/* ==================== HERO SECTION ==================== */}
       <section className="relative min-h-screen flex items-center justify-center pt-20 pb-20 overflow-hidden">
-        {/* Background Image */}
-        <div
+        {/* Background Image with Parallax */}
+        <motion.div
           className="absolute inset-0 z-0"
           style={{
-            backgroundImage:
-              "url('/images/hero-bg.webp')",
+            backgroundImage: "url('/images/hero-bg.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            opacity: 0.7,
+            y: heroY,
+            opacity: heroOpacity,
           }}
         />
 
         {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-1" />
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black z-1"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.2 }}
+        />
 
         {/* Content */}
         <div className="relative z-10 max-w-6xl mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-8"
-          >
+          <div className="space-y-8">
             {/* Tagline */}
-            <div className="inline-block px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/5">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="inline-block px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/5"
+            >
               <p className="text-sm font-light tracking-widest text-cyan-300">
                 DIGITAL STUDIO & PRODUCT LAB
               </p>
+            </motion.div>
+
+            {/* Main Headline - Staggered */}
+            <div className="text-6xl md:text-7xl lg:text-8xl font-light leading-tight tracking-tight">
+              <SplitText
+                text="Design + Technology"
+                delay={0.4}
+                staggerDelay={0.08}
+                once={false}
+                className="block"
+              />
+              <SplitText
+                text="Systems Thinking"
+                delay={0.8}
+                staggerDelay={0.08}
+                once={false}
+                className="block bg-gradient-to-r from-cyan-400 to-violet-500 bg-clip-text text-transparent font-normal"
+              />
             </div>
 
-            {/* Main Headline */}
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-light leading-tight tracking-tight">
-              Design + Technology
-              <br />
-              <span className="bg-gradient-to-r from-cyan-400 to-violet-500 bg-clip-text text-transparent font-normal">
-                Systems Thinking
-              </span>
-            </h1>
-
             {/* Subheading */}
-            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto font-light leading-relaxed">
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.2 }}
+              className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto font-light leading-relaxed"
+            >
               We build intelligent digital experiences for ambitious brands.
               AI-powered automation, scalable SaaS products, and
               high-performance web platforms that drive real business impact.
-            </p>
+            </motion.p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.5 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center pt-8"
+            >
               <a href="#case-studies">
                 <Button className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-8 py-6 text-base">
                   Explore Our Work
@@ -221,21 +253,22 @@ export default function Home() {
               >
                 Start a Conversation
               </button>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
 
         {/* Scroll Indicator */}
         <motion.div
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, y: [0, 10, 0] }}
+          transition={{ opacity: { delay: 2, duration: 0.5 }, y: { duration: 2, repeat: Infinity, delay: 2 } }}
         >
           <div className="w-6 h-10 border border-cyan-500/50 rounded-full flex items-start justify-center p-2">
             <motion.div
               className="w-1 h-2 bg-cyan-500 rounded-full"
               animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
+              transition={{ duration: 2, repeat: Infinity, delay: 2 }}
             />
           </div>
         </motion.div>
@@ -285,9 +318,11 @@ export default function Home() {
             viewport={{ once: true }}
             className="mb-20 text-center"
           >
-            <h2 className="text-5xl md:text-6xl font-light mb-6">
-              Our Systems
-            </h2>
+            <SplitText
+              text="Our Systems"
+              as="h2"
+              className="text-5xl md:text-6xl font-light mb-6"
+            />
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               Four core pillars that define how we approach every project.
             </p>
@@ -419,9 +454,11 @@ export default function Home() {
             viewport={{ once: true }}
             className="mb-20 text-center"
           >
-            <h2 className="text-5xl md:text-6xl font-light mb-6">
-              How We Work
-            </h2>
+            <SplitText
+              text="How We Work"
+              as="h2"
+              className="text-5xl md:text-6xl font-light mb-6"
+            />
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               A proven process that turns ideas into high-performing digital
               products.
@@ -483,9 +520,11 @@ export default function Home() {
             viewport={{ once: true }}
             className="mb-20"
           >
-            <h2 className="text-5xl md:text-6xl font-light mb-6">
-              Case Studies
-            </h2>
+            <SplitText
+              text="Case Studies"
+              as="h2"
+              className="text-5xl md:text-6xl font-light mb-6"
+            />
             <p className="text-gray-400 text-lg max-w-2xl">
               Real projects. Real results. Brands we've helped transform.
             </p>
@@ -496,9 +535,9 @@ export default function Home() {
             {caseStudies.map((study, index) => (
               <Link key={study.id} to={`/case-study/${study.slug}`}>
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  initial={{ opacity: 0, clipPath: "inset(10% 0 10% 0)" }}
+                  whileInView={{ opacity: 1, clipPath: "inset(0% 0 0% 0)" }}
+                  transition={{ duration: 0.8, delay: index * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
                   viewport={{ once: true }}
                   className="group relative overflow-hidden rounded-lg h-96 cursor-pointer"
                 >
@@ -597,9 +636,9 @@ export default function Home() {
             {testimonials.map((testimonial, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.15 }}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.7, delay: index * 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
                 viewport={{ once: true }}
                 className="p-8 rounded-lg border border-gray-800 hover:border-cyan-500/50 bg-gradient-to-br from-gray-900/50 to-black transition-all duration-300"
               >
@@ -689,9 +728,11 @@ export default function Home() {
             viewport={{ once: true }}
             className="mb-20 text-center"
           >
-            <h2 className="text-5xl md:text-6xl font-light mb-6">
-              Latest Insights
-            </h2>
+            <SplitText
+              text="Latest Insights"
+              as="h2"
+              className="text-5xl md:text-6xl font-light mb-6"
+            />
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
               Thoughts on design, technology, and building products that matter.
             </p>
@@ -786,5 +827,6 @@ export default function Home() {
       {/* Footer */}
       <Footer onContactClick={() => setIsContactModalOpen(true)} />
     </div>
+    </PageTransition>
   );
 }

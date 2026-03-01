@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Navigation from "@/components/Navigation";
 import ContactFormModal from "@/components/ContactFormModal";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { caseStudies, getCaseStudyBySlug } from "@/data/caseStudies";
 
 function AnimatedCounter({
@@ -74,7 +75,8 @@ export default function CaseStudy({
   const otherStudies = caseStudies.filter((cs) => cs.slug !== study.slug);
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden">
+    <PageTransition>
+      <div className="min-h-screen bg-black text-white overflow-hidden">
       <Navigation onContactClick={() => setIsContactModalOpen(true)} />
 
       {/* ==================== HERO ==================== */}
@@ -385,6 +387,7 @@ export default function CaseStudy({
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
       />
-    </div>
+      </div>
+    </PageTransition>
   );
 }

@@ -12,28 +12,34 @@ import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
 import CaseStudy from "@/pages/CaseStudy";
 import { Route, Switch } from "wouter";
+import { AnimatePresence } from "framer-motion";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import CookieConsent from "./components/CookieConsent";
+import { useLenis } from "./hooks/useLenis";
 
 function Router() {
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/privacy"} component={Privacy} />
-      <Route path={"/terms"} component={Terms} />
-      <Route path="/blog" component={Blog} />
-      <Route path="/blog/:slug" component={BlogPost} />
-      <Route path="/case-study/:slug" component={CaseStudy} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+    <AnimatePresence mode="wait">
+      <Switch>
+        <Route path={"/"} component={Home} />
+        <Route path={"/privacy"} component={Privacy} />
+        <Route path={"/terms"} component={Terms} />
+        <Route path="/blog" component={Blog} />
+        <Route path="/blog/:slug" component={BlogPost} />
+        <Route path="/case-study/:slug" component={CaseStudy} />
+        <Route path={"/404"} component={NotFound} />
+        {/* Final fallback route */}
+        <Route component={NotFound} />
+      </Switch>
+    </AnimatePresence>
   );
 }
 
 function App() {
+  useLenis();
+
   return (
     <ErrorBoundary>
       <ThemeProvider
