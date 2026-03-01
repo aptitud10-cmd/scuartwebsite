@@ -2,101 +2,157 @@
  * SCUART - Premium Digital Studio & Product Lab
  * Design: Editorial Futuristic Dark Theme
  * Philosophy: Design + Technology + Systems Thinking
- * Sections: Hero, Systems, Philosophy, Case Studies, CTA, Footer
+ * Sections: Hero, Trusted By, Systems, Philosophy, How We Work, Case Studies, Metrics, Testimonials, CTA, Insights, Footer
  */
 
-import AnimatedSection from "@/components/AnimatedSection";
 import FloatingParticles from "@/components/FloatingParticles";
 import Navigation from "@/components/Navigation";
 import ContactFormModal from "@/components/ContactFormModal";
+import Footer from "@/components/Footer";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { motion } from "framer-motion";
-import { ArrowRight, ExternalLink } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { motion, useInView } from "framer-motion";
+import {
+  ArrowRight,
+  ExternalLink,
+  Search,
+  Palette,
+  Code2,
+  Rocket,
+} from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { caseStudies } from "@/data/caseStudies";
 
-export default function Home() {
-  const [scrollY, setScrollY] = useState(0);
-
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+// Animated counter component for metrics
+function AnimatedCounter({
+  value,
+  suffix = "",
+}: {
+  value: number;
+  suffix?: string;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true });
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    if (!isInView) return;
+    let start = 0;
+    const duration = 2000;
+    const increment = value / (duration / 16);
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= value) {
+        setCount(value);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(start));
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [isInView, value]);
 
+  return (
+    <span ref={ref}>
+      {count}
+      {suffix}
+    </span>
+  );
+}
 
+// Data
+const systems = [
+  {
+    title: "AI Integration",
+    description:
+      "Intelligent systems that learn, adapt, and scale with your business.",
+    icon: "⚡",
+  },
+  {
+    title: "Automation",
+    description:
+      "Eliminate friction. Build workflows that work while you sleep.",
+    icon: "🔄",
+  },
+  {
+    title: "SaaS Products",
+    description: "Scalable platforms designed for growth and user delight.",
+    icon: "📊",
+  },
+  {
+    title: "High-Performance Web",
+    description:
+      "Digital experiences that convert. Speed, design, and strategy aligned.",
+    icon: "🚀",
+  },
+];
 
-  // Systems/Pillars
-  const systems = [
-    {
-      title: "AI Integration",
-      description: "Intelligent systems that learn, adapt, and scale with your business.",
-      icon: "⚡",
-    },
-    {
-      title: "Automation",
-      description: "Eliminate friction. Build workflows that work while you sleep.",
-      icon: "🔄",
-    },
-    {
-      title: "SaaS Products",
-      description: "Scalable platforms designed for growth and user delight.",
-      icon: "📊",
-    },
-    {
-      title: "High-Performance Web",
-      description: "Digital experiences that convert. Speed, design, and strategy aligned.",
-      icon: "🚀",
-    },
-  ];
+const clientLogos = [
+  { name: "Eva Beauty Unisex" },
+  { name: "Etnia Braids" },
+  { name: "Arriba Gold" },
+  { name: "Healthy Choice NY" },
+];
 
-  // Case Studies - Real Projects
-  const caseStudies = [
-    {
-      id: 1,
-      title: "Eva Beauty Unisex",
-      category: "Beauty & Salon",
-      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/KQZjlYHYSuqHQBhy.webp",
-      challenge: "Transform salon operations with seamless booking and e-commerce",
-      result: "150% increase in online bookings, 200% revenue growth",
-      tags: ["React", "E-commerce", "Booking System"],
-      url: "https://evabeautyunisex.com/",
-    },
-    {
-      id: 2,
-      title: "Etnia Braids",
-      category: "Hair Salon",
-      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/VyrKsuJTfkBFxfSL.webp",
-      challenge: "Create portfolio showcase with integrated booking system",
-      result: "40% increase in client inquiries, premium positioning",
-      tags: ["Next.js", "Portfolio", "Mobile Responsive"],
-      url: "https://etniabraids.com/",
-    },
-    {
-      id: 3,
-      title: "Arriba Gold",
-      category: "E-commerce",
-      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/gkkdKfkIsmYuqEuW.webp",
-      challenge: "Build scalable e-commerce platform for premium chocolate brand",
-      result: "International shipping enabled, 300% sales increase",
-      tags: ["Shopify", "Payment Gateway", "Inventory"],
-      url: "https://arribagold.com/",
-    },
-    {
-      id: 4,
-      title: "Healthy Choice NY",
-      category: "Food & Nutrition",
-      image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663270033289/XuMZOMnYyftTmACy.webp",
-      challenge: "Streamline catering orders and meal customization",
-      result: "50% reduction in order processing time",
-      tags: ["React", "Menu System", "Ordering"],
-      url: "https://healthychoicenewyork.com/",
-    },
-  ];
+const metrics = [
+  { value: 50, suffix: "+", label: "Projects Delivered" },
+  { value: 4, suffix: "+", label: "Years of Experience" },
+  { value: 98, suffix: "%", label: "Client Satisfaction" },
+];
+
+const testimonials = [
+  {
+    quote:
+      "SCUART transformed our online presence completely. Bookings increased by 150% in the first month after launch.",
+    name: "Maria R.",
+    role: "Owner",
+    company: "Eva Beauty Unisex",
+  },
+  {
+    quote:
+      "Professional, creative, and incredibly responsive. They understood our brand vision from day one and delivered beyond expectations.",
+    name: "Carlos M.",
+    role: "Founder",
+    company: "Arriba Gold",
+  },
+  {
+    quote:
+      "The booking system they built has streamlined our entire operation. Our clients love the seamless experience.",
+    name: "Diana L.",
+    role: "Manager",
+    company: "Etnia Braids",
+  },
+];
+
+const processSteps = [
+  {
+    icon: <Search className="w-6 h-6" />,
+    title: "Discovery & Strategy",
+    description:
+      "We dive deep into your business goals, audience, and competitive landscape to define a clear digital strategy.",
+  },
+  {
+    icon: <Palette className="w-6 h-6" />,
+    title: "Design & Prototyping",
+    description:
+      "Interactive wireframes and high-fidelity designs that bring your vision to life before a single line of code.",
+  },
+  {
+    icon: <Code2 className="w-6 h-6" />,
+    title: "Development & Integration",
+    description:
+      "Clean, scalable code built with modern frameworks. Every integration tested for performance and reliability.",
+  },
+  {
+    icon: <Rocket className="w-6 h-6" />,
+    title: "Launch & Optimization",
+    description:
+      "Strategic launch with analytics, performance monitoring, and ongoing optimization for continuous growth.",
+  },
+];
+
+export default function Home() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
@@ -109,7 +165,8 @@ export default function Home() {
         <div
           className="absolute inset-0 z-0"
           style={{
-            backgroundImage: "url('https://private-us-east-1.manuscdn.com/sessionFile/rBxqvmd5YxjDs7mNttwRQX/sandbox/Xh30elooOx2vbHNU5P7kJM-img-1_1770901063000_na1fn_c2N1YXJ0LWhlcm8tYmc.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvckJ4cXZtZDVZeGpEczdtTnR0d1JRWC9zYW5kYm94L1hoMzBlbG9vT3gydmJITlU1UDdrSk0taW1nLTFfMTc3MDkwMTA2MzAwMF9uYTFmbl9jMk4xWVhKMExXaGxjbTh0WW1jLnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE5MjAsaF8xOTIwL2Zvcm1hdCx3ZWJwL3F1YWxpdHkscV84MCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5ODc2MTYwMH19fV19&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=bkMZSpepMaePzph4piKLbn1zXvHARvoKIQvFmwMrMVWPDlwK5KQhME62wpStm4ov1gLMlnHnYfDgm3hzfRmEzck-2F-3tNcqaV9XqoHB0sgGDIcUjnIZkDcmBFw6EeKPztSiM4Jg6ucTHuwNGzp-JQBDPPawDhPUVLlOmx~GHKKCTTmsF3wCNJvXxZiu5IAdFLL-kXwsLEo8ngugzRolAjfUs--rsyIKvJq6NR-rbC5Ghg2XpVdj4Idex-qkGku1UzaAkJClH6peRMqJtbeZcBrdDlCEfsluD4XR~QvhLMD52kjTYD4TStYbWwUJ6dJEJRo8S9sBoXyexijh0CG6ZA__')",
+            backgroundImage:
+              "url('/images/hero-bg.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             opacity: 0.7,
@@ -145,7 +202,9 @@ export default function Home() {
 
             {/* Subheading */}
             <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto font-light leading-relaxed">
-              We build intelligent digital experiences for ambitious brands. AI-powered automation, scalable SaaS products, and high-performance web platforms that drive real business impact.
+              We build intelligent digital experiences for ambitious brands.
+              AI-powered automation, scalable SaaS products, and
+              high-performance web platforms that drive real business impact.
             </p>
 
             {/* CTA Buttons */}
@@ -180,6 +239,39 @@ export default function Home() {
             />
           </div>
         </motion.div>
+      </section>
+
+      {/* ==================== TRUSTED BY SECTION ==================== */}
+      <section className="relative py-16 px-4 bg-black border-b border-gray-800/50">
+        <div className="max-w-6xl mx-auto">
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center text-sm text-gray-500 uppercase tracking-widest mb-8"
+          >
+            Trusted by ambitious brands
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true }}
+            className="flex flex-wrap items-center justify-center gap-8 md:gap-16"
+          >
+            {clientLogos.map((logo, index) => (
+              <div
+                key={index}
+                className="text-gray-500 hover:text-gray-300 transition-colors duration-300"
+              >
+                <span className="text-lg font-light tracking-wide">
+                  {logo.name}
+                </span>
+              </div>
+            ))}
+          </motion.div>
+        </div>
       </section>
 
       {/* ==================== SYSTEMS SECTION ==================== */}
@@ -217,7 +309,9 @@ export default function Home() {
 
                 {/* Content */}
                 <h3 className="text-2xl font-light mb-3">{system.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{system.description}</p>
+                <p className="text-gray-400 leading-relaxed">
+                  {system.description}
+                </p>
 
                 {/* Hover Arrow */}
                 <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -242,7 +336,7 @@ export default function Home() {
               className="relative h-96 rounded-lg overflow-hidden"
             >
               <img
-                src="https://private-us-east-1.manuscdn.com/sessionFile/rBxqvmd5YxjDs7mNttwRQX/sandbox/Xh30elooOx2vbHNU5P7kJM-img-2_1770901061000_na1fn_c2N1YXJ0LXBoaWxvc29waHktdmlzdWFs.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvckJ4cXZtZDVZeGpEczdtTnR0d1JRWC9zYW5kYm94L1hoMzBlbG9vT3gydmJITlU1UDdrSk0taW1nLTJfMTc3MDkwMTA2MTAwMF9uYTFmbl9jMk4xWVhKMExYQm9hV3h2YzI5d2FIa3RkbWx6ZFdGcy5wbmc~eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsd18xOTIwLGhfMTkyMC9mb3JtYXQsd2VicC9xdWFsaXR5LHFfODAiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3OTg3NjE2MDB9fX1dfQ__&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=oDll75L12NcJd0w2UtrVzfbjsRqgdAPZkizGWUe80-KKtrdU~PGzMf5GNJJfXe67SiuK4SLu5aWL7JNncYuVK~McUOih9H6p5OTlg5nIO9Md-OFA0UH80czro0X7djqMqnhkZyM1QnyQu2LKPx0tkrX~YRy0MQh2Avczhsw6zagvGbRdywXLg41CC6kMDK0uZtEN34OhY7uTUK1gLQ~YeUIgLCiXsP3Tz6xnElfwwJfuUK4EYwcLEC31bjtw~MuKlRiDn67cRzWzTCUJkTUm~eVel9X9axMvqzk7AmLbTMJ2~xwzD~HKeAblk11wjuJ8JiHAeB858J1p7Dmy7r4IAQ__"
+                src="/images/philosophy-vision.webp"
                 alt="Design + Technology Philosophy"
                 className="w-full h-full object-cover"
               />
@@ -262,10 +356,13 @@ export default function Home() {
                   Our Philosophy
                 </h2>
                 <p className="text-gray-400 text-lg leading-relaxed mb-4">
-                  We believe the best digital products emerge at the intersection of elegant design and intelligent technology.
+                  We believe the best digital products emerge at the
+                  intersection of elegant design and intelligent technology.
                 </p>
                 <p className="text-gray-400 text-lg leading-relaxed">
-                  Every decision is grounded in systems thinking—understanding how components interact, scale, and create lasting value for your users and business.
+                  Every decision is grounded in systems thinking—understanding
+                  how components interact, scale, and create lasting value for
+                  your users and business.
                 </p>
               </div>
 
@@ -276,7 +373,9 @@ export default function Home() {
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">Intentional Design</h4>
-                    <p className="text-gray-400 text-sm">Every pixel serves a purpose</p>
+                    <p className="text-gray-400 text-sm">
+                      Every pixel serves a purpose
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -284,8 +383,12 @@ export default function Home() {
                     <div className="w-2 h-2 rounded-full bg-violet-400" />
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1">Scalable Architecture</h4>
-                    <p className="text-gray-400 text-sm">Built to grow with your ambitions</p>
+                    <h4 className="font-semibold mb-1">
+                      Scalable Architecture
+                    </h4>
+                    <p className="text-gray-400 text-sm">
+                      Built to grow with your ambitions
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -294,11 +397,77 @@ export default function Home() {
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">Measurable Impact</h4>
-                    <p className="text-gray-400 text-sm">Strategy aligned with metrics</p>
+                    <p className="text-gray-400 text-sm">
+                      Strategy aligned with metrics
+                    </p>
                   </div>
                 </div>
               </div>
             </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== HOW WE WORK SECTION ==================== */}
+      <section id="process" className="relative py-32 px-4 bg-black">
+        <div className="max-w-6xl mx-auto">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mb-20 text-center"
+          >
+            <h2 className="text-5xl md:text-6xl font-light mb-6">
+              How We Work
+            </h2>
+            <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+              A proven process that turns ideas into high-performing digital
+              products.
+            </p>
+          </motion.div>
+
+          {/* Process Steps */}
+          <div className="relative">
+            {/* Connecting Line - desktop */}
+            <div className="hidden md:block absolute top-24 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
+
+            {/* Vertical Line - mobile */}
+            <div className="md:hidden absolute top-0 bottom-0 left-6 w-px bg-gradient-to-b from-cyan-500/30 via-cyan-500/30 to-transparent" />
+
+            <div className="grid md:grid-cols-4 gap-8 md:gap-6 relative">
+              {processSteps.map((step, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.15 }}
+                  viewport={{ once: true }}
+                  className="relative pl-16 md:pl-0 md:text-center"
+                >
+                  {/* Step Number Circle */}
+                  <div className="absolute left-0 md:relative md:left-auto md:mx-auto w-12 h-12 rounded-full border border-cyan-500/50 bg-black flex items-center justify-center mb-6 z-10">
+                    <span className="text-cyan-400 font-semibold text-sm">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+
+                  {/* Icon */}
+                  <div className="text-cyan-400 mb-4 md:flex md:justify-center">
+                    {step.icon}
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="text-xl font-light mb-3 text-white">
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">
+                    {step.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -325,62 +494,136 @@ export default function Home() {
           {/* Case Studies Grid */}
           <div className="grid md:grid-cols-2 gap-8">
             {caseStudies.map((study, index) => (
-              <motion.a
-                key={study.id}
-                href={study.url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link key={study.id} to={`/case-study/${study.slug}`}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="group relative overflow-hidden rounded-lg h-96 cursor-pointer"
+                >
+                  {/* Background Image */}
+                  <img
+                    src={study.image}
+                    alt={study.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+
+                  {/* Semi-transparent black overlay */}
+                  <div className="absolute inset-0 bg-black/50" />
+
+                  {/* Content - Full card layout */}
+                  <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                    {/* Category Badge */}
+                    <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">
+                      {study.category}
+                    </span>
+
+                    {/* Title */}
+                    <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                      {study.title}
+                    </h3>
+
+                    {/* Result */}
+                    <p className="text-gray-200 text-sm mb-4">
+                      {study.result}
+                    </p>
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2">
+                      {study.tags.map((tag, i) => (
+                        <span
+                          key={i}
+                          className="text-xs font-medium px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Arrow - positioned in top right */}
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ArrowRight className="w-5 h-5 text-cyan-400" />
+                  </div>
+                </motion.div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== METRICS SECTION ==================== */}
+      <section className="relative py-24 px-4 bg-black">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-3 gap-4 md:gap-8 text-center">
+            {metrics.map((metric, index) => (
+              <motion.div
+                key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.6, delay: index * 0.15 }}
                 viewport={{ once: true }}
-                className="group relative overflow-hidden rounded-lg h-96 cursor-pointer"
               >
-                {/* Background Image */}
-                <img
-                  src={study.image}
-                  alt={study.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                <div className="text-4xl md:text-5xl font-light text-white mb-2">
+                  <AnimatedCounter
+                    value={metric.value}
+                    suffix={metric.suffix}
+                  />
+                </div>
+                <p className="text-gray-400 text-sm">{metric.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-                {/* Semi-transparent black overlay */}
-                <div className="absolute inset-0 bg-black/50" />
+      {/* ==================== TESTIMONIALS SECTION ==================== */}
+      <section className="relative py-32 px-4 bg-black">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mb-16 text-center"
+          >
+            <h2 className="text-4xl md:text-5xl font-light mb-4">
+              What Our Clients Say
+            </h2>
+          </motion.div>
 
-                {/* Content - Full card layout */}
-                <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                  {/* Category Badge */}
-                  <span className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-2">
-                    {study.category}
-                  </span>
-
-                  {/* Title */}
-                  <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                    {study.title}
-                  </h3>
-
-                  {/* Result */}
-                  <p className="text-gray-200 text-sm mb-4">
-                    {study.result}
-                  </p>
-
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2">
-                    {study.tags.map((tag, i) => (
-                      <span
-                        key={i}
-                        className="text-xs font-medium px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/40"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.15 }}
+                viewport={{ once: true }}
+                className="p-8 rounded-lg border border-gray-800 hover:border-cyan-500/50 bg-gradient-to-br from-gray-900/50 to-black transition-all duration-300"
+              >
+                {/* Quote icon */}
+                <div className="text-cyan-400 text-4xl mb-4 font-serif">
+                  "
+                </div>
+                <p className="text-gray-300 leading-relaxed mb-6 font-light italic">
+                  {testimonial.quote}
+                </p>
+                <div className="flex items-center gap-3 pt-4 border-t border-gray-800">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-violet-500 flex items-center justify-center text-black font-semibold text-sm">
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold text-sm">
+                      {testimonial.name}
+                    </p>
+                    <p className="text-gray-500 text-xs">
+                      {testimonial.role}, {testimonial.company}
+                    </p>
                   </div>
                 </div>
-
-                {/* Arrow - positioned in top right */}
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ExternalLink className="w-5 h-5 text-cyan-400" />
-                </div>
-              </motion.a>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -405,7 +648,9 @@ export default function Home() {
             </h2>
 
             <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-              Let's discuss your vision. Whether it's an AI-powered platform, automation system, or high-performance SaaS product, we're ready to collaborate.
+              Let's discuss your vision. Whether it's an AI-powered platform,
+              automation system, or high-performance SaaS product, we're ready
+              to collaborate.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
@@ -416,8 +661,15 @@ export default function Home() {
                 Start a Project
                 <ArrowRight className="w-4 h-4" />
               </button>
-              <a href="https://wa.me/13478489720?text=Hi%20SCUART%2C%20I%27m%20interested%20in%20discussing%20a%20project" target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" className="border-gray-600 hover:bg-gray-900 px-8 py-6 text-base">
+              <a
+                href="https://wa.me/13478489720?text=Hi%20SCUART%2C%20I%27m%20interested%20in%20discussing%20a%20project"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button
+                  variant="outline"
+                  className="border-gray-600 hover:bg-gray-900 px-8 py-6 text-base"
+                >
                   WhatsApp
                 </Button>
               </a>
@@ -450,21 +702,24 @@ export default function Home() {
             {[
               {
                 title: "Systems Thinking in Product Design",
-                excerpt: "How interconnected systems create better user experiences and scalable products.",
+                excerpt:
+                  "How interconnected systems create better user experiences and scalable products.",
                 date: "Feb 10, 2026",
                 readTime: "5 min read",
                 category: "Design",
               },
               {
                 title: "AI Integration: Beyond the Hype",
-                excerpt: "Practical approaches to implementing AI that actually solve real business problems.",
+                excerpt:
+                  "Practical approaches to implementing AI that actually solve real business problems.",
                 date: "Feb 5, 2026",
                 readTime: "7 min read",
                 category: "Technology",
               },
               {
                 title: "Building SaaS Products That Scale",
-                excerpt: "Lessons learned from scaling products from 0 to 10k users and beyond.",
+                excerpt:
+                  "Lessons learned from scaling products from 0 to 10k users and beyond.",
                 date: "Jan 28, 2026",
                 readTime: "6 min read",
                 category: "Business",
@@ -479,7 +734,9 @@ export default function Home() {
                 className="group p-6 rounded-lg border border-gray-800 hover:border-cyan-500/50 transition-colors cursor-pointer"
               >
                 <div className="mb-4">
-                  <Link to={`/blog?category=${article.category.toLowerCase()}`}>
+                  <Link
+                    to={`/blog?category=${article.category.toLowerCase()}`}
+                  >
                     <span className="inline-block px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-xs font-light tracking-widest hover:bg-cyan-500/20 transition-colors cursor-pointer">
                       {article.category}
                     </span>
@@ -508,7 +765,10 @@ export default function Home() {
             className="text-center mt-12"
           >
             <Link to="/blog">
-              <Button variant="outline" className="border-gray-600 hover:bg-gray-900 px-8 py-6">
+              <Button
+                variant="outline"
+                className="border-gray-600 hover:bg-gray-900 px-8 py-6"
+              >
                 View All Articles
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
@@ -518,64 +778,13 @@ export default function Home() {
       </section>
 
       {/* Contact Modal */}
-      <ContactFormModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
+      <ContactFormModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+      />
 
-      {/* ==================== FOOTER ==================== */}
-      <footer className="relative py-16 px-4 bg-black border-t border-gray-800">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            {/* Brand */}
-            <div>
-              <h4 className="text-lg font-semibold mb-4">SCUART</h4>
-              <p className="text-gray-500 text-sm">
-                Premium digital studio & product lab specializing in AI, automation, and SaaS.
-              </p>
-            </div>
-
-            {/* Links */}
-            <div>
-              <h5 className="text-sm font-semibold uppercase tracking-widest mb-4 text-gray-400">
-                Company
-              </h5>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li><a href="#systems" className="hover:text-cyan-400 transition-colors">Our Systems</a></li>
-                <li><a href="#case-studies" className="hover:text-cyan-400 transition-colors">Case Studies</a></li>
-                <li><Link to="/blog" className="hover:text-cyan-400 transition-colors">Blog</Link></li>
-              </ul>
-            </div>
-
-            {/* Legal */}
-            <div>
-              <h5 className="text-sm font-semibold uppercase tracking-widest mb-4 text-gray-400">
-                Legal
-              </h5>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li><Link to="/privacy" className="hover:text-cyan-400 transition-colors">Privacy Policy</Link></li>
-                <li><Link to="/terms" className="hover:text-cyan-400 transition-colors">Terms & Conditions</Link></li>
-              </ul>
-            </div>
-
-            {/* Contact */}
-            <div>
-              <h5 className="text-sm font-semibold uppercase tracking-widest mb-4 text-gray-400">
-                Contact
-              </h5>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li><button onClick={() => setIsContactModalOpen(true)} className="hover:text-cyan-400 transition-colors text-left">info@scuart.com</button></li>
-                <li><a href="https://wa.me/13478489720" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors">+1 (347) 848-9720</a></li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-gray-800 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-              <p>&copy; 2026 SCUART. All rights reserved.</p>
-              <p>Crafted with intention. Built to scale.</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      {/* Footer */}
+      <Footer onContactClick={() => setIsContactModalOpen(true)} />
     </div>
   );
 }
