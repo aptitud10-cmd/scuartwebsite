@@ -1,5 +1,10 @@
 import { ExternalLink, Clock } from 'lucide-react';
 
+function scrollTo(id: string) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
 const projects = [
   {
     category: 'Featured',
@@ -27,7 +32,7 @@ const projects = [
     title: 'Etnia Braids',
     description: 'Vibrant website for an African braiding salon featuring online booking, gallery showcase, and a cultural-inspired design with colorful ethnic patterns.',
     status: 'live' as const,
-    link: '#',
+    link: null,
     accentColor: 'from-orange-500/20 to-red-600/10',
     dotColor: 'bg-orange-400',
   },
@@ -37,7 +42,7 @@ const projects = [
     title: 'Eva Beauty Unisex',
     description: 'Elegant dark-themed website for a luxury unisex salon with appointment booking, service gallery, and premium spa aesthetics.',
     status: 'live' as const,
-    link: '#',
+    link: null,
     accentColor: 'from-rose-500/20 to-pink-600/10',
     dotColor: 'bg-rose-400',
   },
@@ -47,7 +52,7 @@ const projects = [
     title: 'Arriba Gold',
     description: 'Artisanal chocolate brand website showcasing premium Ecuadorian cacao products with elegant product photography and brand storytelling.',
     status: 'live' as const,
-    link: '#',
+    link: null,
     accentColor: 'from-yellow-700/20 to-amber-800/10',
     dotColor: 'bg-yellow-600',
   },
@@ -57,7 +62,7 @@ const projects = [
     title: 'Healthy Choice NY',
     description: 'Fresh and vibrant website for a healthy food restaurant with online ordering, catering services, and a location finder across New York.',
     status: 'live' as const,
-    link: '#',
+    link: null,
     accentColor: 'from-green-500/20 to-emerald-600/10',
     dotColor: 'bg-green-400',
   },
@@ -141,9 +146,12 @@ export default function Portfolio() {
           <p className="text-foreground/60 mb-8 max-w-md mx-auto">
             Let's build something that you're proud to show the world.
           </p>
-          <a href="#contact" className="btn-primary inline-flex items-center gap-2">
+          <button
+            onClick={() => scrollTo('contact')}
+            className="btn-primary inline-flex items-center gap-2"
+          >
             Start a Project
-          </a>
+          </button>
         </div>
       </div>
     </section>

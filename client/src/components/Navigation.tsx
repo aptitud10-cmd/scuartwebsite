@@ -2,11 +2,18 @@ import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 
 const navItems = [
-  { label: 'Services', href: '#services' },
-  { label: 'Portfolio', href: '#portfolio' },
-  { label: 'About', href: '#about' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Services', id: 'services' },
+  { label: 'Portfolio', id: 'portfolio' },
+  { label: 'About', id: 'about' },
+  { label: 'Contact', id: 'contact' },
 ];
+
+function scrollTo(id: string) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth' });
+  }
+}
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,6 +25,12 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const handleNavClick = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    setIsOpen(false);
+    scrollTo(id);
+  };
+
   return (
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -27,23 +40,31 @@ export default function Navigation() {
       }`}
     >
       <div className="container flex items-center justify-between h-16">
-        {/* Logo */}
-        <a href="#" className="text-2xl font-bold gradient-text tracking-tight">
+        {/* Logo — scrolls to top */}
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="text-2xl font-bold gradient-text tracking-tight"
+        >
           Scuart
-        </a>
+        </button>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
             <a
               key={item.label}
-              href={item.href}
+              href={`#${item.id}`}
+              onClick={(e) => handleNavClick(e, item.id)}
               className="text-sm text-foreground/70 hover:text-accent transition-colors duration-300 font-medium"
             >
               {item.label}
             </a>
           ))}
-          <a href="#contact" className="btn-primary text-sm">
+          <a
+            href="#contact"
+            onClick={(e) => handleNavClick(e, 'contact')}
+            className="btn-primary text-sm"
+          >
             Start a Project
           </a>
         </div>
@@ -69,17 +90,17 @@ export default function Navigation() {
             {navItems.map((item) => (
               <a
                 key={item.label}
-                href={item.href}
+                href={`#${item.id}`}
+                onClick={(e) => handleNavClick(e, item.id)}
                 className="text-foreground/70 hover:text-accent transition-colors py-3 border-b border-border/30 last:border-0 font-medium"
-                onClick={() => setIsOpen(false)}
               >
                 {item.label}
               </a>
             ))}
             <a
               href="#contact"
+              onClick={(e) => handleNavClick(e, 'contact')}
               className="btn-primary text-center mt-4"
-              onClick={() => setIsOpen(false)}
             >
               Start a Project
             </a>

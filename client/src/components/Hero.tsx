@@ -7,6 +7,11 @@ const stats = [
   { value: '100%', label: 'Client satisfaction' },
 ];
 
+function scrollTo(id: string) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
@@ -43,19 +48,19 @@ export default function Hero() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
-            <a
-              href="#contact"
+            <button
+              onClick={() => scrollTo('contact')}
               className="btn-primary flex items-center justify-center gap-2 text-base px-8 py-4"
             >
               Start a Project
               <ArrowRight size={18} />
-            </a>
-            <a
-              href="#portfolio"
+            </button>
+            <button
+              onClick={() => scrollTo('portfolio')}
               className="btn-secondary flex items-center justify-center gap-2 text-base px-8 py-4"
             >
               View Our Work
-            </a>
+            </button>
           </div>
 
           {/* Stats row */}
@@ -71,13 +76,13 @@ export default function Hero() {
       </div>
 
       {/* Scroll indicator */}
-      <a
-        href="#services"
+      <button
+        onClick={() => scrollTo('services')}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-foreground/30 hover:text-accent transition-colors duration-300"
       >
         <span className="text-xs tracking-widest uppercase">Scroll</span>
         <ChevronDown size={18} className="animate-bounce" />
-      </a>
+      </button>
     </section>
   );
 }

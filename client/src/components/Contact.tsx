@@ -14,14 +14,14 @@ const contactInfo = [
   {
     icon: Mail,
     label: 'Email us',
-    value: 'hello@scuart.com',
-    href: 'mailto:hello@scuart.com',
+    value: 'aptitud10@gmail.com',
+    href: 'mailto:aptitud10@gmail.com',
   },
   {
     icon: MessageSquare,
     label: 'Prefer to chat?',
-    value: 'Book a free 30-min call',
-    href: '#',
+    value: 'Send us an email to schedule a call',
+    href: 'mailto:aptitud10@gmail.com',
   },
   {
     icon: Clock,

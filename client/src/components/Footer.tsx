@@ -1,22 +1,27 @@
 import { Mail, Instagram, Linkedin, Twitter } from 'lucide-react';
 
+function scrollTo(id: string) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+
 const navLinks = [
-  { label: 'Services', href: '#services' },
-  { label: 'Portfolio', href: '#portfolio' },
-  { label: 'About', href: '#about' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Services', id: 'services' },
+  { label: 'Portfolio', id: 'portfolio' },
+  { label: 'About', id: 'about' },
+  { label: 'Contact', id: 'contact' },
 ];
 
 const serviceLinks = [
-  { label: 'Strategy', href: '#services' },
-  { label: 'Design', href: '#services' },
-  { label: 'Development', href: '#services' },
+  { label: 'Strategy', id: 'services' },
+  { label: 'Design', id: 'services' },
+  { label: 'Development', id: 'services' },
 ];
 
 const socialLinks = [
-  { icon: Instagram, label: 'Instagram', href: '#' },
-  { icon: Linkedin, label: 'LinkedIn', href: '#' },
-  { icon: Twitter, label: 'Twitter / X', href: '#' },
+  { icon: Instagram, label: 'Instagram', href: 'https://www.instagram.com/' },
+  { icon: Linkedin, label: 'LinkedIn', href: 'https://www.linkedin.com/' },
+  { icon: Twitter, label: 'Twitter / X', href: 'https://x.com/' },
 ];
 
 export default function Footer() {
@@ -26,16 +31,21 @@ export default function Footer() {
         <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-10 mb-14">
           {/* Brand */}
           <div className="sm:col-span-2 md:col-span-1 space-y-4">
-            <h3 className="text-2xl font-bold gradient-text">Scuart</h3>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="text-2xl font-bold gradient-text"
+            >
+              Scuart
+            </button>
             <p className="text-sm text-foreground/55 leading-relaxed">
               Premium web design and development agency. We build websites that grow your business.
             </p>
             <a
-              href="mailto:hello@scuart.com"
+              href="mailto:aptitud10@gmail.com"
               className="inline-flex items-center gap-2 text-sm text-accent hover:text-accent/80 transition-colors"
             >
               <Mail size={14} />
-              hello@scuart.com
+              aptitud10@gmail.com
             </a>
           </div>
 
@@ -45,9 +55,12 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {navLinks.map(link => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-foreground/60 hover:text-accent transition-colors">
+                  <button
+                    onClick={() => scrollTo(link.id)}
+                    className="text-sm text-foreground/60 hover:text-accent transition-colors"
+                  >
                     {link.label}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -59,9 +72,12 @@ export default function Footer() {
             <ul className="space-y-2.5">
               {serviceLinks.map(link => (
                 <li key={link.label}>
-                  <a href={link.href} className="text-sm text-foreground/60 hover:text-accent transition-colors">
+                  <button
+                    onClick={() => scrollTo(link.id)}
+                    className="text-sm text-foreground/60 hover:text-accent transition-colors"
+                  >
                     {link.label}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -94,8 +110,8 @@ export default function Footer() {
             © 2026 Scuart. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-xs text-foreground/40 hover:text-accent transition-colors">Privacy Policy</a>
-            <a href="#" className="text-xs text-foreground/40 hover:text-accent transition-colors">Terms & Conditions</a>
+            <a href="mailto:aptitud10@gmail.com" className="text-xs text-foreground/40 hover:text-accent transition-colors">Privacy Policy</a>
+            <a href="mailto:aptitud10@gmail.com" className="text-xs text-foreground/40 hover:text-accent transition-colors">Terms & Conditions</a>
           </div>
         </div>
       </div>
