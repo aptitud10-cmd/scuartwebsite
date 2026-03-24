@@ -1,55 +1,59 @@
 const steps = [
   {
-    number: '1',
+    number: '01',
     title: 'Discovery',
-    description: 'Understanding your goals and needs through an in-depth kickoff meeting.',
+    description: 'An in-depth kickoff to understand your goals, audience, and competitive landscape. We leave no question unanswered.',
   },
   {
-    number: '2',
+    number: '02',
     title: 'Strategy',
-    description: 'Defining the site\'s structure and content before moving into design.',
+    description: 'Defining site structure, messaging hierarchy, and content before a single pixel is designed.',
   },
   {
-    number: '3',
+    number: '03',
     title: 'Design',
-    description: 'Creating high-fidelity mockups and iterating based on your feedback.',
+    description: 'High-fidelity mockups crafted with precision. We iterate based on your feedback until every detail is right.',
   },
   {
-    number: '4',
+    number: '04',
     title: 'Development',
-    description: 'Building and optimizing your site for performance, accessibility, and conversion.',
+    description: 'Pixel-perfect build, optimized for speed, SEO, and conversion. Launched and ready to grow.',
   },
 ];
 
 export default function Process() {
   return (
-    <section className="section-spacing">
+    <section id="process" className="section-spacing bg-card/30">
       <div className="container">
         <div className="max-w-3xl mx-auto mb-16">
+          <p className="section-label">How we work</p>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">Process</h2>
-          <p className="text-foreground/60 text-lg">
-            Our approach for designing and delivering great websites.
+          <p className="text-foreground/60 text-lg leading-relaxed">
+            A structured, transparent approach — so you always know what's happening and why.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {steps.map((step, index) => (
-            <div key={index} className="relative">
-              {/* Connector line */}
+            <div
+              key={step.number}
+              className="relative group"
+            >
+              {/* Connector — desktop only */}
               {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-12 left-1/2 w-full h-0.5 bg-gradient-to-r from-accent/50 to-transparent" />
+                <div className="hidden lg:block absolute top-8 left-[calc(100%-1rem)] w-8 h-px bg-gradient-to-r from-accent/40 to-transparent z-10" />
               )}
 
-              <div className="relative z-10 space-y-4">
-                <div className="w-12 h-12 rounded-full bg-accent text-background flex items-center justify-center font-bold text-lg">
-                  {step.number}
+              <div className="p-6 rounded-2xl border border-border bg-background/50 hover:border-accent/40 hover:bg-card/60 transition-all duration-300 h-full">
+                {/* Step number */}
+                <div className="mb-5">
+                  <span className="text-4xl font-bold gradient-text">{step.number}</span>
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-                  <p className="text-foreground/60 text-sm leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
+
+                <h3 className="text-xl font-bold mb-3">{step.title}</h3>
+                <p className="text-foreground/55 text-sm leading-relaxed">
+                  {step.description}
+                </p>
               </div>
             </div>
           ))}

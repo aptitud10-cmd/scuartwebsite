@@ -43,7 +43,6 @@
 }
 
 :root {
-  /* Dark theme - premium aesthetic */
   --primary: #00d9ff;
   --primary-foreground: #0a0e27;
   --sidebar-primary: #00d9ff;
@@ -79,21 +78,25 @@
   --sidebar-ring: #00d9ff;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Sora', sans-serif;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Playfair Display', serif;
     font-weight: 700;
   }
-  
+
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
   [type="button"]:not(:disabled),
@@ -116,11 +119,6 @@
     padding-right: 1rem;
   }
 
-  .flex {
-    min-height: 0;
-    min-width: 0;
-  }
-
   @media (min-width: 640px) {
     .container {
       padding-left: 1.5rem;
@@ -136,22 +134,30 @@
     }
   }
 
-  /* Premium button styles */
   .btn-primary {
-    @apply px-6 py-3 bg-accent text-accent-foreground rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-accent/20 active:scale-95;
+    @apply px-6 py-3 bg-accent text-accent-foreground rounded-lg font-semibold transition-all duration-300 hover:shadow-lg hover:shadow-accent/25 hover:brightness-110 active:scale-95;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 border border-accent text-accent rounded-lg font-semibold transition-all duration-300 hover:bg-accent/10;
+    @apply px-6 py-3 border border-accent/60 text-accent rounded-lg font-semibold transition-all duration-300 hover:bg-accent/10 hover:border-accent;
   }
 
-  /* Gradient text */
   .gradient-text {
     @apply bg-gradient-to-r from-accent via-purple-400 to-pink-400 bg-clip-text text-transparent;
   }
 
-  /* Section spacing */
   .section-spacing {
     @apply py-20 md:py-32;
+  }
+
+  /* Dot grid for hero background */
+  .hero-grid {
+    background-image: radial-gradient(circle, rgba(0, 217, 255, 0.15) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Section label style */
+  .section-label {
+    @apply inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-accent/70 mb-4;
   }
 }
