@@ -1,0 +1,953 @@
+/* TODO: self-host woff2 — actualmente cargando desde Google Fonts como fallback temporal.
+ * Pasos para producción:
+ * 1. Descargar Fraunces (variable, opsz 9–144) woff2 desde fonts.google.com o Google Webfonts Helper
+ * 2. Descargar Hanken Grotesk (400, 500, 600) woff2
+ * 3. Colocar en client/public/fonts/
+ * 4. Reemplazar @import por @font-face declarations con font-display: swap
+ */
+
+/* Fuentes: Fraunces (display serif) + Hanken Grotesk (body grotesca) */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=Hanken+Grotesk:wght@400;500;600&display=swap");
+
+@import "tw-animate-css";
+@import "tailwindcss";
+
+/* Sistema de diseño: Editorial Cálido — SCUART
+ * Paleta: crema (fondo) + tinta (texto) + terracota (acento ≤10%) + oliva (secundario)
+ * Tipografía: Fraunces (display) + Hanken Grotesk (body)
+ * Anti-patrón eliminado: dark-navy, cyan, magenta, violet, glass-card, glow, gradiente holográfico
+ */
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Mapeado a variables semánticas para que componentes Radix hereden bien */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Tokens editoriales — accesibles como bg-crema, text-tinta, etc. en Tailwind 4 */
+  --color-crema: #F5F0E8;
+  --color-tinta: #1A1410;
+  --color-terracota: #C2703D;
+  --color-terracota-hover: #A85A2C;
+  --color-oliva: #6B7253;
+  --color-crema-profunda: #EBE3D6;
+  --color-tinta-suave: #5C5246;
+  --color-borde: #D8CDBC;
+
+  /* Fuentes */
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Hanken Grotesk", system-ui, sans-serif;
+}
+
+:root {
+  /* Background → crema (firma anti-tech del sistema Editorial Cálido) */
+  --background: #F5F0E8;
+  --foreground: #1A1410;
+
+  /* Cards: crema profunda, sin glassmorphism */
+  --card: #EBE3D6;
+  --card-foreground: #1A1410;
+
+  /* Popover */
+  --popover: #F5F0E8;
+  --popover-foreground: #1A1410;
+
+  /* Primary → terracota (CTA, acento principal) */
+  --primary: #C2703D;
+  --primary-foreground: #F5F0E8;
+
+  /* Secondary → oliva */
+  --secondary: #6B7253;
+  --secondary-foreground: #F5F0E8;
+
+  /* Muted → crema profunda con texto tinta-suave */
+  --muted: #EBE3D6;
+  --muted-foreground: #5C5246;
+
+  /* Accent → terracota (mismo rol) */
+  --accent: #C2703D;
+  --accent-foreground: #F5F0E8;
+
+  /* Destructive — rojo sobrio (no afecta paleta editorial) */
+  --destructive: #C0392B;
+  --destructive-foreground: #F5F0E8;
+
+  /* Borde tierra, nunca gris frío */
+  --border: #D8CDBC;
+  --input: #D8CDBC;
+  --ring: #C2703D;
+
+  /* Charts — paleta cálida (raro que se vean en este sitio) */
+  --chart-1: #C2703D;
+  --chart-2: #6B7253;
+  --chart-3: #5C5246;
+  --chart-4: #EBE3D6;
+  --chart-5: #D8CDBC;
+
+  /* Sidebar — hereda crema */
+  --sidebar: #F5F0E8;
+  --sidebar-foreground: #1A1410;
+  --sidebar-primary: #C2703D;
+  --sidebar-primary-foreground: #F5F0E8;
+  --sidebar-accent: #EBE3D6;
+  --sidebar-accent-foreground: #5C5246;
+  --sidebar-border: #D8CDBC;
+  --sidebar-ring: #C2703D;
+
+  /* Radio de borde suave pero no excesivo */
+  --radius: 0.375rem;
+}
+
+/* No hay tema dark en el rediseño — el sitio es siempre claro (crema).
+ * La zona invertida (footer/contacto) se logra con clases utilitarias,
+ * no con el mecanismo de dark mode. */
+.dark {
+  /* Mantener los mismos tokens crema para que aunque exista la clase
+     no rompa el sitio — el ThemeProvider se cambia a "light" en App.tsx */
+  --background: #F5F0E8;
+  --foreground: #1A1410;
+  --card: #EBE3D6;
+  --card-foreground: #1A1410;
+  --popover: #F5F0E8;
+  --popover-foreground: #1A1410;
+  --primary: #C2703D;
+  --primary-foreground: #F5F0E8;
+  --secondary: #6B7253;
+  --secondary-foreground: #F5F0E8;
+  --muted: #EBE3D6;
+  --muted-foreground: #5C5246;
+  --accent: #C2703D;
+  --accent-foreground: #F5F0E8;
+  --destructive: #C0392B;
+  --destructive-foreground: #F5F0E8;
+  --border: #D8CDBC;
+  --input: #D8CDBC;
+  --ring: #C2703D;
+  --sidebar: #F5F0E8;
+  --sidebar-foreground: #1A1410;
+  --sidebar-primary: #C2703D;
+  --sidebar-primary-foreground: #F5F0E8;
+  --sidebar-accent: #EBE3D6;
+  --sidebar-accent-foreground: #5C5246;
+  --sidebar-border: #D8CDBC;
+  --sidebar-ring: #C2703D;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    background-color: #F5F0E8;
+    color: #1A1410;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.65;
+    font-weight: 400;
+    letter-spacing: 0;
+    /* Render tipográfico fino */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Titulares: Fraunces display, peso bajo (elegancia editorial) */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: #1A1410;
+  }
+
+  /* Escala tipográfica con clamp — mobile-first */
+
+  /* Display XL — Hero H1
+   * min reducido a 2.25rem para que la línea más larga ("la web que su comida")
+   * quepa en 375px sin desbordar. Crece con vw hasta 7rem en desktop. */
+  .type-display-xl {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 7.5vw, 7rem);
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    overflow-wrap: break-word;
+  }
+
+  /* Display L — H2 secciones */
+  .type-display-l {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4.5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  /* Display M — H3 */
+  .type-display-m {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  /* Lead / subhead */
+  .type-lead {
+    font-family: var(--font-body);
+    font-size: clamp(1.125rem, 2vw, 1.375rem);
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: 0;
+    color: #5C5246;
+  }
+
+  /* Body */
+  .type-body {
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 1.5vw, 1.0625rem);
+    font-weight: 400;
+    line-height: 1.65;
+    color: #1A1410;
+  }
+
+  /* Caption / meta */
+  .type-caption {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: #5C5246;
+  }
+
+  /* Eyebrow / label */
+  .type-eyebrow {
+    font-family: var(--font-body);
+    font-size: clamp(0.75rem, 1vw, 0.8125rem);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #5C5246;
+    line-height: 1;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  /* Container editorial — márgenes amplios, sensación de "página" */
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 3rem;
+      padding-right: 3rem;
+      max-width: 1280px;
+    }
+  }
+
+  /* Botón primario terracota */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    background-color: #C2703D;
+    color: #F5F0E8;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    border-radius: 0.25rem;
+    border: none;
+    transition: background-color 0.25s ease, transform 0.15s ease;
+    text-decoration: none;
+  }
+
+  .btn-primary:hover {
+    background-color: #A85A2C;
+    transform: scale(0.99);
+  }
+
+  .btn-primary:active {
+    background-color: #A85A2C;
+    transform: scale(0.97);
+  }
+
+  /* CTA secundario: texto con subrayado terracota que crece en hover */
+  .btn-text-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    position: relative;
+    color: #1A1410;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    text-decoration: none;
+    padding-bottom: 2px;
+  }
+
+  .btn-text-link::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 1px;
+    background-color: #C2703D;
+    transition: width 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .btn-text-link:hover::after {
+    width: 100%;
+  }
+
+  /* Divisor hairline editorial */
+  .divider-hairline {
+    border: none;
+    border-top: 1px solid #D8CDBC;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  /* ----------------------------------------------------------------
+   * Hero escalonado — tipografía display gigante
+   * El texto es LA imagen: ocupa casi toda la altura del viewport.
+   * Clases para cada línea del headline con indent creciente (desktop).
+   * Mobile: sin indent, texto fluye natural para evitar overflow h.
+   * ---------------------------------------------------------------- */
+
+  /* Tipografía base del headline hero */
+  .hero-display {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 8.5vw, 11rem);
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: -0.03em;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    color: #1A1410;
+  }
+
+  /* Variante itálica terracota — "merece." */
+  .hero-display-accent {
+    font-style: italic;
+    color: #C2703D;
+  }
+
+  /* Contenedor de cada línea: máscara de reveal (overflow oculta la animación) */
+  .hero-line-mask {
+    display: block;
+    overflow: hidden;
+    line-height: 1.05; /* margen extra para que la máscara no corte descendentes */
+  }
+
+  /* Indents del escalonado — solo desktop (md+).
+   * Mobile: margin-left: 0 en todos (flujo natural). */
+  @media (min-width: 768px) {
+    .hero-line-indent-0 { margin-left: 0%; }
+    .hero-line-indent-1 { margin-left: 8%; }
+    .hero-line-indent-2 { margin-left: 16%; }
+    .hero-line-indent-3 { margin-left: 26%; }
+  }
+
+  /* Subhead del hero — discreto, nivel 3 de jerarquía */
+  .hero-subhead {
+    font-family: var(--font-body);
+    font-size: clamp(0.875rem, 1.4vw, 1rem);
+    font-weight: 400;
+    line-height: 1.65;
+    color: #5C5246;
+    max-width: 22rem;
+  }
+
+  /* Indicador de scroll — pequeño, editorial, abajo */
+  .scroll-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #5C5246;
+    text-decoration: none;
+  }
+
+  .scroll-indicator-line {
+    display: block;
+    width: 2rem;
+    height: 1px;
+    background-color: #D8CDBC;
+    transition: width 0.3s ease, background-color 0.3s ease;
+  }
+
+  .scroll-indicator:hover .scroll-indicator-line {
+    width: 3.5rem;
+    background-color: #C2703D;
+  }
+
+  /* ----------------------------------------------------------------
+   * Loader de entrada
+   * ---------------------------------------------------------------- */
+
+  /* Cada letra de "SCUART" — display grande con máscara de reveal */
+  .loader-letter {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 14vw, 10rem);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    color: #1A1410;
+    line-height: 1;
+    display: inline-block;
+  }
+
+  /* Contador numérico 000→100 */
+  .loader-counter {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #5C5246;
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Zona invertida — footer/contacto: fondo tinta, texto crema */
+  .section-invertida {
+    background-color: #1A1410;
+    color: #F5F0E8;
+  }
+
+  /* Grano de papel — textura sutil para no sentirse plano-digital */
+  .paper-grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+
+  /* Animación discreta de fade-up para reveals */
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* prefers-reduced-motion: sin animaciones */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-up,
+    *[style*="animation"],
+    *[style*="transition"] {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+
+  /* ----------------------------------------------------------------
+   * Sección MENIUS — passe-partout y acento oliva
+   * El fondo crema-profunda enmarca el screenshot oscuro/esmeralda.
+   * ---------------------------------------------------------------- */
+  .menius-section {
+    background-color: #EBE3D6;
+  }
+
+  .menius-eyebrow {
+    color: #6B7253;
+  }
+
+  .menius-acento-italic {
+    font-style: italic;
+    color: #6B7253;
+  }
+
+  .menius-cta {
+    color: #6B7253;
+  }
+
+  .menius-caption {
+    color: #6B7253;
+  }
+
+  /* Passe-partout: marco hairline que enmarca el screenshot oscuro */
+  .menius-passe-partout {
+    border: 1px solid #D8CDBC;
+    border-radius: 4px;
+    padding: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .menius-passe-partout {
+      padding: 1.5rem;
+    }
+  }
+
+  .menius-screenshot {
+    border-radius: 2px;
+  }
+
+  /* ----------------------------------------------------------------
+   * Sección Contacto invertida (fondo tinta, texto crema)
+   * ---------------------------------------------------------------- */
+  .contacto-eyebrow {
+    color: #D8CDBC;
+    letter-spacing: 0.14em;
+  }
+
+  .contacto-titular {
+    color: #F5F0E8;
+  }
+
+  .contacto-acento-italic {
+    font-style: italic;
+    color: #C2703D;
+  }
+
+  .contacto-subtext {
+    color: #D8CDBC;
+  }
+
+  /* ----------------------------------------------------------------
+   * Sección Sobre nosotros
+   * ---------------------------------------------------------------- */
+  .nosotros-italic {
+    font-style: italic;
+  }
+
+  /* ----------------------------------------------------------------
+   * Marquesina kinética horizontal
+   * Loop CSS infinito — GSAP añade control de pausa en hover.
+   * ---------------------------------------------------------------- */
+  .marquesina-wrapper {
+    overflow: hidden;
+    border-top: 1px solid #D8CDBC;
+    border-bottom: 1px solid #D8CDBC;
+    padding: 1.25rem 0;
+    background-color: #F5F0E8;
+    cursor: default;
+  }
+
+  .marquesina-track {
+    display: flex;
+    gap: 0;
+    white-space: nowrap;
+    /* Ancho: 2× el contenido para el loop sin salto */
+    width: max-content;
+  }
+
+  .marquesina-item {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 3.5vw, 2.5rem);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    color: #1A1410;
+    padding-right: 2.5rem;
+    white-space: nowrap;
+  }
+
+  .marquesina-separator {
+    color: #C2703D;
+    padding-right: 2.5rem;
+    font-style: normal;
+  }
+
+  @keyframes marquesina-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* CSS fallback para la animación — GSAP la reemplaza en JS */
+  .marquesina-track--animated {
+    animation: marquesina-scroll 28s linear infinite;
+  }
+
+  .marquesina-track--animated:hover {
+    animation-play-state: paused;
+  }
+
+  /* Reduced-motion: sin movimiento */
+  @media (prefers-reduced-motion: reduce) {
+    .marquesina-track--animated {
+      animation: none;
+    }
+  }
+
+  /* ----------------------------------------------------------------
+   * Lista editorial de servicios
+   * ---------------------------------------------------------------- */
+  .servicio-fila {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: 1.5rem;
+    padding: 2rem 0;
+    border-top: 1px solid #D8CDBC;
+    align-items: start;
+    transition: none;
+  }
+
+  @media (min-width: 768px) {
+    .servicio-fila {
+      grid-template-columns: 7rem 1fr;
+      gap: 2.5rem;
+      padding: 2.5rem 0;
+    }
+  }
+
+  .servicio-fila:last-child {
+    border-bottom: 1px solid #D8CDBC;
+  }
+
+  /* Número grande en serif — N1 de la fila */
+  .servicio-numero {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: #1A1410;
+    transition: color 0.25s ease;
+  }
+
+  .servicio-fila:hover .servicio-numero {
+    color: #C2703D;
+  }
+
+  /* Título del servicio — N2 */
+  .servicio-titulo {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2.5vw, 2rem);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    color: #1A1410;
+    transition: color 0.25s ease;
+    margin-bottom: 0.5rem;
+  }
+
+  .servicio-fila:hover .servicio-titulo {
+    color: #C2703D;
+  }
+
+  /* Descripción — N3 */
+  .servicio-descripcion {
+    font-family: var(--font-body);
+    font-size: clamp(0.9375rem, 1.5vw, 1.0625rem);
+    font-weight: 400;
+    line-height: 1.6;
+    color: #5C5246;
+  }
+
+  /* ----------------------------------------------------------------
+   * Cards de portfolio
+   * ---------------------------------------------------------------- */
+  .portfolio-card {
+    position: relative;
+    overflow: hidden;
+    /* Marco hairline editorial — la imagen protagonista sobre crema */
+    border: 1px solid #D8CDBC;
+  }
+
+  .portfolio-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .portfolio-card:hover .portfolio-card__img {
+    transform: scale(1.03);
+  }
+
+  .portfolio-card__overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(to top, rgba(26, 20, 16, 0.72) 0%, transparent 100%);
+  }
+
+  .portfolio-card__titulo {
+    font-family: var(--font-display);
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    font-weight: 400;
+    color: #F5F0E8;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    margin-bottom: 0.25rem;
+  }
+
+  .portfolio-card__categoria {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #D8CDBC;
+  }
+
+  /* ----------------------------------------------------------------
+   * Timeline de proceso
+   * ---------------------------------------------------------------- */
+  .paso-timeline {
+    padding: 0 1.5rem 2.5rem 0;
+    position: relative;
+  }
+
+  /* Línea horizontal conectora entre pasos (desktop) */
+  @media (min-width: 768px) {
+    .paso-timeline {
+      padding: 2rem 2rem 2rem 0;
+      border-top: 1px solid #D8CDBC;
+    }
+
+    /* Último paso: sin separador a la derecha */
+    .paso-timeline--last {
+      padding-right: 0;
+    }
+  }
+
+  /* Mobile: líneas verticales entre pasos */
+  @media (max-width: 767px) {
+    .paso-timeline {
+      border-left: 1px solid #D8CDBC;
+      padding-left: 1.5rem;
+      padding-bottom: 2.5rem;
+      margin-left: 0.75rem;
+    }
+
+    .paso-timeline--last {
+      border-left: none;
+      padding-left: 1.5rem;
+    }
+  }
+
+  .paso-numero {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .paso-numero--terracota { color: #C2703D; }
+  .paso-numero--oliva     { color: #6B7253; }
+
+  .paso-nombre {
+    font-family: var(--font-display);
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: #1A1410;
+    margin-bottom: 0.625rem;
+  }
+
+  .paso-descripcion {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: #5C5246;
+  }
+
+  /* ----------------------------------------------------------------
+   * Formulario inline de contacto (sección invertida)
+   * ---------------------------------------------------------------- */
+  .form-contacto {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .form-contacto__label {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #D8CDBC;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Input y textarea sobre fondo tinta: borde hairline crema, foco terracota */
+  .form-contacto__input,
+  .form-contacto__textarea,
+  .form-contacto__select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background-color: #241e18; /* levemente más claro que tinta #1A1410 */
+    border: 1px solid rgba(213, 205, 188, 0.35);
+    color: #F5F0E8;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    outline: none;
+    border-radius: 2px;
+    transition: border-color 0.2s ease;
+    /* Quitar estilos nativos en select */
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .form-contacto__input::placeholder,
+  .form-contacto__textarea::placeholder {
+    color: #5C5246;
+  }
+
+  .form-contacto__input:focus,
+  .form-contacto__textarea:focus,
+  .form-contacto__select:focus {
+    border-color: #C2703D;
+  }
+
+  .form-contacto__textarea {
+    resize: none;
+    min-height: 8rem;
+  }
+
+  .form-contacto__select option {
+    background-color: #1A1410;
+    color: #F5F0E8;
+  }
+
+  .form-contacto__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    background-color: #C2703D;
+    color: #F5F0E8;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color 0.25s ease, transform 0.15s ease;
+    align-self: flex-start;
+  }
+
+  .form-contacto__submit:hover:not(:disabled) {
+    background-color: #A85A2C;
+    transform: scale(0.99);
+  }
+
+  .form-contacto__submit:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  .form-contacto__submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .form-contacto__privacidad {
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    color: #5C5246;
+  }
+
+  .form-contacto__exito {
+    padding: 2rem;
+    text-align: center;
+    color: #F5F0E8;
+  }
+
+  .form-contacto__exito-titulo {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #F5F0E8;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-contacto__exito-subtitulo {
+    color: #D8CDBC;
+    font-size: 0.9375rem;
+  }
+}

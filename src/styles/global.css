@@ -1,0 +1,150 @@
+/**
+ * global.css — Reset, base y grain "Declaración en Rojo"
+ * Import order: fonts → tokens → este archivo
+ * §2 DESIGN_RESPONSIVE.md: grain opacity 0.06 + velo luminancia
+ */
+
+@import './fonts.css';
+@import './tokens.css';
+@import 'tailwindcss';
+
+/* ── Reset base ───────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Anti-overflow mobile (C7 DESIGN_RESPONSIVE §11) */
+html,
+body {
+  overflow-x: clip; /* clip no rompe sticky, hidden sí */
+  max-width: 100%;
+}
+
+html {
+  /* Smooth scroll base — Lenis lo reemplaza cuando se integre */
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--carbon);
+  color: var(--crema);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── §2 GRAIN — doble capa (garantía de percepción sobre #0E0E0E) ── */
+/*
+ * Capa A: grain SVG feTurbulence (position fixed, todo el viewport)
+ * Capa B: velo luminancia radial-gradient (base no-uniforme para que el grano "muerda")
+ * Opacity 0.06 (piso perceptible sobre carbón). Fallback Etapa B: subir a 0.08.
+ * Grano físico constante 180px (no escala al viewport).
+ */
+
+/* Capa A: grain en pseudo-elemento del body */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Capa B: velo de luminancia (da base no-uniforme para que el grain muerda) */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: radial-gradient(
+    ellipse 80% 50% at 50% 0%,
+    rgba(232, 226, 214, 0.025) 0%,
+    transparent 70%
+  );
+}
+
+/* ── Tipografía base ─────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight-heavy);
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  /*
+   * Archivo variable: wdth 105-115 (aprobado por critic — NO 125)
+   * wdth=110 es el punto medio del rango aprobado
+   */
+  font-variation-settings: 'wdth' var(--display-wdth);
+}
+
+p {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.5;
+}
+
+/* ── Imágenes (anti-overflow) ────────────────────────────────────── */
+img,
+video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Hero: word reveal (script GSAP unificado en HeroSection.astro) ── */
+/*
+ * Progressive enhancement (fix iter.5):
+ * El H1 es texto real (.h1-word) visible por defecto.
+ * El script GSAP envuelve cada .h1-word en .word-clip > .word-inner
+ * para el efecto de clip/reveal. Si el script no corre, .h1-word
+ * es texto plano crema/.word--rojo rojo, visible sin animacion.
+ *
+ * .word-clip: contenedor con overflow:hidden que clipea el reveal yPercent.
+ * .word-inner: el span animado que sale de abajo del clip.
+ * .word-inner--rojo: instancia roja (STANDS OUT / DISTINTA.).
+ */
+.word-clip {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* Pequeno padding para que el descender no se corte con leading 0.92 */
+  padding-bottom: 0.05em;
+  margin-bottom: -0.05em;
+}
+
+.word-inner {
+  display: inline-block;
+  /* Sin color declarado — hereda del .hero-h1 (crema) */
+}
+
+/* Rojo en el word-inner animado */
+.word-inner--rojo {
+  color: var(--rojo);
+}
+
+/* ── Selección ───────────────────────────────────────────────────── */
+::selection {
+  background-color: var(--rojo);
+  color: var(--crema);
+}
+
+/* ── reduced-motion: anula todas las animaciones ─────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,229 @@
+---
+/**
+ * Nav.astro — Navegacion minima para el hero
+ * v2 (i18n): recibe lang + t (traducciones) para selector EN/ES y labels.
+ * Nav completo (hamburger mobile, overlay) se implementa en hito siguiente.
+ * DESIGN_RESPONSIVE §8: height 72px, transparente, Mono uppercase taupe.
+ */
+
+import type { Lang } from '../i18n/index';
+import type { Translations } from '../i18n/en';
+
+interface Props {
+  lang: Lang;
+  t: Translations;
+}
+
+const { lang, t } = Astro.props;
+---
+
+<nav class="nav" aria-label="Navegacion principal">
+  <a href={`/${lang}`} class="nav__logo" aria-label="SCUART — Inicio">
+    SCUART
+  </a>
+
+  <div class="nav__right">
+    <!-- Placeholder links — se expanden en hito nav completo -->
+    <ul class="nav__links" role="list">
+      <li><a href={`/${lang}#portfolio`} class="nav__link">{t.nav.portfolio}</a></li>
+      <li><a href={`/${lang}#metodo`} class="nav__link">{t.nav.method}</a></li>
+      <li><a href={`/${lang}#contacto`} class="nav__link">{t.nav.contact}</a></li>
+    </ul>
+
+    <!-- Selector de idioma EN/ES -->
+    <div class="nav__lang" role="navigation" aria-label="Selector de idioma">
+      <span class="nav__lang-active" aria-current="true">
+        {lang.toUpperCase()}
+      </span>
+      <span class="nav__lang-sep" aria-hidden="true">/</span>
+      <a
+        href={t.nav.langHref}
+        class="nav__lang-other"
+        hreflang={t.nav.langLabel.toLowerCase()}
+        aria-label={`Cambiar idioma a ${t.nav.langLabel}`}
+      >
+        {t.nav.langLabel}
+      </a>
+    </div>
+  </div>
+</nav>
+
+<style>
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--margin);
+    /* Transparente sobre carbon: grain visible a traves */
+    background-color: transparent;
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  /* Al scrollear, fondo carbon + borde sutil */
+  .nav.scrolled {
+    background-color: var(--carbon);
+    border-bottom-color: var(--linea);
+  }
+
+  .nav__logo {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight-heavy);
+    font-variation-settings: 'wdth' var(--display-wdth);
+    font-size: 1.125rem;
+    letter-spacing: -0.025em;
+    color: var(--crema);
+    text-decoration: none;
+    line-height: 1;
+  }
+
+  /* Contenedor derecho: links + selector idioma */
+  .nav__right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m);
+  }
+
+  .nav__links {
+    display: none; /* oculto en mobile — se muestra en tablet+ */
+    list-style: none;
+    gap: var(--space-m);
+    align-items: center;
+  }
+
+  .nav__link {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    font-weight: 400;
+    color: var(--taupe);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+    position: relative;
+    /* Subrayado barrido rojo hover — scaleX 0→1 */
+    padding-bottom: 2px;
+  }
+
+  .nav__link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: var(--rojo);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* power2.out */
+  }
+
+  .nav__link:hover {
+    color: var(--crema);
+  }
+
+  .nav__link:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* ── Selector de idioma ──────────────────────────────────── */
+  /*
+   * iter.4: jerarquia logo (N1) > selector (N2 discreto).
+   * Opacidad 0.65 en mobile para que se "apague" como metadata.
+   * Tablet+ recupera opacidad plena (hay mas espacio y links de nav equilibran).
+   */
+  .nav__lang {
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+    /* Mobile: metadata discreta, no compite con logo */
+    opacity: 0.65;
+    transition: opacity 0.25s ease;
+  }
+
+  .nav__lang:hover,
+  .nav__lang:focus-within {
+    opacity: 1;
+  }
+
+  /* Idioma activo — crema, no clickeable */
+  .nav__lang-active {
+    color: var(--crema);
+    cursor: default;
+  }
+
+  /* Separador / — taupe bajo */
+  .nav__lang-sep {
+    color: var(--taupe);
+    opacity: 0.5;
+  }
+
+  /* Idioma alternativo — taupe, hover rojo */
+  .nav__lang-other {
+    color: var(--taupe);
+    text-decoration: none;
+    transition: color 0.25s ease;
+    position: relative;
+    padding-bottom: 2px;
+  }
+
+  .nav__lang-other::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: var(--rojo);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .nav__lang-other:hover {
+    color: var(--crema);
+  }
+
+  .nav__lang-other:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* Tablet+: mostrar links inline + restituir opacidad plena del selector */
+  @media (min-width: 768px) {
+    .nav__links {
+      display: flex;
+    }
+
+    /* iter.4: en tablet+ hay links que equilibran — selector vuelve a opacidad plena */
+    .nav__lang {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  // Agrega clase .scrolled al hacer scroll — sin Lenis por ahora
+  const nav = document.querySelector('.nav');
+  if (nav) {
+    const onScroll = () => {
+      if (window.scrollY > 20) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+</script>

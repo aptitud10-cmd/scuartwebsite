@@ -5,21 +5,30 @@
 
 ---
 
+## ⬛ HITO 1 — HERO: CERRADO (sesión implementación)
+
+Estado: **hero implementado y aprobado**. Astro 5 limpio, código viejo en `_old/`, bilingüe EN(default)/ES con i18n + SEO (hreflang/canonical/OG por idioma), 3 fuentes self-hosted OFL (Archivo/DM Sans/IBM Plex Mono).
+
+Recorrido: 7 iteraciones. Bugs/ajustes resueltos: H1 sobredimensionado desktop (166→64px, 3 bloques), grilla subida a 9%, ficha técnica derecha agregada, mobile menos fragmentado (2 palabras/línea), franja roja tablet reposicionada (col 6, ya no cruza texto), **H1 invisible → reescrito como HTML real server-rendered (progressive enhancement, robusto sin JS, SEO/a11y OK)**, **grilla invisible en 1280 → fix lógica GSAP (offsetParent), ahora 3 líneas visibles col 3/6/9**.
+
+**visual-critic Etapa B: APPROVED_WITH_MINOR_FIXES** (9/10 ≥8.5; único fallo desktop 8.4 = grilla invisible 1280, YA RESUELTO). Scores: Originalidad 8.6, Dirección 8.7, Jerarquía 8.8, Tipografía 8.5, Composición 8.5, Premium 8.6, Claridad 8.5, Mobile 8.6, Desktop 8.4→resuelto, Diferenciación 8.7. Los 6 puntos del checklist Etapa B: todos PASAN en pixeles (grilla 1280 tras fix).
+
+**DEUDA DE COPY (pendiente, NO bloquea):** el hero quedó con "YOUR FOOD HAS CHARACTER / YOUR WEBSITE SHOULD TOO" (EN) y "TU COMIDA TIENE CARÁCTER / TU WEB TAMBIÉN DEBERÍA" (ES) — palabra roja CHARACTER/CARÁCTER. William NO está convencido del copy (objeción: "carácter" no concuerda bien con "comida"; quería sacar la metáfora comida↔web). Se cambia en 2 líneas de i18n (src/i18n/en.ts + es.ts) cuando se decida. Research de copy hecho (6 opciones, ver historial). PENDIENTE TAMBIÉN: decidir posicionamiento (solo-food vs amplio) — afecta el copy final. El subhead-filtro "Diseño con criterio, no plantillas / no templates" el critic recomendó conservarlo aunque cambie el H1.
+NOTA: cuando se cambie el copy, mantener: palabra roja corta (no desborda mobile), 2 líneas/bloques máx.
+
 ## DÓNDE RETOMAR (próxima sesión)
 
-William dijo (2026-06-04): retomar la IMPLEMENTACIÓN mañana — paró hoy por presupuesto de tokens. Al abrir, decir: "retomá el rediseño de scuart.com, fase de implementación, hero primero".
+**SECCIÓN 2 — PORTFOLIO.** Hito 1 (hero) CERRADO ✅. Siguiente: implementar el portfolio (peso comercial principal — no hay testimonios/métricas). 4 proyectos reales: Jamón Casero, MENIUS, Healthy Choice NY, Arriba Gold (imágenes en public/images/ o donde el dev las copió en el scaffold Astro). Diseño: lista editorial de nombres gigantes Monument/Archivo, NO grid de cards. Desktop: hover → nombre rojo + otros a taupe + imagen real clip-path reveal col 9-12 + GSAP Flip entre proyectos. Tablet: touch, imagen visible col 5-6. Mobile: scroll-reveal, imagen 4/5 siempre visible. Ver DESIGN_RESPONSIVE.md §10. Bilingüe ES/EN. Tras implementar: screenshots 375/768/1280 EN+ES → William OK visual → visual-critic Etapa B.
 
-**Fase 7 — dev, IMPLEMENTACIÓN INCREMENTAL (decisión de William, NO todo de una).**
-Empezar por: scaffold Astro limpio + 3 fuentes self-hosted (set aprobado abajo) + HERO completo. Parar, William lo ve en localhost (375/768/1280), revisión visual del rumbo (carbón/crema/rojo/grain/tipografía/hero/performance). Solo si aprueba el rumbo, seguir sección por sección. NO construir 8 secciones a ciegas (fue el error del rediseño previo).
-
-Orden incremental aprobado por William:
-1. Hero (primero, es donde el critic dijo que se gana/pierde el 8.5 — Archivo a tamaño real)
-2. Portfolio (peso comercial principal, 4 proyectos reales + FLIP)
+Orden incremental restante:
+2. Portfolio ← ACÁ
 3. Servicios / Método
 4. About / posicionamiento
 5. CTA final
 6. SEO / metadata / polish
-7. QA responsive completo
+7. QA responsive completo (reviewer + qa-responsive al final)
+
+Pendientes no bloqueantes: copy del hero (deuda de copy, arriba), posicionamiento solo-food vs amplio.
 
 Cada sección/hito: screenshots 375/768/1280 → visual-critic Etapa B (checklist 6 puntos) → OK visual de William antes de seguir. Al final del todo: reviewer → qa-responsive.
 
@@ -87,6 +96,16 @@ Reemplaza las de pago (Monument Extended + Messina) hasta que William compre. Sw
 - **Body: DM Sans** (Google Fonts, OFL-1.1), pesos 400/700. [Satoshi DESCARTADA: licencia Fontshare no verificable como OFL.]
 - **Mono: IBM Plex Mono** (Bold Monday/IBM, OFL-1.1), uppercase + taupe + 11-13px, tracking +0.02em mobile / +0.04em desktop. Fallback: Spline Sans Mono si lee "dev/GitHub".
 - Tokens swap: --font-display / --font-body / --font-mono + --display-weight-heavy/light (var settings). Self-host woff2, no <link> Google.
+
+## CAMBIO DE POSICIONAMIENTO — BILINGÜE (William, sesión implementación)
+SCUART ya NO es solo LATAM. Es un **estudio web bilingüe** para restaurantes, food brands y negocios locales que quieren verse premium/confiables/memorables online, vendiendo en: USA + LATAM + restaurantes latinos en USA + negocios bilingües. Como Menius.
+- **Default público: INGLÉS.** `/` redirige a `/en`. /en = versión principal, /es = versión español (sigue importante para LATAM + latinos USA, pero el default es EN).
+- Arquitectura: rutas `/en` y `/es` (Astro i18n nativo). Selector EN/ES en nav. hreflang en/es/x-default. canonical por idioma. metadata (title/desc/OG) por idioma. Copy comercial nativo en ambos, NO traducción literal.
+- **Hero ES:** "TU COCINA ES DISTINTA. / TU WEB NO PUEDE VERSE IGUAL." — palabra roja DISTINTA. (sin voseo — neutro LATAM/USA)
+- **Hero EN:** "YOUR KITCHEN STANDS OUT. / YOUR WEBSITE SHOULD TOO." — palabra roja STANDS OUT.
+- **Subhead ES:** "No hacemos webs lindas. Hacemos que tu negocio se vea tan bien como sabe tu comida. Diseño con criterio, no plantillas."
+- **Subhead EN:** "We don't make pretty websites. We make your business look as good as it tastes. Design with intent, not templates."
+- El copy viejo con voseo ("Cocinás", "sos") queda DESCARTADO.
 
 ## DECISIÓN DE ALCANCE (William, 2026-06-04)
 Migración COMPLETA a Astro desde cero. Descartar implementación Vite/React vieja. NO conservar copy/diseño/componentes/estructura viejos. Conservar SOLO: carpeta redesign/, los 4 assets reales de portfolio (portfolio-jamon-casero.webp, portfolio-menius-real.webp, portfolio-healthy-choice-real.webp, portfolio-arriba-gold-real.webp), documentación del proceso. Producción real de scuart.com está en OTRO proyecto viejo, no se toca. Este repo = nueva web SCUART en Astro.

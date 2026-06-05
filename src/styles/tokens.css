@@ -1,0 +1,52 @@
+/**
+ * tokens.css — Sistema de design tokens "Declaración en Rojo"
+ * Basado en DESIGN_RESPONSIVE.md: §1 colores, §5 tipografía, §6 spacing
+ * Token swap futuro: cambiar Archivo→Monument, DM Sans→Messina en --font-display/--font-body
+ */
+
+:root {
+  /* ── §1 COLORES ──────────────────────────────────────────────── */
+  --carbon:        #0E0E0E;   /* fondo base */
+  --carbon-elev:   #1A1A18;   /* bloque contraste portfolio/CTA */
+  --crema:         #E8E2D6;   /* texto principal (nunca blanco puro) */
+  --rojo:          #D70321;   /* declaración — máx 4 instancias/viewport */
+  --taupe:         #8A857B;   /* metadata, índices inactivos, subhead */
+  --linea:         rgba(232, 226, 214, 0.09);   /* guías editoriales — subido de 0.07 a 0.09 (fallback §4) */
+  --linea-hover:   rgba(232, 226, 214, 0.14);   /* hover */
+
+  /* ── §5 FAMILIAS TIPOGRÁFICAS (token swap ready) ──────────────── */
+  /* Swap futuro: --font-display: 'Monument Extended', sans-serif; */
+  --font-display: 'Archivo', sans-serif;
+  /* Swap futuro: --font-body: 'Messina Sans', sans-serif; */
+  --font-body:    'DM Sans', sans-serif;
+  /* Swap futuro: --font-mono: 'Messina Sans Mono', monospace; */
+  --font-mono:    'IBM Plex Mono', monospace;
+
+  /* Pesos display (Archivo variable: wdth 105-115, NO 125) */
+  --display-weight-heavy: 900;   /* H1, H2, CTA */
+  --display-weight-light:  400;   /* nombres portfolio */
+  --display-wdth: 110;            /* wdth eje variable — aprobado: 105-115 */
+
+  /* ── §6 SPACING FLUIDO ───────────────────────────────────────── */
+  --space-2xs: clamp(0.25rem, 1vw, 0.5rem);     /* 4px → 8px   */
+  --space-xs:  clamp(0.5rem, 1.5vw, 1rem);      /* 8px → 16px  */
+  --space-s:   clamp(1rem, 2.5vw, 1.5rem);      /* 16px → 24px */
+  --space-m:   clamp(1.5rem, 4vw, 2.5rem);      /* 24px → 40px */
+  --space-l:   clamp(2rem, 6vw, 4rem);          /* 32px → 64px */
+  --space-xl:  clamp(3rem, 9vw, 6rem);          /* 48px → 96px */
+  --space-2xl: clamp(4rem, 12vw, 9rem);         /* 64px → 144px */
+  --space-3xl: clamp(6rem, 16vw, 12.5rem);      /* 96px → 200px */
+
+  /* ── §4 GRID ─────────────────────────────────────────────────── */
+  --gutter:  clamp(1rem, 2vw, 2rem);     /* 16px → 32px */
+  --margin:  clamp(1.25rem, 5vw, 7.5rem); /* 20px → 120px */
+
+  /* ── §5 ESCALA TIPOGRÁFICA FLUIDA ───────────────────────────── */
+  --text-h1:      clamp(2.4rem, 10.5vw, 13rem);               /* H1 hero — mobile/tablet ajustado iter.4: min 2.75→2.4, preferred 13→10.5vw */
+  --text-h2:      clamp(2rem, 9vw, 7rem);                     /* H2 sección */
+  --text-names:   clamp(1.75rem, 8vw, 6rem);                  /* nombres portfolio */
+  --text-cta:     clamp(2.5rem, 10vw, 8rem);                  /* "Hablemos." */
+  --text-subhead: clamp(1.125rem, 1.4vw + 0.7rem, 1.375rem); /* subhead-filtro */
+  --text-body:    clamp(1rem, 0.4vw + 0.9rem, 1.125rem);     /* body */
+  --text-mono:    clamp(0.6875rem, 0.3vw + 0.6rem, 0.8125rem); /* índices mono */
+}

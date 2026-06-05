@@ -1,0 +1,33 @@
+---
+/**
+ * pages/es/index.astro — Pagina principal ES
+ * URL canonical: https://scuart.com/es
+ * Audiencia: LATAM + restaurantes latinos en USA + negocios bilingues.
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import HeroSection from '../../components/HeroSection.astro';
+import { getTranslations, getAlternates } from '../../i18n/index';
+
+const lang = 'es';
+const t = getTranslations(lang);
+const alternates = getAlternates();
+const canonicalURL = alternates.es;
+---
+
+<Layout
+  title={t.meta.title}
+  description={t.meta.description}
+  ogTitle={t.meta.ogTitle}
+  ogDescription={t.meta.ogDescription}
+  lang={lang}
+  canonicalURL={canonicalURL}
+  alternates={alternates}
+>
+  <Nav lang={lang} t={t} />
+  <HeroSection t={t} />
+
+  <!-- Secciones futuras: portfolio, servicios, metodo, CTA -->
+  <!-- Se implementan en hitos 2-5 segun el orden incremental aprobado -->
+</Layout>

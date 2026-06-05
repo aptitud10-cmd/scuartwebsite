@@ -1,0 +1,33 @@
+---
+/**
+ * pages/en/index.astro — Pagina principal EN
+ * URL canonical: https://scuart.com/en
+ * Default publico del sitio (x-default apunta aqui).
+ */
+
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import HeroSection from '../../components/HeroSection.astro';
+import { getTranslations, getAlternates } from '../../i18n/index';
+
+const lang = 'en';
+const t = getTranslations(lang);
+const alternates = getAlternates();
+const canonicalURL = alternates.en;
+---
+
+<Layout
+  title={t.meta.title}
+  description={t.meta.description}
+  ogTitle={t.meta.ogTitle}
+  ogDescription={t.meta.ogDescription}
+  lang={lang}
+  canonicalURL={canonicalURL}
+  alternates={alternates}
+>
+  <Nav lang={lang} t={t} />
+  <HeroSection t={t} />
+
+  <!-- Secciones futuras: portfolio, servicios, metodo, CTA -->
+  <!-- Se implementan en hitos 2-5 segun el orden incremental aprobado -->
+</Layout>
