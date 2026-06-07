@@ -1,16 +1,24 @@
 ---
 /**
- * HeroSection.astro — Seccion hero compartida entre /en y /es
- * Recibe las traducciones como prop — el markup HTML es identico en ambos idiomas.
- * Esto garantiza DRY sin duplicar el HTML del hero (P6).
+ * HeroSection.astro — Hero Concepto B: "Design + Technology como sistema"
+ * Aprobado por William (2026-06-07).
  *
- * Basado en DIRECCION_B_v2_REFINADA.md + DESIGN_RESPONSIVE.md §3/§4/§7/§13.
- * Design Gate: APPROVED_WITH_MINOR_FIXES (visual-critic Etapa A).
+ * Composicion:
+ * - Kicker mono arriba-izquierda
+ * - Headline 3 lineas: "DESIGN [+rojo] TECHNOLOGY / FOR BUSINESSES THAT NEED TO / LOOK SHARP AND WORK BETTER."
+ * - El "+" es signo tipografico integrado al headline — mismo peso/tamaño, color --rojo
+ * - Indice de capacidades 001-004 (col 9-12 desktop / lista debajo en mobile)
+ * - Subhead DM Sans taupe col 1-6
+ * - Franja roja: costura vertical 2px sobre col 9 (desktop/tablet) / horizontal (mobile)
+ * - CTA "START A PROJECT →"
  *
- * PROGRESSIVE ENHANCEMENT (fix iter.5):
- * El H1 es HTML real, visible por defecto. GSAP es enhancement no-bloqueante.
- * Eliminada la isla React HeroGSAP — el word-reveal lo maneja el script GSAP
- * de este mismo archivo operando sobre el texto ya presente en el DOM.
+ * PROGRESSIVE ENHANCEMENT:
+ * El H1 es HTML real server-rendered, visible sin JS.
+ * GSAP es enhancement no-bloqueante — si falla, hero visible completo.
+ *
+ * Presupuesto rojo: 2 instancias (el "+" + la franja costura). Maximo respetado.
+ * meta_col: campo conservado en diccionario pero NO renderizado aqui
+ *   (el indice de capacidades reemplaza su funcion).
  */
 
 import type { Translations } from '../i18n/en';
@@ -20,23 +28,21 @@ interface Props {
 }
 
 const { t } = Astro.props;
-
-/* Construir el texto plano de cada linea para el aria-label (ya existia) */
 ---
 
 <!--
-  HERO — §3 DESIGN_RESPONSIVE
-  Estructura responsive mobile-first:
-  - mobile 375: min-height 100svh, H1 anclado ~42%, indice mono arriba, lomo-cuaderno
-  - tablet 768: 6 col, indice arriba derecha, subhead col 1-4
-  - desktop 1280: 12 col, H1 col 1-8, franja roja col 9, indice col 9-12
+  HERO — Concepto B
+  Layout:
+  - mobile 375: flex column, lomo-cuaderno, kicker → H1 → subhead → capacidades → CTA
+  - tablet 768: grid 6 col, headline col 1-6, capacidades debajo subhead
+  - desktop 1280: grid 12 col, headline col 1-8, capacidades col 9-12, subhead col 1-6, CTA col 1-3
 -->
-<section class="hero" aria-label="Seccion principal">
+<section class="hero" aria-label={t.hero.ariaLabel}>
 
   <!--
-    Grilla editorial (§4): lineas verticales 1px crema 7%
-    col 3/6/9 desktop. En mobile se ocultan — el lomo-cuaderno las reemplaza.
-    Sin transform inicial en CSS — GSAP lo maneja completamente.
+    Grilla editorial: lineas verticales 1px crema 9%
+    col 3/6/9 desktop. Mobile: ocultas (lomo-cuaderno las reemplaza).
+    GSAP maneja el estado inicial (opacity 0) y la animacion de entrada.
   -->
   <div class="grid-lines" aria-hidden="true">
     <div class="grid-line" data-col="3"></div>
@@ -44,56 +50,41 @@ const { t } = Astro.props;
     <div class="grid-line" data-col="9"></div>
   </div>
 
-  <!-- Lomo-cuaderno: solo mobile (§4 §12) — linea a izquierda del viewport -->
+  <!-- Lomo-cuaderno: solo mobile — linea vertical izquierda del viewport -->
   <div class="hero-notebook-spine" aria-hidden="true"></div>
 
-  <!-- Franja roja: col 9 desktop / regla horizontal mobile (§7) -->
-  <!-- Instancia 1 del presupuesto rojo (max 4) -->
+  <!--
+    Franja roja costura (instancia 2 del presupuesto rojo):
+    - Desktop/tablet: vertical 2px sobre eje col 9, tramo alineado al bloque de contenido
+    - Mobile: horizontal 2px, separa headline del indice de capacidades
+  -->
   <div class="hero-red-bar" aria-hidden="true"></div>
 
   <!--
-    Indice mono — clamp(88px, 14vh, 120px) desde top
-    §3: "indice mono arriba a clamp(88px,14vh,120px)"
-    §5: IBM Plex Mono 11-13px uppercase tracking +0.04em
+    Kicker — mono uppercase arriba-izquierda
+    Fila 1 del grid en desktop. Plano en mobile/tablet (flujo normal).
   -->
-  <p class="hero-index">
-    {t.hero.index}
+  <p class="hero-kicker">
+    {t.hero.kicker}
   </p>
 
   <!--
-    Meta columna derecha — SOLO DESKTOP (col 10-12)
-    §5 + §7: "ficha tecnica de estudio" en mono taupe.
-    Acompana la franja roja vertical y da estructura editorial a la columna derecha.
-    Info complementaria al indice arriba — sin duplicar "SCUART / ESTUDIO DE DISENO".
-    NO se muestra en mobile ni tablet.
-  -->
-  <aside class="hero-meta" aria-hidden="true">
-    <span class="hero-meta__number">{t.meta_col.number}</span>
-    <span class="hero-meta__label">{t.meta_col.label}</span>
-    <span class="hero-meta__divider"></span>
-    <span class="hero-meta__coords">{t.meta_col.coords}</span>
-    <span class="hero-meta__type">{t.meta_col.type}</span>
-  </aside>
-
-  <!--
     H1 — texto real server-rendered, visible por defecto (progressive enhancement).
-    §3: H1 anclado ~42% desde arriba, 2 lineas fijas, leading 0.92, tracking -0.025em
-    §11 anti-overflow: hyphens manual + overflow-wrap anywhere.
-
-    PROGRESSIVE ENHANCEMENT (fix iter.5):
-    - El texto existe en el HTML estatico: indexable, accesible, visible sin JS.
-    - Palabras rojas marcadas con .h1-word--rojo (color rojo en CSS por defecto).
-    - El script GSAP de abajo envuelve cada .h1-word en .word-clip/.word para
-      el word-reveal — si el script falla, el texto plano ya es visible.
-    - Sin aria-hidden (es el h1 real del documento).
+    3 lineas: DESIGN [+rojo] TECHNOLOGY / FOR BUSINESSES THAT NEED TO / LOOK SHARP AND WORK BETTER.
+    El "+" tiene color --rojo via .h1-word--rojo (CSS, sin JS).
+    GSAP envuelve cada .h1-word en .word-clip/.word-inner para el word-reveal.
+    El "+" entra al final de line1 con animacion propia (scale + fade).
   -->
   <h1 class="hero-h1">
-    <!-- Linea 1: palabras como spans individuales para el word-reveal GSAP -->
+    <!-- Linea 1: DESIGN [+rojo] TECHNOLOGY -->
     <span class="h1-line" data-line="1">
       {t.hero.line1.map((token, i) => (
         <>
           {i > 0 && <span class="h1-space" aria-hidden="true"> </span>}
-          <span class={`h1-word${token.isRed ? ' h1-word--rojo' : ''}`}>{token.word}</span>
+          <span
+            class={`h1-word${token.isRed ? ' h1-word--rojo' : ''}${token.word === '+' ? ' h1-plus' : ''}`}
+            data-plus={token.word === '+' ? 'true' : undefined}
+          >{token.word}</span>
         </>
       ))}
     </span>
@@ -106,22 +97,54 @@ const { t } = Astro.props;
         </>
       ))}
     </span>
+    <!-- Linea 3 -->
+    <span class="h1-line" data-line="3">
+      {t.hero.line3.map((token, i) => (
+        <>
+          {i > 0 && <span class="h1-space" aria-hidden="true"> </span>}
+          <span class={`h1-word${token.isRed ? ' h1-word--rojo' : ''}`}>{token.word}</span>
+        </>
+      ))}
+    </span>
   </h1>
 
   <!--
-    Subhead-filtro — DM Sans (->Messina futuro), taupe, leading 1.5
-    §3: "subhead margin-top --space-l"
-    Col 1-6 desktop.
+    Subhead — DM Sans taupe col 1-6 desktop
   -->
   <p class="hero-subhead">
     {t.hero.subhead}
   </p>
 
+  <!--
+    CTA — "START A PROJECT →"
+    Mono/display, presencia clara. Abajo-izquierda.
+  -->
+  <a class="hero-cta" href="#contact">
+    {t.hero.cta} <span aria-hidden="true">→</span>
+  </a>
+
+  <!--
+    Indice de capacidades 001-004.
+    Desktop: col 9-12, alineado al bloque headline como documento editorial.
+    Mobile/tablet: lista mono full-width debajo del subhead.
+    Se lee como ficha tecnica de estudio, NO como lista de servicios con bullets.
+  -->
+  <ul class="hero-capabilities" aria-label="Capacidades del estudio">
+    {t.hero.capabilities.map((item) => (
+      <li class="hero-capabilities__item">
+        <span class="hero-capabilities__num">{item.num}</span>
+        <span class="hero-capabilities__sep" aria-hidden="true"> / </span>
+        <span class="hero-capabilities__label">{item.label}</span>
+      </li>
+    ))}
+  </ul>
+
 </section>
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   HERO
+   HERO — Concepto B
+   Mobile-first: 375px base. md: 768px. lg: 1280px.
    ═══════════════════════════════════════════════════════════ */
 
 .hero {
@@ -131,13 +154,13 @@ const { t } = Astro.props;
   flex-direction: column;
   padding-left: var(--margin);
   padding-right: var(--margin);
+  padding-top: 0;
   padding-bottom: var(--space-2xl);
-  /* Anti-overflow mobile §11 */
   max-width: 100%;
   overflow-x: clip;
 }
 
-/* ─── GRILLA EDITORIAL (§4) ──────────────────────────────── */
+/* ─── GRILLA EDITORIAL ───────────────────────────────────── */
 
 .grid-lines {
   position: absolute;
@@ -152,34 +175,26 @@ const { t } = Astro.props;
   bottom: 0;
   width: 1px;
   background-color: var(--linea);
-  /* Sin transform aqui — GSAP maneja el estado inicial */
-  opacity: 0; /* GSAP lo revela */
+  opacity: 0; /* GSAP revela */
 }
 
-/* Col 3 (≈ primer cuarto del interior) */
 .grid-line[data-col="3"] {
   left: 25%;
   display: none;
 }
 
-/* Col 6 (≈ mitad) */
 .grid-line[data-col="6"] {
   left: 50%;
   display: none;
 }
 
-/* Col 9 (≈ tercer cuarto) — franja roja en mismo eje */
 .grid-line[data-col="9"] {
   left: 75%;
   display: none;
 }
 
-/* ─── LOMO-CUADERNO mobile (§4 §12) ─────────────────────── */
-/*
- * Linea vertical crema 7% a 20px del borde izquierdo del viewport.
- * Solo mobile — en tablet+ desaparece (las col lines toman su rol).
- * "Margen de cuaderno" que ancla todo el contenido.
- */
+/* ─── LOMO-CUADERNO mobile ───────────────────────────────── */
+
 .hero-notebook-spine {
   position: fixed;
   top: 0;
@@ -193,12 +208,12 @@ const { t } = Astro.props;
   display: block;
 }
 
-/* ─── FRANJA ROJA (§7) ──────────────────────────────────── */
+/* ─── FRANJA ROJA — costura diseno/sistema ───────────────── */
 /*
- * Mobile: regla horizontal 2px, ~33% de ancho, anclada a izquierda,
- *         bajo el H1 hero (instancia de rojo).
- * Desktop: franja vertical 2px sobre eje col 9 (misma X que la grid-line),
- *          tramo alineado al H1 (no recorre toda la pagina).
+ * Mobile: regla horizontal 2px, full-width desde el margen,
+ *         entre subhead y capacidades (JS la posiciona via clase .is-mobile).
+ * Desktop/tablet: vertical 2px sobre eje col 9, tramo del bloque de contenido.
+ * Instancia 2 del presupuesto rojo (max 2 aprobado).
  */
 .hero-red-bar {
   position: absolute;
@@ -207,24 +222,20 @@ const { t } = Astro.props;
   z-index: 2;
   opacity: 0; /* GSAP revela */
 
-  /* Mobile: regla horizontal */
-  /*
-   * iter.4: cambiado de top:62%/68% a bottom-anchored.
-   * Anclar desde abajo: queda sobre el subhead, debajo del H1.
-   * bottom: ~28% = espacio para subhead (~4 lineas) + padding bottom.
-   * Con min-height 100svh = 812px, bottom 28% ≈ 227px desde abajo.
-   */
-  left: 0;
-  width: 33%;
-  height: 2px;
+  /* Mobile: horizontal */
+  left: var(--margin);
+  right: var(--margin);
+  height: 1px;
+  width: auto;
   top: auto;
-  /* iter.4: bottom 22% ≈ 179px desde abajo — debajo del H1, encima del subhead */
-  bottom: 22%;
-  transform-origin: left center;
+  bottom: auto;
+  /* posicion mobile: entre capacidades y subhead — se setea dinamicamente en JS
+     pero con fallback CSS para reduced-motion/no-JS */
 }
 
-/* ─── INDICE MONO (§3) ──────────────────────────────────── */
-.hero-index {
+/* ─── KICKER ─────────────────────────────────────────────── */
+
+.hero-kicker {
   position: relative;
   z-index: 2;
   font-family: var(--font-mono);
@@ -234,67 +245,68 @@ const { t } = Astro.props;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   line-height: 1.4;
-  /* §3: clamp(88px, 14vh, 120px) desde top */
   margin-top: clamp(88px, 14vh, 120px);
-  margin-bottom: auto; /* flex: empuja H1 hacia el 42% desde arriba */
+  margin-bottom: var(--space-m);
   flex-shrink: 0;
   opacity: 0; /* GSAP revela */
 }
 
-/* ─── H1 (§3 §5) ────────────────────────────────────────── */
+/* ─── H1 ─────────────────────────────────────────────────── */
 /*
- * Archivo variable wght 900 wdth 110 (rango aprobado 105-115).
- * Mobile wdth reducido a 95 para que entre mejor en 375px (iter.4: 100→95).
- * Leading 0.92, tracking -0.025em, 2 lineas fijas.
- * text-wrap balance: favorece agrupamiento 2-por-linea vs 1-por-linea.
- * Anti-overflow: hyphens + overflow-wrap.
+ * Archivo variable 900 wdth 95 mobile → 105 tablet → 110 desktop.
+ * Leading 0.92, tracking -0.025em. 3 lineas fijas en desktop.
+ * El "+" (.h1-plus) es inline, mismo tamaño/peso/baseline que el resto.
+ * Color rojo aplicado via .h1-word--rojo (CSS, sin JS).
  */
 .hero-h1 {
   position: relative;
   z-index: 2;
   font-family: var(--font-display);
   font-weight: var(--display-weight-heavy);
-  font-size: var(--text-h1);
+  /* Mobile: override del token global para que el copy largo no ocupe todo el viewport.
+     El token --text-h1 (10.5vw preferred) fue calibrado para copy corto de 2 líneas.
+     Con el copy nuevo de 3 líneas largas, bajamos el preferred a 6vw → ~22.5px en 375px.
+     Esto da ~6-7 líneas y deja respirar subhead + CTA en el fold. */
+  font-size: clamp(1.6rem, 6vw, 2.8rem);
   line-height: 0.92;
   letter-spacing: -0.025em;
   color: var(--crema);
-  /* wdth mobile: 95 (iter.4: mas estrecho para que 2 palabras entren por linea) */
   font-variation-settings: 'wdth' 95;
-  text-wrap: balance;
   hyphens: manual;
   overflow-wrap: anywhere;
   flex-shrink: 0;
   margin-bottom: 0;
-  /* Aire adicional entre H1 y subhead — iter.4 */
   margin-top: 0;
 }
 
-/* Lineas del H1 — bloque para que cada linea ocupe su propia fila */
 .h1-line {
   display: block;
 }
 
-/* Cada palabra — inline-block por defecto, visible sin JS */
 .h1-word {
   display: inline-block;
 }
 
-/* Palabras rojas: color rojo visible en CSS sin JS (progressive enhancement) */
+/* El "+" — mismo display/peso/tamaño que el resto, color rojo */
 .h1-word--rojo {
   color: var(--rojo);
 }
 
-/* Espacio entre palabras */
+/*
+ * .h1-plus: espaciado lateral leve para que respire como signo tipografico.
+ * No es padding/margin de objeto — es el espacio natural de la palabra en el flujo.
+ * Las h1-space antes/despues ya dan el espacio de palabra. No agregar extra.
+ */
+.h1-plus {
+  /* Sin estilos adicionales — el espacio ya viene del h1-space entre palabras.
+     Solo se usa como hook de JS para la animacion diferenciada del "+". */
+}
+
 .h1-space {
   display: inline;
 }
 
-/*
- * Cuando el script GSAP confirma que va a animar (.hero-h1.will-animate),
- * los .h1-word son envueltos en .word-clip por el script — en ese momento
- * el overflow:hidden del .word-clip clipea el word-inner durante el yPercent.
- * El estado initial de yPercent lo setea GSAP (no CSS) para evitar flash.
- */
+/* word-clip / word-inner: inyectados por GSAP para el word-reveal */
 :global(.word-clip) {
   display: inline-block;
   overflow: hidden;
@@ -307,7 +319,8 @@ const { t } = Astro.props;
   display: inline-block;
 }
 
-/* ─── SUBHEAD-FILTRO (§3 §5) ────────────────────────────── */
+/* ─── SUBHEAD ────────────────────────────────────────────── */
+
 .hero-subhead {
   position: relative;
   z-index: 2;
@@ -317,11 +330,85 @@ const { t } = Astro.props;
   color: var(--taupe);
   line-height: 1.5;
   letter-spacing: 0;
-  /* iter.4: mas aire H1→subhead en mobile (space-l→space-xl) */
   margin-top: var(--space-xl);
   max-width: 38ch;
   flex-shrink: 0;
   opacity: 0; /* GSAP revela */
+}
+
+/* ─── CTA ────────────────────────────────────────────────── */
+
+.hero-cta {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  font-weight: 400;
+  color: var(--crema);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-decoration: none;
+  margin-top: var(--space-l);
+  padding: 0.75em 1.5em;
+  border: 1px solid var(--linea-hover);
+  flex-shrink: 0;
+  opacity: 0; /* GSAP revela */
+  /* Touch target minimo 48px (P9) */
+  min-height: 48px;
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.hero-cta:hover {
+  border-color: var(--crema);
+  color: var(--crema);
+}
+
+/* ─── INDICE DE CAPACIDADES ──────────────────────────────── */
+/*
+ * Mobile: lista mono full-width, debajo del CTA.
+ * Desktop: col 9-12, alineada al centro vertical del headline.
+ * Se lee como ficha tecnica de estudio — no bullets, no cards, no iconos.
+ */
+.hero-capabilities {
+  position: relative;
+  z-index: 2;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-top: var(--space-l);
+  flex-shrink: 0;
+  opacity: 0; /* GSAP revela */
+}
+
+.hero-capabilities__item {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  font-weight: 400;
+  color: var(--taupe);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 2;
+}
+
+.hero-capabilities__num {
+  display: inline;
+  /* Alineacion de numeracion: tabular para que 001/002/003/004 queden en columna */
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-capabilities__sep {
+  color: var(--taupe);
+  opacity: 0.5;
+}
+
+.hero-capabilities__label {
+  display: inline;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -331,9 +418,10 @@ const { t } = Astro.props;
   .hero {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto auto auto auto;
     column-gap: var(--gutter);
     align-items: start;
+    row-gap: 0;
   }
 
   /* Lomo solo mobile */
@@ -346,50 +434,56 @@ const { t } = Astro.props;
     display: block;
   }
 
-  .hero-index {
+  .hero-kicker {
     grid-column: 1 / 7;
-    text-align: right;
-    margin-bottom: 0;
+    margin-bottom: var(--space-s);
+    /* En tablet el kicker va arriba, ocupa toda la fila */
   }
 
   .hero-h1 {
     grid-column: 1 / 7;
-    align-self: center;
-    /* wdth tablet: 105 (iter.4: ligeramente expandido vs mobile 95) */
+    align-self: start;
+    /* Tablet: preferred 4.8vw → ~37px en 768px. ~5-6 líneas, CTA entra en el fold. */
+    font-size: clamp(2rem, 4.8vw, 3.8rem);
     font-variation-settings: 'wdth' 105;
-    /* iter.4: balance ayuda a que 2 palabras agrupen por linea en 768 */
-    text-wrap: balance;
     hyphens: none;
     overflow-wrap: normal;
+    text-wrap: balance;
   }
 
   .hero-subhead {
     grid-column: 1 / 5;
     max-width: none;
-    /* iter.4: restituir space-l en tablet (el space-xl es solo mobile) */
     margin-top: var(--space-l);
   }
 
+  .hero-cta {
+    grid-column: 1 / 4;
+    margin-top: var(--space-m);
+    align-self: start;
+  }
+
+  /* Capacidades: debajo del subhead en tablet, 4 columnas */
+  .hero-capabilities {
+    grid-column: 1 / 7;
+    margin-top: var(--space-m);
+    /* En tablet las capacidades van en columna, debajo del CTA */
+  }
+
   /*
-   * Franja roja tablet (§7): col 6 encendida, vertical.
-   * iter.4: cambiado de left:50% (cruzaba el texto H1) a col 5/6 borde
-   * = calc(margin + (100% - 2*margin) * 5/6) ≈ 81% del viewport a 768px.
-   * Queda despues del texto, intencional al margen derecho.
-   * Tramo acortado: top 25% → bottom 15% (solo acompana el H1, no sangra).
+   * Franja roja tablet: vertical 2px sobre col 5/6
+   * Separa el bloque de contenido de la columna derecha (aunque colapsada).
+   * left = margen + 4/6 del interior del grid (4 columnas de 6 = 66.6%)
    */
   .hero-red-bar {
-    left: calc(var(--margin) + (100% - 2 * var(--margin)) * 0.833);
-    width: 2px;
+    left: calc(var(--margin) + (100% - 2 * var(--margin)) * 0.667);
+    right: auto;
+    width: 1px;
     height: auto;
-    top: 25%;
-    bottom: 15%;
+    top: 22%;
+    bottom: 12%;
     transform-origin: top center;
   }
-}
-
-/* ─── META COLUMNA DERECHA (solo desktop) ──────────────────── */
-.hero-meta {
-  display: none; /* oculto mobile/tablet */
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -398,7 +492,9 @@ const { t } = Astro.props;
 @media (min-width: 1280px) {
   .hero {
     grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto auto auto auto;
     min-height: 100svh;
+    align-items: start;
   }
 
   /* Col 3/6/9 visibles */
@@ -408,208 +504,196 @@ const { t } = Astro.props;
     display: block;
   }
 
-  .hero-index {
-    grid-column: 9 / 13;
-    text-align: left;
+  /* Kicker: fila superior, col 1-8 (izquierda) */
+  .hero-kicker {
+    grid-column: 1 / 9;
+    grid-row: 1;
+    margin-bottom: var(--space-m);
   }
 
+  /* H1: col 1-8, fila 2 */
   .hero-h1 {
-    /* Col 1-8 alineacion izquierda dura (§3) */
     grid-column: 1 / 9;
-    align-self: center;
-    font-size: clamp(4rem, 5vw, 6rem);
-    /* wdth desktop: 110 (rango aprobado 105-115) */
+    grid-row: 2;
+    align-self: start;
+    font-size: clamp(3.5rem, 4.8vw, 6rem);
     font-variation-settings: 'wdth' 110;
-    /* iter.4: anular balance mobile — desktop tiene composicion de texto controlada */
     text-wrap: unset;
     hyphens: none;
     overflow-wrap: normal;
   }
 
+  /* Subhead: col 1-6, fila 3 */
   .hero-subhead {
     grid-column: 1 / 7;
+    grid-row: 3;
     max-width: 50ch;
+    margin-top: var(--space-l);
+  }
+
+  /* CTA: col 1-3, fila 4 */
+  .hero-cta {
+    grid-column: 1 / 4;
+    grid-row: 4;
+    margin-top: var(--space-m);
+    align-self: start;
   }
 
   /*
-   * Franja roja desktop (§7): vertical 2px sobre eje col 9.
-   * Col 9 = 75% del ancho interior del grid.
+   * Indice de capacidades: col 9-12, fila 2.
+   * Alineado verticalmente al centro del headline.
+   * Se lee como documento editorial de estudio — NO lista con bullets.
    */
-  .hero-red-bar {
-    left: calc(var(--margin) + (100% - 2 * var(--margin)) * 0.75);
-    width: 2px;
-    height: auto;
-    top: 28%;
-    bottom: 30%;
-    transform-origin: top center;
-  }
-
-  /*
-   * Meta columna derecha — visible solo desktop.
-   * Col 9-12, apilada verticalmente.
-   */
-  .hero-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    grid-column: 10 / 13;
+  .hero-capabilities {
+    grid-column: 9 / 13;
+    grid-row: 2 / 5;
     align-self: center;
-    position: relative;
-    z-index: 2;
-    opacity: 0; /* GSAP revela */
+    margin-top: 0;
     padding-left: var(--gutter);
   }
 
-  .hero-meta__number {
-    font-family: var(--font-mono);
-    font-size: var(--text-mono);
-    font-weight: 400;
-    color: var(--crema);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    line-height: 1.4;
-    opacity: 0.7;
+  .hero-capabilities__item {
+    line-height: 2.4;
+    /* En desktop hay mas aire entre items — se ve como indice editorial */
   }
 
-  .hero-meta__label,
-  .hero-meta__coords,
-  .hero-meta__type {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: var(--text-mono);
-    font-weight: 400;
-    color: var(--taupe);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    line-height: 1.4;
-  }
-
-  /* Linea divisoria 1px crema 9% entre N°/label y coordenadas */
-  .hero-meta__divider {
-    display: block;
-    width: 100%;
-    height: 1px;
-    background-color: var(--linea);
-    margin: 0.75rem 0;
-  }
-
-  .hero-meta__type {
-    margin-top: 0.25rem;
-    opacity: 0.7;
+  /*
+   * Franja roja desktop: vertical 2px sobre eje col 9 (costura diseno/sistema).
+   * Col 9 = 8/12 del interior = 66.6% + margen.
+   * Tramo alineado al bloque de contenido (no recorre toda la pagina).
+   */
+  .hero-red-bar {
+    left: calc(var(--margin) + (100% - 2 * var(--margin)) * 0.6667);
+    right: auto;
+    width: 1px;
+    height: auto;
+    top: 20%;
+    bottom: 18%;
+    transform-origin: top center;
   }
 }
 </style>
 
 <script>
   /**
-   * Animacion GSAP del hero — SISTEMA UNIFICADO (fix iter.5).
+   * Animacion GSAP del hero — Concepto B (2026-06-07).
    *
    * PROGRESSIVE ENHANCEMENT:
    * Todo el hero es HTML/CSS visible por defecto. Este script es enhancement.
-   * Si falla: el hero se ve completo, sin animacion. Nunca invisible.
+   * Si falla: el hero se ve completo estatico. Nunca invisible.
    *
-   * Secuencia §13 DESIGN_RESPONSIVE:
-   * 1. Lineas de grilla (scaleY 0→1, 1.1s expo.out)
-   * 2. Indice mono fade-in
-   * 3. H1 word-reveal (yPercent 110→0, stagger por palabra)
-   * 4. Franja roja (scaleX/Y 0→1)
-   * 5. Subhead + meta columna
+   * Secuencia aprobada:
+   * 1. Grilla/lomo (scaleY 0→1, expo.out)
+   * 2. Kicker (fade)
+   * 3. H1 word-reveal lineas 1+2+3 (yPercent 110→0, stagger)
+   *    3a. El "+" entra AL FINAL de line1 con scale 0.6→1 + fade (beat propio)
+   * 4. Indice de capacidades 001-004 (fade + leve translateY, stagger — "imprime linea por linea")
+   * 5. Franja roja costura (scale 0→1)
+   * 6. Subhead + CTA (fade)
    *
-   * Word-reveal del H1: opera sobre .h1-word ya presentes en el DOM
-   * (el texto existe como HTML real — no reemplazado por JS).
-   * El script envuelve cada .h1-word en .word-clip + .word-inner para
-   * el efecto de clip. Si el script no corre, los .h1-word son texto plano.
+   * INTERACCION (solo desktop pointer:fine):
+   * Micro-pulso scale en el "+" al hover cercano — GSAP quickTo.
+   * Muy sutil. Solo el "+", no todo el hero.
+   *
+   * REDUCED-MOTION: todo estatico visible, sin animacion.
    */
 
   import { gsap } from 'gsap';
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* ── Helper: posicion de la franja roja mobile ── */
+  /*
+   * En mobile la franja es horizontal. La posicionamos entre el subhead y
+   * el indice de capacidades. Se calcula una vez al cargar.
+   */
+  function positionRedBarMobile(redBar: HTMLElement | null, subhead: HTMLElement | null) {
+    if (!redBar || !subhead) return;
+    const subheadRect = subhead.getBoundingClientRect();
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    redBar.style.top = `${subheadRect.bottom + scrollTop + 20}px`;
+    redBar.style.bottom = 'auto';
+  }
+
   if (!reducedMotion) {
-    /* ── Word-split del H1 (opera sobre texto ya en el DOM) ── */
-    /*
-     * Envuelve cada .h1-word en <span class="word-clip"><span class="word-inner">
-     * para el efecto de reveal con yPercent. El texto original sigue presente.
-     * Si este bloque lanza, el catch no interrumpe el resto de la animacion.
-     */
+    /* ── Word-split del H1 ── */
     const heroH1 = document.querySelector<HTMLElement>('.hero-h1');
     let wordInners: HTMLElement[] = [];
-    let wordInnersRojo: HTMLElement[] = [];
+    let plusInner: HTMLElement | null = null;
 
     if (heroH1) {
       try {
         const wordSpans = heroH1.querySelectorAll<HTMLElement>('.h1-word');
         wordSpans.forEach((wordEl) => {
           const isRojo = wordEl.classList.contains('h1-word--rojo');
+          const isPlus = wordEl.dataset.plus === 'true';
           const text = wordEl.textContent ?? '';
 
-          /* Crear la estructura: word-clip > word-inner */
           const clip = document.createElement('span');
           clip.className = 'word-clip';
 
           const inner = document.createElement('span');
-          inner.className = isRojo ? 'word-inner word-inner--rojo' : 'word-inner';
+          inner.className = 'word-inner';
+          if (isRojo) inner.style.color = 'var(--rojo)';
           inner.textContent = text;
 
           clip.appendChild(inner);
-
-          /* Reemplazar el .h1-word original con el clip */
           wordEl.replaceWith(clip);
 
-          if (isRojo) {
-            wordInnersRojo.push(inner);
+          if (isPlus) {
+            /* El "+" se anima separado: no va al array wordInners */
+            plusInner = inner;
           } else {
             wordInners.push(inner);
           }
         });
       } catch (_) {
-        /* Si el word-split falla, el texto plano ya es visible — no pasa nada */
         wordInners = [];
-        wordInnersRojo = [];
+        plusInner = null;
       }
     }
 
-    /* ── Elementos del hero (sin H1 — se anima por separado) ── */
+    /* ── Referencias DOM ── */
     const gridLines = document.querySelectorAll<HTMLElement>('.grid-line');
     const spine = document.querySelector<HTMLElement>('.hero-notebook-spine');
     const redBar = document.querySelector<HTMLElement>('.hero-red-bar');
-    const heroIndex = document.querySelector<HTMLElement>('.hero-index');
+    const kicker = document.querySelector<HTMLElement>('.hero-kicker');
     const heroSubhead = document.querySelector<HTMLElement>('.hero-subhead');
-    const heroMeta = document.querySelector<HTMLElement>('.hero-meta');
+    const heroCta = document.querySelector<HTMLElement>('.hero-cta');
+    const capabilityItems = document.querySelectorAll<HTMLElement>('.hero-capabilities__item');
+    const capabilities = document.querySelector<HTMLElement>('.hero-capabilities');
 
-    /* Estados iniciales — solo se setean SI el word-split funciono */
+    const isMobile = window.innerWidth < 768;
+
+    /* ── Estados iniciales ── */
     gsap.set(gridLines, { opacity: 1, scaleY: 0, transformOrigin: 'top center' });
     if (spine) gsap.set(spine, { opacity: 1, scaleY: 0, transformOrigin: 'top center' });
 
-    const isMobile = window.innerWidth < 768;
     if (isMobile) {
-      gsap.set(redBar, { opacity: 1, scaleX: 0, transformOrigin: 'left center' });
+      positionRedBarMobile(redBar, heroSubhead);
+      if (redBar) gsap.set(redBar, { opacity: 1, scaleX: 0, transformOrigin: 'left center' });
     } else {
-      gsap.set(redBar, { opacity: 1, scaleY: 0, transformOrigin: 'top center' });
+      if (redBar) gsap.set(redBar, { opacity: 1, scaleY: 0, transformOrigin: 'top center' });
     }
 
-    gsap.set(heroIndex, { opacity: 0 });
+    gsap.set(kicker, { opacity: 0 });
     gsap.set(heroSubhead, { opacity: 0 });
-    if (heroMeta) gsap.set(heroMeta, { opacity: 0 });
+    gsap.set(heroCta, { opacity: 0 });
+    if (capabilities) gsap.set(capabilities, { opacity: 1 });
+    gsap.set(capabilityItems, { opacity: 0, y: 8 });
 
-    /* Estado inicial de los word-inners (yPercent fuera del clip) */
     if (wordInners.length > 0) {
       gsap.set(wordInners, { yPercent: 110 });
     }
-    if (wordInnersRojo.length > 0) {
-      gsap.set(wordInnersRojo, { yPercent: 110 });
+    if (plusInner) {
+      /* El "+" empieza invisible y pequeno — entra con beat propio */
+      gsap.set(plusInner, { opacity: 0, scale: 0.6, transformOrigin: 'center center' });
     }
 
-    /* ── Timeline unificada ── */
+    /* ── Timeline principal ── */
     const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
 
     /* 1. Grilla / lomo */
-    /*
-     * Bug fix iter.7: querySelector encuentra el elemento aunque tenga display:none.
-     * En tablet/desktop el lomo tiene display:none (CSS) pero spine !== null,
-     * haciendo que la rama del else (gridLines) nunca se ejecutara.
-     * Fix: chequear visibilidad real con offsetParent en lugar de existencia del nodo.
-     */
     const spineVisible = spine !== null && spine.offsetParent !== null;
     if (spineVisible) {
       tl.to(spine, { scaleY: 1, duration: 1.1 });
@@ -617,36 +701,81 @@ const { t } = Astro.props;
       tl.to(gridLines, { scaleY: 1, duration: 1.1, stagger: 0.06 });
     }
 
-    /* 2. Indice mono */
-    tl.to(heroIndex, { opacity: 1, duration: 0.6 }, '-=0.5');
+    /* 2. Kicker */
+    tl.to(kicker, { opacity: 1, duration: 0.6 }, '-=0.5');
 
-    /* 3. H1 word-reveal — linea 1 (no-rojo primero, rojo con delay) */
+    /* 3. H1 word-reveal (todas las palabras excepto el "+") */
     if (wordInners.length > 0) {
-      tl.to(wordInners, { yPercent: 0, duration: 0.85, stagger: 0.08 }, '-=0.2');
-    }
-    if (wordInnersRojo.length > 0) {
-      /* Palabras rojas: 0.25s despues del inicio de la linea 1 */
-      tl.to(wordInnersRojo, { yPercent: 0, duration: 0.85, stagger: 0.05 }, '<+0.25');
+      tl.to(wordInners, { yPercent: 0, duration: 0.85, stagger: 0.07 }, '-=0.3');
     }
 
-    /* 4. Franja roja */
+    /* 3a. El "+" entra al final de line1 con su beat propio: scale + fade */
+    if (plusInner) {
+      tl.to(
+        plusInner,
+        { opacity: 1, scale: 1, duration: 0.55, ease: 'expo.out' },
+        /* Entra 0.2s despues de que arranca el stagger de line1 (~2 palabras ya mostraron) */
+        wordInners.length > 0 ? '<+0.2' : '-=0.3'
+      );
+    }
+
+    /* 4. Franja roja costura */
     if (isMobile) {
-      tl.to(redBar, { scaleX: 1, duration: 0.6, ease: 'expo.out' }, '+=0.4');
+      tl.to(redBar, { scaleX: 1, duration: 0.5, ease: 'expo.out' }, '+=0.1');
     } else {
-      tl.to(redBar, { scaleY: 1, duration: 0.8, ease: 'expo.out' }, '-=0.5');
+      tl.to(redBar, { scaleY: 1, duration: 0.8, ease: 'expo.out' }, '-=0.6');
     }
 
-    /* 5. Subhead + meta */
-    tl.to(heroSubhead, { opacity: 1, duration: 0.7 }, '+=0.1');
-    if (heroMeta) {
-      tl.to(heroMeta, { opacity: 1, duration: 0.6 }, '<+0.1');
+    /* 5. Indice de capacidades — "se imprime linea por linea" */
+    tl.to(
+      capabilityItems,
+      { opacity: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'expo.out' },
+      '-=0.4'
+    );
+
+    /* 6. Subhead + CTA */
+    tl.to(heroSubhead, { opacity: 1, duration: 0.7 }, '+=0.05');
+    tl.to(heroCta, { opacity: 1, duration: 0.5 }, '<+0.15');
+
+    /* ── Micro-interaccion en el "+" (solo desktop pointer:fine) ── */
+    /*
+     * Pulso scale sutil al pasar cerca del "+".
+     * NO magnetico en todo el hero — SOLO el "+".
+     * Progressive enhancement: si el "+" no existe, no pasa nada.
+     */
+    const isPointerFine = window.matchMedia('(pointer: fine)').matches;
+    /* Captura en const para que TS pueda estrechar el tipo dentro de los callbacks */
+    const plusInnerRef: HTMLElement | null = plusInner;
+    if (isPointerFine && plusInnerRef) {
+      const plusInnerEl: HTMLElement = plusInnerRef;
+      const plusClip = plusInnerEl.parentElement;
+      if (plusClip) {
+        let pulseTween: gsap.core.Tween | null = null;
+
+        plusClip.addEventListener('mouseenter', () => {
+          if (pulseTween) pulseTween.kill();
+          pulseTween = gsap.to(plusInnerEl, {
+            scale: 1.12,
+            duration: 0.35,
+            ease: 'expo.out',
+          });
+        });
+
+        plusClip.addEventListener('mouseleave', () => {
+          if (pulseTween) pulseTween.kill();
+          pulseTween = gsap.to(plusInnerEl, {
+            scale: 1,
+            duration: 0.55,
+            ease: 'expo.out',
+          });
+        });
+      }
     }
 
   } else {
-    /* reduced-motion: todo visible de inmediato (sin animacion) */
-    /* Los elementos con opacity:0 en CSS se fuerzan a 1 con GSAP (ya importado) */
+    /* ── reduced-motion: todo visible de inmediato ── */
     const allAnimated = document.querySelectorAll<HTMLElement>(
-      '.grid-line, .hero-notebook-spine, .hero-red-bar, .hero-index, .hero-subhead, .hero-meta'
+      '.grid-line, .hero-notebook-spine, .hero-red-bar, .hero-kicker, .hero-subhead, .hero-cta'
     );
     gsap.set(allAnimated, { opacity: 1 });
 
@@ -658,6 +787,14 @@ const { t } = Astro.props;
 
     const redBarRM = document.querySelector<HTMLElement>('.hero-red-bar');
     if (redBarRM) gsap.set(redBarRM, { scaleX: 1, scaleY: 1 });
-    /* El H1 es texto plano visible por defecto — no necesita set */
+
+    const capRM = document.querySelectorAll<HTMLElement>('.hero-capabilities__item');
+    gsap.set(capRM, { opacity: 1, y: 0 });
+
+    const capContainerRM = document.querySelector<HTMLElement>('.hero-capabilities');
+    if (capContainerRM) gsap.set(capContainerRM, { opacity: 1 });
+
+    /* H1 y su "+" son HTML plano visible por defecto — no necesitan set */
+    /* El "+" tiene color --rojo en CSS via .h1-word--rojo */
   }
 </script>

@@ -1,7 +1,7 @@
 /**
  * es.ts — Diccionario de copy ES (Español)
  * Copy nativo neutro LATAM, sin voseo. SCUART bilingue USA + LATAM.
- * Hero copy aprobado por William (sesion 2026-06-05).
+ * Hero copy: Concepto B "Diseño + Tecnología como sistema" (aprobado 2026-06-07).
  */
 
 import type { Translations } from './en';
@@ -9,12 +9,12 @@ import type { Translations } from './en';
 export const es: Translations = {
   /* ── SEO / metadata ─────────────────────────────────────── */
   meta: {
-    title: 'SCUART — Estudio de Diseño Bilingüe',
+    title: 'SCUART — Estudio Bilingüe de Diseño y Tecnología',
     description:
-      'No hacemos webs lindas. Hacemos que tu negocio se vea tan bien como sabe tu comida. Diseño con criterio, no plantillas.',
-    ogTitle: 'SCUART — Estudio de Diseño Bilingüe',
+      'Estudio bilingüe que construye webs premium, plataformas y sistemas digitales para negocios ambiciosos en USA y LATAM.',
+    ogTitle: 'SCUART — Estudio Bilingüe de Diseño y Tecnología',
     ogDescription:
-      'Diseño web premium para restaurantes, marcas de comida y negocios locales. MX · AR · US.',
+      'Diseño web premium y sistemas digitales para negocios en USA y LATAM.',
   },
 
   /* ── Nav ────────────────────────────────────────────────── */
@@ -26,32 +26,61 @@ export const es: Translations = {
     langHref: '/en',
   },
 
-  /* ── Hero ────────────────────────────────────────────────── */
+  /* ── Hero — Concepto B ──────────────────────────────────── */
   hero: {
+    /** Kicker: linea editorial arriba-izquierda, mono uppercase */
+    kicker: 'SCUART — ESTUDIO DE DISEÑO Y TECNOLOGÍA',
+
     /**
-     * line1: "TU COMIDA TIENE CARÁCTER." — solo "CARÁCTER." es roja.
-     * El punto va pegado al token. Á (U+00C1) presente en el woff2.
+     * line1: "DISEÑO [+] TECNOLOGÍA"
+     * El "+" es el UNICO elemento rojo del headline.
+     * Mismo peso/tamaño/baseline que las palabras — signo tipografico, no icono.
      */
     line1: [
-      { word: 'TU', isRed: false },
-      { word: 'COMIDA', isRed: false },
-      { word: 'TIENE', isRed: false },
-      { word: 'CARÁCTER.', isRed: true },
+      { word: 'DISEÑO', isRed: false },
+      { word: '+', isRed: true },
+      { word: 'TECNOLOGÍA', isRed: false },
     ],
-    /** line2: "TU WEB TAMBIÉN DEBERÍA." — sin rojo */
+
+    /** line2: "PARA NEGOCIOS QUE NECESITAN" */
     line2: [
-      { word: 'TU', isRed: false },
-      { word: 'WEB', isRed: false },
-      { word: 'TAMBIÉN', isRed: false },
-      { word: 'DEBERÍA.', isRed: false },
+      { word: 'PARA', isRed: false },
+      { word: 'NEGOCIOS', isRed: false },
+      { word: 'QUE', isRed: false },
+      { word: 'NECESITAN', isRed: false },
     ],
-    ariaLabel: 'Tu comida tiene carácter. Tu web también debería.',
+
+    /** line3: "VERSE MEJOR Y FUNCIONAR MEJOR." */
+    line3: [
+      { word: 'VERSE', isRed: false },
+      { word: 'MEJOR', isRed: false },
+      { word: 'Y', isRed: false },
+      { word: 'FUNCIONAR', isRed: false },
+      { word: 'MEJOR.', isRed: false },
+    ],
+
+    /**
+     * Indice de capacidades: col 9-12 desktop, lista mono debajo en mobile.
+     * Terminos tecnicos se mantienen en ingles en ambos idiomas (como PORTFOLIO).
+     */
+    capabilities: [
+      { num: '001', label: 'WEB PLATFORMS' },
+      { num: '002', label: 'SAAS + SYSTEMS' },
+      { num: '003', label: 'AI AUTOMATION' },
+      { num: '004', label: 'ORDERING · BOOKING · WORKFLOWS' },
+    ],
+
+    ariaLabel:
+      'Diseño y Tecnología para negocios que necesitan verse mejor y funcionar mejor.',
     subhead:
-      'No hacemos webs lindas. Hacemos que tu negocio se vea tan bien como sabe tu comida. Diseño con criterio, no plantillas.',
-    index: 'SCUART / ESTUDIO DE DISEÑO · MX·AR·US · 2026',
+      'Estudio que construye webs premium, plataformas y sistemas digitales para negocios ambiciosos en USA y LATAM.',
+    cta: 'EMPEZAR UN PROYECTO',
+
+    /* Campo conservado para compatibilidad — no se renderiza en el hero */
+    index: 'SCUART / ESTUDIO DE DISEÑO Y TECNOLOGÍA · MX·AR·US · 2026',
   },
 
-  /* ── Meta columna derecha (solo desktop, aria-hidden) ────── */
+  /* ── Meta columna derecha (campo conservado, no renderizado en hero) ── */
   meta_col: {
     number: 'N°·01',
     label: 'DECLARACIÓN',

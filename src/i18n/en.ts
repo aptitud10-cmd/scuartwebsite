@@ -1,7 +1,7 @@
 /**
  * en.ts — Diccionario de copy EN (English)
  * Copy nativo, NO traduccion literal. SCUART bilingue USA + LATAM.
- * Hero copy aprobado por William (sesion 2026-06-05).
+ * Hero copy: Concepto B "Design + Technology como sistema" (aprobado 2026-06-07).
  *
  * NOTA de tipos: se usa una interfaz explícita (no "typeof en" con as const)
  * para que es.ts pueda implementar la misma forma sin colision de literales.
@@ -10,6 +10,11 @@
 export interface HeroToken {
   word: string;
   isRed: boolean;
+}
+
+export interface CapabilityItem {
+  num: string;
+  label: string;
 }
 
 export interface Translations {
@@ -27,10 +32,14 @@ export interface Translations {
     langHref: string;
   };
   hero: {
+    kicker: string;
     line1: HeroToken[];
     line2: HeroToken[];
+    line3: HeroToken[];
+    capabilities: CapabilityItem[];
     ariaLabel: string;
     subhead: string;
+    cta: string;
     index: string;
   };
   meta_col: {
@@ -44,12 +53,12 @@ export interface Translations {
 export const en: Translations = {
   /* ── SEO / metadata ─────────────────────────────────────── */
   meta: {
-    title: 'SCUART — Bilingual Design Studio',
+    title: 'SCUART — Bilingual Design & Tech Studio',
     description:
-      "We don't make pretty websites. We make your business look as good as it tastes. Design with intent, not templates.",
-    ogTitle: 'SCUART — Bilingual Design Studio',
+      'A bilingual studio building premium websites, platforms and digital systems for ambitious businesses across the US and LATAM.',
+    ogTitle: 'SCUART — Bilingual Design & Tech Studio',
     ogDescription:
-      'Premium web design for restaurants, food brands, and local businesses. US · LATAM.',
+      'Premium web design and digital systems for businesses in the US and LATAM.',
   },
 
   /* ── Nav ────────────────────────────────────────────────── */
@@ -61,32 +70,62 @@ export const en: Translations = {
     langHref: '/es',
   },
 
-  /* ── Hero ────────────────────────────────────────────────── */
+  /* ── Hero — Concepto B ──────────────────────────────────── */
   hero: {
+    /** Kicker: linea editorial arriba-izquierda, mono uppercase */
+    kicker: 'SCUART — DESIGN & TECHNOLOGY STUDIO',
+
     /**
-     * line1: "YOUR FOOD HAS CHARACTER." — solo "CHARACTER." es roja.
-     * El punto va pegado al token.
+     * line1: "DESIGN [+] TECHNOLOGY"
+     * El "+" es el UNICO elemento rojo del headline.
+     * Mismo peso/tamaño/baseline que las palabras — signo tipografico, no icono.
      */
     line1: [
-      { word: 'YOUR', isRed: false },
-      { word: 'FOOD', isRed: false },
-      { word: 'HAS', isRed: false },
-      { word: 'CHARACTER.', isRed: true },
+      { word: 'DESIGN', isRed: false },
+      { word: '+', isRed: true },
+      { word: 'TECHNOLOGY', isRed: false },
     ],
-    /** line2: ninguna palabra roja */
+
+    /** line2: "FOR BUSINESSES THAT NEED TO" */
     line2: [
-      { word: 'YOUR', isRed: false },
-      { word: 'WEBSITE', isRed: false },
-      { word: 'SHOULD', isRed: false },
-      { word: 'TOO.', isRed: false },
+      { word: 'FOR', isRed: false },
+      { word: 'BUSINESSES', isRed: false },
+      { word: 'THAT', isRed: false },
+      { word: 'NEED', isRed: false },
+      { word: 'TO', isRed: false },
     ],
-    ariaLabel: 'Your food has character. Your website should too.',
+
+    /** line3: "LOOK SHARP AND WORK BETTER." */
+    line3: [
+      { word: 'LOOK', isRed: false },
+      { word: 'SHARP', isRed: false },
+      { word: 'AND', isRed: false },
+      { word: 'WORK', isRed: false },
+      { word: 'BETTER.', isRed: false },
+    ],
+
+    /**
+     * Indice de capacidades: col 9-12 desktop, lista mono debajo en mobile.
+     * Terminos tecnicos se mantienen en ingles en ambos idiomas (como PORTFOLIO).
+     */
+    capabilities: [
+      { num: '001', label: 'WEB PLATFORMS' },
+      { num: '002', label: 'SAAS + SYSTEMS' },
+      { num: '003', label: 'AI AUTOMATION' },
+      { num: '004', label: 'ORDERING · BOOKING · WORKFLOWS' },
+    ],
+
+    ariaLabel:
+      'Design and Technology for businesses that need to look sharp and work better.',
     subhead:
-      "We don't make pretty websites. We make your business look as good as it tastes. Design with intent, not templates.",
-    index: 'SCUART / DESIGN STUDIO · US·LATAM · 2026',
+      'A studio building premium websites, platforms and digital systems for ambitious businesses across the US and LATAM.',
+    cta: 'START A PROJECT',
+
+    /* Campo conservado para compatibilidad — no se renderiza en el hero */
+    index: 'SCUART / DESIGN & TECH STUDIO · US·LATAM · 2026',
   },
 
-  /* ── Meta columna derecha (solo desktop, aria-hidden) ────── */
+  /* ── Meta columna derecha (campo conservado, no renderizado en hero) ── */
   meta_col: {
     number: 'N°·01',
     label: 'STATEMENT',

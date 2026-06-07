@@ -1,20 +1,30 @@
 # Estado del flujo Agency OS — Rediseño scuart.com
 
-**Última actualización:** 2026-06-04
-**Motivo del handoff:** reiniciar Claude Code para que cargue visual-critic y disenador-desktop como subagentes reales del plugin 1.4.0 (se actualizó el plugin durante la sesión, después de que el registro de agentes ya estaba cargado en memoria).
+**Última actualización:** 2026-06-07
+**Motivo del handoff:** Hito 1 (hero) RE-HECHO de cero al Concepto B "Diseño + Tecnología". El hero anterior ("Declaración en Rojo" / copy de comida) fue descartado por William. Ver HERO_RESET.md.
 
 ---
 
-## ⬛ HITO 1 — HERO: CERRADO (sesión implementación)
+## ⬛ HITO 1 — HERO: CERRADO v2 (Concepto B "Diseño + Tecnología")
 
-Estado: **hero implementado y aprobado**. Astro 5 limpio, código viejo en `_old/`, bilingüe EN(default)/ES con i18n + SEO (hreflang/canonical/OG por idioma), 3 fuentes self-hosted OFL (Archivo/DM Sans/IBM Plex Mono).
+Estado: **hero re-hecho y aprobado visualmente por William (2026-06-07)**. Astro 5 limpio, bilingüe EN(default)/ES con i18n + SEO (hreflang/canonical/OG por idioma), 3 fuentes self-hosted OFL (Archivo/DM Sans/IBM Plex Mono).
 
-Recorrido: 7 iteraciones. Bugs/ajustes resueltos: H1 sobredimensionado desktop (166→64px, 3 bloques), grilla subida a 9%, ficha técnica derecha agregada, mobile menos fragmentado (2 palabras/línea), franja roja tablet reposicionada (col 6, ya no cruza texto), **H1 invisible → reescrito como HTML real server-rendered (progressive enhancement, robusto sin JS, SEO/a11y OK)**, **grilla invisible en 1280 → fix lógica GSAP (offsetParent), ahora 3 líneas visibles col 3/6/9**.
+**Qué cambió vs la v1 (Declaración en Rojo):** se descartó por completo el concepto de comida/carácter y la "declaración roja" como afiche tipográfico. William lo encontró genérico ("texto grande + línea roja + grain") y rechazó dos intentos de elevarlo que resultaron ser INVENTOS de Claude disfrazados de research: (1) marcas de coordenadas X:03·Y:02 espolvoreadas en la grilla, (2) morphing bilingüe del H1 (el headline cambiaba EN↔ES solo en loop — ridículo, nadie navega en 2 idiomas a la vez). Ambos revertidos. Lección registrada en HERO_RESET.md: NO inventar ideas visuales y anclarlas a research falso.
 
-**visual-critic Etapa B: APPROVED_WITH_MINOR_FIXES** (9/10 ≥8.5; único fallo desktop 8.4 = grilla invisible 1280, YA RESUELTO). Scores: Originalidad 8.6, Dirección 8.7, Jerarquía 8.8, Tipografía 8.5, Composición 8.5, Premium 8.6, Claridad 8.5, Mobile 8.6, Desktop 8.4→resuelto, Diferenciación 8.7. Los 6 puntos del checklist Etapa B: todos PASAN en pixeles (grilla 1280 tras fix).
+**Concepto B aprobado (ver HERO_RESET.md §3):** "Diseño + Tecnología como sistema". Estudio de diseño + tecnología (NO solo restaurantes; entrada local/gastro pero capacidad técnica visible: web/SaaS/IA/workflows).
+- **Copy hero EN:** "DESIGN + TECHNOLOGY / FOR BUSINESSES THAT NEED TO / LOOK SHARP AND WORK BETTER." Subhead: "A studio building premium websites, platforms and digital systems for ambitious businesses across the US and LATAM."
+- **Copy hero ES:** "DISEÑO + TECNOLOGÍA / PARA NEGOCIOS QUE NECESITAN / VERSE MEJOR Y FUNCIONAR MEJOR." Subhead: "Estudio que construye webs premium, plataformas y sistemas digitales para negocios ambiciosos en USA y LATAM."
+- **Protagonista visual = el "+" rojo** entre DESIGN y TECHNOLOGY. ÚNICO elemento rojo del headline, signo tipográfico integrado (mismo peso/baseline, NO icono). Hace literal "diseño + tecnología como una sola cosa". Tiene micro-interacción sutil al cursor (solo el +, solo desktop).
+- **Lado derecho (col 9-12) = índice mono de capacidades** como documento editorial de estudio (NO dashboard, NO cards, NO iconos tech): 001/WEB PLATFORMS · 002/SAAS + SYSTEMS · 003/AI AUTOMATION · 004/ORDERING·BOOKING·WORKFLOWS. Términos técnicos en inglés en ambos idiomas (como PORTFOLIO). Conecta con MÉTODO.
+- **Franja roja:** regla vertical fina sobre col 9 = "costura" entre lado diseño (izq) y lado sistema (der). Ya no es protagonista (lo es el +). Presupuesto rojo: 2 instancias (+ y costura).
+- **Kicker mono** arriba-izq: "SCUART — DESIGN & TECHNOLOGY STUDIO" / "ESTUDIO DE DISEÑO Y TECNOLOGÍA". "Bilingüe" NO va en el copy visible (es arquitectura, no se anuncia); solo en meta.title/ogTitle para SEO.
+- **CTA hero:** "START A PROJECT →" / "EMPEZAR UN PROYECTO →".
+- **Motion:** entrada sobria UNA vez (grilla → word-reveal headline → el + entra último con beat propio → índice stagger → subhead/CTA). Sin loops. reduced-motion estático.
+- **Responsive:** desktop editorial 12-col con índice a la derecha; tablet 768 headline contenido (3-4 líneas) + todo en fold; mobile 375 apilado limpio (kicker→headline 5-6 líneas→subhead→CTA→índice). H1 con override de font-size en mobile/tablet (clamp menor que --text-h1 global, que quedó para otras secciones).
 
-**DEUDA DE COPY (pendiente, NO bloquea):** el hero quedó con "YOUR FOOD HAS CHARACTER / YOUR WEBSITE SHOULD TOO" (EN) y "TU COMIDA TIENE CARÁCTER / TU WEB TAMBIÉN DEBERÍA" (ES) — palabra roja CHARACTER/CARÁCTER. William NO está convencido del copy (objeción: "carácter" no concuerda bien con "comida"; quería sacar la metáfora comida↔web). Se cambia en 2 líneas de i18n (src/i18n/en.ts + es.ts) cuando se decida. Research de copy hecho (6 opciones, ver historial). PENDIENTE TAMBIÉN: decidir posicionamiento (solo-food vs amplio) — afecta el copy final. El subhead-filtro "Diseño con criterio, no plantillas / no templates" el critic recomendó conservarlo aunque cambie el H1.
-NOTA: cuando se cambie el copy, mantener: palabra roja corta (no desborda mobile), 2 líneas/bloques máx.
+Archivos del hero: src/components/HeroSection.astro, src/i18n/en.ts, src/i18n/es.ts. Screenshots: redesign/shots/hero-b-{en,es}-{375,768,1280}.png.
+
+**DEUDA NO BLOQUEANTE:** el copy del Concepto B es base aprobada pero William puede afinar las frases más adelante (sin cambiar el concepto). El campo meta_col en i18n quedó conservado pero NO se renderiza (lo reemplazó el índice de capacidades).
 
 ## DÓNDE RETOMAR (próxima sesión)
 
