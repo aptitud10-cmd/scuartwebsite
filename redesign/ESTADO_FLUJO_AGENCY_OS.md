@@ -26,19 +26,36 @@ Archivos del hero: src/components/HeroSection.astro, src/i18n/en.ts, src/i18n/es
 
 **DEUDA NO BLOQUEANTE:** el copy del Concepto B es base aprobada pero William puede afinar las frases más adelante (sin cambiar el concepto). El campo meta_col en i18n quedó conservado pero NO se renderiza (lo reemplazó el índice de capacidades).
 
-## DÓNDE RETOMAR (próxima sesión)
+## DÓNDE RETOMAR (próxima sesión — 2026-06-08)
 
-**SECCIÓN 2 — PORTFOLIO.** Hito 1 (hero) CERRADO ✅. Siguiente: implementar el portfolio (peso comercial principal — no hay testimonios/métricas). 4 proyectos reales: Jamón Casero, MENIUS, Healthy Choice NY, Arriba Gold (imágenes en public/images/ o donde el dev las copió en el scaffold Astro). Diseño: lista editorial de nombres gigantes Monument/Archivo, NO grid de cards. Desktop: hover → nombre rojo + otros a taupe + imagen real clip-path reveal col 9-12 + GSAP Flip entre proyectos. Tablet: touch, imagen visible col 5-6. Mobile: scroll-reveal, imagen 4/5 siempre visible. Ver DESIGN_RESPONSIVE.md §10. Bilingüe ES/EN. Tras implementar: screenshots 375/768/1280 EN+ES → William OK visual → visual-critic Etapa B.
+**SECCIÓN 3 — MÉTODO.** Hero ✅ y Portfolio ✅ cerrados.
+
+DECISIÓN PENDIENTE antes de diseñar Método (William iba a elegir, quedó sin decidir al cerrar la sesión 06-07). Qué comunica la sección Método — 4 opciones planteadas:
+  a) Proceso de trabajo (etapas paso a paso: descubrimiento→dirección→diseño→build→lanzamiento). Necesita las etapas REALES de William, no inventar.
+  b) Capacidades/servicios: expandir el índice 001-004 del hero (WEB PLATFORMS, SAAS+SYSTEMS, AI AUTOMATION, ORDERING/BOOKING/WORKFLOWS) explicando cada uno.
+  c) Por qué SCUART (manifiesto/diferenciador, más editorial).
+  d) Ayudar a William a decidir.
+→ RETOMAR preguntando esto. El concepto del hero (diseño + tecnología que "funciona mejor") + el índice 001-004 apuntan a que Método demuestre el "funcionar mejor".
 
 Orden incremental restante:
-2. Portfolio ← ACÁ
-3. Servicios / Método
+3. Método ← ACÁ (decidir enfoque primero)
 4. About / posicionamiento
-5. CTA final
+5. CTA / contacto
 6. SEO / metadata / polish
 7. QA responsive completo (reviewer + qa-responsive al final)
 
-Pendientes no bloqueantes: copy del hero (deuda de copy, arriba), posicionamiento solo-food vs amplio.
+## ESTADO DE SECCIONES (sesión 2026-06-07)
+
+- **HERO ✅** Concepto B "Diseño + Tecnología". Commit cd49ba5. Aprobado por William. Ver bloque Hito 1 arriba + HERO_RESET.md.
+- **PORTFOLIO ✅** Sección 2. Commit 3299f85. src/components/PortfolioSection.astro. Lista editorial 4 proyectos reales (JAMÓN CASERO/MENIUS/HEALTHY CHOICE NY/ARRIBA GOLD), hover-reveal+Flip desktop, scroll-reveal mobile. Aprobado funcional por William.
+  - DEUDA PORTFOLIO (no bloquea): 3 de 4 imágenes son screenshots de UI con fondo claro que bajan el nivel premium. El código tiene tratamiento (overlay carbón + filtro) pero no transforma un screenshot en pieza editorial. William va a reemplazar por mockups/fotos editoriales → SOLO cambiar el archivo .webp (mismo nombre/ruta en public/images/), no toca código.
+  - DEUDA PORTFOLIO: descripciones/categorías/años son PLACEHOLDER marcado ([CATEGORÍA — PENDIENTE], etc.) en src/i18n/en.ts y es.ts bloque `portfolio`. William completa con datos reales (C1/P4 — no inventar). Cuando ponga texto corto real, el layout ya es robusto (no se encima).
+  - Páginas de caso individuales NO existen (hito futuro). "VIEW CASE / VER CASO" es visual, no navega.
+
+Pendientes no bloqueantes globales:
+- Copy del hero: base aprobada, William puede afinar frases sin cambiar concepto.
+- Imágenes y textos reales del portfolio (arriba).
+- Lenis (smooth scroll) NO integrado aún — evaluar si se agrega en alguna sección o al final.
 
 Cada sección/hito: screenshots 375/768/1280 → visual-critic Etapa B (checklist 6 puntos) → OK visual de William antes de seguir. Al final del todo: reviewer → qa-responsive.
 
