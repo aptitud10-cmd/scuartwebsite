@@ -17,6 +17,29 @@ export interface CapabilityItem {
   label: string;
 }
 
+export interface PortfolioProject {
+  /** Nombre real del proyecto — NO cambiar */
+  name: string;
+  /** Número de orden editorial, ej "001" */
+  num: string;
+  /**
+   * Categoría del proyecto.
+   * PLACEHOLDER — William completa con el tipo real de cada proyecto.
+   * NO inventar: web, SaaS, branding, etc. Dejar marcado.
+   */
+  category: string;
+  /**
+   * Año del proyecto.
+   * PLACEHOLDER — William completa con el año real.
+   * NO inventar. Dejar marcado.
+   */
+  year: string;
+  /** Ruta de imagen desde /public — ej "/images/portfolio-jamon-casero.webp" */
+  image: string;
+  /** Alt text descriptivo — usa el nombre real (no es invento, es el nombre propio) */
+  alt: string;
+}
+
 export interface Translations {
   meta: {
     title: string;
@@ -47,6 +70,18 @@ export interface Translations {
     label: string;
     coords: string;
     type: string;
+  };
+  portfolio: {
+    /** Kicker de sección — mono uppercase, arriba-izquierda */
+    sectionLabel: string;
+    /**
+     * Texto del enlace "ver caso".
+     * NOTA: las páginas de caso individuales NO existen aún (hito futuro).
+     * El enlace es elemento visual; href="#" con preventDefault en JS.
+     */
+    viewCase: string;
+    /** Los 4 proyectos reales. Nombres definitivos; category/year son placeholders. */
+    projects: PortfolioProject[];
   };
 }
 
@@ -131,5 +166,57 @@ export const en: Translations = {
     label: 'STATEMENT',
     coords: 'GASTRO · WEB',
     type: 'DIGITAL DESIGN',
+  },
+
+  /* ── Portfolio — Sección 2 ──────────────────────────────── */
+  /*
+   * C1/P4 — ANTI-INVENCIÓN:
+   * Los nombres de proyecto son reales y definitivos.
+   * Las categorías y años son PLACEHOLDER marcados — William los completa.
+   * NO se inventó: stack, resultados, descripción, tipo de proyecto, fecha.
+   */
+  portfolio: {
+    sectionLabel: 'SELECTED WORK',
+    /**
+     * NOTA DE IMPLEMENTACIÓN:
+     * Las páginas de caso individuales NO existen todavía (hito futuro).
+     * El enlace "VIEW CASE ↓" se renderiza como elemento visual pero
+     * no navega a ningún lado. Ver PortfolioSection.astro para el manejo JS.
+     */
+    viewCase: 'VIEW CASE ↓',
+    projects: [
+      {
+        name: 'JAMÓN CASERO',
+        num: '001',
+        category: '[CATEGORÍA — PENDIENTE]',
+        year: '[AÑO — PENDIENTE]',
+        image: '/images/portfolio-jamon-casero.webp',
+        alt: 'JAMÓN CASERO — proyecto SCUART',
+      },
+      {
+        name: 'MENIUS',
+        num: '002',
+        category: '[CATEGORÍA — PENDIENTE]',
+        year: '[AÑO — PENDIENTE]',
+        image: '/images/portfolio-menius-real.webp',
+        alt: 'MENIUS — proyecto SCUART',
+      },
+      {
+        name: 'HEALTHY CHOICE NY',
+        num: '003',
+        category: '[CATEGORÍA — PENDIENTE]',
+        year: '[AÑO — PENDIENTE]',
+        image: '/images/portfolio-healthy-choice-real.webp',
+        alt: 'HEALTHY CHOICE NY — proyecto SCUART',
+      },
+      {
+        name: 'ARRIBA GOLD',
+        num: '004',
+        category: '[CATEGORÍA — PENDIENTE]',
+        year: '[AÑO — PENDIENTE]',
+        image: '/images/portfolio-arriba-gold-real.webp',
+        alt: 'ARRIBA GOLD — proyecto SCUART',
+      },
+    ],
   },
 };

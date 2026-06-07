@@ -87,4 +87,56 @@ export const es: Translations = {
     coords: 'GASTRO · WEB',
     type: 'DISEÑO DIGITAL',
   },
+
+  /* ── Portfolio — Sección 2 ──────────────────────────────── */
+  /*
+   * C1/P4 — ANTI-INVENCIÓN:
+   * Nombres de proyecto: reales, iguales en ambos idiomas (nombres propios).
+   * Categorías y años: PLACEHOLDER marcados — William los completa.
+   * sectionLabel y viewCase: traducidos al español.
+   */
+  portfolio: {
+    sectionLabel: 'TRABAJO SELECCIONADO',
+    /**
+     * NOTA DE IMPLEMENTACIÓN:
+     * Las páginas de caso individuales NO existen todavía (hito futuro).
+     * El enlace "VER CASO ↓" se renderiza como elemento visual pero
+     * no navega a ningún lado. Ver PortfolioSection.astro para el manejo JS.
+     */
+    viewCase: 'VER CASO ↓',
+    projects: [
+      {
+        name: 'JAMÓN CASERO',
+        num: '001',
+        category: '[CATEGORÍA — PENDIENTE]',
+        year: '[AÑO — PENDIENTE]',
+        image: '/images/portfolio-jamon-casero.webp',
+        alt: 'JAMÓN CASERO — proyecto SCUART',
+      },
+      {
+        name: 'MENIUS',
+        num: '002',
+        category: '[CATEGORÍA — PENDIENTE]',
+        year: '[AÑO — PENDIENTE]',
+        image: '/images/portfolio-menius-real.webp',
+        alt: 'MENIUS — proyecto SCUART',
+      },
+      {
+        name: 'HEALTHY CHOICE NY',
+        num: '003',
+        category: '[CATEGORÍA — PENDIENTE]',
+        year: '[AÑO — PENDIENTE]',
+        image: '/images/portfolio-healthy-choice-real.webp',
+        alt: 'HEALTHY CHOICE NY — proyecto SCUART',
+      },
+      {
+        name: 'ARRIBA GOLD',
+        num: '004',
+        category: '[CATEGORÍA — PENDIENTE]',
+        year: '[AÑO — PENDIENTE]',
+        image: '/images/portfolio-arriba-gold-real.webp',
+        alt: 'ARRIBA GOLD — proyecto SCUART',
+      },
+    ],
+  },
 };

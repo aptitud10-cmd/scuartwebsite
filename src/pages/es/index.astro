@@ -8,6 +8,7 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import HeroSection from '../../components/HeroSection.astro';
+import PortfolioSection from '../../components/PortfolioSection.astro';
 import { getTranslations, getAlternates } from '../../i18n/index';
 
 const lang = 'es';
@@ -27,7 +28,8 @@ const canonicalURL = alternates.es;
 >
   <Nav lang={lang} t={t} />
   <HeroSection t={t} />
+  <PortfolioSection t={t} />
 
-  <!-- Secciones futuras: portfolio, servicios, metodo, CTA -->
-  <!-- Se implementan en hitos 2-5 segun el orden incremental aprobado -->
+  <!-- Secciones futuras: servicios, metodo, CTA -->
+  <!-- Se implementan en hitos 3-5 segun el orden incremental aprobado -->
 </Layout>

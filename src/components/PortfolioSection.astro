@@ -1,0 +1,925 @@
+---
+/**
+ * PortfolioSection.astro — Sección Portfolio (Hito 2)
+ * SCUART — "Diseño + Tecnología como sistema"
+ *
+ * Concepto: LISTA EDITORIAL de nombres gigantes (Archivo 400), NO grid de cards.
+ * Jerarquía ≤3 niveles:
+ *   N1 — nombre activo (Monument/Archivo grande, rojo en hover desktop)
+ *   N2 — imagen real revelada (clip-path reveal)
+ *   N3 — ficha mono (N°/categoría/año); inactivos en taupe
+ *
+ * Viewports:
+ * - Desktop 1280: 4 nombres apilados col 1-9, hover-reveal imagen col 9-12,
+ *   franja roja 2px col 9 al alto de imagen activa. GSAP Flip entre imágenes.
+ * - Tablet 768: nombre col 1-4 + imagen col 5-6 siempre visible.
+ *   Scroll-reveal clip-path 0.7s expo.out (ScrollTrigger).
+ * - Mobile 375: fichas apiladas con imagen 4/5 full-width siempre visible.
+ *   Scroll-reveal clip-path 0.7s. Regla horizontal entre fichas.
+ *
+ * PÁGINAS DE CASO: NO existen aún (hito futuro).
+ * El enlace "VIEW CASE / VER CASO" está como elemento visual (href="#" + preventDefault).
+ * Ver manejo en <script> abajo.
+ *
+ * PRESUPUESTO ROJO en esta sección:
+ *   instancia A — nombre activo en hover (desktop)
+ *   instancia B — franja col 9 alineada al alto de imagen activa (desktop)
+ *   Total = 2 instancias. Coherente con el máx 4/viewport del sistema.
+ *
+ * PROGRESSIVE ENHANCEMENT:
+ *   HTML es real y server-rendered. Visible sin JS (imágenes siempre visibles
+ *   en mobile/tablet; en desktop las imágenes están presentes en el DOM pero
+ *   visualmente ocultas — JS agrega el hover reveal).
+ *
+ * C1/P4 — ANTI-INVENCIÓN:
+ *   Descripciones, categorías y años son PLACEHOLDER marcados.
+ *   William los completa. No se inventó nada sobre los proyectos.
+ */
+
+import type { Translations } from '../i18n/en';
+
+interface Props {
+  t: Translations;
+}
+
+const { t } = Astro.props;
+const projects = t.portfolio.projects;
+---
+
+<section class="portfolio" aria-label={t.portfolio.sectionLabel} id="portfolio">
+
+  <!--
+    Kicker de sección — mono uppercase, coherente con el hero.
+    "SELECTED WORK" / "TRABAJO SELECCIONADO"
+  -->
+  <div class="portfolio-header">
+    <p class="portfolio-kicker">{t.portfolio.sectionLabel}</p>
+    <!--
+      Regla horizontal de entrada — quiebre editorial entre hero y portfolio.
+      1px, --linea. Coherente con §4 DESIGN_RESPONSIVE.
+    -->
+  </div>
+
+  <!--
+    DESKTOP: contenedor principal con lista de nombres + imagen revelada.
+    La imagen del proyecto activo vive en un solo contenedor que se intercambia
+    con GSAP Flip (no reaparece, se transforma). Está fuera de la lista.
+
+    MOBILE/TABLET: las imágenes están dentro de cada .portfolio-item
+    para garantizar que siempre sean visibles y se revelen con scroll.
+  -->
+  <div class="portfolio-layout">
+
+    <!-- Lista editorial de proyectos -->
+    <ol class="portfolio-list" role="list">
+      {projects.map((project, index) => (
+        <li
+          class="portfolio-item"
+          data-index={index}
+          data-image={project.image}
+          data-alt={project.alt}
+        >
+          <!--
+            Fila desktop: toda la fila es la zona de hover.
+            Mobile/tablet: layout vertical.
+          -->
+          <div class="portfolio-item__inner">
+
+            <!-- Ficha mono: número + categoría -->
+            <div class="portfolio-item__meta">
+              <span class="portfolio-item__num">{project.num}</span>
+              <span class="portfolio-item__sep" aria-hidden="true"> / </span>
+              <span class="portfolio-item__category">{project.category}</span>
+              <span class="portfolio-item__year">{project.year}</span>
+            </div>
+
+            <!-- Nombre del proyecto — protagonista N1 -->
+            <h2 class="portfolio-item__name">
+              {project.name}
+            </h2>
+
+            <!--
+              Subrayado barrido rojo (desktop hover): scaleX 0→1, power2.out 0.4s.
+              CSS: transform-origin left, scale(0) por default, scale(1) con JS.
+            -->
+            <div class="portfolio-item__underline" aria-hidden="true"></div>
+
+            <!--
+              Imagen: SOLO visible en mobile/tablet dentro del item.
+              En desktop está oculta aquí (display:none en lg) y
+              se muestra en el contenedor externo .portfolio-image-slot.
+              aspect-ratio 4/5 mobile, 3/4 tablet.
+              loading="lazy" — sección after-fold.
+            -->
+            <div class="portfolio-item__img-wrap">
+              <img
+                class="portfolio-item__img"
+                src={project.image}
+                alt={project.alt}
+                loading="lazy"
+                width="400"
+                height="500"
+              />
+            </div>
+
+            <!--
+              "VER CASO / VIEW CASE" — elemento visual presente.
+              IMPORTANTE: las páginas de caso NO existen todavía (hito futuro).
+              href="#" con preventDefault en JS para que no navegue.
+              El enlace no linkea a una página rota.
+            -->
+            <a
+              class="portfolio-item__view-case"
+              href="#"
+              data-view-case="true"
+              aria-label={`${t.portfolio.viewCase} — ${project.name}`}
+            >
+              {t.portfolio.viewCase}
+            </a>
+
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <!--
+      DESKTOP ONLY: slot donde se revela la imagen del proyecto en hover.
+      Col 9-12. Un solo elemento cuya imagen cambia con GSAP Flip.
+      La franja roja (.portfolio-red-bar) se alinea al alto de este slot.
+      En mobile/tablet: display:none (las imágenes están dentro de cada item).
+    -->
+    <div class="portfolio-image-slot" aria-hidden="true">
+      <!--
+        La imagen inicial muestra el primer proyecto.
+        GSAP Flip la intercambia al hacer hover en otra fila.
+        El clip-path inicial oculta la imagen (inset 100% → 0 en hover).
+      -->
+      <img
+        class="portfolio-image-slot__img"
+        src={projects[0].image}
+        alt={projects[0].alt}
+        loading="lazy"
+        width="400"
+        height="500"
+        data-slot-img="true"
+      />
+    </div>
+
+    <!--
+      FRANJA ROJA COL 9 (desktop only) — "columna activada".
+      2px vertical, alineada al alto de la imagen activa.
+      Instancia B del presupuesto rojo. JS la posiciona dinámicamente.
+      En reposo: opacity 0. En hover: se alinea y aparece.
+    -->
+    <div class="portfolio-red-bar" aria-hidden="true"></div>
+
+  </div>
+
+</section>
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   PORTFOLIO SECTION
+   Mobile-first: 375px base. md: 768px. lg: 1280px.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── SECCIÓN ────────────────────────────────────────────── */
+
+.portfolio {
+  background-color: var(--carbon-elev);
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-xl);
+  padding-left: var(--margin);
+  padding-right: var(--margin);
+  position: relative;
+  overflow-x: clip;
+}
+
+/* ─── HEADER / KICKER ────────────────────────────────────── */
+
+.portfolio-header {
+  margin-bottom: var(--space-l);
+  border-top: 1px solid var(--linea);
+  padding-top: var(--space-m);
+}
+
+.portfolio-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  font-weight: 400;
+  color: var(--taupe);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+/* ─── LAYOUT PRINCIPAL ───────────────────────────────────── */
+
+.portfolio-layout {
+  position: relative;
+}
+
+/* ─── LISTA DE PROYECTOS ─────────────────────────────────── */
+
+.portfolio-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── ITEM (mobile: ficha vertical apilada) ──────────────── */
+
+.portfolio-item {
+  /* Quiebre entre fichas mobile: regla horizontal --linea */
+  border-top: 1px solid var(--linea);
+  padding-top: var(--space-m);
+  padding-bottom: var(--space-l);
+}
+
+.portfolio-item:last-child {
+  border-bottom: 1px solid var(--linea);
+}
+
+.portfolio-item__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+/* ─── FICHA MONO (número + categoría + año) ──────────────── */
+
+.portfolio-item__meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  font-weight: 400;
+  color: var(--taupe);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.portfolio-item__num {
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-item__sep {
+  color: var(--taupe);
+  opacity: 0.5;
+  margin: 0 0.25em;
+}
+
+.portfolio-item__category {
+  flex: 1;
+}
+
+.portfolio-item__year {
+  margin-left: auto;
+  opacity: 0.6;
+}
+
+/* ─── NOMBRE DEL PROYECTO — protagonista N1 ──────────────── */
+/*
+ * Archivo 400 (--display-weight-light), clamp ajustado.
+ * HEALTHY CHOICE NY puede romper a 2 líneas en mobile, leading 0.95.
+ * tracking -0.015em (Archivo portfolio — del §5 tabla tipográfica).
+ */
+.portfolio-item__name {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight-light);
+  font-size: var(--text-names);
+  line-height: 0.95;
+  letter-spacing: -0.015em;
+  font-variation-settings: 'wdth' 105;
+  color: var(--crema);
+  /* Anti-overflow mobile (§11): hyphens auto + overflow-wrap */
+  hyphens: auto;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+  margin: 0;
+  /*
+   * En desktop: cursor pointer (hover activa el reveal).
+   * Se setea en JS para no afectar mobile/tablet.
+   */
+}
+
+/* ─── SUBRAYADO BARRIDO ROJO (desktop hover) ─────────────── */
+/*
+ * scaleX 0 → 1 en hover, power2.out 0.4s.
+ * En mobile/tablet: display:none.
+ */
+.portfolio-item__underline {
+  display: none; /* oculto en mobile/tablet */
+  height: 1px;
+  background-color: var(--rojo);
+  transform: scaleX(0);
+  transform-origin: left center;
+  width: 100%;
+}
+
+/* ─── IMAGEN DENTRO DEL ITEM (mobile/tablet) ─────────────── */
+/*
+ * Mobile: aspect 4/5, full-width.
+ * Tablet: se oculta (se reposiciona en col 5-6 con el grid).
+ * Desktop: display:none (la imagen va al slot externo).
+ *
+ * Scroll-reveal: clip-path inset(100% 0 0 0) → inset(0%) en viewport.
+ * Con JS (ScrollTrigger). reduced-motion: visible sin clip-path.
+ *
+ * TRATAMIENTO EDITORIAL: el wrapper tiene position:relative para el
+ * overlay ::after que asienta los screenshots blancos al fondo carbón.
+ */
+.portfolio-item__img-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  position: relative; /* necesario para el overlay ::after */
+  /* clip-path inicial para scroll-reveal — JS lo maneja */
+}
+
+/*
+ * Overlay de integración editorial — trata los screenshots como fotografías
+ * en penumbra, asimilándolos al fondo carbón oscuro.
+ *
+ * Estrategia: overlay oscuro plano opacity 0.50 + filter agresivo en la imagen.
+ * Los screenshots de UI (fondo blanco/gris) quedan en tonos oscuros integrados.
+ * Las fotos reales (Jamón Casero) se oscurecen un poco más pero conviven mejor.
+ *
+ * pointer-events: none para no interferir con interacciones.
+ */
+.portfolio-item__img-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: #0E0E0E; /* --carbon, más oscuro que --carbon-elev */
+  opacity: 0.50;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.portfolio-item__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  /*
+   * Filter editorial: baja brillo y satura para integrar al carbón.
+   * brightness(0.65): oscurece los fondos blancos a gris medio-oscuro.
+   * saturate(0.75): menos color crudo — más elegante con la paleta.
+   * contrast(1.10): rescata detalle en las zonas ya oscuras.
+   */
+  filter: saturate(0.75) brightness(0.65) contrast(1.10);
+}
+
+/* ─── "VER CASO / VIEW CASE" ─────────────────────────────── */
+/*
+ * Elemento visual mono. NO navega a ningún lado (hito futuro).
+ * href="#" + preventDefault en JS. Mobile/tablet: visible.
+ * Desktop: oculto en el layout de lista (la interacción es hover en la fila).
+ */
+.portfolio-item__view-case {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  font-weight: 400;
+  color: var(--taupe);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  line-height: 1.4;
+  /* Touch target mínimo 48px (P9) */
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  /* Hover: suave sin ser rojo (presupuesto rojo reservado para nombre activo y franja) */
+  transition: color 0.2s ease;
+}
+
+.portfolio-item__view-case:hover {
+  color: var(--crema);
+}
+
+/* ─── SLOT IMAGEN DESKTOP ────────────────────────────────── */
+/*
+ * Un solo contenedor col 9-12. La imagen se intercambia con GSAP Flip.
+ * Mobile/tablet: display:none (imágenes están dentro de los items).
+ *
+ * TRATAMIENTO EDITORIAL: position:relative para overlay ::after.
+ * El slot ya tiene overflow:hidden — el overlay queda recortado junto
+ * a la imagen, conviviendo con el clip-path de reveal sin problemas.
+ */
+.portfolio-image-slot {
+  display: none; /* mobile: oculto */
+  position: relative; /* necesario para el overlay ::after */
+}
+
+/*
+ * Overlay desktop — mismo tratamiento que mobile/tablet.
+ * El clip-path del slot recorta el overlay junto a la imagen: animación sin romper.
+ */
+.portfolio-image-slot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: #0E0E0E;
+  opacity: 0.50;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.portfolio-image-slot__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  /*
+   * Mismo filter editorial que mobile/tablet — coherencia entre viewports.
+   */
+  filter: saturate(0.75) brightness(0.65) contrast(1.10);
+}
+
+/* ─── FRANJA ROJA COL 9 (desktop) ────────────────────────── */
+/*
+ * 2px vertical, instancia B del presupuesto rojo.
+ * "Columna activada" — no recorre toda la sección, solo el tramo
+ * alineado al alto de la imagen activa. JS la posiciona dinámicamente.
+ * Mobile/tablet: display:none.
+ */
+.portfolio-red-bar {
+  display: none;
+  position: absolute;
+  width: 2px;
+  background-color: var(--rojo);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  transform-origin: top center;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TABLET (768px+)
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 768px) {
+  .portfolio {
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+  }
+
+  /* En tablet: las imágenes inline siguen visibles en col 5-6 (grid en item) */
+  .portfolio-item__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Col 1: meta + nombre + view case. Col 2: imagen */
+    grid-template-rows: auto auto auto;
+    column-gap: var(--gutter);
+    align-items: start;
+  }
+
+  .portfolio-item__meta {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .portfolio-item__name {
+    grid-column: 1;
+    grid-row: 2;
+    hyphens: none;
+    overflow-wrap: normal;
+  }
+
+  .portfolio-item__underline {
+    display: none; /* solo desktop */
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .portfolio-item__img-wrap {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    aspect-ratio: 3 / 4; /* tablet: 3/4 */
+    align-self: start;
+  }
+
+  .portfolio-item__view-case {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  /* Slot desktop: sigue oculto en tablet */
+  .portfolio-image-slot {
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DESKTOP (1280px+)
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 1280px) {
+  .portfolio {
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+  }
+
+  /* Layout principal: 12 columnas */
+  .portfolio-layout {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    align-items: start;
+  }
+
+  /* Lista: col 1-9 */
+  .portfolio-list {
+    grid-column: 1 / 9;
+  }
+
+  /* Slot imagen: col 9-12 (comienza en col 9, el mismo eje que la franja) */
+  .portfolio-image-slot {
+    display: block;
+    grid-column: 9 / 13;
+    aspect-ratio: 4 / 5;
+    position: sticky;
+    top: calc(var(--space-xl));
+    align-self: start;
+    overflow: hidden;
+    /*
+     * clip-path inicial: imagen oculta (inset 100% = cubierta desde arriba).
+     * JS revela con inset(0%) en el primer hover.
+     * reduced-motion: visible sin clip-path.
+     */
+    clip-path: inset(100% 0 0 0);
+  }
+
+  /* Franja roja: visible en desktop */
+  .portfolio-red-bar {
+    display: block;
+    grid-column: 9;
+    /*
+     * Posición y alto: JS los calcula dinámicamente según el alto del slot.
+     * La franja se alinea al alto de la imagen activa = "columna activada ahí".
+     */
+  }
+
+  /* Items desktop: layout horizontal (fila hover), NO grid interno */
+  .portfolio-item {
+    padding-top: var(--space-m);
+    padding-bottom: var(--space-m);
+    cursor: pointer;
+    /* transición del color del nombre: suave (reduced-motion override en media) */
+  }
+
+  .portfolio-item__inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--gutter);
+    /* Sin flex-direction column del mobile */
+  }
+
+  .portfolio-item__meta {
+    /*
+     * Columna de índice — ancho fijo a la izquierda, el nombre toma el resto.
+     * width: 100% (mobile) se reemplaza por width: auto + max-width aquí.
+     * Robusto con texto largo (placeholders) y corto (texto real futuro).
+     * flex-direction: column para apilar num/categoría y año verticalmente
+     * dentro de su columna, evitando que empujen al nombre.
+     */
+    flex-shrink: 0;
+    width: auto;
+    max-width: clamp(8rem, 14%, 13rem);
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  /* En desktop el año va debajo de la categoría — sin margin-left auto */
+  .portfolio-item__year {
+    margin-left: 0;
+    opacity: 0.6;
+    /* El año va en su propio renglón dentro del bloque meta */
+    flex-basis: 100%;
+    margin-top: 0.1em;
+  }
+
+  /* El nombre ocupa el resto del ancho disponible (col 1-9 menos la ficha) */
+  .portfolio-item__name {
+    flex: 1;
+    /* En desktop: sin hyphens, no debe romper líneas (excepto HEALTHY CHOICE NY) */
+    hyphens: none;
+    overflow-wrap: normal;
+    font-size: clamp(1.75rem, 5.5vw, 5.5rem);
+    /*
+     * Color crema por defecto (reposo).
+     * GSAP lo cambia a --rojo en hover (instancia A) y a --taupe en inactivos.
+     * La transición se hace con GSAP, no CSS transition (para Flip coherente).
+     */
+  }
+
+  /* Subrayado: visible en desktop (GSAP lo anima) */
+  .portfolio-item__underline {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background-color: var(--rojo);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  /* En desktop el item es position:relative para el underline absoluto */
+  .portfolio-item {
+    position: relative;
+  }
+
+  /* Imagen dentro del item: OCULTA en desktop (va al slot externo) */
+  .portfolio-item__img-wrap {
+    display: none;
+  }
+
+  /* "VIEW CASE": oculto en desktop (la interacción es hover en la fila completa) */
+  .portfolio-item__view-case {
+    display: none;
+  }
+}
+</style>
+
+<script>
+  /**
+   * PortfolioSection — GSAP interactions
+   *
+   * PROGRESSIVE ENHANCEMENT:
+   * El HTML es visible y completo sin JS.
+   * - Mobile/tablet: imágenes presentes en DOM, scroll-reveal como enhancement.
+   * - Desktop: hover-reveal + Flip como enhancement.
+   * Si falla JS: mobile/tablet muestran todo estático. Desktop muestra la lista
+   * sin imagen revelada (gap visual aceptable — la sección es funcional).
+   *
+   * PÁGINAS DE CASO (HITO FUTURO):
+   * Los enlaces [data-view-case] tienen href="#" y se previene la navegación aquí.
+   * Cuando las páginas de caso existan, reemplazar href="#" con el path real
+   * y quitar el preventDefault. El Flip de página también es hito futuro.
+   *
+   * LENIS: no instalado en este proyecto. Scroll nativo. ScrollTrigger opera
+   * sobre scroll nativo sin configuración adicional.
+   */
+
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { Flip } from 'gsap/Flip';
+
+  gsap.registerPlugin(ScrollTrigger, Flip);
+
+  /* ── Prevenir navegación de los enlaces "VIEW CASE / VER CASO" ── */
+  /*
+   * HITO FUTURO: las páginas de caso no existen todavía.
+   * Cuando existan, eliminar estos listeners y poner el href real.
+   */
+  const viewCaseLinks = document.querySelectorAll<HTMLAnchorElement>('[data-view-case]');
+  viewCaseLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      /* No hace nada. Elemento visual. */
+    });
+  });
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ══════════════════════════════════════════════════════════
+     MOBILE / TABLET — scroll-reveal con ScrollTrigger
+     Clip-path inset(100% 0 0 0) → inset(0% 0 0 0), 0.7s expo.out.
+     reduced-motion: imágenes visibles sin clip-path.
+     ══════════════════════════════════════════════════════════ */
+
+  const isDesktop = window.matchMedia('(min-width: 1280px)').matches;
+
+  if (!isDesktop) {
+    const imgWraps = document.querySelectorAll<HTMLElement>('.portfolio-item__img-wrap');
+
+    if (reducedMotion) {
+      /* Sin animación: imágenes visibles inmediatamente */
+      gsap.set(imgWraps, { clipPath: 'inset(0% 0 0 0)' });
+    } else {
+      /* Estado inicial: cubiertas desde arriba */
+      gsap.set(imgWraps, { clipPath: 'inset(100% 0 0 0)' });
+
+      imgWraps.forEach((wrap) => {
+        ScrollTrigger.create({
+          trigger: wrap,
+          start: 'top 85%',
+          once: true,
+          onEnter: () => {
+            gsap.to(wrap, {
+              clipPath: 'inset(0% 0 0 0)',
+              duration: 0.7,
+              ease: 'expo.out',
+            });
+          },
+        });
+      });
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     DESKTOP — hover-reveal + GSAP Flip
+     Solo activo si pointer:fine (mouse real, no touch).
+     ══════════════════════════════════════════════════════════ */
+
+  if (isDesktop && window.matchMedia('(pointer: fine)').matches) {
+    const portfolioItems = document.querySelectorAll<HTMLElement>('.portfolio-item');
+    const imageSlot = document.querySelector<HTMLElement>('.portfolio-image-slot');
+    const slotImg = document.querySelector<HTMLImageElement>('.portfolio-image-slot__img');
+    const redBar = document.querySelector<HTMLElement>('.portfolio-red-bar');
+
+    /* Guard: si los elementos no existen, no ejecutar nada */
+    if (imageSlot && slotImg && portfolioItems.length > 0) {
+
+    /* Captura en const tipadas como no-nullable para que TS las propague en closures */
+    const slot: HTMLElement = imageSlot;
+    const img: HTMLImageElement = slotImg;
+
+    /* Índice del proyecto activo actualmente (-1 = ninguno en reposo) */
+    let activeIndex = -1;
+    /* Si ya se hizo el primer reveal */
+    let hasRevealed = false;
+
+    /* ── Posición de la franja roja ── */
+    /*
+     * La franja se alinea al top/bottom del slot de imagen activa.
+     * Se calcula respecto al contenedor .portfolio-layout (position:relative).
+     */
+    function positionRedBar() {
+      if (!redBar) return;
+      const layout = slot.closest<HTMLElement>('.portfolio-layout');
+      if (!layout) return;
+      const layoutRect = layout.getBoundingClientRect();
+      const slotRect = slot.getBoundingClientRect();
+      const top = slotRect.top - layoutRect.top;
+      const height = slotRect.height;
+      redBar.style.top = `${top}px`;
+      redBar.style.height = `${height}px`;
+      /* left: borde de col 9 = 8/12 del interior del layout */
+      const layoutWidth = layoutRect.width;
+      redBar.style.left = `${(layoutWidth * 8) / 12}px`;
+    }
+
+    /* ── Activar un proyecto ── */
+    function activateProject(index: number) {
+      if (index === activeIndex) return;
+
+      const project = Array.from(portfolioItems)[index];
+      if (!project) return;
+
+      const newSrc = project.dataset.image ?? '';
+      const newAlt = project.dataset.alt ?? '';
+
+      if (reducedMotion) {
+        /* reduced-motion: color instantáneo, imagen visible sin clip-path */
+        portfolioItems.forEach((item, i) => {
+          const name = item.querySelector<HTMLElement>('.portfolio-item__name');
+          if (name) {
+            name.style.color = i === index ? 'var(--rojo)' : 'var(--taupe)';
+          }
+        });
+        if (newSrc) {
+          img.src = newSrc;
+          img.alt = newAlt;
+        }
+        if (!hasRevealed) {
+          gsap.set(slot, { clipPath: 'inset(0% 0 0 0)' });
+          hasRevealed = true;
+        }
+        if (redBar) {
+          positionRedBar();
+          gsap.set(redBar, { opacity: 1, scaleY: 1 });
+        }
+        activeIndex = index;
+        return;
+      }
+
+      /* ── Con animación ── */
+
+      /* 1. Colores: activo → rojo, resto → taupe */
+      portfolioItems.forEach((item, i) => {
+        const name = item.querySelector<HTMLElement>('.portfolio-item__name');
+        const underline = item.querySelector<HTMLElement>('.portfolio-item__underline');
+        if (name) {
+          gsap.to(name, {
+            color: i === index ? 'var(--rojo)' : 'var(--taupe)',
+            duration: 0.2,
+            ease: 'power2.out',
+          });
+        }
+        /* Subrayado: scaleX 0→1 en activo, 1→0 en los demás */
+        if (underline) {
+          gsap.to(underline, {
+            scaleX: i === index ? 1 : 0,
+            duration: 0.4,
+            ease: 'power2.out',
+          });
+        }
+      });
+
+      /* 2. Imagen: primer reveal o Flip entre proyectos */
+      if (!hasRevealed) {
+        /* Primer hover: clip-path reveal inset(100% 0 0 0) → inset(0%) */
+        if (newSrc) {
+          img.src = newSrc;
+          img.alt = newAlt;
+        }
+        gsap.to(slot, {
+          clipPath: 'inset(0% 0 0 0)',
+          duration: 0.7,
+          ease: 'expo.out',
+          onComplete: () => {
+            hasRevealed = true;
+          },
+        });
+      } else {
+        /*
+         * Cambio de proyecto: GSAP Flip 0.6s expo.inOut.
+         * La imagen se transforma (no reaparece), dando continuidad visual.
+         * Flip registra el estado antes del cambio y anima la diferencia.
+         */
+        const flipState = Flip.getState(slot);
+        if (newSrc) {
+          img.src = newSrc;
+          img.alt = newAlt;
+        }
+        Flip.from(flipState, {
+          duration: 0.6,
+          ease: 'expo.inOut',
+        });
+      }
+
+      /* 3. Franja roja: posicionar + revelar */
+      positionRedBar();
+      if (redBar) {
+        gsap.to(redBar, {
+          opacity: 1,
+          scaleY: 1,
+          duration: 0.5,
+          ease: 'expo.out',
+        });
+      }
+
+      activeIndex = index;
+    }
+
+    /* ── Desactivar todo (mouse sale de la lista) ── */
+    function deactivateAll() {
+      if (reducedMotion) {
+        portfolioItems.forEach((item) => {
+          const name = item.querySelector<HTMLElement>('.portfolio-item__name');
+          if (name) name.style.color = 'var(--crema)';
+        });
+        return;
+      }
+
+      portfolioItems.forEach((item) => {
+        const name = item.querySelector<HTMLElement>('.portfolio-item__name');
+        const underline = item.querySelector<HTMLElement>('.portfolio-item__underline');
+        if (name) {
+          gsap.to(name, { color: 'var(--crema)', duration: 0.3, ease: 'power2.out' });
+        }
+        if (underline) {
+          gsap.to(underline, { scaleX: 0, duration: 0.3, ease: 'power2.out' });
+        }
+      });
+
+      /* La imagen NO desaparece al salir — queda como "portada por defecto" */
+      /* La franja roja se apaga sutilmente */
+      if (redBar) {
+        gsap.to(redBar, { opacity: 0, duration: 0.4, ease: 'power2.out' });
+      }
+      activeIndex = -1;
+    }
+
+    /* ── Event listeners ── */
+    portfolioItems.forEach((item, index) => {
+      item.addEventListener('mouseenter', () => {
+        activateProject(index);
+      });
+    });
+
+    /* Al salir de la lista completa, desactivar */
+    const portfolioList = document.querySelector<HTMLElement>('.portfolio-list');
+    if (portfolioList) {
+      portfolioList.addEventListener('mouseleave', deactivateAll);
+    }
+
+    /* ── Estado inicial de la franja roja ── */
+    gsap.set(redBar, { opacity: 0, scaleY: 0, transformOrigin: 'top center' });
+
+    /* ── reduced-motion desktop: slot visible desde el inicio ── */
+    if (reducedMotion) {
+      gsap.set(slot, { clipPath: 'inset(0% 0 0 0)' });
+    }
+
+    } /* fin guard: imageSlot && slotImg && portfolioItems.length > 0 */
+  }
+</script>
