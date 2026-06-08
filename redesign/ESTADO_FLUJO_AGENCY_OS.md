@@ -28,14 +28,26 @@ Archivos del hero: src/components/HeroSection.astro, src/i18n/en.ts, src/i18n/es
 
 ## DÓNDE RETOMAR (próxima sesión — 2026-06-08)
 
-**SECCIÓN 3 — MÉTODO.** Hero ✅ y Portfolio ✅ cerrados.
+**SECCIÓN 3 — MÉTODO. EN CURSO (rehacer).** Hero ✅ y Portfolio ✅ cerrados.
 
-DECISIÓN PENDIENTE antes de diseñar Método (William iba a elegir, quedó sin decidir al cerrar la sesión 06-07). Qué comunica la sección Método — 4 opciones planteadas:
-  a) Proceso de trabajo (etapas paso a paso: descubrimiento→dirección→diseño→build→lanzamiento). Necesita las etapas REALES de William, no inventar.
-  b) Capacidades/servicios: expandir el índice 001-004 del hero (WEB PLATFORMS, SAAS+SYSTEMS, AI AUTOMATION, ORDERING/BOOKING/WORKFLOWS) explicando cada uno.
-  c) Por qué SCUART (manifiesto/diferenciador, más editorial).
-  d) Ayudar a William a decidir.
-→ RETOMAR preguntando esto. El concepto del hero (diseño + tecnología que "funciona mejor") + el índice 001-004 apuntan a que Método demuestre el "funcionar mejor".
+ESTADO MÉTODO (pausa 2026-06-08):
+- Enfoque elegido por William: PROCESO DE TRABAJO, 4 pasos. Contenido textual dado por William (no inventar):
+  001 DISCOVER/DIAGNÓSTICO · 002 DIRECTION/DIRECCIÓN · 003 SYSTEM/SISTEMA · 004 LAUNCH/LANZAMIENTO.
+  Los body ES son TEXTUAL de William; los body EN son copy nativo ya en el diccionario (bloque `method` en src/i18n/en.ts y es.ts — YA EXISTE).
+- PRIMERA implementación (filas editoriales + índice técnico lateral) quedó PLANA — William la rechazó ("proceso de agencia convencional, sin movimiento"). Esa versión está en src/components/MethodSection.astro SIN COMMITEAR. Montada en en/index.astro y es/index.astro.
+- CONCEPTO DE REEMPLAZO APROBADO: "EL EXPEDIENTE QUE SE ABRE" (Concepto 1 de 5 propuestos). Sticky split scroll-driven:
+  · Desktop: sección pineada (ScrollTrigger pin ~100vh). IZQ = índice expediente 001-004 (activo crema+rojo, inactivos taupe, número activo grande protagonista). DER = panel que MUTA con crossfade entre los 4 pasos al scrollear (título + párrafo + capacidades del paso + "qué cambia para el negocio"). Franja roja costura marca activo. Al completar 004, libera.
+  · Tablet: índice horizontal arriba + panel; sticky liviano o tap-able si pin complica.
+  · Mobile: SIN sticky. Secuencia vertical editorial, cada paso bloque limpio (número/título/texto/capacidades/qué cambia), regla fina entre pasos, reveal sobrio. Sensación de expediente, NO cards.
+- WIREFRAME aprobado por William (ver historial chat sesión 06-08).
+- CAMPOS i18n NUEVOS a agregar al rehacer: por cada step → `stepCapabilities` (array, capacidades técnicas de ese paso, inglés ambos idiomas) + `whatChanges` (string por idioma, "qué cambia para el negocio" — copy nativo SIN métricas/resultados inventados, solo cambio cualitativo). Y labels `capabilitiesLabel` (CAPABILITIES/CAPACIDADES) + `whatChangesLabel` (WHAT CHANGES/QUÉ CAMBIA).
+- PROHIBICIONES (William): nada de cards, nada de timeline corporativo, nada de contador gimmick, nada de iconos, nada de horizontal complejo todavía. Grilla fina visible, mono para datos, rojo disciplinado.
+- Progressive enhancement obligatorio: sin JS los 4 pasos visibles/legibles (NO que quede 1 solo). El pin/crossfade es enhancement. reduced-motion = secuencia vertical estática.
+
+→ RETOMAR: mandar el dev a reescribir MethodSection.astro con el concepto expediente sticky (el spec detallado quedó redactado en el chat, listo para reenviar). Luego screenshots con `node scripts/shot.mjs "section.method" method <puerto>` → OK visual de William.
+
+NOTA TÉCNICA: dev server a veces arranca en 4322 si 4321 ocupado. Error de esbuild dev "Expected identifier but found *" en PortfolioSection = FALSO POSITIVO del pre-scanner, verificado: el build de producción pasa y el script compila. No perseguir.
+NOTA HERRAMIENTA: hay script de screenshots reutilizable en scripts/shot.mjs (usa @playwright/test). Uso: node scripts/shot.mjs "<selector>" <nombre> <puerto>.
 
 Orden incremental restante:
 3. Método ← ACÁ (decidir enfoque primero)

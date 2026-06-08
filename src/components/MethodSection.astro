@@ -1,0 +1,577 @@
+---
+/**
+ * MethodSection.astro — Sección Método (Sección 3)
+ * SCUART — "Design + Technology como sistema"
+ *
+ * Concepto: DOCUMENTO EDITORIAL. Los 4 pasos del método como filas grandes
+ * (NO cards, NO service cards genéricas). Índice técnico de 6 capacidades
+ * anclado a la derecha.
+ *
+ * Jerarquía visual (≤3 niveles):
+ *   N1 — número mono + título display (Archivo 900, col 1-8 desktop)
+ *   N2 — párrafo body DM Sans (taupe, subordinado por tamaño/color)
+ *   N3 — índice técnico (col 9-12 desktop, mono taupe — detalle referencial)
+ *
+ * Viewports:
+ * - Desktop 1280: 4 pasos col 1-8 + índice sticky col 9-12.
+ *   Franja roja 1px vertical sobre eje col 9 (costura pasos/índice).
+ * - Tablet 768: índice como bloque horizontal al inicio, pasos full-width.
+ * - Mobile 375: pasos apilados, índice mono al final. TODO visible.
+ *
+ * FONDO: --carbon (fondo base). Alternancia con portfolio (--carbon-elev).
+ *   Hero (carbon) → Portfolio (carbon-elev) → Método (carbon) = ritmo de planos.
+ *
+ * STICKY del índice: position:sticky, top calculado en CSS.
+ *   La sección usa overflow-x:clip (igual que hero/portfolio) — no bloquea sticky.
+ *   Se libera naturalmente al final de la sección cuando el scroll lo empuja.
+ *
+ * PRESUPUESTO ROJO en esta sección:
+ *   instancia única — franja vertical 1px sobre eje col 9 (desktop/tablet).
+ *   Total = 1 instancia. Dentro del presupuesto máx 4/viewport del sistema.
+ *
+ * PROGRESSIVE ENHANCEMENT:
+ *   HTML es real y server-rendered. Visible sin JS.
+ *   GSAP ScrollTrigger es enhancement — si falla, sección visible completa estática.
+ *
+ * C1/P4 — ANTI-INVENCIÓN:
+ *   Párrafos ES son TEXTUAL de William.
+ *   Copy EN es nativo profesional (mismo sentido, no traducción literal).
+ *   No se inventó ningún claim, resultado ni métrica.
+ */
+
+import type { Translations } from '../i18n/en';
+
+interface Props {
+  t: Translations;
+}
+
+const { t } = Astro.props;
+const { kicker, indexLabel, capabilities, steps } = t.method;
+---
+
+<!--
+  MÉTODO — Layout
+  - mobile 375: flex column — kicker → pasos con reglas → índice al final
+  - tablet 768: flex column — kicker → índice bloque horizontal → pasos
+  - desktop 1280: grid 12 col — pasos col 1-8, índice sticky col 9-12
+-->
+<section class="method" aria-label={kicker} id="method">
+
+  <!--
+    Franja roja costura — instancia única del presupuesto rojo en esta sección.
+    Desktop/tablet: vertical 1px sobre eje col 9.
+    Mobile: oculta (los pasos fluyen sin separador vertical).
+    GSAP la revela con ScrollTrigger al entrar la sección.
+  -->
+  <div class="method-red-bar" aria-hidden="true"></div>
+
+  <!--
+    Kicker — mono uppercase, coherente con hero y portfolio.
+    "METHOD" / "MÉTODO"
+  -->
+  <div class="method-header">
+    <p class="method-kicker">{kicker}</p>
+  </div>
+
+  <!--
+    Índice técnico de capacidades — posición según viewport:
+    - Desktop: sticky col 9-12, acompaña el scroll de los 4 pasos.
+    - Tablet: bloque horizontal al inicio (grid-row 2, antes de los pasos).
+    - Mobile: al final de la sección (order:3 en flex column).
+    Las 6 capacidades en mayúsculas mono taupe — igual tratamiento que el
+    índice del hero. Se lee como ficha técnica, no como lista de servicios.
+  -->
+  <aside class="method-index" aria-label={indexLabel}>
+    <p class="method-index__label">{indexLabel}</p>
+    <ul class="method-index__list">
+      {capabilities.map((cap) => (
+        <li class="method-index__item">{cap}</li>
+      ))}
+    </ul>
+  </aside>
+
+  <!--
+    Lista de pasos — filas editoriales grandes.
+    Cada paso: número mono (001-004) + título display fuerte + párrafo corto.
+    Regla horizontal 1px --linea entre pasos (ritmo de documento).
+    NO cards, NO iconos, NO hover reveals — son filas de documento indexable.
+  -->
+  <ol class="method-steps" role="list">
+    {steps.map((step) => (
+      <li class="method-step">
+        <!--
+          Cabecera de paso: número mono + título display en la misma línea.
+          El número actúa como índice de documento (001/002/003/004).
+          El título es el protagonista visual (Archivo 900, crema, grande).
+        -->
+        <div class="method-step__head">
+          <span class="method-step__num">{step.num}</span>
+          <h2 class="method-step__title">{step.title}</h2>
+        </div>
+        <!--
+          Párrafo body — DM Sans, taupe, espaciado debajo del título.
+          ES: textual de William.
+          EN: copy nativo profesional (mismo sentido, no traducción literal).
+          TODO visible en todos los viewports — nada detrás de hover.
+        -->
+        <p class="method-step__body">{step.body}</p>
+      </li>
+    ))}
+  </ol>
+
+</section>
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   METHOD SECTION
+   Mobile-first: 375px base. md: 768px. lg: 1280px.
+   Fondo: --carbon (ritmo de planos: hero carbon → portfolio carbon-elev → método carbon).
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── SECCIÓN ────────────────────────────────────────────── */
+/*
+ * display:flex + flex-direction:column en mobile para controlar el order
+ * del índice técnico (al final). Los override de tablet/desktop vuelven
+ * a block / grid según corresponda.
+ * overflow-x:clip (no hidden) — permite position:sticky en hijos (desktop).
+ */
+.method {
+  background-color: var(--carbon);
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-2xl);
+  padding-left: var(--margin);
+  padding-right: var(--margin);
+  position: relative;
+  overflow-x: clip;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── FRANJA ROJA (instancia única) ──────────────────────── */
+/*
+ * Desktop/tablet: vertical 1px sobre eje col 9 = costura pasos/índice.
+ * Mobile: oculta (display:none — no aplica en layout de columna única).
+ * GSAP la revela con ScrollTrigger (scaleY 0→1 desde el top).
+ * opacity:0 por defecto — GSAP gestiona. reduced-motion: visible estático.
+ */
+.method-red-bar {
+  display: none; /* mobile: oculta */
+  position: absolute;
+  width: 1px;
+  background-color: var(--rojo);
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transform-origin: top center;
+}
+
+/* ─── HEADER / KICKER ────────────────────────────────────── */
+
+.method-header {
+  border-top: 1px solid var(--linea);
+  padding-top: var(--space-m);
+  margin-bottom: var(--space-l);
+}
+
+.method-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  font-weight: 400;
+  color: var(--taupe);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+}
+
+/* ─── ÍNDICE TÉCNICO (mobile: al final) ──────────────────── */
+/*
+ * Mobile: fluye después de los pasos (order:3 en el flex column).
+ * Se muestra como lista mono vertical al final de la sección.
+ * opacity:0 inicial — GSAP revela con ScrollTrigger.
+ */
+.method-index {
+  order: 3; /* mobile: al final */
+  margin-top: var(--space-xl);
+  opacity: 0; /* GSAP revela */
+}
+
+.method-index__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  font-weight: 400;
+  color: var(--taupe);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  margin-bottom: var(--space-s);
+  opacity: 0.6;
+}
+
+.method-index__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.method-index__item {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  font-weight: 400;
+  color: var(--taupe);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 2.2;
+}
+
+/* ─── LISTA DE PASOS ─────────────────────────────────────── */
+/*
+ * Mobile: orden 2 (después del header, antes del índice).
+ * Cada paso separado por regla horizontal 1px --linea (ritmo de documento).
+ */
+.method-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  order: 2; /* mobile: entre header e índice */
+}
+
+/* ─── PASO INDIVIDUAL ────────────────────────────────────── */
+/*
+ * Regla horizontal entre pasos — quiebre editorial de documento.
+ * Primer paso: border-top para consistencia (como portfolio-item).
+ */
+.method-step {
+  border-top: 1px solid var(--linea);
+  padding-top: var(--space-m);
+  padding-bottom: var(--space-l);
+  opacity: 0; /* GSAP revela con ScrollTrigger, stagger */
+}
+
+/* ─── CABECERA DEL PASO: número + título ─────────────────── */
+/*
+ * Mobile: número mono encima, título debajo (flex column).
+ * Desktop: número mono a la izquierda, título al lado (flex row).
+ * El número es índice de documento — tabular-nums, taupe.
+ * El título es protagonista N1 — Archivo 900, crema, grande.
+ */
+.method-step__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  margin-bottom: var(--space-s);
+}
+
+.method-step__num {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  font-weight: 400;
+  color: var(--taupe);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Título del paso — protagonista N1.
+ * Archivo 900, crema, grande pero no bestial:
+ * clamp(1.75rem, 6vw, 3.5rem) — más pequeño que el H1 del hero,
+ * proporcional a una sección secundaria de documento.
+ * Tracking -0.02em: tensión tipográfica de display sin exceso.
+ */
+.method-step__title {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight-heavy);
+  font-size: clamp(1.75rem, 6vw, 3.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  font-variation-settings: 'wdth' 105;
+  color: var(--crema);
+  text-transform: uppercase;
+  margin: 0;
+  hyphens: none;
+  overflow-wrap: normal;
+}
+
+/* ─── PÁRRAFO BODY ───────────────────────────────────────── */
+/*
+ * DM Sans, taupe, nivel N2.
+ * max-width 55ch: columna de lectura cómoda, no se estira a full-width.
+ * Párrafos cortos — 2-3 líneas como máximo. Nivel de detalle, no manifiesto.
+ */
+.method-step__body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: 400;
+  color: var(--taupe);
+  line-height: 1.6;
+  letter-spacing: 0;
+  max-width: 55ch;
+  margin: 0;
+}
+
+/* El header va arriba — order:0 default, sin override necesario */
+
+/* ═══════════════════════════════════════════════════════════
+   TABLET (768px+)
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 768px) {
+  .method {
+    display: block; /* volvemos a block para usar la grilla de los pasos */
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+  }
+
+  /*
+   * Tablet: franja roja visible.
+   * left: eje col 5 (mitad aproximada en grilla de 6 col tablet).
+   * Posición: sobre el límite entre contenido y margen derecho.
+   * top/bottom: alineado al bloque de pasos.
+   */
+  .method-red-bar {
+    display: block;
+    left: calc(var(--margin) + (100% - 2 * var(--margin)) * 0.667);
+    top: 12%;
+    bottom: 8%;
+  }
+
+  /*
+   * Tablet: índice como bloque horizontal al inicio de la sección.
+   * Aparece entre el kicker y los pasos.
+   * Las 6 capacidades en 2 columnas (columnas mono).
+   */
+  .method-index {
+    order: unset;
+    margin-top: 0;
+    margin-bottom: var(--space-xl);
+    padding-top: var(--space-m);
+    border-top: 1px solid var(--linea);
+  }
+
+  .method-index__label {
+    margin-bottom: var(--space-xs);
+  }
+
+  .method-index__list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--gutter);
+  }
+
+  .method-index__item {
+    line-height: 2;
+  }
+
+  /* Pasos: layout con cabecera en fila (número + título) */
+  .method-step__head {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--space-s);
+  }
+
+  .method-step__title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  .method-step__body {
+    max-width: 60ch;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DESKTOP (1280px+)
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 1280px) {
+  .method {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    column-gap: var(--gutter);
+    align-items: start;
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+  }
+
+  /* Header: fila 1, col 1-9 */
+  .method-header {
+    grid-column: 1 / 9;
+    grid-row: 1;
+    order: unset;
+  }
+
+  /* Pasos: fila 2, col 1-9 */
+  .method-steps {
+    grid-column: 1 / 9;
+    grid-row: 2;
+    order: unset;
+  }
+
+  /*
+   * Índice sticky: col 9-12, fila 1-2 (span 2 filas).
+   * position:sticky — acompaña el scroll mientras los pasos están visibles.
+   * top: espacio desde el viewport top (similar al slot imagen del portfolio).
+   * Se libera naturalmente al final de la sección sin JS adicional.
+   * padding-left: gutter para aire visual desde la franja roja.
+   */
+  .method-index {
+    grid-column: 9 / 13;
+    grid-row: 1 / 3;
+    order: unset;
+    position: sticky;
+    top: var(--space-xl);
+    align-self: start;
+    margin-top: 0;
+    padding-left: var(--gutter);
+    /* Coincide con el kicker (border-top del header) visualmente */
+    padding-top: calc(var(--space-m) + 1px); /* +1px por el border del header */
+    margin-bottom: 0;
+    border-top: none;
+  }
+
+  .method-index__list {
+    display: block; /* columna única desktop */
+  }
+
+  .method-index__item {
+    line-height: 2.4; /* más aire en desktop */
+  }
+
+  /*
+   * Franja roja desktop: vertical 1px sobre eje col 9 (costura pasos/índice).
+   * col 9 = 8/12 del interior del grid.
+   * Tramo: desde el header hasta el final de la sección.
+   */
+  .method-red-bar {
+    display: block;
+    left: calc(var(--margin) + (100% - 2 * var(--margin)) * 0.6667);
+    top: 8%;
+    bottom: 8%;
+  }
+
+  /* Cabecera del paso: número + título en fila */
+  .method-step__head {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--space-m);
+  }
+
+  .method-step__num {
+    /* En desktop el número tiene más peso como índice de columna */
+    flex-shrink: 0;
+    min-width: 3.5ch;
+  }
+
+  .method-step__title {
+    /* Desktop: tamaño mayor — protagonista de sección secundaria */
+    font-size: clamp(2.5rem, 4vw, 4.5rem);
+    font-variation-settings: 'wdth' 110;
+  }
+
+  .method-step__body {
+    /* En desktop el párrafo no toma toda la col 1-9 — respira */
+    max-width: 52ch;
+    padding-left: calc(3.5ch + var(--space-m)); /* alineado al inicio del título */
+  }
+}
+</style>
+
+<script>
+  /**
+   * MethodSection — GSAP ScrollTrigger animations
+   *
+   * PROGRESSIVE ENHANCEMENT:
+   * Todo el HTML es visible y server-rendered. Este script es enhancement.
+   * Si falla: la sección se ve completa estática (opacity:0 revertido por reduced-motion).
+   *
+   * Secuencia por scroll:
+   * 1. Franja roja: scaleY 0→1 cuando la sección entra en viewport (70%).
+   * 2. Cada paso: fade-in + leve translateY (8px→0) con stagger entre pasos.
+   *    El stagger visual es sutil — documento que se "imprime", no cascada dramática.
+   * 3. Índice técnico: fade-in cuando el primer paso entra.
+   *
+   * REDUCED-MOTION: todo visible estático desde el inicio. Sin animación.
+   * opacity:0 → opacity:1 instantáneo.
+   */
+
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const methodSection = document.querySelector<HTMLElement>('.method');
+  const redBar = document.querySelector<HTMLElement>('.method-red-bar');
+  const steps = document.querySelectorAll<HTMLElement>('.method-step');
+  const methodIndex = document.querySelector<HTMLElement>('.method-index');
+
+  if (reducedMotion) {
+    /* Reduced-motion: todo visible de inmediato, sin animación */
+    if (redBar) gsap.set(redBar, { opacity: 1, scaleY: 1 });
+    if (steps.length > 0) gsap.set(steps, { opacity: 1, y: 0 });
+    if (methodIndex) gsap.set(methodIndex, { opacity: 1 });
+  } else {
+    /* ── Estados iniciales — ya están en CSS (opacity:0) ──────────── */
+    /* GSAP confirma el estado inicial explícitamente para robustez */
+    if (redBar) gsap.set(redBar, { scaleY: 0, transformOrigin: 'top center' });
+    if (steps.length > 0) gsap.set(steps, { y: 10 });
+    /* methodIndex: opacity:0 ya está en CSS */
+
+    /* ── Franja roja: entra con la sección ────────────────────────── */
+    if (redBar && methodSection) {
+      ScrollTrigger.create({
+        trigger: methodSection,
+        start: 'top 75%',
+        once: true,
+        onEnter: () => {
+          gsap.to(redBar, {
+            opacity: 1,
+            scaleY: 1,
+            duration: 0.9,
+            ease: 'expo.out',
+          });
+        },
+      });
+    }
+
+    /* ── Pasos: scroll-reveal con stagger ────────────────────────── */
+    /*
+     * Cada paso se revela al entrar en el viewport (top 85% del viewport).
+     * fade + y 10→0, expo.out, stagger 0.12s — "imprime el documento".
+     * once:true — no se anima dos veces al regresar.
+     */
+    steps.forEach((step, i) => {
+      ScrollTrigger.create({
+        trigger: step,
+        start: 'top 88%',
+        once: true,
+        onEnter: () => {
+          gsap.to(step, {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'expo.out',
+            delay: i * 0.05, /* stagger leve entre pasos que entran juntos */
+          });
+        },
+      });
+    });
+
+    /* ── Índice técnico: fade-in al entrar la sección ─────────────── */
+    if (methodIndex && methodSection) {
+      ScrollTrigger.create({
+        trigger: methodSection,
+        start: 'top 70%',
+        once: true,
+        onEnter: () => {
+          gsap.to(methodIndex, {
+            opacity: 1,
+            duration: 0.8,
+            ease: 'expo.out',
+            delay: 0.15,
+          });
+        },
+      });
+    }
+  }
+</script>

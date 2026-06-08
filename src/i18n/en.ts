@@ -40,6 +40,27 @@ export interface PortfolioProject {
   alt: string;
 }
 
+export interface MethodStep {
+  /** Número editorial: "001" — "004". Igual en ambos idiomas. */
+  num: string;
+  /** Título del paso — por idioma (DISCOVER / DIAGNÓSTICO, etc.) */
+  title: string;
+  /** Párrafo corto — copy nativo por idioma. ES es textual de William. */
+  body: string;
+  /**
+   * Capacidades técnicas relacionadas a ESTE paso específico.
+   * Subconjunto de las globales + términos relevantes.
+   * Términos técnicos en inglés en ambos idiomas (coherente con el sistema).
+   */
+  stepCapabilities: string[];
+  /**
+   * Qué cambia para el negocio al completar este paso — 1 línea mono.
+   * Cambio CUALITATIVO. Sin métricas, sin revenue, sin claims. C1/P4.
+   * Por idioma.
+   */
+  whatChanges: string;
+}
+
 export interface Translations {
   meta: {
     title: string;
@@ -82,6 +103,29 @@ export interface Translations {
     viewCase: string;
     /** Los 4 proyectos reales. Nombres definitivos; category/year son placeholders. */
     projects: PortfolioProject[];
+  };
+  method: {
+    /** Kicker mono — "METHOD" / "MÉTODO" */
+    kicker: string;
+    /** Label del índice técnico — "WE WORK WITH:" / "TRABAJAMOS CON:" */
+    indexLabel: string;
+    /**
+     * Las 6 capacidades técnicas globales — conservadas en el diccionario.
+     * En MethodSection.astro se usan las stepCapabilities por paso.
+     */
+    capabilities: string[];
+    /**
+     * Label de la sub-sección capabilities del panel derecho.
+     * EN "CAPABILITIES" / ES "CAPACIDADES"
+     */
+    capabilitiesLabel: string;
+    /**
+     * Label de la sub-sección whatChanges del panel derecho.
+     * EN "WHAT CHANGES" / ES "QUÉ CAMBIA"
+     */
+    whatChangesLabel: string;
+    /** Los 4 pasos del método. title y body son por idioma; num es igual en ambos. */
+    steps: MethodStep[];
   };
 }
 
@@ -216,6 +260,58 @@ export const en: Translations = {
         year: '[AÑO — PENDIENTE]',
         image: '/images/portfolio-arriba-gold-real.webp',
         alt: 'ARRIBA GOLD — proyecto SCUART',
+      },
+    ],
+  },
+
+  /* ── Method — Sección 3 ─────────────────────────────────── */
+  /*
+   * C1/P4 — ANTI-INVENCIÓN:
+   * Los párrafos ES son textual de William. Los EN son copy nativo profesional
+   * que expresan el mismo sentido — no traducción literal.
+   * Capacidades técnicas: iguales en ambos idiomas (términos técnicos).
+   */
+  method: {
+    kicker: 'METHOD',
+    indexLabel: 'WE WORK WITH:',
+    capabilities: [
+      'WEB PLATFORMS',
+      'SAAS + SYSTEMS',
+      'AI AUTOMATION',
+      'E-COMMERCE',
+      'WORKFLOWS',
+      'BRAND IDENTITY',
+    ],
+    capabilitiesLabel: 'CAPABILITIES',
+    whatChangesLabel: 'WHAT CHANGES',
+    steps: [
+      {
+        num: '001',
+        title: 'DISCOVER',
+        body: 'We start with the business — the market, the customer, the real problem, the digital opportunity. Not aesthetics first. We start with what has to change in perception, trust and conversion.',
+        stepCapabilities: ['RESEARCH', 'POSITIONING', 'BRAND IDENTITY'],
+        whatChanges: 'The business gets clarity on what actually needs to change.',
+      },
+      {
+        num: '002',
+        title: 'DIRECTION',
+        body: 'We define positioning, copy, visual direction, bilingual EN/ES structure and the editorial system before designing or building. The website doesn\'t come from a template. It comes from a decision.',
+        stepCapabilities: ['BRAND IDENTITY', 'COPY', 'UX'],
+        whatChanges: 'Every decision after this points the same way.',
+      },
+      {
+        num: '003',
+        title: 'SYSTEM',
+        body: 'We design and build the right solution: web platforms, SaaS, AI automation, e-commerce, ordering / booking / workflows, or a high-performance website if that\'s what the business actually needs. This is where the technology side of the work gets demonstrated.',
+        stepCapabilities: ['WEB PLATFORMS', 'SAAS + SYSTEMS', 'AI AUTOMATION', 'E-COMMERCE', 'WORKFLOWS'],
+        whatChanges: 'The business gets something that works, not just something that looks good.',
+      },
+      {
+        num: '004',
+        title: 'LAUNCH',
+        body: 'We test responsive, performance, SEO, accessibility, tracking, conversion paths and final details before publishing. We launch something that looks premium and works in production.',
+        stepCapabilities: ['PERFORMANCE', 'SEO', 'QA'],
+        whatChanges: 'It goes live ready to perform, not just to exist.',
       },
     ],
   },

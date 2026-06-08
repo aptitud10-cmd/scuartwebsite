@@ -139,4 +139,55 @@ export const es: Translations = {
       },
     ],
   },
+
+  /* ── Method — Sección 3 ─────────────────────────────────── */
+  /*
+   * C1/P4 — ANTI-INVENCIÓN:
+   * Los párrafos ES son TEXTUAL de William — no se modificó ninguna palabra.
+   * Capacidades técnicas: iguales en ambos idiomas (términos técnicos).
+   */
+  method: {
+    kicker: 'MÉTODO',
+    indexLabel: 'TRABAJAMOS CON:',
+    capabilities: [
+      'WEB PLATFORMS',
+      'SAAS + SYSTEMS',
+      'AI AUTOMATION',
+      'E-COMMERCE',
+      'WORKFLOWS',
+      'BRAND IDENTITY',
+    ],
+    capabilitiesLabel: 'CAPACIDADES',
+    whatChangesLabel: 'QUÉ CAMBIA',
+    steps: [
+      {
+        num: '001',
+        title: 'DIAGNÓSTICO',
+        body: 'Entendemos el negocio, el mercado, el cliente, el problema actual y la oportunidad digital. No empezamos por estética; empezamos por lo que debe cambiar en percepción, confianza y conversión.',
+        stepCapabilities: ['RESEARCH', 'POSITIONING', 'BRAND IDENTITY'],
+        whatChanges: 'El negocio gana claridad sobre lo que realmente debe cambiar.',
+      },
+      {
+        num: '002',
+        title: 'DIRECCIÓN',
+        body: 'Definimos posicionamiento, copy, dirección visual, estructura bilingüe EN/ES y sistema editorial antes de diseñar o construir. La web no nace de una plantilla; nace de una decisión.',
+        stepCapabilities: ['BRAND IDENTITY', 'COPY', 'UX'],
+        whatChanges: 'Cada decisión a partir de acá apunta al mismo lugar.',
+      },
+      {
+        num: '003',
+        title: 'SISTEMA',
+        body: 'Diseñamos y construimos la solución correcta: web platforms, SaaS, AI automation, e-commerce, ordering / booking / workflows, o una web de alto rendimiento si eso es lo que el negocio necesita. Aquí se demuestra la parte de tecnología.',
+        stepCapabilities: ['WEB PLATFORMS', 'SAAS + SYSTEMS', 'AI AUTOMATION', 'E-COMMERCE', 'WORKFLOWS'],
+        whatChanges: 'El negocio obtiene algo que funciona, no solo algo que se ve bien.',
+      },
+      {
+        num: '004',
+        title: 'LANZAMIENTO',
+        body: 'Probamos responsive, performance, SEO, accesibilidad, tracking, conversion paths y detalles finales antes de publicar. Lanzamos algo que se ve premium y funciona en producción.',
+        stepCapabilities: ['PERFORMANCE', 'SEO', 'QA'],
+        whatChanges: 'Sale en vivo listo para rendir, no solo para existir.',
+      },
+    ],
+  },
 };
