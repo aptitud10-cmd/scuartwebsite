@@ -147,22 +147,35 @@ const projects = t.portfolio.projects;
       Col 9-12. Un solo elemento cuya imagen cambia con GSAP Flip.
       La franja roja (.portfolio-red-bar) se alinea al alto de este slot.
       En mobile/tablet: display:none (las imágenes están dentro de cada item).
+
+      CAPAS (Art Layer — parallax):
+        .portfolio-image-slot       → Flip target + clip-path reveal + sticky
+        .portfolio-image-slot__inner → parallax yPercent (ScrollTrigger scrub)
+        .portfolio-image-slot__img  → imagen real
+
+      Separar capas evita que el ScrollTrigger parallax pelee con el Flip.
+      El Flip opera sobre el slot (no sobre el inner), por lo que los transforms
+      de yPercent en __inner son invisibles para Flip.getState().
+      El __inner tiene height: 110% para que el desplazamiento del parallax
+      (rango ±6%) no descubra el fondo detrás de la imagen.
     -->
     <div class="portfolio-image-slot" aria-hidden="true">
-      <!--
-        La imagen inicial muestra el primer proyecto.
-        GSAP Flip la intercambia al hacer hover en otra fila.
-        El clip-path inicial oculta la imagen (inset 100% → 0 en hover).
-      -->
-      <img
-        class="portfolio-image-slot__img"
-        src={projects[0].image}
-        alt={projects[0].alt}
-        loading="lazy"
-        width="400"
-        height="500"
-        data-slot-img="true"
-      />
+      <div class="portfolio-image-slot__inner">
+        <!--
+          La imagen inicial muestra el primer proyecto.
+          GSAP Flip la intercambia al hacer hover en otra fila.
+          El clip-path inicial oculta la imagen (inset 100% → 0 en hover).
+        -->
+        <img
+          class="portfolio-image-slot__img"
+          src={projects[0].image}
+          alt={projects[0].alt}
+          loading="lazy"
+          width="400"
+          height="500"
+          data-slot-img="true"
+        />
+      </div>
     </div>
 
     <!--
@@ -412,6 +425,13 @@ const projects = t.portfolio.projects;
  * TRATAMIENTO EDITORIAL: position:relative para overlay ::after.
  * El slot ya tiene overflow:hidden — el overlay queda recortado junto
  * a la imagen, conviviendo con el clip-path de reveal sin problemas.
+ *
+ * CAPAS parallax (Art Layer):
+ *   .portfolio-image-slot       → Flip + clip-path + sticky (overflow:hidden)
+ *   .portfolio-image-slot__inner → parallax yPercent — height 110% para que
+ *                                   el desplazamiento ±6% no descubra bordes
+ *   .portfolio-image-slot__img  → imagen
+ *   ::after overlay             → en el slot, z-index 1 sobre __inner
  */
 .portfolio-image-slot {
   display: none; /* mobile: oculto */
@@ -421,6 +441,7 @@ const projects = t.portfolio.projects;
 /*
  * Overlay desktop — mismo tratamiento que mobile/tablet.
  * El clip-path del slot recorta el overlay junto a la imagen: animación sin romper.
+ * z-index: 1 asegura que queda sobre .portfolio-image-slot__inner.
  */
 .portfolio-image-slot::after {
   content: '';
@@ -430,6 +451,22 @@ const projects = t.portfolio.projects;
   opacity: 0.50;
   pointer-events: none;
   z-index: 1;
+}
+
+/*
+ * Inner: capa de parallax.
+ * width: 100%, height: 110% — los 5% extra en cada extremo absorben el
+ * desplazamiento máximo del parallax (±6% yPercent) sin descubrir el fondo.
+ * position: absolute + top: -5% centra el excedente verticalmente.
+ * will-change: transform — hint al navegador para capa GPU dedicada.
+ */
+.portfolio-image-slot__inner {
+  position: absolute;
+  top: -5%;
+  left: 0;
+  width: 100%;
+  height: 110%;
+  will-change: transform;
 }
 
 .portfolio-image-slot__img {
@@ -621,13 +658,18 @@ const projects = t.portfolio.projects;
   }
 
   /* Subrayado: visible en desktop (GSAP lo anima) */
+  /*
+   * Art Layer refinamiento: height 1px → 2px para más presencia del rojo.
+   * El barrido scaleX 0→1 sigue siendo el gesto, pero con más peso visual.
+   * Coherente con la disciplina bicromía — no se añade color, solo presencia.
+   */
   .portfolio-item__underline {
     display: block;
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
-    height: 1px;
+    height: 2px;
     background-color: var(--rojo);
     transform: scaleX(0);
     transform-origin: left center;
@@ -666,8 +708,15 @@ const projects = t.portfolio.projects;
    * Cuando las páginas de caso existan, reemplazar href="#" con el path real
    * y quitar el preventDefault. El Flip de página también es hito futuro.
    *
-   * LENIS: no instalado en este proyecto. Scroll nativo. ScrollTrigger opera
-   * sobre scroll nativo sin configuración adicional.
+   * LENIS (Art Layer Fase 1): smooth scroll activo globalmente en Layout.astro.
+   * La integración lenis.on('scroll', ScrollTrigger.update) + gsap.ticker → lenis.raf
+   * garantiza que todos los ScrollTrigger de este componente leen la posición de
+   * Lenis correctamente. No se requiere configuración adicional aquí.
+   *
+   * ART LAYER — PARALLAX SUTIL (desktop):
+   * Se aplica yPercent en .portfolio-image-slot__inner (capa separada del Flip).
+   * Arquitectura: slot (Flip + clip-path) > __inner (parallax) > img.
+   * Rango: yPercent -6 a +6. scrub: 1.5 (suave con Lenis). Solo desktop.
    */
 
   import { gsap } from 'gsap';
@@ -816,12 +865,17 @@ const projects = t.portfolio.projects;
             ease: 'power2.out',
           });
         }
-        /* Subrayado: scaleX 0→1 en activo, 1→0 en los demás */
+        /*
+         * Subrayado: scaleX 0→1 en activo, 1→0 en los demás.
+         * Art Layer refinamiento: ease expo.out + 0.45s para un barrido
+         * más satisfactorio (antes: power2.out 0.4s). La salida sigue en
+         * power2.out 0.25s en deactivateAll (asimetría entrada/salida).
+         */
         if (underline) {
           gsap.to(underline, {
             scaleX: i === index ? 1 : 0,
-            duration: 0.4,
-            ease: 'power2.out',
+            duration: i === index ? 0.45 : 0.25,
+            ease: i === index ? 'expo.out' : 'power2.out',
           });
         }
       });
@@ -889,7 +943,8 @@ const projects = t.portfolio.projects;
           gsap.to(name, { color: 'var(--crema)', duration: 0.3, ease: 'power2.out' });
         }
         if (underline) {
-          gsap.to(underline, { scaleX: 0, duration: 0.3, ease: 'power2.out' });
+          /* Salida: más rápida que la entrada (0.25s vs 0.45s) — asimetría intencional */
+          gsap.to(underline, { scaleX: 0, duration: 0.25, ease: 'power2.out' });
         }
       });
 
@@ -920,6 +975,61 @@ const projects = t.portfolio.projects;
     /* ── reduced-motion desktop: slot visible desde el inicio ── */
     if (reducedMotion) {
       gsap.set(slot, { clipPath: 'inset(0% 0 0 0)' });
+    }
+
+    /* ── Art Layer — Parallax sutil en la imagen desktop ──────────────────
+     *
+     * ARQUITECTURA DE CAPAS (anti-conflicto con Flip):
+     *   slot (.portfolio-image-slot)         → Flip.getState target + clip-path
+     *   slotInner (.portfolio-image-slot__inner) → parallax yPercent aquí
+     *   img (.portfolio-image-slot__img)     → imagen
+     *
+     * El Flip opera sobre `slot`, no sobre `slotInner`. Los transforms de
+     * yPercent en slotInner son invisibles para Flip.getState() porque Flip
+     * captura el estado del elemento que se le pasa, no de sus descendientes.
+     * Por lo tanto: parallax y Flip NO compiten por el mismo transform.
+     *
+     * RANGO: yPercent de +6 a -6 mientras el slot pasa por el viewport.
+     *   - Cuando el slot entra desde abajo: yPercent: +6 (imagen levemente baja)
+     *   - Cuando el slot sale hacia arriba: yPercent: -6 (imagen levemente sube)
+     *   El efecto neto: la imagen se mueve más lento que el scroll → profundidad sutil.
+     *
+     * scrub: 1.5 — amortiguado para convivir suavemente con el lerp 0.1 de Lenis.
+     * Un scrub bajo (0.5) podría competir visiblemente con el smooth scroll;
+     * 1.5 deja que Lenis domine la sensación táctil.
+     *
+     * trigger: la sección .portfolio (no el slot sticky) para que el ScrollTrigger
+     * tenga recorrido suficiente. start/end cubren el alto de la sección.
+     *
+     * Solo activo si !reducedMotion (ya verificado arriba en el outer guard).
+     * El parallax se salta sin animar si reducedMotion está activo.
+     * ─────────────────────────────────────────────────────────────────────── */
+    if (!reducedMotion) {
+      const slotInner = document.querySelector<HTMLElement>('.portfolio-image-slot__inner');
+      const portfolioSection = document.querySelector<HTMLElement>('.portfolio');
+
+      if (slotInner && portfolioSection) {
+        /* Estado inicial: centrado (yPercent 0 → sin desplazamiento en reposo) */
+        gsap.set(slotInner, { yPercent: 0 });
+
+        ScrollTrigger.create({
+          trigger: portfolioSection,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 1.5,
+          /*
+           * onUpdate en lugar de animation directa para evitar conflictos con
+           * cualquier tween activo sobre slotInner. Calcula yPercent linealmente
+           * basado en el progreso del ScrollTrigger (0 → 1).
+           * Mapeamos: progress 0 → yPercent +6, progress 1 → yPercent -6.
+           * (La imagen "cae" levemente al entrar desde abajo y "sube" al salir)
+           */
+          onUpdate: (self) => {
+            const yVal = 6 - self.progress * 12; /* +6 → -6 */
+            gsap.set(slotInner, { yPercent: yVal });
+          },
+        });
+      }
     }
 
     } /* fin guard: imageSlot && slotImg && portfolioItems.length > 0 */
