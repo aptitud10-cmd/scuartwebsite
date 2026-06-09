@@ -107,3 +107,6 @@ temp/
 
 # Vercel build output
 .vercel/output/
+
+# Playwright
+test-results/
