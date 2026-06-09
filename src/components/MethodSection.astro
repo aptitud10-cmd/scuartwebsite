@@ -959,8 +959,12 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
    * Si falla: bloques visibles estáticos (no dependen de JS para mostrarse).
    */
 
-  const methodSection = document.querySelector<HTMLElement>('.method');
-  if (!methodSection) throw new Error('MethodSection: .method no encontrado');
+  const methodSectionEl = document.querySelector<HTMLElement>('.method');
+  if (!methodSectionEl) throw new Error('MethodSection: .method no encontrado');
+  /* Tras el throw, methodSection es no-null. Const tipada explícita para que
+     TS estreche el tipo dentro de las funciones declaradas abajo (el narrowing
+     por throw no cruza el límite de función en el scope del módulo del script). */
+  const methodSection: HTMLElement = methodSectionEl;
 
   const indexItems = methodSection.querySelectorAll<HTMLElement>('[data-index-item]');
   const isMobile = () => window.matchMedia('(max-width: 767px)').matches;

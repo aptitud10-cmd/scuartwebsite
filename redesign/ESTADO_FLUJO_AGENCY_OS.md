@@ -50,11 +50,24 @@ NOTA TÉCNICA: dev server a veces arranca en 4322 si 4321 ocupado. Error de esbu
 NOTA HERRAMIENTA: hay script de screenshots reutilizable en scripts/shot.mjs (usa @playwright/test). Uso: node scripts/shot.mjs "<selector>" <nombre> <puerto>.
 
 Orden incremental restante:
-3. Método ← ACÁ (decidir enfoque primero)
-4. About / posicionamiento
-5. CTA / contacto
-6. SEO / metadata / polish
-7. QA responsive completo (reviewer + qa-responsive al final)
+3. Método ✅ CERRADO (expediente click/tap)
+4. CTA / contacto ← ACÁ
+5. SEO / metadata / polish
+6. QA responsive completo (reviewer + qa-responsive al final)
+7. FASE ART LAYER / EMOTIONAL LAYER (post-estructura, antes de final) — ver abajo
+
+## CTA / CONTACTO — decisiones de William (2026-06-09)
+- Mecanismo PRINCIPAL: FORMULARIO tipo brief corto y elegante. CTA "Start a project / Empezar un proyecto".
+- NO WhatsApp como principal (SCUART = estudio premium, no negocio local informal). NO botón flotante, NO verde, NO protagonista.
+- Jerarquía: 1) Formulario estructurado (leads serios). 2) Email directo (respaldo). 3) WhatsApp opcional SECUNDARIO discreto al final ("Prefer a quick message? WhatsApp / Email").
+- Diseñar como CIERRE PREMIUM DE PROYECTO, no página de contacto común.
+- PENDIENTE resolver al implementar: backend del form (cómo se reciben los envíos — servicio tipo Formspree/Resend/Vercel, o email). Decidir con William.
+
+## FASE ART LAYER / EMOTIONAL LAYER (marcada por William 2026-06-09, NO implementar aún)
+CRITERIO: William siente que el sitio, aunque sólido, puede terminar siendo "web negra con texto + líneas + tipografía grande" sin capa visual memorable. Tras cerrar estructura (CTA + SEO + QA), hacer una fase de ELEVACIÓN visual/emocional para que SCUART se sienta estudio premium con dirección artística real, no solo texto editorial oscuro.
+Explorar (sin implementar hasta la fase): motion editorial con intención (no trucos); previews de proyectos más vivos; video loops / micro-reels de proyectos REALES; interacciones portfolio que muestren UI real; transiciones entre secciones; detalles visuales más allá de líneas; textura/material más refinado; rojo con momentos memorables; CTA con más personalidad; una pieza visual que DEMUESTRE "design + technology" (no solo lo diga).
+REGLAS: no video stock genérico; no humo/luces/futurismo vacío/dashboards falsos/SaaS común; no sacrificar performance; no tapar copy; no adornos sin concepto. Todo refuerza "verse premium + funcionar mejor online".
+NOTA Claude: esta fase es la que el research (RESEARCH_HERO_2026.md) identificó como la diferencia real entre "muy bueno" y "award". No es opcional para el nivel que William quiere. Las deudas de imágenes del portfolio (3/4 son screenshots) se resuelven naturalmente acá.
 
 ## ESTADO DE SECCIONES (sesión 2026-06-07)
 

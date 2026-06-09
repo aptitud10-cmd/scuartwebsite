@@ -61,6 +61,51 @@ export interface MethodStep {
   whatChanges: string;
 }
 
+export interface ContactTranslations {
+  /** Statement de cierre grande — Archivo 900 */
+  statement: string;
+  /** Subcopy debajo del statement — DM Sans taupe */
+  subcopy: string;
+  /** Kicker de sección — mono uppercase */
+  kicker: string;
+  /* Labels de campos */
+  labelName: string;
+  labelBusiness: string;
+  labelEmail: string;
+  labelCountry: string;
+  labelWhatDoYouNeed: string;
+  labelBudget: string;
+  labelTimeline: string;
+  labelMessage: string;
+  /* Placeholders */
+  placeholderName: string;
+  placeholderBusiness: string;
+  placeholderEmail: string;
+  placeholderCountry: string;
+  placeholderMessage: string;
+  /* Opciones del select "What do you need" */
+  needOptions: { value: string; label: string }[];
+  /* Opciones del select de presupuesto */
+  budgetOptions: { value: string; label: string }[];
+  /* Opciones del select de timeline */
+  timelineOptions: { value: string; label: string }[];
+  /* Botón de envío */
+  submitLabel: string;
+  submitLoadingLabel: string;
+  /* Mensajes de estado */
+  successHeading: string;
+  successBody: string;
+  errorMessage: string;
+  /* Bloque secundario WhatsApp/email */
+  alternativeLabel: string;
+  whatsappLabel: string;
+  emailLabel: string;
+  /** Número de WhatsApp — placeholder hasta que William lo confirme */
+  whatsappHref: string;
+  /** Email de contacto público */
+  emailHref: string;
+}
+
 export interface Translations {
   meta: {
     title: string;
@@ -127,6 +172,8 @@ export interface Translations {
     /** Los 4 pasos del método. title y body son por idioma; num es igual en ambos. */
     steps: MethodStep[];
   };
+  /** Sección 4 — CTA / Contacto */
+  contact: ContactTranslations;
 }
 
 export const en: Translations = {
@@ -314,5 +361,61 @@ export const en: Translations = {
         whatChanges: 'It goes live ready to perform, not just to exist.',
       },
     ],
+  },
+
+  /* ── Contact — Sección 4 ────────────────────────────────── */
+  contact: {
+    kicker: 'START A PROJECT',
+    statement: 'LET\'S\nBUILD\nSOMETHING.',
+    subcopy: 'Tell us about the project. We\'ll respond within 24 hours.',
+    labelName: 'Name',
+    labelBusiness: 'Business or brand',
+    labelEmail: 'Email',
+    labelCountry: 'Country / Market',
+    labelWhatDoYouNeed: 'What do you need?',
+    labelBudget: 'Budget range',
+    labelTimeline: 'Timeline',
+    labelMessage: 'Message',
+    placeholderName: 'Your name',
+    placeholderBusiness: 'Company or brand name',
+    placeholderEmail: 'you@example.com',
+    placeholderCountry: 'US, Mexico, Argentina…',
+    placeholderMessage: 'Brief description of the project — the more context, the better.',
+    needOptions: [
+      { value: '', label: 'Select one' },
+      { value: 'website', label: 'Website' },
+      { value: 'saas', label: 'SaaS / Web platform' },
+      { value: 'ecommerce', label: 'E-commerce' },
+      { value: 'ordering', label: 'Ordering / Booking system' },
+      { value: 'automation', label: 'AI / Automation' },
+      { value: 'branding', label: 'Branding + Web' },
+      { value: 'other', label: 'Other / Not sure yet' },
+    ],
+    budgetOptions: [
+      { value: '', label: 'Select range' },
+      { value: 'under5k', label: '< $5,000' },
+      { value: '5k-15k', label: '$5,000 – $15,000' },
+      { value: '15k-50k', label: '$15,000 – $50,000' },
+      { value: 'over50k', label: '$50,000+' },
+      { value: 'notsure', label: 'Not sure' },
+    ],
+    timelineOptions: [
+      { value: '', label: 'Select timeline' },
+      { value: 'asap', label: 'ASAP' },
+      { value: '1-3mo', label: '1 – 3 months' },
+      { value: '3-6mo', label: '3 – 6 months' },
+      { value: 'flexible', label: 'Flexible' },
+    ],
+    submitLabel: 'SEND PROJECT BRIEF →',
+    submitLoadingLabel: 'SENDING…',
+    successHeading: 'Brief received.',
+    successBody: 'We\'ll review it and get back to you within 24 hours.',
+    errorMessage: 'Something went wrong. Try again or write us directly.',
+    alternativeLabel: 'Prefer a quick message?',
+    whatsappLabel: 'WhatsApp',
+    /* PLACEHOLDER — William reemplaza con su número real en formato internacional */
+    whatsappHref: 'https://wa.me/[WHATSAPP_NUMBER]',
+    emailLabel: 'Email',
+    emailHref: 'mailto:hello@scuart.com',
   },
 };
