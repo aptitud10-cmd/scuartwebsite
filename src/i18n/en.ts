@@ -106,6 +106,21 @@ export interface ContactTranslations {
   emailHref: string;
 }
 
+export interface FooterTranslations {
+  /** Etiqueta de navegación interna — mono uppercase */
+  navLabel: string;
+  /** Label selector de idioma — "EN / ES" */
+  langSwitchLabel: string;
+  /** Mercados del estudio — mono taupe, banda de créditos */
+  markets: string;
+  /** Texto de créditos + año — mono taupe */
+  builtBy: string;
+  /** Statement final corto (opcional) — se muestra como tagline bajo SCUART+ */
+  tagline: string;
+  /** Aria-label del elemento <footer> */
+  ariaLabel: string;
+}
+
 export interface Translations {
   meta: {
     title: string;
@@ -174,6 +189,8 @@ export interface Translations {
   };
   /** Sección 4 — CTA / Contacto */
   contact: ContactTranslations;
+  /** Footer — cierre editorial de marca */
+  footer: FooterTranslations;
 }
 
 export const en: Translations = {
@@ -363,6 +380,16 @@ export const en: Translations = {
     ],
   },
 
+  /* ── Footer — cierre editorial de marca ─────────────────── */
+  /*
+   * C1/P4 — ANTI-INVENCIÓN:
+   * Email: hello@scuart.com — extraído del contacto (emailHref).
+   * WhatsApp: placeholder wa.me/[WHATSAPP_NUMBER] — igual que el contacto.
+   * Mercados: US · LATAM — de la identidad del estudio (hero index).
+   * Bogotá: ciudad del estudio (de project_scuart.md). Sin dirección exacta.
+   * Año: 2026 — año actual.
+   */
+
   /* ── Contact — Sección 4 ────────────────────────────────── */
   contact: {
     kicker: 'START A PROJECT',
@@ -417,5 +444,15 @@ export const en: Translations = {
     whatsappHref: 'https://wa.me/[WHATSAPP_NUMBER]',
     emailLabel: 'Email',
     emailHref: 'mailto:hello@scuart.com',
+  },
+
+  /* ── Footer — cierre de marca ───────────────────────────── */
+  footer: {
+    navLabel: 'NAVIGATION',
+    langSwitchLabel: 'LANGUAGE',
+    markets: 'Bogotá · US · LATAM',
+    builtBy: '© 2026 SCUART',
+    tagline: 'Design + Technology for businesses that need to look sharp and work better.',
+    ariaLabel: 'SCUART — Studio footer',
   },
 };

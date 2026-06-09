@@ -246,4 +246,14 @@ export const es: Translations = {
     emailLabel: 'Email',
     emailHref: 'mailto:hello@scuart.com',
   },
+
+  /* ── Footer — cierre de marca ───────────────────────────── */
+  footer: {
+    navLabel: 'NAVEGACIÓN',
+    langSwitchLabel: 'IDIOMA',
+    markets: 'Bogotá · US · LATAM',
+    builtBy: '© 2026 SCUART',
+    tagline: 'Diseño y tecnología para negocios que necesitan verse mejor y funcionar mejor.',
+    ariaLabel: 'SCUART — Pie de página del estudio',
+  },
 };
