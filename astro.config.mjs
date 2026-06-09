@@ -6,6 +6,17 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   site: 'https://scuart.com',
+
+  /*
+   * Redirect HTTP real de / → /en.
+   * Con el adaptador Vercel, Astro emite esto como una route de redirect
+   * en .vercel/output/config.json (status 308) — NO como meta-refresh.
+   * Reemplaza el src/pages/index.astro que generaba el meta-refresh con delay.
+   */
+  redirects: {
+    '/': '/en',
+  },
+
   integrations: [
     react(),
     sitemap({
