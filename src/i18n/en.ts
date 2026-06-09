@@ -121,6 +121,19 @@ export interface FooterTranslations {
   ariaLabel: string;
 }
 
+export interface ManifestoTranslations {
+  /** Kicker mono arriba-izquierda — igual en ambos idiomas */
+  kicker: string;
+  /** Primera línea — crema */
+  line1: string;
+  /** Segunda línea, parte crema (antes del acento) */
+  line2a: string;
+  /** Segunda línea, parte roja (el acento — 1 instancia) */
+  line2red: string;
+  /** Aria-label del elemento <section> */
+  ariaLabel: string;
+}
+
 export interface Translations {
   meta: {
     title: string;
@@ -152,6 +165,8 @@ export interface Translations {
     coords: string;
     type: string;
   };
+  /** Sección 1.5 — Manifesto (entre hero y portfolio) */
+  manifesto: ManifestoTranslations;
   portfolio: {
     /** Kicker de sección — mono uppercase, arriba-izquierda */
     sectionLabel: string;
@@ -274,6 +289,20 @@ export const en: Translations = {
     label: 'STATEMENT',
     coords: 'GASTRO · WEB',
     type: 'DIGITAL DESIGN',
+  },
+
+  /* ── Manifesto — Sección 1.5 (entre hero y portfolio) ───── */
+  /*
+   * Copy aprobado por William. NO modificar.
+   * Presupuesto rojo: 1 instancia (line2red). Coherente con el sistema.
+   * Kicker: MANIFESTO en ambos idiomas — coherencia del sistema técnico.
+   */
+  manifesto: {
+    kicker: 'N°·01 / MANIFESTO',
+    line1: 'We don\'t build websites.',
+    line2a: 'We build ',
+    line2red: 'competitive advantages.',
+    ariaLabel: 'Manifesto — We don\'t build websites. We build competitive advantages.',
   },
 
   /* ── Portfolio — Sección 2 ──────────────────────────────── */

@@ -88,6 +88,19 @@ export const es: Translations = {
     type: 'DISEÑO DIGITAL',
   },
 
+  /* ── Manifesto — Sección 1.5 (entre hero y portfolio) ───── */
+  /*
+   * Copy aprobado por William. NO modificar.
+   * Kicker: MANIFESTO en ambos idiomas — coherencia del sistema técnico.
+   */
+  manifesto: {
+    kicker: 'N°·01 / MANIFESTO',
+    line1: 'No hacemos webs.',
+    line2a: 'Construimos ',
+    line2red: 'ventajas competitivas.',
+    ariaLabel: 'Manifiesto — No hacemos webs. Construimos ventajas competitivas.',
+  },
+
   /* ── Portfolio — Sección 2 ──────────────────────────────── */
   /*
    * C1/P4 — ANTI-INVENCIÓN:

@@ -1,0 +1,295 @@
+---
+/**
+ * ManifestoSection.astro — Statement editorial entre hero y portfolio.
+ * Sección 1.5 del sitio SCUART.
+ *
+ * Copy aprobado por William:
+ *   EN: "We don't build websites. / We build [competitive advantages]."
+ *   ES: "No hacemos webs. / Construimos [ventajas competitivas]."
+ *   "[...]" = --rojo, única instancia de acento en esta sección.
+ *
+ * Composición:
+ * - Fondo: --carbon. Continuidad con el hero — el cambio de plano llega en portfolio (--carbon-elev).
+ * - Kicker mono arriba-izquierda: "N°·01 / MANIFESTO" (igual en ambos idiomas).
+ * - 2 líneas Archivo 900, alineación izquierda dura.
+ * - Tamaño máximo: clamp(2rem, 5.5vw, 4.5rem) — menor que el hero (~6rem desktop).
+ * - Espacio negativo generoso arriba/abajo (--space-3xl): el aire ES el diseño.
+ * - Mobile: texto entero, nunca cortado. "competitive advantages" (22 chars)
+ *   rompe naturalmente a 2 líneas — correcto.
+ *
+ * Reveal: IntersectionObserver + CSS transition. Fade + translateY(20px→0).
+ * Progressive enhancement: visible sin JS (sin opacity:0 inicial en CSS base).
+ * reduced-motion: estático, sin transición.
+ *
+ * HTML server-rendered — indexable por SEO sin JS.
+ */
+
+import type { Translations } from '../i18n/en';
+
+interface Props {
+  t: Translations;
+}
+
+const { t } = Astro.props;
+---
+
+<section class="manifesto" aria-label={t.manifesto.ariaLabel}>
+
+  <!--
+    Kicker — mono uppercase arriba-izquierda.
+    Coherente con el sistema: mismo tratamiento que hero-kicker y portfolio-kicker.
+  -->
+  <p class="manifesto-kicker">{t.manifesto.kicker}</p>
+
+  <!--
+    Statement — 2 líneas Archivo 900.
+    HTML real server-rendered: indexable sin JS.
+    line2a + line2red = la segunda línea completa con el acento rojo al final.
+    No se usa array de tokens (más simple para 1 acento fijo al final de línea 2).
+  -->
+  <div class="manifesto-statement" aria-hidden="false">
+    <p class="manifesto-line manifesto-line--1">{t.manifesto.line1}</p>
+    <p class="manifesto-line manifesto-line--2">
+      {t.manifesto.line2a}<span class="manifesto-accent">{t.manifesto.line2red}</span>
+    </p>
+  </div>
+
+</section>
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   MANIFESTO SECTION
+   Mobile-first: 375px base. md: 768px. lg: 1280px.
+   Fondo: --carbon (continuidad con el hero).
+   ═══════════════════════════════════════════════════════════ */
+
+.manifesto {
+  background-color: var(--carbon);
+  padding-top: var(--space-3xl);
+  padding-bottom: var(--space-3xl);
+  padding-left: var(--margin);
+  padding-right: var(--margin);
+  /*
+   * Separador superior del hero: línea editorial --linea 1px.
+   * El hero termina en --carbon, el manifesto empieza en --carbon —
+   * la línea marca el cambio de bloque sin cambiar el plano de color.
+   */
+  border-top: 1px solid var(--linea);
+}
+
+/* ─── KICKER ─────────────────────────────────────────────── */
+
+.manifesto-kicker {
+  font-family: var(--font-mono);
+  font-size: var(--text-mono);
+  font-weight: 400;
+  color: var(--taupe);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  margin-bottom: var(--space-l);
+  /*
+   * Estado inicial para el reveal (JS-driven via IntersectionObserver).
+   * opacity:0 + translateY se setean en JS, NO en CSS:
+   * → el HTML es visible sin JS (progressive enhancement, P4).
+   * Clase .is-hidden se agrega en JS antes del observe.
+   */
+}
+
+/* ─── STATEMENT ─────────────────────────────────────────── */
+
+.manifesto-statement {
+  /* Sin max-width forzado: el texto fluye izquierda, el aire del margen lo contiene */
+}
+
+.manifesto-line {
+  font-family: var(--font-display);
+  font-weight: var(--display-weight-heavy); /* 900 */
+  /*
+   * Clamp calibrado para quedar MENOR que el hero:
+   * - Hero desktop max: ~6rem (clamp(3.5rem, 4.8vw, 6rem) en desktop)
+   * - Manifesto: max 4.5rem — visualmente apoya, no compite.
+   * - Mobile min 2rem (32px): "competitive advantages" a 32px rompe a 2 líneas
+   *   en 390px pero nunca se corta (overflow-wrap: anywhere).
+   * - leading 0.95: display tight, igual que el hero. Editorial.
+   */
+  font-size: clamp(2rem, 5.5vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.025em;
+  font-variation-settings: 'wdth' 105;
+  color: var(--crema);
+  margin: 0;
+  /*
+   * Anti-overflow mobile: garantiza que texto largo ("competitive advantages")
+   * nunca se desborde del viewport. Rompe a la siguiente línea entero.
+   */
+  overflow-wrap: anywhere;
+  hyphens: manual;
+  text-transform: none; /* copy ya está en sentence case — correcto */
+}
+
+.manifesto-line--1 {
+  margin-bottom: 0.1em; /* aire mínimo entre las 2 líneas — no excesivo */
+}
+
+/* ─── ACENTO ROJO ────────────────────────────────────────── */
+/*
+ * Única instancia roja en esta sección.
+ * Presupuesto rojo: coherente con el sistema (max 4/viewport).
+ * No añade ningún estilo de layout — solo el color.
+ */
+.manifesto-accent {
+  color: var(--rojo);
+}
+
+/* ─── REVEAL — clases manejadas por JS ─────────────────────
+ * .is-hidden: estado inicial antes del reveal.
+ *   opacity:0 + translateY(20px). Transition definida aquí.
+ * .is-visible: estado final (clase añadida por IntersectionObserver).
+ *   opacity:1 + translateY(0).
+ *
+ * El estado por defecto (sin clases) es visible — progressive enhancement.
+ * JS añade .is-hidden ANTES de observar, luego alterna a .is-visible.
+ * ─────────────────────────────────────────────────────────── */
+
+.manifesto-kicker.is-hidden,
+.manifesto-line.is-hidden {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.manifesto-kicker.is-visible,
+.manifesto-line.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/*
+ * Stagger visual: la segunda línea entra 0.12s después del kicker / la primera.
+ * Se logra con transition-delay en la clase, no con JS.
+ */
+.manifesto-kicker.is-visible {
+  transition-delay: 0s;
+}
+
+.manifesto-line--1.is-visible {
+  transition-delay: 0.08s;
+}
+
+.manifesto-line--2.is-visible {
+  transition-delay: 0.18s;
+}
+
+/* ─── reduced-motion: override — sin transición ─────────── */
+@media (prefers-reduced-motion: reduce) {
+  .manifesto-kicker.is-hidden,
+  .manifesto-line.is-hidden {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .manifesto-kicker.is-visible,
+  .manifesto-line.is-visible {
+    transition: none;
+    transition-delay: 0s;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TABLET (768px+) — escala intermedia, aire generoso
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 768px) {
+  .manifesto {
+    /* El clamp de padding ya escala — no se necesita override */
+  }
+
+  .manifesto-line {
+    /* wdth sube a 108 en tablet (coherente con la progresión del hero) */
+    font-variation-settings: 'wdth' 108;
+    hyphens: none;
+    overflow-wrap: normal;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DESKTOP (1280px+) — col 1-9, aire máximo
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 1280px) {
+  .manifesto-line {
+    /*
+     * Desktop: el texto ocupa col 1-9 implícitamente (el margen --margin
+     * a 7.5rem crea el aire derecho natural). wdth 110 = mismo eje que el hero.
+     * max-width 75% = ~9 columnas de 12 sin usar grid explícito.
+     * Más simple (P6) y produce el mismo resultado que grid: 1/10.
+     */
+    font-variation-settings: 'wdth' 110;
+    max-width: 75%;
+    hyphens: none;
+    overflow-wrap: normal;
+  }
+}
+</style>
+
+<script>
+  /**
+   * ManifestoSection — Reveal con IntersectionObserver.
+   *
+   * PROGRESSIVE ENHANCEMENT:
+   * El HTML es visible sin JS (sin opacity:0 inicial en CSS base).
+   * JS añade .is-hidden ANTES de observar → el estado inicial invisible
+   * solo existe si JS está disponible.
+   *
+   * Secuencia:
+   * 1. JS añade .is-hidden a kicker y líneas (opacity:0 + translateY(20px)).
+   * 2. IntersectionObserver detecta cuando la sección entra al viewport.
+   * 3. Se reemplaza .is-hidden por .is-visible → CSS transition hace el reveal.
+   * 4. Stagger visual: transition-delay en CSS (0s kicker / 0.08s línea1 / 0.18s línea2).
+   *
+   * reduced-motion: las clases se añaden igual pero el CSS override elimina
+   * la transición → aparición instantánea.
+   */
+
+  /*
+   * reduced-motion: el CSS override (.manifesto-kicker.is-visible, .manifesto-line.is-visible
+   * con transition:none) maneja el caso sin JS. No se necesita branch aquí.
+   */
+  const section = document.querySelector<HTMLElement>('.manifesto');
+  if (section) {
+    const kicker = section.querySelector<HTMLElement>('.manifesto-kicker');
+    const lines = section.querySelectorAll<HTMLElement>('.manifesto-line');
+
+    const targets = [kicker, ...Array.from(lines)].filter(Boolean) as HTMLElement[];
+
+    /* Añadir estado inicial oculto ANTES de observar */
+    targets.forEach((el) => {
+      el.classList.add('is-hidden');
+    });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            /* Revelar todos los targets */
+            targets.forEach((el) => {
+              el.classList.remove('is-hidden');
+              el.classList.add('is-visible');
+            });
+            /* Una sola vez — desconectar después del reveal */
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        /*
+         * threshold: 0.15 — la sección debe estar al menos 15% visible
+         * antes de triggerear el reveal. Evita el disparo en scroll rápido
+         * cuando la sección apenas aparece 1px en pantalla.
+         */
+        threshold: 0.15,
+      }
+    );
+
+    observer.observe(section);
+  }
+</script>
