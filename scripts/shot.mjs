@@ -1,15 +1,20 @@
 /**
  * shot.mjs — Screenshots de secciones para review visual.
- * Uso: node scripts/shot.mjs <selector|full> <nombre> [puerto]
+ * Uso: node scripts/shot.mjs <selector|full> <nombre> [puerto] [anchos separados por coma]
  * Ej:  node scripts/shot.mjs "#method" method
- * Captura /en y /es en 1280, 768, 375 → redesign/shots/<nombre>-{en,es}-{w}.png
+ * Ej:  node scripts/shot.mjs "#method" method 4322 1280,820,390
+ * Captura /en y /es en los anchos indicados → redesign/shots/<nombre>-{en,es}-{w}.png
+ * Anchos por defecto: 1280, 820, 390
  */
 import { chromium } from '@playwright/test';
 
 const target = process.argv[2] || 'full';   // selector CSS o "full"
 const name = process.argv[3] || 'shot';
 const port = process.argv[4] || '4321';
-const widths = [1280, 768, 375];
+const widthsArg = process.argv[5];
+const widths = widthsArg
+  ? widthsArg.split(',').map(Number).filter(Boolean)
+  : [1280, 820, 390];
 const langs = ['en', 'es'];
 
 const browser = await chromium.launch();
