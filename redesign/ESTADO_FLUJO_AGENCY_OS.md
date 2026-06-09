@@ -26,7 +26,41 @@ Archivos del hero: src/components/HeroSection.astro, src/i18n/en.ts, src/i18n/es
 
 **DEUDA NO BLOQUEANTE:** el copy del Concepto B es base aprobada pero William puede afinar las frases más adelante (sin cambiar el concepto). El campo meta_col en i18n quedó conservado pero NO se renderiza (lo reemplazó el índice de capacidades).
 
-## DÓNDE RETOMAR (próxima sesión — 2026-06-08)
+## ESTADO ACTUAL (2026-06-09 — fin de sesión larga)
+
+ESTRUCTURA COMPLETA + EXPANSIÓN tanda 1 hecha. Sitio = 7 secciones, en orden:
+**hero → manifesto → portfolio → capabilities → método → contacto → footer**
+
+Secciones (todas commiteadas, aprobadas por William, astro check 0/0, build limpio):
+- HERO (Concepto B, el "+" rojo) — commit cd49ba5
+- MANIFESTO ("No hacemos webs / Construimos ventajas competitivas" — copy rescatado del SCUART viejo scuart-next.vercel.app) — ManifestoSection.astro
+- PORTFOLIO (lista editorial 4 proyectos) — commit 3299f85. DEUDA: 3/4 imágenes son screenshots de UI; reemplazar por mockups/fotos (mismo nombre .webp). Textos = placeholder.
+- CAPABILITIES (lista editorial 01-06 + "qué resuelve") — CapabilitiesSection.astro
+- MÉTODO (expediente click/tap 001-004) — MethodSection.astro
+- CONTACTO (cierre "EMPECEMOS/LET'S BUILD SOMETHING" + form Resend) — ContactSection.astro
+- FOOTER (firma SCUART+) — FooterSection.astro
+
+FUNCIONAL HECHO:
+- Nav links arreglados (#portfolio/#method/#contact) + scroll-margin.
+- SEO completo: site scuart.com, sitemap, robots, OG image propia (public/og.png), canonicals/hreflang/twitter/theme-color. Verificado: cero vercel.app/localhost en SEO.
+- Form Resend: endpoint /api/contact serverless, adaptador @astrojs/vercel. Sitio sigue estático salvo endpoint.
+- Redirect raíz / → /en = 301 HTTP real (no meta-refresh).
+- scripts/shot.mjs + shot-scroll.mjs (screenshots, @playwright/test, anchos custom).
+- .vercel/output gitignoreado.
+
+PENDIENTE WILLIAM (para que el sitio funcione 100% en prod, NO bloquea dev):
+- Vercel env vars: RESEND_API_KEY + CONTACT_EMAIL (Settings → Environment Variables → redeploy).
+- Reemplazar placeholder: número WhatsApp ([WHATSAPP_NUMBER] en i18n contact+footer), from de Resend (dominio verificado en Resend).
+- Imágenes reales del portfolio (3/4 son screenshots). Textos reales de proyectos (placeholders).
+- Posible afinado de copy (hero, whatChanges del método) — base aprobada, no urgente.
+
+PRÓXIMO (decisión de William, sin decidir al cerrar):
+- Opción A: FASE ART LAYER (Lenis smooth scroll + transiciones entre secciones + portfolio vivo + rojo con momentos memorables). Ver bloque FASE ART LAYER abajo. Es lo que lleva de "competente" a "award".
+- Opción B: QA final (reviewer + qa-responsive: Lighthouse/WCAG/perf 3 viewports) + deploy prod.
+- Recomendación Claude: Art Layer primero (va a cambiar código igual), QA al final sobre sitio terminado.
+- Último preview deploy: https://scuartwebsite-o1ximit4y-william-2622f910.vercel.app (desactualizado — re-deployar para ver las 3 secciones nuevas).
+
+## DÓNDE RETOMAR (sesión anterior — 2026-06-08, ya resuelto)
 
 **SECCIÓN 3 — MÉTODO. EN CURSO (rehacer).** Hero ✅ y Portfolio ✅ cerrados.
 
