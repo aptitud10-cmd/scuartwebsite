@@ -176,15 +176,17 @@ const projects = t.portfolio.projects;
           data-slot-img="true"
         />
       </div>
-    </div>
 
-    <!--
-      FRANJA ROJA COL 9 (desktop only) — "columna activada".
-      2px vertical, alineada al alto de la imagen activa.
-      Instancia B del presupuesto rojo. JS la posiciona dinámicamente.
-      En reposo: opacity 0. En hover: se alinea y aparece.
-    -->
-    <div class="portfolio-red-bar" aria-hidden="true"></div>
+      <!--
+        FRANJA ROJA COL 9 (desktop only) — "columna activada".
+        2px vertical, instancia B del presupuesto rojo.
+        Es HIJA del slot (no del layout): hereda su posición y comportamiento
+        sticky automáticamente, sin JS de posicionamiento. Se alinea al borde
+        izquierdo del slot (= col 9) y a su alto exacto sin recalcular en scroll.
+        En reposo: opacity 0. En hover: aparece (scaleY 0→1).
+      -->
+      <div class="portfolio-red-bar" aria-hidden="true"></div>
+    </div>
 
   </div>
 
@@ -458,7 +460,10 @@ const projects = t.portfolio.projects;
  * width: 100%, height: 110% — los 5% extra en cada extremo absorben el
  * desplazamiento máximo del parallax (±6% yPercent) sin descubrir el fondo.
  * position: absolute + top: -5% centra el excedente verticalmente.
- * will-change: transform — hint al navegador para capa GPU dedicada.
+ *
+ * will-change: NO permanente. Mantenerlo siempre fuerza una capa GPU viva
+ * todo el tiempo (anti-patrón MDN) aunque no haya scroll. Se activa on-scroll
+ * desde el ScrollTrigger del parallax (onToggle) y se quita al salir.
  */
 .portfolio-image-slot__inner {
   position: absolute;
@@ -466,7 +471,6 @@ const projects = t.portfolio.projects;
   left: 0;
   width: 100%;
   height: 110%;
-  will-change: transform;
 }
 
 .portfolio-image-slot__img {
@@ -484,13 +488,18 @@ const projects = t.portfolio.projects;
 /* ─── FRANJA ROJA COL 9 (desktop) ────────────────────────── */
 /*
  * 2px vertical, instancia B del presupuesto rojo.
- * "Columna activada" — no recorre toda la sección, solo el tramo
- * alineado al alto de la imagen activa. JS la posiciona dinámicamente.
+ * "Columna activada" — alineada al borde izquierdo (col 9) y al alto del slot.
+ * Es hija del slot: hereda su posición sticky sin JS de posicionamiento.
+ * top:0 / bottom:0 la estiran al alto del slot automáticamente; left:0 la ancla
+ * al borde de col 9. JS solo controla opacity/scaleY (aparición), no posición.
  * Mobile/tablet: display:none.
  */
 .portfolio-red-bar {
   display: none;
   position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
   width: 2px;
   background-color: var(--rojo);
   opacity: 0;
@@ -593,14 +602,10 @@ const projects = t.portfolio.projects;
     clip-path: inset(100% 0 0 0);
   }
 
-  /* Franja roja: visible en desktop */
+  /* Franja roja: visible en desktop. Posición/alto vienen del slot padre
+     (top:0/bottom:0/left:0) — no se calcula nada en JS. */
   .portfolio-red-bar {
     display: block;
-    grid-column: 9;
-    /*
-     * Posición y alto: JS los calcula dinámicamente según el alto del slot.
-     * La franja se alinea al alto de la imagen activa = "columna activada ahí".
-     */
   }
 
   /* Items desktop: layout horizontal (fila hover), NO grid interno */
@@ -798,25 +803,34 @@ const projects = t.portfolio.projects;
     /* Si ya se hizo el primer reveal */
     let hasRevealed = false;
 
-    /* ── Posición de la franja roja ── */
-    /*
-     * La franja se alinea al top/bottom del slot de imagen activa.
-     * Se calcula respecto al contenedor .portfolio-layout (position:relative).
-     */
-    function positionRedBar() {
-      if (!redBar) return;
-      const layout = slot.closest<HTMLElement>('.portfolio-layout');
-      if (!layout) return;
-      const layoutRect = layout.getBoundingClientRect();
-      const slotRect = slot.getBoundingClientRect();
-      const top = slotRect.top - layoutRect.top;
-      const height = slotRect.height;
-      redBar.style.top = `${top}px`;
-      redBar.style.height = `${height}px`;
-      /* left: borde de col 9 = 8/12 del interior del layout */
-      const layoutWidth = layoutRect.width;
-      redBar.style.left = `${(layoutWidth * 8) / 12}px`;
+    /* ── Preload de imágenes del portfolio (W2: anti-flash) ──────────────
+     * Solo la imagen del proyecto 0 está en el DOM (loading="lazy"). Las otras 3
+     * se descargan recién cuando img.src = newSrc en el hover → flash/hueco
+     * durante el Flip de 0.6s en conexiones lentas (audiencia 4G LATAM).
+     *
+     * Las precargamos a la caché del browser cuando el cursor entra a la lista
+     * por primera vez (no en load: no competir con el LCP del hero). Para cuando
+     * el usuario llega a la 2ª fila, ya están listas. Disparo único.
+     * ──────────────────────────────────────────────────────────────────── */
+    let imagesPreloaded = false;
+    function preloadProjectImages() {
+      if (imagesPreloaded) return;
+      imagesPreloaded = true;
+      portfolioItems.forEach((item) => {
+        const src = item.dataset.image;
+        if (src) {
+          const pre = new Image();
+          pre.src = src;
+        }
+      });
     }
+
+    /*
+     * NOTA: la franja roja ya NO se posiciona por JS. Es hija del slot y
+     * se ancla por CSS (top:0/bottom:0/left:0). Hereda el sticky del slot,
+     * por lo que sigue a la imagen activa en scroll sin recalcular nada.
+     * JS solo anima su aparición (opacity/scaleY).
+     */
 
     /* ── Activar un proyecto ── */
     function activateProject(index: number) {
@@ -845,7 +859,6 @@ const projects = t.portfolio.projects;
           hasRevealed = true;
         }
         if (redBar) {
-          positionRedBar();
           gsap.set(redBar, { opacity: 1, scaleY: 1 });
         }
         activeIndex = index;
@@ -912,8 +925,7 @@ const projects = t.portfolio.projects;
         });
       }
 
-      /* 3. Franja roja: posicionar + revelar */
-      positionRedBar();
+      /* 3. Franja roja: revelar (posición la maneja el CSS desde el slot padre) */
       if (redBar) {
         gsap.to(redBar, {
           opacity: 1,
@@ -963,9 +975,10 @@ const projects = t.portfolio.projects;
       });
     });
 
-    /* Al salir de la lista completa, desactivar */
+    /* Al entrar a la lista: precargar imágenes (anti-flash). Al salir: desactivar. */
     const portfolioList = document.querySelector<HTMLElement>('.portfolio-list');
     if (portfolioList) {
+      portfolioList.addEventListener('mouseenter', preloadProjectImages, { once: true });
       portfolioList.addEventListener('mouseleave', deactivateAll);
     }
 
@@ -1027,6 +1040,14 @@ const projects = t.portfolio.projects;
           onUpdate: (self) => {
             const yVal = 6 - self.progress * 12; /* +6 → -6 */
             gsap.set(slotInner, { yPercent: yVal });
+          },
+          /*
+           * will-change on-scroll: capa GPU dedicada SOLO mientras la sección
+           * está en viewport. Al salir (isActive false) se quita para no
+           * mantener una capa de composición viva permanentemente.
+           */
+          onToggle: (self) => {
+            slotInner.style.willChange = self.isActive ? 'transform' : 'auto';
           },
         });
       }

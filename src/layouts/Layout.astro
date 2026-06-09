@@ -149,10 +149,12 @@ const resolvedOgDesc = ogDescription ?? description;
         lenis.on('scroll', ScrollTrigger.update);
 
         /* Conectar Lenis al ticker de GSAP para que ambos corran en el mismo RAF.
-           gsap.ticker.add recibe tiempo en segundos, lenis.raf espera milisegundos. */
-        gsap.ticker.add((time) => {
+           gsap.ticker.add recibe tiempo en segundos, lenis.raf espera milisegundos.
+           Guardamos la referencia del callback para poder removerlo en el teardown. */
+        const tickerCallback = (time: number) => {
           lenis.raf(time * 1000);
-        });
+        };
+        gsap.ticker.add(tickerCallback);
 
         /* Evitar que GSAP haga lag smoothing propio — Lenis ya maneja el suavizado. */
         gsap.ticker.lagSmoothing(0);
@@ -163,6 +165,27 @@ const resolvedOgDesc = ogDescription ?? description;
 
         /* Disparar evento personalizado para que Nav.astro sepa que Lenis está listo. */
         window.dispatchEvent(new CustomEvent('lenis:ready', { detail: { lenis } }));
+
+        /*
+         * TEARDOWN — evita acumular tickers/Lenis huérfanos entre páginas.
+         * El sitio es multi-página y el selector EN/ES navega con <a> real.
+         * Sin View Transitions, la navegación dura recarga todo (limpieza implícita),
+         * pero registramos teardown explícito para:
+         *   1. astro:before-swap → si se activan View Transitions, cada swap
+         *      destruiría el Lenis viejo en lugar de apilar uno nuevo.
+         *   2. pagehide → red de seguridad en navegación dura / bfcache.
+         * lenis.raf deja de llamarse (ticker removido) y Lenis libera sus listeners.
+         */
+        let toreDown = false;
+        const teardown = () => {
+          if (toreDown) return; /* idempotente: solo el primer evento que dispare */
+          toreDown = true;
+          gsap.ticker.remove(tickerCallback);
+          lenis.destroy();
+          delete (window as unknown as Record<string, unknown>)['__lenis'];
+        };
+        document.addEventListener('astro:before-swap', teardown, { once: true });
+        window.addEventListener('pagehide', teardown, { once: true });
       }
     </script>
   </body>

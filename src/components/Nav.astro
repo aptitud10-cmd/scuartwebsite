@@ -235,8 +235,17 @@ const { lang, t } = Astro.props;
       }
     };
 
-    /* Intentar conectar al evento de Lenis cuando esté listo */
+    /*
+     * Flag único: garantiza que SOLO se ata una fuente de scroll (Lenis O nativo),
+     * nunca las dos. Sin esto había una carrera: si Lenis llega tarde (>200ms en
+     * un device lento), el timeout ataba el listener nativo Y después lenis:ready
+     * ataba el de Lenis → doble cálculo de .scrolled.
+     */
+    let connected = false;
+
+    /* Intentar conectar al evento de Lenis. Devuelve true si conectó. */
     const connectLenis = () => {
+      if (connected) return true;
       const lenis = (window as unknown as Record<string, unknown>)['__lenis'];
       if (lenis && typeof (lenis as { on?: unknown }).on === 'function') {
         /* Lenis emite { scroll: number, ... } en el evento 'scroll' */
@@ -244,33 +253,34 @@ const { lang, t } = Astro.props;
           .on('scroll', ({ scroll }: { scroll: number }) => {
             applyScrolled(scroll);
           });
+        connected = true;
         return true;
       }
       return false;
     };
 
-    /* Si Lenis ya está inicializado (script de Layout corrió primero) */
+    /* Fallback a scroll nativo. No-op si ya hay una fuente atada. */
+    const connectNative = () => {
+      if (connected) return;
+      connected = true;
+      window.addEventListener('scroll', () => applyScrolled(window.scrollY), { passive: true });
+    };
+
+    /* Si Lenis ya está inicializado (script de Layout corrió primero), listo. */
     if (!connectLenis()) {
-      /* Esperar el evento lenis:ready */
+      /* Esperar el evento lenis:ready (puede conectar Lenis o no-op si ya conectó). */
       window.addEventListener(
         'lenis:ready',
         () => {
-          if (!connectLenis()) {
-            /* Lenis no disponible — usar scroll nativo */
-            window.addEventListener('scroll', () => applyScrolled(window.scrollY), { passive: true });
-          }
+          if (!connectLenis()) connectNative();
         },
         { once: true }
       );
 
-      /* Timeout de seguridad: si lenis:ready nunca llega (reduced-motion),
-         activar el listener nativo después de 200ms */
-      setTimeout(() => {
-        const lenis = (window as unknown as Record<string, unknown>)['__lenis'];
-        if (!lenis) {
-          window.addEventListener('scroll', () => applyScrolled(window.scrollY), { passive: true });
-        }
-      }, 200);
+      /* Red de seguridad: si lenis:ready nunca llega (reduced-motion: Lenis no
+         se inicializa), atar el nativo a los 200ms. El flag 'connected' evita
+         el doble-atado si Lenis termina conectando justo después. */
+      setTimeout(connectNative, 200);
     }
   }
 </script>
