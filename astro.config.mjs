@@ -2,9 +2,22 @@ import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
+import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  integrations: [react()],
+  site: 'https://scuart.com',
+  integrations: [
+    react(),
+    sitemap({
+      i18n: {
+        defaultLocale: 'en',
+        locales: {
+          en: 'en-US',
+          es: 'es',
+        },
+      },
+    }),
+  ],
   /*
    * output: 'static' — páginas prerendered por defecto (comportamiento anterior preservado).
    * En Astro 5.x, 'hybrid' fue eliminado: 'static' es ahora el modo híbrido.
