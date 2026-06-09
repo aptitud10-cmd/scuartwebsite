@@ -101,6 +101,49 @@ export const es: Translations = {
     ariaLabel: 'Manifiesto — No hacemos webs. Construimos ventajas competitivas.',
   },
 
+  /* ── Capabilities — Sección entre portfolio y método ───── */
+  /*
+   * C1/P4 — ANTI-INVENCIÓN:
+   * Copy "resolves" nativo ES, neutro LATAM — sin claims, sin métricas.
+   * Nombres de capability en inglés (términos técnicos, coherente con el sistema).
+   */
+  capabilities: {
+    kicker: 'CAPACIDADES',
+    ariaLabel: 'Capacidades — qué construye SCUART y qué problema resuelve cada una.',
+    items: [
+      {
+        num: '01',
+        name: 'WEB PLATFORMS',
+        resolves: 'Sitios que cargan rápido, posicionan en búsqueda y convierten visitantes en clientes.',
+      },
+      {
+        num: '02',
+        name: 'SAAS + SYSTEMS',
+        resolves: 'Productos completos — login, pagos, paneles, APIs. De cero a producción.',
+      },
+      {
+        num: '03',
+        name: 'AI AUTOMATION',
+        resolves: 'Automatizamos lo repetitivo para que el equipo se enfoque en lo que importa.',
+      },
+      {
+        num: '04',
+        name: 'E-COMMERCE',
+        resolves: 'Tiendas hechas para vender — checkout rápido, inventario, listas para crecer.',
+      },
+      {
+        num: '05',
+        name: 'ORDERING · BOOKING · WORKFLOWS',
+        resolves: 'Pedidos, reservas y operación sin el desorden manual.',
+      },
+      {
+        num: '06',
+        name: 'BRAND IDENTITY',
+        resolves: 'Un sistema visual coherente en todo — no armado por accidente.',
+      },
+    ],
+  },
+
   /* ── Portfolio — Sección 2 ──────────────────────────────── */
   /*
    * C1/P4 — ANTI-INVENCIÓN:

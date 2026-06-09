@@ -17,6 +17,23 @@ export interface CapabilityItem {
   label: string;
 }
 
+/**
+ * CapabilityService — un ítem de la sección CAPABILITIES.
+ * Se diferencia de CapabilityItem (hero) en que agrega `resolves`:
+ * la línea editorial de "qué problema resuelve" esta capability.
+ * num: "01"-"06" (2 dígitos, distinto al "001"-"004" del hero/método).
+ * name: término técnico en inglés en ambos idiomas (coherente con el sistema).
+ * resolves: copy por idioma — directo, comercial, sin claims.
+ */
+export interface CapabilityService {
+  /** Número editorial: "01" – "06". Igual en ambos idiomas. */
+  num: string;
+  /** Nombre de la capability — técnico, inglés en ambos idiomas. */
+  name: string;
+  /** Una línea que explica qué problema resuelve — nativo por idioma. */
+  resolves: string;
+}
+
 export interface PortfolioProject {
   /** Nombre real del proyecto — NO cambiar */
   name: string;
@@ -167,6 +184,20 @@ export interface Translations {
   };
   /** Sección 1.5 — Manifesto (entre hero y portfolio) */
   manifesto: ManifestoTranslations;
+  /**
+   * Sección CAPABILITIES — entre portfolio y método.
+   * Expande las 6 capabilities con su "qué resuelve".
+   * NO duplica el índice del hero (4 items, sin resolves)
+   * ni el stepCapabilities del método (por paso, técnico).
+   */
+  capabilities: {
+    /** Kicker mono arriba — "CAPABILITIES" / "CAPACIDADES" */
+    kicker: string;
+    /** Aria-label del elemento <section> */
+    ariaLabel: string;
+    /** Los 6 servicios con número + nombre + línea editorial */
+    items: CapabilityService[];
+  };
   portfolio: {
     /** Kicker de sección — mono uppercase, arriba-izquierda */
     sectionLabel: string;
@@ -303,6 +334,50 @@ export const en: Translations = {
     line2a: 'We build ',
     line2red: 'competitive advantages.',
     ariaLabel: 'Manifesto — We don\'t build websites. We build competitive advantages.',
+  },
+
+  /* ── Capabilities — Sección entre portfolio y método ───── */
+  /*
+   * C1/P4 — ANTI-INVENCIÓN:
+   * Copy "resolves" directo y comercial — sin claims, sin métricas inventadas.
+   * Nombres de capability en inglés en ambos idiomas (términos técnicos del sistema).
+   * E-COMMERCE y BRAND IDENTITY existen aquí pero NO en el hero (hero tiene 4; aquí 6).
+   */
+  capabilities: {
+    kicker: 'CAPABILITIES',
+    ariaLabel: 'Capabilities — what SCUART builds and what problems each one solves.',
+    items: [
+      {
+        num: '01',
+        name: 'WEB PLATFORMS',
+        resolves: 'Sites that load fast, rank on search, and turn visitors into clients.',
+      },
+      {
+        num: '02',
+        name: 'SAAS + SYSTEMS',
+        resolves: 'Full products — auth, billing, dashboards, APIs. From zero to launch.',
+      },
+      {
+        num: '03',
+        name: 'AI AUTOMATION',
+        resolves: 'Automate the repetitive work so the team focuses on what actually matters.',
+      },
+      {
+        num: '04',
+        name: 'E-COMMERCE',
+        resolves: 'Stores built to sell — fast checkout, inventory, ready to grow.',
+      },
+      {
+        num: '05',
+        name: 'ORDERING · BOOKING · WORKFLOWS',
+        resolves: 'Take orders, manage bookings and run operations without the manual chaos.',
+      },
+      {
+        num: '06',
+        name: 'BRAND IDENTITY',
+        resolves: 'A visual system that looks consistent everywhere — not assembled by accident.',
+      },
+    ],
   },
 
   /* ── Portfolio — Sección 2 ──────────────────────────────── */
