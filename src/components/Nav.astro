@@ -214,16 +214,63 @@ const { lang, t } = Astro.props;
 </style>
 
 <script>
-  // Agrega clase .scrolled al hacer scroll — sin Lenis por ahora
+  /**
+   * Nav scroll — clase .scrolled al scrollear.
+   *
+   * Con Lenis activo: escucha el evento 'scroll' de Lenis via el objeto
+   * expuesto en window.__lenis. Lenis 1.3+ no usa translateY en el body
+   * (mueve el scroll real del documento), por lo que window.scrollY sigue
+   * siendo válido. El evento de Lenis es más preciso: se dispara en cada
+   * tick del RAF sincronizado, no en el evento nativo del browser.
+   *
+   * Sin Lenis (reduced-motion o fallo de carga): fallback a window.scroll nativo.
+   */
   const nav = document.querySelector('.nav');
   if (nav) {
-    const onScroll = () => {
-      if (window.scrollY > 20) {
+    const applyScrolled = (y: number) => {
+      if (y > 20) {
         nav.classList.add('scrolled');
       } else {
         nav.classList.remove('scrolled');
       }
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
+
+    /* Intentar conectar al evento de Lenis cuando esté listo */
+    const connectLenis = () => {
+      const lenis = (window as unknown as Record<string, unknown>)['__lenis'];
+      if (lenis && typeof (lenis as { on?: unknown }).on === 'function') {
+        /* Lenis emite { scroll: number, ... } en el evento 'scroll' */
+        (lenis as { on: (event: string, cb: (e: { scroll: number }) => void) => void })
+          .on('scroll', ({ scroll }: { scroll: number }) => {
+            applyScrolled(scroll);
+          });
+        return true;
+      }
+      return false;
+    };
+
+    /* Si Lenis ya está inicializado (script de Layout corrió primero) */
+    if (!connectLenis()) {
+      /* Esperar el evento lenis:ready */
+      window.addEventListener(
+        'lenis:ready',
+        () => {
+          if (!connectLenis()) {
+            /* Lenis no disponible — usar scroll nativo */
+            window.addEventListener('scroll', () => applyScrolled(window.scrollY), { passive: true });
+          }
+        },
+        { once: true }
+      );
+
+      /* Timeout de seguridad: si lenis:ready nunca llega (reduced-motion),
+         activar el listener nativo después de 200ms */
+      setTimeout(() => {
+        const lenis = (window as unknown as Record<string, unknown>)['__lenis'];
+        if (!lenis) {
+          window.addEventListener('scroll', () => applyScrolled(window.scrollY), { passive: true });
+        }
+      }, 200);
+    }
   }
 </script>

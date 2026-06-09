@@ -107,5 +107,63 @@ const resolvedOgDesc = ogDescription ?? description;
   </head>
   <body>
     <slot />
+
+    <!--
+      Lenis smooth scroll — FASE 1 del Art Layer.
+      Se inicializa aquí (Layout global) para que esté activo en todas las páginas.
+      Integración con GSAP ScrollTrigger: ticker compartido para que los ScrollTrigger
+      de Portfolio y Method lean la posición de Lenis en sincronía con el RAF.
+
+      Carga como módulo ES: Vite garantiza que gsap y ScrollTrigger sean el mismo
+      singleton que usan los scripts de los componentes (deduplicación por path).
+
+      prefers-reduced-motion: no se inicializa Lenis → scroll nativo puro.
+    -->
+    <script>
+      import Lenis from 'lenis';
+      import { gsap } from 'gsap';
+      import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+      /* Registrar ScrollTrigger en el singleton compartido de GSAP.
+         Los scripts de PortfolioSection y MethodSection también lo registran,
+         pero registerPlugin es idempotente — no hay problema con llamarlo varias veces. */
+      gsap.registerPlugin(ScrollTrigger);
+
+      /* Respetar prefers-reduced-motion: sin Lenis, scroll nativo puro. */
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (!reducedMotion) {
+        const lenis = new Lenis({
+          /* lerp 0.1: sutil y elegante. No flotante exagerado. */
+          lerp: 0.1,
+          smoothWheel: true,
+          /* syncTouch: false — el scroll touch en mobile ya es suave nativamente.
+             Activarlo en iOS puede interferir con el momentum scroll nativo. */
+          syncTouch: false,
+        });
+
+        /* Integración Lenis + GSAP ScrollTrigger — patrón oficial verificado.
+           Lenis emite el evento 'scroll' en cada tick de RAF.
+           ScrollTrigger.update() recalcula las posiciones usando la posición
+           real del scroll (que Lenis ya aplicó al documento). */
+        lenis.on('scroll', ScrollTrigger.update);
+
+        /* Conectar Lenis al ticker de GSAP para que ambos corran en el mismo RAF.
+           gsap.ticker.add recibe tiempo en segundos, lenis.raf espera milisegundos. */
+        gsap.ticker.add((time) => {
+          lenis.raf(time * 1000);
+        });
+
+        /* Evitar que GSAP haga lag smoothing propio — Lenis ya maneja el suavizado. */
+        gsap.ticker.lagSmoothing(0);
+
+        /* Exponer lenis en window para que el Nav pueda escuchar su evento de scroll.
+           Alternativa más simple a un eventBus o import cruzado entre scripts. */
+        (window as unknown as Record<string, unknown>)['__lenis'] = lenis;
+
+        /* Disparar evento personalizado para que Nav.astro sepa que Lenis está listo. */
+        window.dispatchEvent(new CustomEvent('lenis:ready', { detail: { lenis } }));
+      }
+    </script>
   </body>
 </html>
