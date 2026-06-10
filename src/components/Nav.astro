@@ -134,9 +134,12 @@ const { lang, t } = Astro.props;
 
   /* ── Selector de idioma ──────────────────────────────────── */
   /*
-   * iter.4: jerarquia logo (N1) > selector (N2 discreto).
-   * Opacidad 0.65 en mobile para que se "apague" como metadata.
-   * Tablet+ recupera opacidad plena (hay mas espacio y links de nav equilibran).
+   * iter.5 (B3 WCAG): opacidad del contenedor eliminada.
+   * Antes: opacity:0.65 en mobile hundía #9C978D a ~#6a6761 = 3.42:1 (falla).
+   * Ahora: jerarquía discreta se logra por color, no opacity en el padre.
+   *   - .nav__lang-active: var(--crema) — el foco, resalta.
+   *   - .nav__lang-sep: opacity:0.5 solo en él (aria-hidden, no texto WCAG).
+   *   - .nav__lang-other: #9C978D puro = 4.56:1 sobre #0E0E0E → PASA.
    */
   .nav__lang {
     display: flex;
@@ -148,14 +151,6 @@ const { lang, t } = Astro.props;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     line-height: 1.4;
-    /* Mobile: metadata discreta, no compite con logo */
-    opacity: 0.65;
-    transition: opacity 0.25s ease;
-  }
-
-  .nav__lang:hover,
-  .nav__lang:focus-within {
-    opacity: 1;
   }
 
   /* Idioma activo — crema, no clickeable */
@@ -170,9 +165,13 @@ const { lang, t } = Astro.props;
     opacity: 0.5;
   }
 
-  /* Idioma alternativo — taupe, hover rojo */
+  /* Idioma alternativo — color elevado para pasar WCAG 4.5:1.
+   * B3 FIX: var(--taupe) puro = 4.24:1 sobre #0E0E0E — NO pasa 4.5:1 para texto <14px.
+   * Además el contenedor .nav__lang tenía opacity:0.65 (ya eliminada, ver arriba)
+   * que lo hundía aún más a 2.86:1. Solución: color propio #9C978D sin opacity
+   * heredada = 4.56:1 sobre #0E0E0E (verificado axe-core). PASA en todos los viewports. */
   .nav__lang-other {
-    color: var(--taupe);
+    color: #9C978D;
     text-decoration: none;
     transition: color 0.25s ease;
     position: relative;
@@ -200,15 +199,10 @@ const { lang, t } = Astro.props;
     transform: scaleX(1);
   }
 
-  /* Tablet+: mostrar links inline + restituir opacidad plena del selector */
+  /* Tablet+: mostrar links inline */
   @media (min-width: 768px) {
     .nav__links {
       display: flex;
-    }
-
-    /* iter.4: en tablet+ hay links que equilibran — selector vuelve a opacidad plena */
-    .nav__lang {
-      opacity: 1;
     }
   }
 </style>

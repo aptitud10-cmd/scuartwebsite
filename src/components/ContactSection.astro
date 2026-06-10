@@ -612,7 +612,9 @@ const c = t.contact;
   font-family: var(--font-mono);
   font-size: var(--text-mono);
   font-weight: 400;
-  color: var(--crema);
+  /* B-submit WCAG: blanco puro #FFFFFF sobre --rojo (#D70321) = 4.87:1 → PASA 4.5:1.
+   * var(--crema) #E8E2D6 sobre rojo = 4.14:1 → fallaba. El rojo de marca no cambia. */
+  color: #FFFFFF;
   background-color: var(--rojo);
   border: 1px solid var(--rojo);
   border-radius: 0;
@@ -705,7 +707,8 @@ const c = t.contact;
 }
 
 .contact-alt__label {
-  opacity: 0.7;
+  /* B3a WCAG: opacity:0.7 hundía var(--taupe) #8A857B a ~#65615a = 3.13:1 (falla).
+   * Sin opacity: #8A857B puro = 5.26:1 sobre #0E0E0E → PASA 4.5:1. */
 }
 
 .contact-alt__sep,

@@ -104,9 +104,53 @@ const resolvedOgDesc = ogDescription ?? description;
 
     <!-- Favicon placeholder -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- B5: skip-link styles — inlined para garantizar disponibilidad inmediata -->
+    <style>
+      /*
+       * Skip-link: visible solo cuando recibe foco (usuarios de teclado/screen reader).
+       * Oculto visualmente con translate negativo (no display:none — accesible al foco).
+       * Al enfocar salta al viewport, esquina superior izquierda sobre el nav.
+       * Identidad SCUART: fondo carbon, texto crema, mono uppercase — no genérico.
+       */
+      .skip-link {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translateY(-100%);
+        z-index: 9999;
+        padding: 0.75rem 1.25rem;
+        background-color: #0E0E0E; /* --carbon */
+        color: #E8E2D6; /* --crema */
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.75rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+        border-bottom: 1px solid #C8281A; /* --rojo: acento editorial */
+        transition: transform 0.15s ease;
+      }
+
+      .skip-link:focus {
+        transform: translateY(0);
+        outline: 2px solid #C8281A; /* --rojo */
+        outline-offset: 2px;
+      }
+    </style>
   </head>
   <body>
-    <slot />
+    <!--
+      B5 FIX: skip-link para usuarios de teclado.
+      Visible solo al recibir foco (posición absoluta fuera de pantalla por defecto,
+      entra al viewport en :focus). Fondo --carbon, texto --crema, mono — coherente
+      con la identidad del sitio. z-index sobre todo el contenido incluyendo el nav.
+    -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <main id="main-content">
+      <slot />
+    </main>
 
     <!--
       Lenis smooth scroll — FASE 1 del Art Layer.

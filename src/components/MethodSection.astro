@@ -106,19 +106,29 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
         role=list + li con role=button para a11y.
         keydown: Enter/Space activa el paso.
       -->
-      <ol class="method-index__list" role="list">
+      <!--
+        B4 FIX (ARIA): <ol> nativo ya es lista — no necesita role="list".
+        Los <li> tenían role="button" lo que viola ARIA (list requiere listitem, no button).
+        Solución: <button> real dentro de cada <li>. El <button> maneja foco, Enter y Space
+        nativamente. CSS reset en .method-index__item-btn para verse igual que antes.
+        El data-index-item se mantiene en el <li> para que el querySelector del JS funcione.
+      -->
+      <ol class="method-index__list">
         {steps.map((step, i) => (
           <li
             class="method-index__item"
             data-index-item={i}
-            role="button"
-            tabindex="0"
-            aria-label={`Paso ${step.num}: ${step.title}`}
           >
-            <!-- Marca roja vertical — instancia A del presupuesto rojo -->
-            <span class="method-index__indicator" aria-hidden="true"></span>
-            <span class="method-index__num">{step.num}</span>
-            <span class="method-index__title">{step.title}</span>
+            <button
+              class="method-index__item-btn"
+              aria-label={`Paso ${step.num}: ${step.title}`}
+              type="button"
+            >
+              <!-- Marca roja vertical — instancia A del presupuesto rojo -->
+              <span class="method-index__indicator" aria-hidden="true"></span>
+              <span class="method-index__num">{step.num}</span>
+              <span class="method-index__title">{step.title}</span>
+            </button>
           </li>
         ))}
       </ol>
@@ -378,7 +388,8 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   line-height: 1.4;
-  opacity: 0.6;
+  /* B3b WCAG mobile: opacity:0.6 hundía var(--taupe) a 2.59:1 (falla).
+   * Sin opacity: #8A857B puro = 5.26:1 → PASA. */
   /* mobile: --space-2xs (≈4px) vs anterior --space-xs (≈8px) */
   margin-bottom: var(--space-2xs);
 }
@@ -423,7 +434,8 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   line-height: 1.4;
-  opacity: 0.6;
+  /* B3c WCAG mobile: opacity:0.6 hundía var(--taupe) a 2.59:1 (falla).
+   * Sin opacity: #8A857B puro = 5.26:1 → PASA. */
 }
 
 .method-mobile-block__change-text {
@@ -495,7 +507,7 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
 
   /*
    * Ítem tablet — navegación de expediente:
-   * Ancho: igual para todos (flex: 1). Padding generoso vertical.
+   * Ancho: igual para todos (flex: 1). El <li> ya no tiene padding (lo tiene el button).
    * Separador derecho editorial. Cursor pointer claro.
    * min-height 72px: toque cómodo, con presencia de barra de documento.
    */
@@ -504,14 +516,32 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--space-2xs);
-    padding: var(--space-m) var(--space-s);
+    gap: 0;
+    padding: 0; /* B4: padding movido al button interno */
     border-right: 1px solid var(--linea);
     cursor: pointer;
     min-height: 72px;
     position: relative;
-    transition: none; /* la interacción visual la maneja el CSS del atributo */
+    transition: none;
     user-select: none;
+  }
+
+  /* B4 FIX: button reset — aspecto idéntico al <li> original.
+   * background/border/outline nativos del <button> se eliminan.
+   * width: 100% + min-height: 100% para que llene el <li> completo.
+   * flex layout replica el orden visual: indicator + num + title. */
+  .method-index__item-btn {
+    all: unset;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2xs);
+    padding: var(--space-m) var(--space-s);
+    width: 100%;
+    min-height: 72px;
+    cursor: pointer;
+    box-sizing: border-box;
+    position: relative;
   }
 
   .method-index__item:last-child {
@@ -637,7 +667,8 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     line-height: 1.4;
-    opacity: 0.6;
+    /* B3b WCAG: opacity:0.6 hundía var(--taupe) #8A857B a ~#58554f = 2.59:1 (falla).
+     * Sin opacity: #8A857B puro = 5.26:1 sobre #0E0E0E → PASA 4.5:1. */
     margin-bottom: var(--space-xs);
   }
 
@@ -675,7 +706,8 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     line-height: 1.4;
-    opacity: 0.6;
+    /* B3c WCAG: opacity:0.6 hundía var(--taupe) #8A857B a ~#58554f = 2.59:1 (falla).
+     * Sin opacity: #8A857B puro = 5.26:1 sobre #0E0E0E → PASA 4.5:1. */
   }
 
   /*
@@ -732,29 +764,32 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
   .method[data-method-root="3"] .method-index__item[data-index-item="3"] .method-index__title { color: var(--crema); }
   .method[data-method-root="3"] .method-panel[data-panel-index="3"] { display: block; opacity: 1; }
 
-  /* Hover en ítems inactivos — leve pre-iluminación */
-  .method-index__item:hover .method-index__num,
-  .method-index__item:hover .method-index__title {
+  /* Hover en ítems inactivos — leve pre-iluminación.
+   * B4: ahora el button es el elemento hover, pero el selector :hover en el <li>
+   * también se dispara cuando el cursor está sobre el button hijo. Se actualiza
+   * a .method-index__item-btn:hover para que sea semánticamente el elemento correcto. */
+  .method-index__item-btn:hover .method-index__num,
+  .method-index__item-btn:hover .method-index__title {
     color: var(--crema);
     opacity: 0.7;
     transition: color 0.15s ease, opacity 0.15s ease;
   }
 
-  /* Focus visible para teclado */
-  .method-index__item:focus-visible {
+  /* Focus visible para teclado — B4: el button nativo recibe el foco */
+  .method-index__item-btn:focus-visible {
     outline: 2px solid var(--crema);
     outline-offset: -2px;
   }
 
   /* El panel activo no aplica hover del item encima */
-  .method[data-method-root="0"] .method-index__item[data-index-item="0"]:hover .method-index__num,
-  .method[data-method-root="0"] .method-index__item[data-index-item="0"]:hover .method-index__title,
-  .method[data-method-root="1"] .method-index__item[data-index-item="1"]:hover .method-index__num,
-  .method[data-method-root="1"] .method-index__item[data-index-item="1"]:hover .method-index__title,
-  .method[data-method-root="2"] .method-index__item[data-index-item="2"]:hover .method-index__num,
-  .method[data-method-root="2"] .method-index__item[data-index-item="2"]:hover .method-index__title,
-  .method[data-method-root="3"] .method-index__item[data-index-item="3"]:hover .method-index__num,
-  .method[data-method-root="3"] .method-index__item[data-index-item="3"]:hover .method-index__title {
+  .method[data-method-root="0"] .method-index__item[data-index-item="0"] .method-index__item-btn:hover .method-index__num,
+  .method[data-method-root="0"] .method-index__item[data-index-item="0"] .method-index__item-btn:hover .method-index__title,
+  .method[data-method-root="1"] .method-index__item[data-index-item="1"] .method-index__item-btn:hover .method-index__num,
+  .method[data-method-root="1"] .method-index__item[data-index-item="1"] .method-index__item-btn:hover .method-index__title,
+  .method[data-method-root="2"] .method-index__item[data-index-item="2"] .method-index__item-btn:hover .method-index__num,
+  .method[data-method-root="2"] .method-index__item[data-index-item="2"] .method-index__item-btn:hover .method-index__title,
+  .method[data-method-root="3"] .method-index__item[data-index-item="3"] .method-index__item-btn:hover .method-index__num,
+  .method[data-method-root="3"] .method-index__item[data-index-item="3"] .method-index__item-btn:hover .method-index__title {
     color: var(--crema);
     opacity: 1;
     transition: none;
@@ -846,8 +881,8 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
   .method-index__item {
     flex-direction: row;
     align-items: center;
-    gap: var(--space-s);
-    padding: var(--space-s) 0;
+    gap: 0;
+    padding: 0; /* B4 desktop: padding en el button interno */
     border-top: 1px solid var(--linea);
     border-right: none;
     min-height: 48px;
@@ -857,6 +892,15 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
 
   .method-index__item:last-child {
     border-bottom: 1px solid var(--linea);
+  }
+
+  /* B4 desktop: button override para layout fila horizontal */
+  .method-index__item-btn {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-s);
+    padding: var(--space-s) 0;
+    min-height: 48px;
   }
 
   /* Indicador rojo desktop: barra vertical 2px a la izquierda */
@@ -990,18 +1034,19 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
   }
 
   /* ── Event listeners en ítems del índice ──────────────────── */
+  /*
+   * B4 FIX: los listeners ahora van en el <button> interno (.method-index__item-btn).
+   * El <button> nativo maneja Enter/Space sin keydown handler explícito.
+   * El click listener en el button es suficiente para mouse y teclado.
+   * El data-index-item sigue en el <li> padre — se lee desde el item.
+   */
   indexItems.forEach((item) => {
     const idx = parseInt(item.getAttribute('data-index-item') ?? '0', 10);
+    const btn = item.querySelector<HTMLButtonElement>('.method-index__item-btn');
+    if (!btn) return;
 
-    item.addEventListener('click', () => {
+    btn.addEventListener('click', () => {
       if (!isMobile()) activateStep(idx);
-    });
-
-    item.addEventListener('keydown', (e: KeyboardEvent) => {
-      if ((e.key === 'Enter' || e.key === ' ') && !isMobile()) {
-        e.preventDefault();
-        activateStep(idx);
-      }
     });
   });
 

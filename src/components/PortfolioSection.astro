@@ -295,7 +295,8 @@ const projects = t.portfolio.projects;
 
 .portfolio-item__year {
   margin-left: auto;
-  opacity: 0.6;
+  /* opacity: 0.6 eliminado — B2 WCAG: opacity hundia taupe a #5d5a53 = 2.53:1.
+     Con var(--taupe) puro = 4.75:1 sobre #1A1A18. PASA 4.5:1. */
 }
 
 /* ─── NOMBRE DEL PROYECTO — protagonista N1 ──────────────── */
@@ -642,7 +643,8 @@ const projects = t.portfolio.projects;
   /* En desktop el año va debajo de la categoría — sin margin-left auto */
   .portfolio-item__year {
     margin-left: 0;
-    opacity: 0.6;
+    /* opacity: 0.6 eliminado — B2 WCAG: opacity hundia taupe a #5d5a53 = 2.53:1.
+       Con var(--taupe) puro = 4.75:1 sobre #1A1A18. PASA 4.5:1. */
     /* El año va en su propio renglón dentro del bloque meta */
     flex-basis: 100%;
     margin-top: 0.1em;
