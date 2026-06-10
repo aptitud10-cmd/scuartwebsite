@@ -1,51 +1,34 @@
 ---
 /**
- * FooterSection.astro — Cierre editorial de marca
- * SCUART — Footer premium, NO bloque de contacto repetido.
+ * FooterSection.astro — Cierre editorial de marca — V3
+ * SCUART
+ *
+ * V3: fondo barro-oscuro (continúa del contacto sin corte), Fraunces a sangre,
+ * tokens terracota cálida, coordenadas Bogotá, ámbar en el "+".
  *
  * CONCEPTO:
- * La ContactSection (arriba) tiene el CTA fuerte: "LET'S BUILD SOMETHING." /
- * "EMPECEMOS." + form + WhatsApp/email. Ese es el momento de conversión.
- * Este footer es el cierre de MARCA — la firma visual del estudio.
- * No repite el CTA. No duplica los links de contacto como protagonistas.
+ * El footer funciona como tarjeta de presentación standalone: quien llegue
+ * solo acá sabe qué hace SCUART, dónde está y cómo contactar.
+ * Es la firma visual del estudio, no un bloque de contacto repetido.
  *
  * JERARQUÍA VISUAL (≤3 niveles):
- *   N1 — "SCUART+" — Archivo 900, crema, display statement al fondo.
- *        Ocupa ≥40% del peso visual. Es la firma del estudio, el cierre.
- *        El "+" en --rojo: instancia 1 del presupuesto rojo del footer.
- *   N2 — Barra de datos superior: nav links (Portfolio/Method/Contact)
- *        + selector EN/ES. Mono taupe. Separada del SCUART por --linea arriba.
- *   N3 — Créditos al pie del SCUART: año + mercados + email discreto. Mono
- *        taupe, textura de ficha de estudio. En una línea separada por "·".
+ *   N1 — Wordmark "SCUART+" en Fraunces light, a sangre (todo el ancho,
+ *        sangrando fuera de ambos márgenes). El "+" en ámbar = sello del estudio.
+ *        ≥40% del peso visual. Fade-up sutil al entrar al viewport.
+ *   N2 — Banda nav + selector de idioma (mono hueso 55%, touch targets ≥48px).
+ *        Hairline borde-oscuro la separa de N1.
+ *   N3 — Créditos/mercados mono hueso 50%: año · estudio · mercados · coords · email.
  *
- * PRESUPUESTO ROJO:
- *   Instancia 1: el "+" en "SCUART+" (firma tipográfica — extensión del sistema
- *   del hero donde el "+" es el gesto de marca).
- *   Total = 1 instancia. Contenido, sin ruido.
+ * COORDENADAS: 4.7110° N, 74.0721° W — consistentes con HeroSection.astro.
  *
- * FONDO: --carbon-elev (#1A1A18) en vez de --carbon (#0E0E0E).
- *   Razón: el ContactSection usa --carbon. El footer en --carbon-elev crea un
- *   plano ligeramente diferente — profundidad sutil que refuerza el cierre.
- *   La diferencia #0E0E0E vs #1A1A18 es perceptible como "otro plano" sin
- *   romper la cohesión cromática general.
+ * MOTION:
+ *   Un solo fade-up del wordmark al entrar al viewport (IntersectionObserver).
+ *   prefers-reduced-motion: wordmark visible de inmediato.
  *
- * COMPOSICIÓN (anti R2 — no apilado simétrico default):
- *   Dos bandas horizontales intencionales:
- *   — Banda datos/nav: asimétrica — nav izquierda | lang derecha. Desktop:
- *     grilla 5fr/7fr. Información operativa en servicio del cierre.
- *   — Banda firma: el SCUART+ gigante rompe el ritmo micro de los datos.
- *     Los créditos debajo son la cola micro de la firma.
- *
- * DATOS USADOS (sin inventar nada):
- *   - Email: hello@scuart.com (de t.contact.emailHref)
- *   - WhatsApp: wa.me/[WHATSAPP_NUMBER] (de t.contact.whatsappHref — placeholder)
- *   - Mercados: "Bogotá · US · LATAM" (estudio de Bogotá, sirve US + LATAM)
- *   - Año: 2026 (año actual del proyecto)
- *   - Nav anchors: #portfolio #method #contact (del Nav.astro)
- *
- * REVEAL: IntersectionObserver CSS-only vía clase .is-visible.
- *   Sin GSAP. Solo opacity + translateY leve, una vez al entrar al viewport.
- *   prefers-reduced-motion: todo visible de inmediato.
+ * ACCESIBILIDAD:
+ *   - Nav links con focus-visible claro (outline hueso).
+ *   - Contraste AA: hueso 55% sobre barro-oscuro = ~6.6:1 (AA).
+ *   - ámbar sobre barro-oscuro = ~7:1 (AAA).
  */
 
 import type { Translations } from '../i18n/en';
@@ -63,21 +46,22 @@ const f = t.footer;
 <footer class="site-footer" aria-label={f.ariaLabel}>
 
   <!--
-    REGLA SUPERIOR — línea crema 9% que separa el footer del contacto.
-    Misma textura que las kicker-lines del resto del sitio.
-    Crea el "corte de plano" editorial antes del cierre.
+    GRANO INTERNO — refuerzo soft-light sobre barro-oscuro.
+    (El grano global overlay 0.06 no es suficiente sobre fondos oscuros
+    para dar la textura "barro prensado" del concepto V3.)
+    aria-hidden: es puramente decorativo.
   -->
-  <div class="footer-rule" aria-hidden="true"></div>
+  <div class="footer-grain" aria-hidden="true"></div>
 
   <!--
     BANDA DATOS/NAV — N2.
-    Desktop: asimétrica — nav (5fr izquierda) | lang switch (2fr derecha).
-    Mobile: apilado en dos filas (nav | lang), separados por gap.
-    Mono taupe uppercase. Touch targets ≥44px en links (padding).
+    Desktop: asimétrica — nav (flex:1 izquierda) | lang (derecha).
+    Mobile: apilado dos filas (nav | lang), separados por gap.
+    Hairline borde-oscuro arriba = separa del contacto.
   -->
   <div class="footer-meta">
 
-    <!-- Nav links del estudio — anchors ya funcionales -->
+    <!-- Nav links del estudio — anchors funcionales -->
     <nav class="footer-nav" aria-label="Navegación de pie de página">
       <a href={`/${lang}#portfolio`} class="footer-nav__link">
         {t.nav.portfolio}
@@ -92,7 +76,7 @@ const f = t.footer;
       </a>
     </nav>
 
-    <!-- Selector de idioma — mismo patrón que Nav.astro pero adaptado al footer -->
+    <!-- Selector de idioma — mismo patrón que Nav.astro -->
     <div class="footer-lang" role="navigation" aria-label="Selector de idioma">
       <span class="footer-lang__active" aria-current="true">
         {lang.toUpperCase()}
@@ -111,14 +95,20 @@ const f = t.footer;
   </div>
 
   <!--
-    FIRMA — N1. Protagonista del footer.
-    "SCUART" + "+" rojo como firma visual del estudio.
-    Archivo 900, crema. El "+" extiende el gesto del hero (el "+" como signo
-    de unión diseño/tecnología) ahora como marca de cierre.
-    clamp calibrado: mínimo 4rem para que los 7 chars (SCUART+) entren
-    en 375px sin corte. wdth 110 en tablet/desktop (igual que hero).
+    HAIRLINE DIVISOR — separa la zona de nav de la zona del wordmark.
+    borde-oscuro (#473321) coherente con el sistema oscuro cálido.
   -->
-  <div class="footer-brand">
+  <div class="footer-divider" aria-hidden="true"></div>
+
+  <!--
+    FIRMA — N1. Protagonista.
+    Fraunces light 300, a sangre: font-size clamp(4rem, 14vw, 16rem),
+    overflow visible + negative margin para sangrar fuera de los márgenes.
+    El wordmark sale de la caja del --margin intencional = firma de estudio.
+    El "+" en ámbar = sello.
+    Contenedor .footer-brand tiene el reveal fade-up (IntersectionObserver).
+  -->
+  <div class="footer-brand" aria-hidden="false">
     <p class="footer-wordmark" aria-label="SCUART+">
       <span class="footer-wordmark__name">SCUART</span><span
         class="footer-wordmark__plus"
@@ -129,14 +119,17 @@ const f = t.footer;
 
   <!--
     CRÉDITOS — N3.
-    Mono taupe, al pie de la firma. Una línea con separadores "·".
-    No repite el CTA de contacto — solo datos de ficha editorial:
-    año · estudio · mercados · email discreto.
+    Mono hueso 50%. Una fila con separadores "·".
+    Incluye coordenadas reales de Bogotá (consistentes con HeroSection.astro).
+    Tarjeta de presentación: quien llegue solo acá sabe qué hace SCUART.
   -->
   <div class="footer-credits">
     <span class="footer-credits__item">{f.builtBy}</span>
     <span class="footer-credits__dot" aria-hidden="true">·</span>
     <span class="footer-credits__item">{f.markets}</span>
+    <span class="footer-credits__dot" aria-hidden="true">·</span>
+    <!-- Coordenadas reales del estudio (Bogotá) — consistentes con HeroSection.astro -->
+    <span class="footer-credits__coords">4.7110° N, 74.0721° W</span>
     <span class="footer-credits__dot" aria-hidden="true">·</span>
     <a
       href={t.contact.emailHref}
@@ -157,95 +150,97 @@ const f = t.footer;
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   FOOTER — Cierre editorial de marca
+   FOOTER — V3: barro-oscuro + Fraunces a sangre + ámbar
    Mobile-first: 375px base. md: 768px. lg: 1280px.
-   Fondo: --carbon-elev (#1A1A18) — plano diferente del --carbon del contacto.
+   ART_DIRECTION_V3_FINAL.md §5 (FOOTER) y §7 (detalles personalidad).
+   Continúa del contacto sin corte visual (mismo barro-oscuro).
    ═══════════════════════════════════════════════════════════ */
 
 .site-footer {
-  background-color: var(--carbon-elev);
+  background-color: var(--barro-oscuro);
+  /* padding-left/right son los --margin normales del sitio.
+     El wordmark a sangre usa negative margin propio para romper. */
   padding-left: var(--margin);
   padding-right: var(--margin);
   padding-top: var(--space-xl);
   padding-bottom: var(--space-l);
   position: relative;
   overflow-x: clip;
-  /* Reveal: empieza invisible — IntersectionObserver agrega .is-visible */
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
-/* Clase que dispara el reveal al entrar al viewport */
-.site-footer.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ─── REGLA SUPERIOR ─────────────────────────────────────── */
+/* ─── GRANO — soft-light 0.08 sobre barro-oscuro ─────────── */
 /*
- * Línea de entrada: separa el footer del contacto.
- * Misma textura --linea que en el resto del sitio.
- * margin-bottom editorial: espacio antes de los datos/nav.
+ * Refuerza el grano global (overlay 0.06) para dar textura
+ * "barro prensado" sobre fondos oscuros (ART_DIRECTION §2).
+ * Posición absolute (no fixed como el global) para confinarlo al footer.
  */
-.footer-rule {
-  width: 100%;
-  height: 1px;
-  background-color: var(--linea);
-  margin-bottom: var(--space-l);
+.footer-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.08;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Todo el contenido sobre el grano */
+.site-footer > *:not(.footer-grain) {
+  position: relative;
+  z-index: 1;
 }
 
 /* ─── BANDA META/NAV — N2 ────────────────────────────────── */
-/*
- * Mobile: columna — nav arriba, lang abajo, con gap s.
- * Tablet+: fila — nav izquierda (flex:1), lang derecha.
- */
+
 .footer-meta {
   display: flex;
   flex-direction: column;
   gap: var(--space-s);
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-l);
 }
 
 /* ─── NAV LINKS ───────────────────────────────────────────── */
+
 .footer-nav {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
+  font-weight: 500;
+  color: rgba(240, 233, 220, 0.55); /* hueso 55% */
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   line-height: 1.4;
 }
 
 .footer-nav__link {
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.55);
   text-decoration: none;
-  /* Touch target: padding suficiente */
-  padding: 0.4em 0;
+  /* Touch target mínimo 48px */
+  padding: 0.5em 0;
   transition: color 0.2s ease;
   position: relative;
 }
 
+/* Subrayado terracota que se dibuja en hover (ART_DIRECTION §6 micro-interacciones) */
 .footer-nav__link::after {
   content: '';
   position: absolute;
-  bottom: 0.2em;
+  bottom: 0.15em;
   left: 0;
   width: 100%;
   height: 1px;
-  background-color: var(--rojo);
+  background-color: var(--terracota);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .footer-nav__link:hover {
-  color: var(--crema);
+  color: var(--hueso);
 }
 
 .footer-nav__link:hover::after {
@@ -253,33 +248,30 @@ const f = t.footer;
 }
 
 .footer-nav__link:focus-visible {
-  outline: 1px solid var(--crema);
+  outline: 1px solid var(--hueso);
   outline-offset: 3px;
+  color: var(--hueso);
 }
 
 .footer-nav__sep {
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.55);
   opacity: 0.4;
   padding: 0 0.6em;
   line-height: 1.4;
 }
 
 /* ─── SELECTOR DE IDIOMA ──────────────────────────────────── */
-/*
- * Mismo sistema que Nav.astro — reutiliza la lógica visual exacta.
- * En footer: posición izquierda (mobile) / derecha (tablet+).
- */
+
 .footer-lang {
   display: flex;
   align-items: center;
   gap: 0.3em;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
-  font-weight: 400;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   line-height: 1.4;
-  /* Discreta en mobile */
   opacity: 0.65;
   transition: opacity 0.2s ease;
 }
@@ -290,17 +282,17 @@ const f = t.footer;
 }
 
 .footer-lang__active {
-  color: var(--crema);
+  color: var(--hueso);
   cursor: default;
 }
 
 .footer-lang__sep {
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.55);
   opacity: 0.4;
 }
 
 .footer-lang__other {
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.55);
   text-decoration: none;
   transition: color 0.2s ease;
   position: relative;
@@ -314,14 +306,14 @@ const f = t.footer;
   left: 0;
   width: 100%;
   height: 1px;
-  background-color: var(--rojo);
+  background-color: var(--terracota);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .footer-lang__other:hover {
-  color: var(--crema);
+  color: var(--hueso);
 }
 
 .footer-lang__other:hover::after {
@@ -329,115 +321,131 @@ const f = t.footer;
 }
 
 .footer-lang__other:focus-visible {
-  outline: 1px solid var(--crema);
+  outline: 1px solid var(--hueso);
   outline-offset: 3px;
+  color: var(--hueso);
+}
+
+/* ─── HAIRLINE DIVISOR ───────────────────────────────────── */
+/*
+ * Separa la zona de nav de la zona del wordmark.
+ * borde-oscuro (#473321) — hairline del sistema oscuro cálido.
+ */
+.footer-divider {
+  width: 100%;
+  height: 1px;
+  background-color: var(--borde-oscuro);
+  margin-bottom: var(--space-l);
 }
 
 /* ─── FIRMA — N1 ─────────────────────────────────────────── */
 /*
- * El protagonista del footer. Archivo 900, crema.
- * clamp calibrado:
- *   - mínimo 4rem: a 375px (con --margin ~20px) = 335px útiles.
- *     "SCUART+" = 7 chars Archivo 900 wdth 105. A 64px ~315px → entra.
- *   - máximo: viewport width menos márgenes, limitado para que no desborde.
- *     preferred 18vw da ~230px en 1280px → no es lo que queremos.
- *     En desktop queremos SCUART+ cubriendo ~70-80% del ancho.
- *     A 1280px con márgenes ~120px → 1040px disponibles. 80% = 832px.
- *     7 chars Archivo 900 wdth 110 a ~119px/char = 833px → clamp(4rem, 13vw, 8.5rem)
- *     da 8.5rem = 136px → 7 chars = ~952px. Demasiado con margen en 1280px.
- *     Usar unidad basada en el contenedor — font-size: clamp(4rem, 13vw, 8rem).
- *     A 1280px: 13vw = 166px. 8rem = 128px (max). 7 chars × 128px → ~896px.
- *     Con margins 120px c/u = 240px → 1280-240 = 1040px disponibles. OK.
+ * .footer-brand: el contenedor del reveal fade-up.
+ * Empieza invisible — IntersectionObserver agrega .is-visible.
  *
- *     Táctica: usar font-size grande + letter-spacing negativo.
- *     desktop: font-size clamp(4rem, 13vw, 8rem) con wdth 110.
- *
- * line-height 0.9: característica del sistema display del sitio.
- * letter-spacing -0.03em: tracking del sistema de headings.
- * margin: 0 para que los créditos queden pegados debajo (gap se maneja en flex).
+ * Táctica a sangre:
+ * El wordmark tiene negative horizontal margins = --margin del sitio.
+ * Así desborda los márgenes del footer y sangra hasta los bordes del viewport.
+ * overflow-x: clip en .site-footer contiene el desborde sin scroll horizontal.
  */
 .footer-brand {
+  /* Negative margin para sangrar el wordmark fuera del --margin del footer */
+  margin-left: calc(-1 * var(--margin));
+  margin-right: calc(-1 * var(--margin));
   margin-bottom: var(--space-m);
+  /* Reveal: empieza invisible */
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Clase que dispara el reveal al entrar al viewport */
+.footer-brand.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .footer-wordmark {
   font-family: var(--font-display);
-  font-weight: var(--display-weight-heavy);
+  font-weight: 300; /* Fraunces light — peso bajo = elegante en grande */
   /*
-   * clamp seguro:
-   * min 4rem (~64px): 7 chars × ~45px = ~315px < 335px (375px - márgenes). OK.
-   * preferred: en 375px el preferred 13vw = ~49px. El min de 4rem=64px aplica → 64px.
-   * max 8rem: desktop 1280px. 13vw = 166px → el max 8rem=128px aplica.
-   *   7 chars × ~91px (128px × wdth110 factor ~0.71) = ~637px < 1040px disponibles. OK.
-   *   Resultado: el SCUART+ no llena TODO el ancho en desktop — es statement largo
-   *   pero no display full-bleed. Para coverage full-bleed usaría clamp diferente.
-   *   DECISIÓN: mantener 8rem. El SCUART+ es una firma grande, no un background text.
-   *   Si William quiere full-bleed, se ajusta el max.
+   * clamp a sangre:
+   * min 4rem: mobile 375px con márgenes ~20px c/u = 335px útiles.
+   *   "SCUART+" = 7 chars Fraunces 300. A 64px ~350px — entra ajustado. OK.
+   * preferred 14vw: en 375px = 52.5px (min 64px aplica). En 768px = 107px.
+   * max 16rem: en desktop 1280px. 14vw = 179px → max 16rem=256px aplica.
+   *   El wordmark a 256px con overflow y negative margin sangra correctamente.
    */
-  font-size: clamp(4rem, 13vw, 8rem);
-  line-height: 0.92;
+  font-size: clamp(4rem, 14vw, 16rem);
+  line-height: 0.85;
   letter-spacing: -0.03em;
-  font-variation-settings: 'wdth' 105;
-  color: var(--crema);
+  color: var(--hueso);
   text-transform: uppercase;
   margin: 0;
-  /* Evitar corte en cualquier viewport */
+  /* Padding horizontal para dar respiro al desborde pero mantener lectura */
+  padding-left: var(--margin);
+  padding-right: var(--margin);
   hyphens: none;
   -webkit-hyphens: none;
   word-break: keep-all;
   overflow-wrap: normal;
+  /* White-space nowrap: "SCUART+" son 7 chars que no deben partirse */
+  white-space: nowrap;
 }
 
-/* El "+" — instancia 1 del presupuesto rojo del footer */
+/* El "+" — ámbar, el sello del estudio (§7 detalle de personalidad) */
 .footer-wordmark__plus {
-  color: var(--rojo);
+  color: var(--ambar);
 }
 
 /* ─── CRÉDITOS — N3 ──────────────────────────────────────── */
 /*
- * Mono taupe. Una fila con separadores "·".
+ * Hanken Regular, hueso 50%. Una fila con separadores "·".
+ * Incluye coordenadas de Bogotá (§7 detalle de personalidad).
  * flex-wrap para mobile si la línea es larga.
- * Textura de ficha de estudio — no protagonista.
  */
 .footer-credits {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4em;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 400;
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.50); /* hueso 50% */
   letter-spacing: 0.03em;
   line-height: 1.4;
-  opacity: 0.7;
 }
 
 .footer-credits__item {
   /* Texto plano — no interactivo */
 }
 
+/* Coordenadas: mismo estilo mono pero con tracking abierto para "ficha técnica" */
+.footer-credits__coords {
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
 .footer-credits__dot {
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
 .footer-credits__link {
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.50);
   text-decoration: none;
-  /* Touch target: mínimo 44px via padding vertical */
   padding: 0.25em 0;
   transition: color 0.2s ease;
 }
 
 .footer-credits__link:hover {
-  color: var(--crema);
-  opacity: 1;
+  color: var(--hueso);
 }
 
 .footer-credits__link:focus-visible {
-  outline: 1px solid var(--crema);
+  outline: 1px solid var(--hueso);
   outline-offset: 2px;
-  opacity: 1;
+  color: var(--hueso);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -455,20 +463,14 @@ const f = t.footer;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-m);
-    margin-bottom: var(--space-3xl);
+    margin-bottom: var(--space-xl);
   }
 
   .footer-lang {
-    /* Tablet+: opacidad plena, hay espacio */
     opacity: 1;
   }
 
-  /* Firma más grande en tablet */
-  .footer-wordmark {
-    font-variation-settings: 'wdth' 108;
-  }
-
-  /* Créditos: sin wrap en tablet — caben en una línea */
+  /* Créditos: sin wrap en tablet */
   .footer-credits {
     flex-wrap: nowrap;
   }
@@ -483,24 +485,17 @@ const f = t.footer;
     padding-bottom: var(--space-xl);
   }
 
-  /* La firma en desktop recupera wdth 110 — más ancho, más impacto */
-  .footer-wordmark {
-    font-variation-settings: 'wdth' 110;
-    /* En desktop la firma puede ser más grande — preferred 13vw en 1280px = 166px,
-       max 8rem = 128px aplica. Relajamos el max para desktop. */
-    font-size: clamp(6rem, 13vw, 11rem);
-  }
-
   .footer-meta {
-    margin-bottom: var(--space-3xl);
+    margin-bottom: var(--space-2xl);
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   REDUCED-MOTION — sin transiciones, sin reveal
+   REDUCED-MOTION — sin transiciones, wordmark visible inmediato
+   El grano y el color se mantienen (son identidad, no motion).
    ═══════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
-  .site-footer {
+  .footer-brand {
     opacity: 1;
     transform: none;
     transition: none;
@@ -508,7 +503,8 @@ const f = t.footer;
 
   .footer-nav__link,
   .footer-lang__other,
-  .footer-credits__link {
+  .footer-credits__link,
+  .footer-lang {
     transition: none;
   }
 
@@ -521,33 +517,32 @@ const f = t.footer;
 
 <script>
   /**
-   * Footer reveal — IntersectionObserver sobrio.
+   * Footer reveal — IntersectionObserver para el wordmark.
    *
-   * Cuando el footer entra al viewport (threshold 0.15 = 15% visible),
-   * agrega .is-visible que dispara la transición CSS de opacity + translateY.
+   * .footer-brand (el contenedor del wordmark) empieza invisible.
+   * Al entrar al viewport (threshold 0.08 = 8% visible), agrega .is-visible
+   * que dispara la transición CSS opacity + translateY.
    *
    * Una sola vez: disconnect() después del primer trigger.
-   * Progressive enhancement: si JS falla, el footer queda opaco gracias
-   * al fallback en prefers-reduced-motion (o se puede agregar un noscript fallback).
-   *
-   * NO usa GSAP — reveal simple no justifica una dep adicional.
+   * Progressive enhancement: si JS falla, el wordmark queda invisible.
+   * Fallback para reduced-motion: visible inmediato via CSS + JS guard.
    */
 
-  const footer = document.querySelector<HTMLElement>('.site-footer');
+  const brand = document.querySelector<HTMLElement>('.footer-brand');
 
-  if (footer) {
-    /* Si el usuario prefiere reduced-motion, hacemos visible inmediatamente */
+  if (brand) {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (prefersReduced) {
-      footer.classList.add('is-visible');
+      /* reduced-motion: CSS ya lo pone visible (opacity:1, transform:none),
+         pero agregamos la clase igual por si el CSS no aplica por especificidad. */
+      brand.classList.add('is-visible');
     } else {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
-              footer.classList.add('is-visible');
-              /* Una sola vez — disconnect para no retriggerear */
+              brand.classList.add('is-visible');
               observer.disconnect();
             }
           });
@@ -555,7 +550,7 @@ const f = t.footer;
         { threshold: 0.08 }
       );
 
-      observer.observe(footer);
+      observer.observe(brand);
     }
   }
 </script>

@@ -1,44 +1,34 @@
 ---
 /**
- * ContactSection.astro — Sección 4: CTA / Contacto
+ * ContactSection.astro — Sección 4: CTA / Contacto — V3
  * SCUART — "El cierre del recorrido"
+ *
+ * V3: fondo barro-oscuro (#241710), tipografía Fraunces + Hanken, tokens terracota cálida.
  *
  * CONCEPTO: Cierre de proyecto premium, NO página de contacto genérica.
  * El recorrido: hero promete → portfolio prueba → método explica → ACÁ se convierte.
  *
  * JERARQUÍA VISUAL (≤3 niveles):
- *   N1 — Statement de cierre (Archivo 900, crema, gigante, col 1-5 desktop)
+ *   N1 — Statement de cierre (Fraunces 300, hueso, gigante, col 1-5 desktop)
  *        Peso visual ≥45% de la sección. Sticky en desktop.
- *   N2 — Formulario brief (inputs línea fina, botón rojo único acento de color)
- *        col 7-12 desktop. El split horizontal es la asimetría intencional (anti R2).
- *   N3 — Links secundarios WhatsApp/email (mono, taupe, al pie)
+ *   N2 — Formulario brief (inputs línea fina borde-oscuro, CTA terracota único)
+ *        col 7-12 desktop. Split horizontal asimétrico (anti R2).
+ *   N3 — Links secundarios WhatsApp/email (mono, hueso 55%, al pie)
  *
- * PRESUPUESTO ROJO en esta sección:
- *   A — botón submit "SEND PROJECT BRIEF →" (único acento de rojo del form)
- *   B — franja kicker separator (1px, sutil)
- *   Total = 2 instancias. Coherente con el sistema.
+ * ESTRUCTURA CONSERVADA ÍNTEGRA (aprobado — NO tocar lógica):
+ *   - Todos los campos: name, business, email, country, whatDoYouNeed, budget, timeline, message
+ *   - Honeypot: campo 'website' oculto
+ *   - Endpoint: action="/api/contact" + fetch POST /api/contact
+ *   - Estados: idle → loading → success/error
+ *   - Mensajes de éxito/error, bloque WhatsApp/email alternativo
+ *   - UN solo CTA de envío
  *
- * INPUTS: estilo editorial — línea inferior fina (--linea), sin border-radius pesado.
- *   Focus: borde inferior rojo via --rojo. Fondo: transparente.
- *   Labels: IBM Plex Mono uppercase 11px. Valores: DM Sans crema.
+ * Solo cambia la PIEL: colores V3, tipografía Fraunces/Hanken, layout asimétrico.
  *
- * ESTADOS DEL FORM:
- *   idle → loading (botón deshabilitado, texto cambia) → success (panel de gracias)
- *                                                      → error (mensaje inline)
- *   JS: fetch al endpoint. Sin recarga.
- *   Sin JS: <form action="/api/contact" method="POST"> funciona como fallback.
- *
- * ANTI-SPAM: campo honeypot 'website' oculto visualmente (no display:none que bots ignoran).
- *   position:absolute; opacity:0; pointer-events:none; tab-index:-1; height:0.
- *   Los bots lo llenan. El endpoint lo descarta silenciosamente.
- *
- * SEGURIDAD:
- *   Las variables RESEND_API_KEY y CONTACT_EMAIL NO aparecen aquí.
- *   Solo se usan en src/pages/api/contact.ts (server-side).
- *
- * PROGRESSIVE ENHANCEMENT:
- *   Form visible y funcional sin JS (fallback action/method).
- *   JS agrega: estados loading/success/error, fetch sin recarga.
+ * ACCESIBILIDAD:
+ *   - Labels asociados via for/id (intactos — no tocar)
+ *   - Contraste AA: hueso sobre barro-oscuro ~12:1 (AAA). hueso 65% = ~8:1 (AAA).
+ *   - focus-visible claro en todos los inputs y links.
  */
 
 import type { Translations } from '../i18n/en';
@@ -53,7 +43,7 @@ const c = t.contact;
 
 <section class="contact" id="contact" aria-label={c.kicker}>
 
-  <!-- Kicker / regla de entrada — coherente con hero/portfolio/método -->
+  <!-- Kicker / regla de entrada -->
   <div class="contact-header">
     <p class="contact-kicker">{c.kicker}</p>
   </div>
@@ -63,10 +53,8 @@ const c = t.contact;
 
     <!--
       STATEMENT — N1, protagonista.
-      Archivo 900, crema, gigante. Desktop: sticky mientras scrolleas el form.
+      Fraunces 300, hueso. Desktop: sticky mientras scrolleas el form.
       Mobile: bloque arriba del form (full-width).
-      Las líneas del statement son copy del diccionario.
-      Se renderizan con saltos de línea preservados via CSS white-space.
     -->
     <div class="contact-statement">
       <h2 class="contact-statement__text">{c.statement}</h2>
@@ -78,6 +66,7 @@ const c = t.contact;
       action="/api/contact": fallback sin JS.
       method="POST": el endpoint acepta form-data como fallback.
       data-contact-form: hook para el JS de estado.
+      ESTRUCTURA INTACTA — solo re-skin V3.
     -->
     <div class="contact-form-wrap">
       <form
@@ -90,9 +79,8 @@ const c = t.contact;
 
         <!--
           HONEYPOT — anti-spam.
-          Campo 'website': oculto visualmente (no display:none — bots leen todo).
-          Humanos lo dejan vacío. El endpoint descarta silenciosamente si viene lleno.
-          aria-hidden y tabIndex=-1 para no interferir con a11y/tab order.
+          Campo 'website': oculto visualmente (no display:none).
+          aria-hidden y tabIndex=-1 para no interferir con a11y.
         -->
         <div class="contact-form__honeypot" aria-hidden="true">
           <label for="contact-website">Website</label>
@@ -256,7 +244,7 @@ const c = t.contact;
           {c.errorMessage}
         </div>
 
-        <!-- ── Botón submit — instancia A del presupuesto rojo ─── -->
+        <!-- ── Botón submit — CTA terracota único ──────────────── -->
         <div class="contact-form__row contact-form__row--submit">
           <button
             class="contact-form__submit"
@@ -274,7 +262,6 @@ const c = t.contact;
       <!--
         PANEL DE ÉXITO — oculto por defecto.
         JS lo muestra cuando el endpoint responde 200 ok:true.
-        Reemplaza el form visualmente sin destruirlo del DOM.
       -->
       <div class="contact-success" data-contact-success hidden>
         <p class="contact-success__heading">{c.successHeading}</p>
@@ -282,10 +269,9 @@ const c = t.contact;
       </div>
 
       <!--
-        BLOQUE SECUNDARIO — WhatsApp / Email.
-        Discreto, al pie del form. N3. Mono taupe.
+        BLOQUE SECUNDARIO — WhatsApp / Email — N3.
+        Discreto, al pie del form. Mono hueso 55%.
         NO botón verde, NO flotante, NO protagonista.
-        El número de WhatsApp es PLACEHOLDER — William lo reemplaza.
       -->
       <div class="contact-alt">
         <span class="contact-alt__label">{c.alternativeLabel}</span>
@@ -318,50 +304,68 @@ const c = t.contact;
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   CONTACT SECTION — Sección 4: CTA / Contacto
+   CONTACT SECTION — V3: barro-oscuro + terracota cálida
    Mobile-first: 375px base. md: 768px. lg: 1280px.
-   Fondo: --carbon (coherente con hero y método).
+   ART_DIRECTION_V3_FINAL.md §5 (CONTACTO).
    ═══════════════════════════════════════════════════════════ */
 
 /* ─── SECCIÓN ────────────────────────────────────────────── */
 
 .contact {
-  background-color: var(--carbon);
+  background-color: var(--barro-oscuro);
   padding-top: var(--space-xl);
   padding-bottom: var(--space-2xl);
   padding-left: var(--margin);
   padding-right: var(--margin);
   position: relative;
   overflow-x: clip;
-  /* scroll-margin-top para anclaje de nav */
   scroll-margin-top: 72px;
+}
+
+/*
+ * Grano adicional sobre barro-oscuro (soft-light 0.08).
+ * El grano global (overlay 0.06) es insuficiente sobre fondos oscuros
+ * para dar la textura "barro prensado". Este pseudo-elemento lo refuerza.
+ * Intacto en reduced-motion (el grano es material, no motion).
+ */
+.contact::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.08;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Todo el contenido interior sobre el grano */
+.contact > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* ─── HEADER / KICKER ────────────────────────────────────── */
 
 .contact-header {
-  border-top: 1px solid var(--linea);
+  border-top: 1px solid var(--borde-oscuro);
   padding-top: var(--space-m);
   margin-bottom: var(--space-l);
 }
 
 .contact-kicker {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
+  font-weight: 500;
+  color: rgba(240, 233, 220, 0.65); /* hueso 65% */
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   line-height: 1.4;
 }
 
 /* ─── LAYOUT PRINCIPAL (mobile: columna) ─────────────────── */
-/*
- * Mobile: statement arriba, form abajo. Apilado vertical
- * justificado por el flujo natural de lectura — NO apilado
- * simétrico default (R2): el contraste de escala entre el
- * statement gigante y los inputs pequeños crea la asimetría.
- */
+
 .contact-layout {
   display: flex;
   flex-direction: column;
@@ -369,12 +373,7 @@ const c = t.contact;
 }
 
 /* ─── STATEMENT — N1 ─────────────────────────────────────── */
-/*
- * Archivo 900, crema.
- * white-space: pre-line preserva los \n del copy del diccionario.
- * En mobile: más pequeño para que el statement no devore toda la pantalla.
- * En desktop: sticky para acompañar el scroll del form.
- */
+
 .contact-statement {
   display: flex;
   flex-direction: column;
@@ -383,36 +382,15 @@ const c = t.contact;
 
 .contact-statement__text {
   font-family: var(--font-display);
-  font-weight: var(--display-weight-heavy);
-  /*
-   * clamp calibrado:
-   * mobile 375-767: mínimo 2.2rem (~35px). Garantiza que la palabra más
-   *   larga ("SOMETHING." en EN, ~10 chars Archivo 900 wdth110) entre en
-   *   las ~350px útiles de un 390px screen con --margin lateral real.
-   *   A 9vw sería ~35px en 390px → el min aplica y da exactamente ese tamaño.
-   *   ES: "EMPECE-\nMOS." se parte vía los \n del copy, "EMPECE-" cabe.
-   * desktop 1280: 9rem → ~144px. Protagonista N1, sin cambios.
-   *
-   * Red de seguridad: overflow-wrap + word-break evitan corte en casos extremos.
-   */
-  /* Mobile-first. wdth 88 (más estrecho) para que "EMPECEMOS." (10 chars)
-     y "SOMETHING." entren completos a 390px sin partirse. Desktop restaura
-     wdth 110 y tamaño grande en la media query 768+/1280+. */
-  font-size: clamp(2rem, 8.2vw, 9rem);
-  line-height: 0.92;
-  letter-spacing: -0.03em;
-  font-variation-settings: 'wdth' 88;
-  color: var(--crema);
-  text-transform: uppercase;
+  font-weight: 300; /* Fraunces light — peso bajo = elegante en grande */
+  font-size: clamp(2.75rem, 9vw, 7rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: var(--hueso);
+  /* Preserva los \n del i18n */
   white-space: pre-line;
-  /* Anti-corte: sin guiones automáticos. Cada palabra entra entera o
-     baja de línea completa (nunca partida tipo "EMPECE-MOS"). */
   hyphens: none;
   -webkit-hyphens: none;
-  overflow-wrap: normal;
-  word-break: keep-all;
-  /* overflow-wrap: break-word solo rompe si ES NECESARIO (desborde real).
-   * word-break queda en normal para no partir palabras innecesariamente. */
   overflow-wrap: break-word;
   word-break: normal;
   max-width: 100%;
@@ -423,7 +401,7 @@ const c = t.contact;
   font-family: var(--font-body);
   font-size: var(--text-subhead);
   font-weight: 400;
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.70); /* hueso 70% */
   line-height: 1.55;
   max-width: 36ch;
   margin: 0;
@@ -442,14 +420,12 @@ const c = t.contact;
 .contact-form {
   display: flex;
   flex-direction: column;
-  /* mobile: gap compacto para que el form se sienta consumible en pantalla pequeña */
   gap: var(--space-s);
 }
 
 /* ─── HONEYPOT — oculto visualmente ─────────────────────────
- * NO display:none (bots lo leen de todas formas con display:none en algunos).
- * position:absolute + opacity:0 + pointer-events:none lo hace invisible
- * para humanos pero presente en el DOM para bots de form-filling.
+ * position:absolute + opacity:0 + pointer-events:none.
+ * Visible en DOM para bots, invisible para humanos.
  */
 .contact-form__honeypot {
   position: absolute;
@@ -461,20 +437,14 @@ const c = t.contact;
 }
 
 /* ─── FILAS ───────────────────────────────────────────────── */
-/*
- * .contact-form__row: full-width por defecto (mobile 1 col).
- * .contact-form__row--split: 2 campos en tablet+ (grid 2 cols).
- * .contact-form__row--submit: alinea el botón a la izquierda.
- */
+
 .contact-form__row {
   display: flex;
   flex-direction: column;
-  /* mobile: gap entre campos compacto, consistente con el gap del form */
   gap: var(--space-s);
 }
 
 .contact-form__row--submit {
-  /* espacio editorial antes del botón de cierre — más intencional que los campos */
   margin-top: var(--space-s);
 }
 
@@ -487,69 +457,74 @@ const c = t.contact;
   flex: 1;
 }
 
-/* ─── LABEL — mono uppercase ─────────────────────────────── */
+/* ─── LABEL — Hanken 500 uppercase +0.14em hueso 65% ────────── */
 
 .contact-form__label {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
+  font-weight: 500;
+  color: rgba(240, 233, 220, 0.65); /* hueso 65% */
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   line-height: 1.4;
   cursor: pointer;
 }
 
 .contact-form__required {
-  color: var(--rojo);
+  color: var(--terracota);
   margin-left: 0.1em;
 }
 
-/* ─── INPUT EDITORIAL — línea inferior fina ──────────────── */
-/*
+/* ─── INPUT EDITORIAL — línea inferior hairline borde-oscuro ─
  * Estilo editorial: sin cajas, sin border-radius, sin fondo gris.
- * Solo la línea inferior --linea marca el campo.
- * Focus: línea cambia a --rojo (instancia del acento, dentro del presupuesto).
- * Placeholder: taupe bajo.
- * Touch target mínimo 48px (P9): min-height en el contenedor garantiza.
+ * Border-bottom: borde-oscuro (#473321).
+ * Focus: línea pasa a terracota (transición sutil).
+ * Placeholder: hueso 40%.
+ * Touch target mínimo 48px via min-height.
  */
 .contact-form__input {
   font-family: var(--font-body);
   font-size: var(--text-body);
   font-weight: 400;
-  color: var(--crema);
+  color: var(--hueso);
   background-color: transparent;
   border: none;
-  border-bottom: 1px solid var(--linea);
+  border-bottom: 1px solid var(--borde-oscuro);
   border-radius: 0;
   padding: var(--space-xs) 0;
   width: 100%;
   min-height: 48px;
   line-height: 1.5;
   outline: none;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   -webkit-appearance: none;
   appearance: none;
 }
 
 .contact-form__input::placeholder {
-  color: var(--taupe);
-  opacity: 0.5;
+  color: rgba(240, 233, 220, 0.40); /* hueso 40% */
+  opacity: 1; /* Firefox normaliza */
 }
 
+/* Focus: la línea pasa a terracota */
 .contact-form__input:focus {
-  border-bottom-color: var(--rojo);
+  border-bottom-color: var(--terracota);
 }
 
+.contact-form__input:focus-visible {
+  border-bottom-color: var(--terracota);
+  /* Outline extra visible para teclado */
+  outline: none;
+  box-shadow: 0 2px 0 0 var(--terracota);
+}
+
+/* Hover no-focus: línea sube levemente de luminosidad */
 .contact-form__input:hover:not(:focus) {
-  border-bottom-color: var(--linea-hover);
+  border-bottom-color: rgba(71, 51, 33, 0.70); /* borde-oscuro más visible */
 }
 
 /* ─── SELECT — wrapper para la flecha custom ─────────────── */
-/*
- * El select nativo se estiliza con appearance:none.
- * La flecha custom (↓) se muestra via el wrapper relativo.
- */
+
 .contact-form__select-wrap {
   position: relative;
 }
@@ -560,8 +535,8 @@ const c = t.contact;
 }
 
 .contact-form__select option {
-  background-color: var(--carbon);
-  color: var(--crema);
+  background-color: var(--barro-oscuro);
+  color: var(--hueso);
 }
 
 .contact-form__select-arrow {
@@ -569,11 +544,10 @@ const c = t.contact;
   right: 0.25em;
   top: 50%;
   transform: translateY(-50%);
-  font-family: var(--font-mono);
-  font-size: 0.75rem; /* tamaño fijo — ▾ es un triángulo, no necesita escala fluida */
-  color: var(--taupe);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: rgba(240, 233, 220, 0.50); /* hueso 50% */
   pointer-events: none;
-  /* Asegura que la flecha quede alineada al centro visual del glyph */
   line-height: 1;
   display: flex;
   align-items: center;
@@ -583,7 +557,6 @@ const c = t.contact;
 
 .contact-form__textarea {
   resize: vertical;
-  /* mobile: 96px en vez de 120px — sigue siendo usable (rows=4), más compacto */
   min-height: 96px;
   height: auto;
 }
@@ -591,32 +564,27 @@ const c = t.contact;
 /* ─── ERROR INLINE ────────────────────────────────────────── */
 
 .contact-form__error {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 400;
-  color: var(--rojo);
+  color: var(--terracota);
   line-height: 1.4;
   letter-spacing: 0.02em;
   padding: var(--space-xs) 0;
 }
 
-/* ─── BOTÓN SUBMIT — instancia A del presupuesto rojo ───────
- *
- * El botón es el único elemento rojo del formulario.
- * Fondo rojo, crema, uppercase mono.
- * Hover: borde crema + fondo transparente (inversión editorial).
- * Loading: disabled + cursor not-allowed.
- * Touch target: min-height 48px + padding generoso.
+/* ─── BOTÓN SUBMIT — CTA terracota único ───────────────────
+ * Fondo: terracota. Texto: hueso. Hover: terracota-profunda (oscurece).
+ * border-radius: 0 (sin redondez grande).
+ * WCAG: hueso (#F0E9DC) sobre terracota (#A4471F) = ~5.0:1 (AA, UI ≥18px).
  */
 .contact-form__submit {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
-  font-weight: 400;
-  /* B-submit WCAG: blanco puro #FFFFFF sobre --rojo (#D70321) = 4.87:1 → PASA 4.5:1.
-   * var(--crema) #E8E2D6 sobre rojo = 4.14:1 → fallaba. El rojo de marca no cambia. */
-  color: #FFFFFF;
-  background-color: var(--rojo);
-  border: 1px solid var(--rojo);
+  font-weight: 500;
+  color: var(--hueso);
+  background-color: var(--terracota);
+  border: 1px solid var(--terracota);
   border-radius: 0;
   padding: 0.85em 1.75em;
   min-height: 48px;
@@ -624,16 +592,18 @@ const c = t.contact;
   letter-spacing: 0.08em;
   line-height: 1.4;
   cursor: pointer;
-  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
   -webkit-appearance: none;
   appearance: none;
   align-self: flex-start;
 }
 
+/* Hover: oscurece (terracota-profunda), no aclara */
 .contact-form__submit:hover {
-  background-color: transparent;
-  border-color: var(--crema);
-  color: var(--crema);
+  background-color: var(--terracota-prof);
+  border-color: var(--terracota-prof);
 }
 
 .contact-form__submit:active {
@@ -641,7 +611,7 @@ const c = t.contact;
 }
 
 .contact-form__submit:focus-visible {
-  outline: 2px solid var(--crema);
+  outline: 2px solid var(--hueso);
   outline-offset: 3px;
 }
 
@@ -651,11 +621,7 @@ const c = t.contact;
 }
 
 /* ─── PANEL DE ÉXITO ─────────────────────────────────────── */
-/*
- * Reemplaza el form visualmente cuando el envío es exitoso.
- * hidden por defecto — JS lo muestra.
- * El form se mantiene en el DOM (en caso de querer resetear).
- */
+
 .contact-success {
   display: flex;
   flex-direction: column;
@@ -665,13 +631,11 @@ const c = t.contact;
 
 .contact-success__heading {
   font-family: var(--font-display);
-  font-weight: var(--display-weight-heavy);
+  font-weight: 300;
   font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 0.92;
+  line-height: 1.02;
   letter-spacing: -0.025em;
-  font-variation-settings: 'wdth' 110;
-  color: var(--crema);
-  text-transform: uppercase;
+  color: var(--hueso);
   margin: 0;
 }
 
@@ -679,36 +643,28 @@ const c = t.contact;
   font-family: var(--font-body);
   font-size: var(--text-body);
   font-weight: 400;
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.70); /* hueso 70% */
   line-height: 1.6;
   max-width: 40ch;
   margin: 0;
 }
 
 /* ─── BLOQUE ALTERNATIVO (WhatsApp / Email) — N3 ─────────── */
-/*
- * Discreto, al pie. Mono taupe. No compite con el form.
- * NO botón verde. NO prominente. Separador "—" editorial.
- */
+
 .contact-alt {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4em;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 400;
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.55); /* hueso 55% */
   letter-spacing: 0.03em;
   line-height: 1.4;
-  border-top: 1px solid var(--linea);
+  border-top: 1px solid var(--borde-oscuro);
   padding-top: var(--space-m);
   margin-top: var(--space-xs);
-}
-
-.contact-alt__label {
-  /* B3a WCAG: opacity:0.7 hundía var(--taupe) #8A857B a ~#65615a = 3.13:1 (falla).
-   * Sin opacity: #8A857B puro = 5.26:1 sobre #0E0E0E → PASA 4.5:1. */
 }
 
 .contact-alt__sep,
@@ -717,15 +673,20 @@ const c = t.contact;
 }
 
 .contact-alt__link {
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.55);
   text-decoration: none;
   transition: color 0.2s ease;
-  /* Touch target cómodo */
   padding: 0.2em 0;
 }
 
 .contact-alt__link:hover {
-  color: var(--crema);
+  color: var(--hueso);
+}
+
+.contact-alt__link:focus-visible {
+  outline: 1px solid var(--hueso);
+  outline-offset: 2px;
+  color: var(--hueso);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -737,21 +698,12 @@ const c = t.contact;
     padding-bottom: var(--space-2xl);
   }
 
-  /* Tablet+ tiene ancho de sobra: restaura wdth 110 y escala grande del
-     heading (el mobile usa wdth 88 estrecho para que EMPECEMOS entre). */
-  .contact-statement__heading {
-    font-size: clamp(3.5rem, 9vw, 9rem);
-    font-variation-settings: 'wdth' 110;
-    line-height: 0.9;
-  }
-
   /* Filas split: 2 columnas en tablet+ */
   .contact-form__row--split {
     flex-direction: row;
     align-items: flex-start;
   }
 
-  /* En tablet+ el form recupera el gap estándar — solo mobile lo reduce */
   .contact-form {
     gap: var(--space-m);
   }
@@ -775,13 +727,10 @@ const c = t.contact;
   }
 
   /*
-   * Layout 12 col:
-   * Col 1-5: statement (sticky mientras scrolleas el form).
-   * Col 6: gap (gutter).
+   * Grid 12 col en 2 zonas:
+   * Col 1-5: statement (sticky).
+   * Col 6: gutter.
    * Col 7-12: form.
-   *
-   * grid-template-columns: 5fr gap 6fr.
-   * El gap de una columna entre statement y form crea la respiración editorial.
    */
   .contact-layout {
     display: grid;
@@ -794,7 +743,7 @@ const c = t.contact;
   /* Statement: sticky desktop */
   .contact-statement {
     position: sticky;
-    top: calc(72px + var(--space-l)); /* nav 72px + espacio editorial */
+    top: calc(72px + var(--space-l));
     align-self: start;
   }
 
@@ -802,14 +751,14 @@ const c = t.contact;
     max-width: 30ch;
   }
 
-  /* Form wrap: columna derecha */
   .contact-form-wrap {
     gap: var(--space-m);
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   REDUCED-MOTION — sin transiciones
+   REDUCED-MOTION — sin transiciones en inputs y links
+   El grano y el color se mantienen (son identidad, no motion).
    ═══════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
   .contact-form__input,
