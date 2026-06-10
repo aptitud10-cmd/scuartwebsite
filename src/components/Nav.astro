@@ -60,27 +60,43 @@ const { lang, t } = Astro.props;
     align-items: center;
     justify-content: space-between;
     padding: 0 var(--margin);
-    /* Transparente sobre carbon: grain visible a traves */
+    /*
+     * V3: transparente sobre hueso. El fondo del hero es claro (#F0E9DC)
+     * así que el nav arranca con texto oscuro (tinta) para legibilidad.
+     * Al scrollear hacia secciones oscuras (barro-oscuro), se aplica .scrolled
+     * que invierte los colores — ver abajo.
+     */
     background-color: transparent;
     border-bottom: 1px solid transparent;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
   }
 
-  /* Al scrollear, fondo carbon + borde sutil */
+  /*
+   * Al scrollear: fondo barro-oscuro + borde hairline oscuro.
+   * Aplica cuando el JS detecta scroll > 20px.
+   * Nota futura: si se quiere inversión precisa por sección, usar
+   * IntersectionObserver con las secciones — por ahora .scrolled es suficiente.
+   */
   .nav.scrolled {
-    background-color: var(--carbon);
-    border-bottom-color: var(--linea);
+    background-color: var(--barro-oscuro);
+    border-bottom-color: var(--borde-oscuro);
   }
 
   .nav__logo {
     font-family: var(--font-display);
-    font-weight: var(--display-weight-heavy);
-    font-variation-settings: 'wdth' var(--display-wdth);
+    font-weight: var(--display-weight-light);
     font-size: 1.125rem;
-    letter-spacing: -0.025em;
-    color: var(--crema);
+    letter-spacing: var(--display-tracking);
+    /* V3: tinta sobre hueso (nav transparente sobre hero claro) */
+    color: var(--tinta);
     text-decoration: none;
     line-height: 1;
+    transition: color 0.35s ease;
+  }
+
+  /* Logo en scrolled: hueso sobre barro-oscuro */
+  .nav.scrolled .nav__logo {
+    color: var(--hueso);
   }
 
   /* Contenedor derecho: links + selector idioma */
@@ -98,17 +114,19 @@ const { lang, t } = Astro.props;
   }
 
   .nav__link {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: var(--text-mono);
-    font-weight: 400;
-    color: var(--taupe);
+    font-weight: 500;
+    /* V3: tinta-suave sobre hueso — 5.2:1, pasa AA */
+    color: var(--tinta-suave);
     text-decoration: none;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.14em;
     line-height: 1.4;
     position: relative;
-    /* Subrayado barrido rojo hover — scaleX 0→1 */
+    /* Subrayado terracota en hover — scaleX 0→1 */
     padding-bottom: 2px;
+    transition: color 0.35s ease;
   }
 
   .nav__link::after {
@@ -118,60 +136,67 @@ const { lang, t } = Astro.props;
     left: 0;
     width: 100%;
     height: 1px;
-    background-color: var(--rojo);
+    background-color: var(--terracota);
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* power2.out */
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .nav__link:hover {
-    color: var(--crema);
+    color: var(--tinta);
   }
 
   .nav__link:hover::after {
     transform: scaleX(1);
   }
 
+  /* En scrolled (sobre barro-oscuro): links en hueso/tinta-suave claro */
+  .nav.scrolled .nav__link {
+    color: rgba(240, 233, 220, 0.65); /* hueso al 65% = legible sobre barro */
+  }
+
+  .nav.scrolled .nav__link:hover {
+    color: var(--hueso);
+  }
+
   /* ── Selector de idioma ──────────────────────────────────── */
   /*
-   * iter.5 (B3 WCAG): opacidad del contenedor eliminada.
-   * Antes: opacity:0.65 en mobile hundía #9C978D a ~#6a6761 = 3.42:1 (falla).
-   * Ahora: jerarquía discreta se logra por color, no opacity en el padre.
-   *   - .nav__lang-active: var(--crema) — el foco, resalta.
-   *   - .nav__lang-sep: opacity:0.5 solo en él (aria-hidden, no texto WCAG).
-   *   - .nav__lang-other: #9C978D puro = 4.56:1 sobre #0E0E0E → PASA.
+   * V3 sobre hueso: usar tinta/tinta-suave para legibilidad.
+   * Contraste WCAG:
+   *   - .nav__lang-active: var(--tinta) #1C140E sobre --hueso #F0E9DC = ~13.5:1 (AAA)
+   *   - .nav__lang-other: var(--tinta-suave) #6B5D4F sobre --hueso #F0E9DC = ~5.2:1 (AA)
+   * En .scrolled (sobre barro-oscuro):
+   *   - active: var(--hueso) sobre --barro-oscuro = ~12:1 (AAA)
+   *   - other: rgba(hueso, 0.65) sobre barro-oscuro = ~7:1 (AA)
    */
   .nav__lang {
     display: flex;
     align-items: center;
     gap: 0.3em;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: var(--text-mono);
-    font-weight: 400;
+    font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.14em;
     line-height: 1.4;
   }
 
-  /* Idioma activo — crema, no clickeable */
+  /* Idioma activo — tinta sobre hueso, no clickeable */
   .nav__lang-active {
-    color: var(--crema);
+    color: var(--tinta);
     cursor: default;
+    transition: color 0.35s ease;
   }
 
-  /* Separador / — taupe bajo */
+  /* Separador / — decorativo, aria-hidden */
   .nav__lang-sep {
-    color: var(--taupe);
-    opacity: 0.5;
+    color: var(--tinta-suave);
+    opacity: 0.4;
   }
 
-  /* Idioma alternativo — color elevado para pasar WCAG 4.5:1.
-   * B3 FIX: var(--taupe) puro = 4.24:1 sobre #0E0E0E — NO pasa 4.5:1 para texto <14px.
-   * Además el contenedor .nav__lang tenía opacity:0.65 (ya eliminada, ver arriba)
-   * que lo hundía aún más a 2.86:1. Solución: color propio #9C978D sin opacity
-   * heredada = 4.56:1 sobre #0E0E0E (verificado axe-core). PASA en todos los viewports. */
+  /* Idioma alternativo — tinta-suave sobre hueso: 5.2:1 pasa AA */
   .nav__lang-other {
-    color: #9C978D;
+    color: var(--tinta-suave);
     text-decoration: none;
     transition: color 0.25s ease;
     position: relative;
@@ -185,18 +210,36 @@ const { lang, t } = Astro.props;
     left: 0;
     width: 100%;
     height: 1px;
-    background-color: var(--rojo);
+    background-color: var(--terracota);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .nav__lang-other:hover {
-    color: var(--crema);
+    color: var(--tinta);
   }
 
   .nav__lang-other:hover::after {
     transform: scaleX(1);
+  }
+
+  /* En scrolled (sobre barro-oscuro): invertir a claro */
+  .nav.scrolled .nav__lang-active {
+    color: var(--hueso);
+  }
+
+  .nav.scrolled .nav__lang-sep {
+    color: var(--hueso);
+    opacity: 0.3;
+  }
+
+  .nav.scrolled .nav__lang-other {
+    color: rgba(240, 233, 220, 0.65);
+  }
+
+  .nav.scrolled .nav__lang-other:hover {
+    color: var(--hueso);
   }
 
   /* Tablet+: mostrar links inline */

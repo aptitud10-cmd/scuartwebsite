@@ -1,31 +1,77 @@
 /**
- * tokens.css — Sistema de design tokens "Declaración en Rojo"
- * Basado en DESIGN_RESPONSIVE.md: §1 colores, §5 tipografía, §6 spacing
- * Token swap futuro: cambiar Archivo→Monument, DM Sans→Messina en --font-display/--font-body
+ * tokens.css — Sistema de design tokens
+ *
+ * PALETA ACTIVA: V3 "Terracota cálida en alternancia" (ART_DIRECTION_V3_FINAL.md §2)
+ * Los tokens V1 "Declaración en Rojo" se conservan al final como legado.
+ *
+ * TIPOGRAFÍA ACTIVA: Fraunces (display) + Hanken Grotesk (cuerpo/ficha).
+ * Los tokens --font-* anteriores se conservan al final como legado.
  */
 
 :root {
-  /* ── §1 COLORES ──────────────────────────────────────────────── */
-  --carbon:        #0E0E0E;   /* fondo base */
-  --carbon-elev:   #1A1A18;   /* bloque contraste portfolio/CTA */
-  --crema:         #E8E2D6;   /* texto principal (nunca blanco puro) */
-  --rojo:          #D70321;   /* declaración — máx 4 instancias/viewport */
-  --taupe:         #8A857B;   /* metadata, índices inactivos, subhead */
-  --linea:         rgba(232, 226, 214, 0.09);   /* guías editoriales — subido de 0.07 a 0.09 (fallback §4) */
-  --linea-hover:   rgba(232, 226, 214, 0.14);   /* hover */
+  /* ══════════════════════════════════════════════════════════════
+     §V3 PALETA — "Terracota cálida en alternancia"
+     ART_DIRECTION_V3_FINAL.md §2
+     ══════════════════════════════════════════════════════════════ */
 
-  /* ── §5 FAMILIAS TIPOGRÁFICAS (token swap ready) ──────────────── */
-  /* Swap futuro: --font-display: 'Monument Extended', sans-serif; */
-  --font-display: 'Archivo', sans-serif;
-  /* Swap futuro: --font-body: 'Messina Sans', sans-serif; */
-  --font-body:    'DM Sans', sans-serif;
-  /* Swap futuro: --font-mono: 'Messina Sans Mono', monospace; */
-  --font-mono:    'IBM Plex Mono', monospace;
+  /* Bases claras (~50% del scroll) */
+  --hueso:           #F0E9DC;   /* fondo claro dominante. Hero, portfolio, capabilities, method */
+  --tinta:           #1C140E;   /* texto/titulares sobre hueso. Contraste ~13.5:1 (AAA) */
+  --tinta-suave:     #6B5D4F;   /* texto secundario, metadatos, captions sobre hueso. ~5.2:1 (AA) */
 
-  /* Pesos display (Archivo variable: wdth 105-115, NO 125) */
-  --display-weight-heavy: 900;   /* H1, H2, CTA */
-  --display-weight-light:  400;   /* nombres portfolio */
-  --display-wdth: 110;            /* wdth eje variable — aprobado: 105-115 */
+  /* Bases oscuras cálidas (~35% del scroll) */
+  --barro-oscuro:    #241710;   /* fondo oscuro cálido. Manifiesto, contacto, footer */
+  --barro-elevado:   #2E1F15;   /* bloques/cards sobre barro-oscuro (profundidad de plano) */
+
+  /* Terracota — el gesto de marca (~12% de superficie) */
+  --terracota:       #A4471F;   /* color de marca. Fondo manifiesto, CTA primario, acento hero */
+  --terracota-prof:  #7E3415;   /* hover/pressed del CTA terracota */
+
+  /* Ámbar — el brillo (≤3% de superficie, 1-2 apariciones por pantalla) */
+  --ambar:           #D99A4E;   /* solo sobre fondos oscuros o como elemento gráfico */
+
+  /* Bordes cálidos (derivados cálidos, jamás grises fríos) */
+  --borde:           #D8C9B4;   /* hairlines sobre hueso */
+  --borde-oscuro:    #473321;   /* hairlines sobre barro-oscuro */
+
+  /* Líneas editoriales contextuales (derivados de los fondos activos) */
+  --linea-claro:     rgba(28, 20, 14, 0.08);    /* guía editorial sobre hueso */
+  --linea-oscuro:    rgba(240, 233, 220, 0.08); /* guía editorial sobre barro-oscuro */
+
+  /* ── §V3 FAMILIAS TIPOGRÁFICAS ─────────────────────────────── */
+  /* Swap premium: --font-display: 'Canela', serif; (1:1 con Fraunces, solo cambiar este token) */
+  --font-display:  'Fraunces Variable', serif;
+  --font-body:     'Hanken Grotesk', sans-serif;
+  /* Mono sigue como tercera familia de apoyo (IBM Plex Mono self-hosted) */
+  --font-mono:     'IBM Plex Mono', monospace;
+
+  /* Pesos display (Fraunces variable: eje wght 100-900, WONK/SOFT) */
+  --display-weight-light:  300;   /* titulares gigantes — H1, H2 (peso bajo = elegante en grande) */
+  --display-weight-normal: 400;   /* itálica de acento + H3/nombres portfolio */
+  /* Legado: --display-weight-heavy conservado en 900 para los componentes
+     no migrados (Footer wordmark, Method numerales, Contact statement, etc.).
+     NO bajar a 700 hasta que esos componentes sean migrados a V3. */
+  --display-weight-heavy:  900;
+
+  /* Tracking y leading display */
+  --display-tracking: -0.025em;   /* -0.02 a -0.03em según ART_DIRECTION §3 */
+  --display-leading:  1.02;       /* 1.0–1.05 leading apretado editorial */
+
+  /* ══════════════════════════════════════════════════════════════
+     LEGADO V1 "Declaración en Rojo" — CONSERVADOS para retro-compat
+     Se usan en ManifestoSection, Nav (scrolled), skip-link inlined.
+     NO eliminar hasta que esos componentes sean migrados a V3.
+     ══════════════════════════════════════════════════════════════ */
+
+  --carbon:        #0E0E0E;
+  --carbon-elev:   #1A1A18;
+  --crema:         #E8E2D6;
+  --rojo:          #D70321;
+  --taupe:         #8A857B;
+  --linea:         rgba(232, 226, 214, 0.09);
+  --linea-hover:   rgba(232, 226, 214, 0.14);
+  /* Legado: wdth axis Archivo (no aplica a Fraunces — ignorado en práctica) */
+  --display-wdth:  110;
 
   /* ── §6 SPACING FLUIDO ───────────────────────────────────────── */
   --space-2xs: clamp(0.25rem, 1vw, 0.5rem);     /* 4px → 8px   */

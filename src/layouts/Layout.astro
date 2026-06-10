@@ -62,8 +62,8 @@ const resolvedOgDesc = ogDescription ?? description;
     <meta name="twitter:description" content={resolvedOgDesc} />
     <meta name="twitter:image" content="https://scuart.com/og.png" />
 
-    <!-- Browser theme -->
-    <meta name="theme-color" content="#0E0E0E" />
+    <!-- Browser theme — V3: hueso como color de tema (el hero arranca claro) -->
+    <meta name="theme-color" content="#F0E9DC" />
 
     <title>{title}</title>
 
@@ -110,8 +110,7 @@ const resolvedOgDesc = ogDescription ?? description;
       /*
        * Skip-link: visible solo cuando recibe foco (usuarios de teclado/screen reader).
        * Oculto visualmente con translate negativo (no display:none — accesible al foco).
-       * Al enfocar salta al viewport, esquina superior izquierda sobre el nav.
-       * Identidad SCUART: fondo carbon, texto crema, mono uppercase — no genérico.
+       * V3: fondo barro-oscuro, texto hueso, mono uppercase, borde terracota.
        */
       .skip-link {
         position: absolute;
@@ -120,21 +119,21 @@ const resolvedOgDesc = ogDescription ?? description;
         transform: translateY(-100%);
         z-index: 9999;
         padding: 0.75rem 1.25rem;
-        background-color: #0E0E0E; /* --carbon */
-        color: #E8E2D6; /* --crema */
-        font-family: 'IBM Plex Mono', monospace;
+        background-color: #241710; /* --barro-oscuro */
+        color: #F0E9DC; /* --hueso */
+        font-family: 'Hanken Grotesk', sans-serif;
         font-size: 0.75rem;
-        font-weight: 400;
+        font-weight: 500;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.1em;
         text-decoration: none;
-        border-bottom: 1px solid #C8281A; /* --rojo: acento editorial */
+        border-bottom: 1px solid #A4471F; /* --terracota */
         transition: transform 0.15s ease;
       }
 
       .skip-link:focus {
         transform: translateY(0);
-        outline: 2px solid #C8281A; /* --rojo */
+        outline: 2px solid #A4471F; /* --terracota */
         outline-offset: 2px;
       }
     </style>

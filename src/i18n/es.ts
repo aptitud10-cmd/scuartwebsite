@@ -50,10 +50,10 @@ export const es: Translations = {
       { word: 'NECESITAN', isRed: false },
     ],
 
-    /** line3: "VERSE MEJOR Y FUNCIONAR MEJOR." */
+    /** line3: "VERSE MEJOR Y FUNCIONAR MEJOR." — primer "MEJOR" en itálica terracota (gesto de marca V3) */
     line3: [
       { word: 'VERSE', isRed: false },
-      { word: 'MEJOR', isRed: false },
+      { word: 'MEJOR', isRed: false, isItalicAccent: true },
       { word: 'Y', isRed: false },
       { word: 'FUNCIONAR', isRed: false },
       { word: 'MEJOR.', isRed: false },

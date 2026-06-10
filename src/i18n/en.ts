@@ -10,6 +10,8 @@
 export interface HeroToken {
   word: string;
   isRed: boolean;
+  /** Si true: esta palabra se renderiza en Fraunces itálica terracota (gesto de marca V3) */
+  isItalicAccent?: boolean;
 }
 
 export interface CapabilityItem {
@@ -284,10 +286,10 @@ export const en: Translations = {
       { word: 'TO', isRed: false },
     ],
 
-    /** line3: "LOOK SHARP AND WORK BETTER." */
+    /** line3: "LOOK SHARP AND WORK BETTER." — "SHARP" en itálica terracota (gesto de marca V3) */
     line3: [
       { word: 'LOOK', isRed: false },
-      { word: 'SHARP', isRed: false },
+      { word: 'SHARP', isRed: false, isItalicAccent: true },
       { word: 'AND', isRed: false },
       { word: 'WORK', isRed: false },
       { word: 'BETTER.', isRed: false },

@@ -1,24 +1,33 @@
 ---
 /**
- * HeroSection.astro — Hero Concepto B: "Design + Technology como sistema"
- * Aprobado por William (2026-06-07).
+ * HeroSection.astro — Hero V3 "Terracota cálida en alternancia"
+ * ART_DIRECTION_V3_FINAL.md §5-HERO
  *
- * Composicion:
- * - Kicker mono arriba-izquierda
- * - Headline 3 lineas: "DESIGN [+rojo] TECHNOLOGY / FOR BUSINESSES THAT NEED TO / LOOK SHARP AND WORK BETTER."
- * - El "+" es signo tipografico integrado al headline — mismo peso/tamaño, color --rojo
- * - Indice de capacidades 001-004 (col 9-12 desktop / lista debajo en mobile)
- * - Subhead DM Sans taupe col 1-6
- * - Franja roja: costura vertical 2px sobre col 9 (desktop/tablet) / horizontal (mobile)
- * - CTA "START A PROJECT →"
+ * Composición:
+ * - Fondo hueso (#F0E9DC) con grano obligatorio
+ * - Kicker mono arriba-izquierda: "SCUART / DESIGN STUDIO · BOGOTÁ · 2026"
+ * - Índice mono arriba-derecha col 10-12 (desktop)
+ * - H1: Fraunces 300 light, 3 líneas, tinta sobre hueso.
+ *   La palabra "SHARP" (EN) / "MEJOR" (ES) en Fraunces 400 itálica terracota — gesto de marca.
+ * - Subhead: Hanken Grotesk tinta-suave, max 38ch, col 1-6
+ * - CTA: "START A PROJECT →" / "EMPEZAR UN PROYECTO →"
+ * - Franja terracota 1px vertical (col 9 desktop) / horizontal (mobile)
+ *
+ * MOTION — Momento 1 (ART_DIRECTION_V3_FINAL.md §6):
+ * H1 entra por líneas con máscara (line-mask/line-inner, clip de abajo hacia arriba),
+ * expo.out, ~0.9s, stagger 0.12s entre líneas.
+ * La palabra itálica terracota entra con delay +0.2s extra — el gesto de marca aterriza último.
+ * prefers-reduced-motion: todo estático visible, sin máscara, sin animación.
  *
  * PROGRESSIVE ENHANCEMENT:
- * El H1 es HTML real server-rendered, visible sin JS.
- * GSAP es enhancement no-bloqueante — si falla, hero visible completo.
+ * El H1 es HTML server-rendered visible por defecto.
+ * GSAP agrega .hero-animating al <h1> para activar las máscaras (opacity: 0 inicial).
+ * Si el script falla: texto plano visible completo.
  *
- * Presupuesto rojo: 2 instancias (el "+" + la franja costura). Maximo respetado.
- * meta_col: campo conservado en diccionario pero NO renderizado aqui
- *   (el indice de capacidades reemplaza su funcion).
+ * Copy e i18n keys: CONSERVADOS de Concepto B (aprobado 2026-06-07).
+ * isRed sigue disponible en los tokens pero NO se usa en V3 (el rojo fue reemplazado
+ * por terracota/itálica como gesto de marca — preservado en la interfaz para no romper
+ * la forma del diccionario).
  */
 
 import type { Translations } from '../i18n/en';
@@ -31,18 +40,18 @@ const { t } = Astro.props;
 ---
 
 <!--
-  HERO — Concepto B
+  HERO V3 — fondo hueso, Fraunces light, grano obligatorio
   Layout:
-  - mobile 375: flex column, lomo-cuaderno, kicker → H1 → subhead → capacidades → CTA
-  - tablet 768: grid 6 col, headline col 1-6, capacidades debajo subhead
-  - desktop 1280: grid 12 col, headline col 1-8, capacidades col 9-12, subhead col 1-6, CTA col 1-3
+  - mobile 375: flex column, margen lateral var(--margin)
+  - tablet 768: grid 6 col
+  - desktop 1280: grid 12 col, H1 col 1-9, índice col 10-12
 -->
 <section class="hero" aria-label={t.hero.ariaLabel}>
 
   <!--
-    Grilla editorial: lineas verticales 1px crema 9%
-    col 3/6/9 desktop. Mobile: ocultas (lomo-cuaderno las reemplaza).
-    GSAP maneja el estado inicial (opacity 0) y la animacion de entrada.
+    Líneas editoriales de grilla: 1px tinta 8% opacidad.
+    Col 3/6/9 desktop. Ocultas en mobile.
+    GSAP gestiona el estado inicial y el reveal.
   -->
   <div class="grid-lines" aria-hidden="true">
     <div class="grid-line" data-col="3"></div>
@@ -50,84 +59,93 @@ const { t } = Astro.props;
     <div class="grid-line" data-col="9"></div>
   </div>
 
-  <!-- Lomo-cuaderno: solo mobile — linea vertical izquierda del viewport -->
-  <div class="hero-notebook-spine" aria-hidden="true"></div>
-
   <!--
-    Franja roja costura (instancia 2 del presupuesto rojo):
-    - Desktop/tablet: vertical 2px sobre eje col 9, tramo alineado al bloque de contenido
-    - Mobile: horizontal 2px, separa headline del indice de capacidades
+    Franja terracota costura (gesto de marca estructural):
+    - Desktop/tablet: vertical 1px sobre eje col 9
+    - Mobile: horizontal 1px, separa headline del resto
   -->
-  <div class="hero-red-bar" aria-hidden="true"></div>
+  <div class="hero-terracota-bar" aria-hidden="true"></div>
 
   <!--
     Kicker — mono uppercase arriba-izquierda
-    Fila 1 del grid en desktop. Plano en mobile/tablet (flujo normal).
+    Muestra el índice editorial del estudio.
   -->
   <p class="hero-kicker">
     {t.hero.kicker}
   </p>
 
   <!--
+    Índice de estudio — col 10-12 desktop (arriba-derecha).
+    Coordenadas reales de Bogotá (ART_DIRECTION_V3_FINAL.md §7.2).
+    Oculto en mobile/tablet.
+  -->
+  <p class="hero-studio-index" aria-hidden="true">
+    SCUART / DESIGN STUDIO<br />
+    4.7110° N, 74.0721° W<br />
+    BOGOTÁ · 2026
+  </p>
+
+  <!--
     H1 — texto real server-rendered, visible por defecto (progressive enhancement).
-    3 lineas: DESIGN [+rojo] TECHNOLOGY / FOR BUSINESSES THAT NEED TO / LOOK SHARP AND WORK BETTER.
-    El "+" tiene color --rojo via .h1-word--rojo (CSS, sin JS).
-    GSAP envuelve cada .h1-word en .word-clip/.word-inner para el word-reveal.
-    El "+" entra al final de line1 con animacion propia (scale + fade).
+    Fraunces 300 light. 3 líneas fijas en desktop.
+    La palabra con isItalicAccent=true recibe la clase .italic-acento (Fraunces 400 itálica terracota).
+    isRed conservado en la interfaz pero ignorado en V3 (no se renderiza --rojo aquí).
+    GSAP envuelve cada .h1-line en .line-mask > .line-inner para el line-reveal.
   -->
   <h1 class="hero-h1">
-    <!-- Linea 1: DESIGN [+rojo] TECHNOLOGY -->
     <span class="h1-line" data-line="1">
       {t.hero.line1.map((token, i) => (
         <>
           {i > 0 && <span class="h1-space" aria-hidden="true"> </span>}
           <span
-            class={`h1-word${token.isRed ? ' h1-word--rojo' : ''}${token.word === '+' ? ' h1-plus' : ''}`}
-            data-plus={token.word === '+' ? 'true' : undefined}
+            class={`h1-word${token.isItalicAccent ? ' italic-acento' : ''}`}
           >{token.word}</span>
         </>
       ))}
     </span>
-    <!-- Linea 2 -->
     <span class="h1-line" data-line="2">
       {t.hero.line2.map((token, i) => (
         <>
           {i > 0 && <span class="h1-space" aria-hidden="true"> </span>}
-          <span class={`h1-word${token.isRed ? ' h1-word--rojo' : ''}`}>{token.word}</span>
+          <span
+            class={`h1-word${token.isItalicAccent ? ' italic-acento' : ''}`}
+          >{token.word}</span>
         </>
       ))}
     </span>
-    <!-- Linea 3 -->
     <span class="h1-line" data-line="3">
       {t.hero.line3.map((token, i) => (
         <>
           {i > 0 && <span class="h1-space" aria-hidden="true"> </span>}
-          <span class={`h1-word${token.isRed ? ' h1-word--rojo' : ''}`}>{token.word}</span>
+          <span
+            class={`h1-word${token.isItalicAccent ? ' italic-acento' : ''}`}
+          >{token.word}</span>
         </>
       ))}
     </span>
   </h1>
 
   <!--
-    Subhead — DM Sans taupe col 1-6 desktop
+    Subhead — Hanken Grotesk tinta-suave, col 1-6 desktop
   -->
   <p class="hero-subhead">
     {t.hero.subhead}
   </p>
 
   <!--
-    CTA — "START A PROJECT →"
-    Mono/display, presencia clara. Abajo-izquierda.
+    CTA — "START A PROJECT →" / "EMPEZAR UN PROYECTO →"
+    Borde hairline borde, texto tinta. Hover: terracota.
+    Touch target mínimo 48px (P9).
   -->
   <a class="hero-cta" href="#contact">
     {t.hero.cta} <span aria-hidden="true">→</span>
   </a>
 
   <!--
-    Indice de capacidades 001-004.
-    Desktop: col 9-12, alineado al bloque headline como documento editorial.
-    Mobile/tablet: lista mono full-width debajo del subhead.
-    Se lee como ficha tecnica de estudio, NO como lista de servicios con bullets.
+    Índice de capacidades 001-004.
+    Desktop: col 9-12 alineado verticalmente al centro del headline.
+    Mobile/tablet: lista mono full-width debajo del CTA.
+    Se lee como ficha técnica de estudio, NO lista de servicios con bullets.
   -->
   <ul class="hero-capabilities" aria-label="Capacidades del estudio">
     {t.hero.capabilities.map((item) => (
@@ -143,7 +161,7 @@ const { t } = Astro.props;
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   HERO — Concepto B
+   HERO V3 — fondo hueso, Fraunces light
    Mobile-first: 375px base. md: 768px. lg: 1280px.
    ═══════════════════════════════════════════════════════════ */
 
@@ -158,6 +176,9 @@ const { t } = Astro.props;
   padding-bottom: var(--space-2xl);
   max-width: 100%;
   overflow-x: clip;
+  /* V3: fondo hueso. El grano viene de body::after (fixed, lo atraviesa). */
+  background-color: var(--hueso);
+  color: var(--tinta);
 }
 
 /* ─── GRILLA EDITORIAL ───────────────────────────────────── */
@@ -174,8 +195,9 @@ const { t } = Astro.props;
   top: 0;
   bottom: 0;
   width: 1px;
-  background-color: var(--linea);
-  opacity: 0; /* GSAP revela */
+  /* Línea editorial V3: tinta al 8% sobre hueso */
+  background-color: var(--linea-claro);
+  opacity: 0; /* GSAP revela en la entrada */
 }
 
 .grid-line[data-col="3"] {
@@ -193,31 +215,16 @@ const { t } = Astro.props;
   display: none;
 }
 
-/* ─── LOMO-CUADERNO mobile ───────────────────────────────── */
-
-.hero-notebook-spine {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 20px;
-  width: 1px;
-  background-color: var(--linea);
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0; /* GSAP revela */
-  display: block;
-}
-
-/* ─── FRANJA ROJA — costura diseno/sistema ───────────────── */
+/* ─── FRANJA TERRACOTA — costura estructura ──────────────── */
 /*
- * Mobile: regla horizontal 2px, full-width desde el margen,
- *         entre subhead y capacidades (JS la posiciona via clase .is-mobile).
- * Desktop/tablet: vertical 2px sobre eje col 9, tramo del bloque de contenido.
- * Instancia 2 del presupuesto rojo (max 2 aprobado).
+ * Mobile: regla horizontal 1px, full-width desde el margen,
+ *         debajo del H1 (JS la posiciona).
+ * Desktop/tablet: vertical 1px sobre eje col 9.
+ * El terracota como estructura visible = el sitio "es" terracota.
  */
-.hero-red-bar {
+.hero-terracota-bar {
   position: absolute;
-  background-color: var(--rojo);
+  background-color: var(--terracota);
   pointer-events: none;
   z-index: 2;
   opacity: 0; /* GSAP revela */
@@ -229,8 +236,6 @@ const { t } = Astro.props;
   width: auto;
   top: auto;
   bottom: auto;
-  /* posicion mobile: entre capacidades y subhead — se setea dinamicamente en JS
-     pero con fallback CSS para reduced-motion/no-JS */
 }
 
 /* ─── KICKER ─────────────────────────────────────────────── */
@@ -238,40 +243,59 @@ const { t } = Astro.props;
 .hero-kicker {
   position: relative;
   z-index: 2;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   line-height: 1.4;
+  color: var(--tinta-suave);
   margin-top: clamp(88px, 14vh, 120px);
   margin-bottom: var(--space-m);
   flex-shrink: 0;
   opacity: 0; /* GSAP revela */
 }
 
+/* ─── ÍNDICE DE ESTUDIO — solo desktop ───────────────────── */
+
+.hero-studio-index {
+  display: none; /* solo desktop — ver breakpoint 1280px */
+  position: absolute;
+  z-index: 2;
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 1.8;
+  color: var(--tinta-suave);
+  opacity: 0; /* GSAP revela */
+  text-align: right;
+}
+
 /* ─── H1 ─────────────────────────────────────────────────── */
 /*
- * Archivo variable 900 wdth 95 mobile → 105 tablet → 110 desktop.
- * Leading 0.92, tracking -0.025em. 3 lineas fijas en desktop.
- * El "+" (.h1-plus) es inline, mismo tamaño/peso/baseline que el resto.
- * Color rojo aplicado via .h1-word--rojo (CSS, sin JS).
+ * Fraunces 300 light. Leading 1.02, tracking -0.025em.
+ * 3 líneas fijas en desktop.
+ * Sentence/title case editorial (NO caps condensadas del diseño bloqueado).
+ * .italic-acento hereda de global.css: itálica 400 terracota — el gesto de marca.
+ *
+ * PROGRESSIVE ENHANCEMENT:
+ * Por defecto el H1 es texto plano visible (no se oculta con opacity:0).
+ * El script agrega .hero-animating al <h1> ANTES de crear las máscaras,
+ * lo que oculta el contenido original. Luego crea los line-mask/line-inner
+ * y anima desde abajo. Sin JS: texto visible sin ninguna máscara.
  */
 .hero-h1 {
   position: relative;
   z-index: 2;
   font-family: var(--font-display);
-  font-weight: var(--display-weight-heavy);
-  /* Mobile: override del token global para que el copy largo no ocupe todo el viewport.
-     El token --text-h1 (10.5vw preferred) fue calibrado para copy corto de 2 líneas.
-     Con el copy nuevo de 3 líneas largas, bajamos el preferred a 6vw → ~22.5px en 375px.
-     Esto da ~6-7 líneas y deja respirar subhead + CTA en el fold. */
+  font-weight: var(--display-weight-light);
+  /* Mobile: 6vw preferred — con copy de 3 líneas largas queda 5-6 líneas manejables */
   font-size: clamp(1.6rem, 6vw, 2.8rem);
-  line-height: 0.92;
-  letter-spacing: -0.025em;
-  color: var(--crema);
-  font-variation-settings: 'wdth' 95;
+  line-height: var(--display-leading);
+  letter-spacing: var(--display-tracking);
+  color: var(--tinta);
   hyphens: manual;
   overflow-wrap: anywhere;
   flex-shrink: 0;
@@ -279,44 +303,36 @@ const { t } = Astro.props;
   margin-top: 0;
 }
 
+/*
+ * .hero-h1.hero-animating — estado durante la animación GSAP.
+ * El script vacía el contenido de cada .h1-line y lo mete en .line-mask > .line-inner.
+ * No usamos visibility:hidden porque se hereda a los hijos: en su lugar el GSAP
+ * pone los .line-inner en yPercent:102 (fuera del overflow:hidden del .line-mask),
+ * lo que los oculta sin afectar la herencia de visibilidad.
+ * Esta clase se agrega antes de construir las masks y se remueve al finalizar el tl.
+ */
+.hero-h1.hero-animating {
+  /* Solo necesaria como hook de JS — sin estilos propios. */
+}
+
 .h1-line {
   display: block;
 }
 
 .h1-word {
-  display: inline-block;
+  display: inline;
 }
 
-/* El "+" — mismo display/peso/tamaño que el resto, color rojo */
-.h1-word--rojo {
-  color: var(--rojo);
-}
-
-/*
- * .h1-plus: espaciado lateral leve para que respire como signo tipografico.
- * No es padding/margin de objeto — es el espacio natural de la palabra en el flujo.
- * Las h1-space antes/despues ya dan el espacio de palabra. No agregar extra.
- */
-.h1-plus {
-  /* Sin estilos adicionales — el espacio ya viene del h1-space entre palabras.
-     Solo se usa como hook de JS para la animacion diferenciada del "+". */
+/* La palabra itálica (italic-acento) dentro del H1:
+ * Como es display:inline junto al resto de la línea, necesitamos
+ * que el inline-block del ancestor no rompa el layout.
+ * Se mantiene inline para preservar el flujo natural del texto. */
+.hero-h1 .italic-acento {
+  display: inline;
 }
 
 .h1-space {
   display: inline;
-}
-
-/* word-clip / word-inner: inyectados por GSAP para el word-reveal */
-:global(.word-clip) {
-  display: inline-block;
-  overflow: hidden;
-  vertical-align: bottom;
-  padding-bottom: 0.05em;
-  margin-bottom: -0.05em;
-}
-
-:global(.word-inner) {
-  display: inline-block;
 }
 
 /* ─── SUBHEAD ────────────────────────────────────────────── */
@@ -327,8 +343,8 @@ const { t } = Astro.props;
   font-family: var(--font-body);
   font-size: var(--text-subhead);
   font-weight: 400;
-  color: var(--taupe);
-  line-height: 1.5;
+  color: var(--tinta-suave);
+  line-height: 1.55;
   letter-spacing: 0;
   margin-top: var(--space-xl);
   max-width: 38ch;
@@ -341,38 +357,39 @@ const { t } = Astro.props;
 .hero-cta {
   position: relative;
   z-index: 2;
-  display: inline-block;
-  font-family: var(--font-mono);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--font-body);
   font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--crema);
+  font-weight: 500;
+  color: var(--tinta);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   line-height: 1.4;
   text-decoration: none;
   margin-top: var(--space-l);
   padding: 0.75em 1.5em;
-  border: 1px solid var(--linea-hover);
+  /* Borde hairline borde sobre hueso */
+  border: 1px solid var(--borde);
   flex-shrink: 0;
   opacity: 0; /* GSAP revela */
-  /* Touch target minimo 48px (P9) */
+  /* Touch target mínimo 48px (P9) */
   min-height: 48px;
   align-self: flex-start;
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
+  transition: border-color 0.25s ease, color 0.25s ease, background-color 0.25s ease;
 }
 
 .hero-cta:hover {
-  border-color: var(--crema);
-  color: var(--crema);
+  border-color: var(--terracota);
+  color: var(--hueso);
+  background-color: var(--terracota);
 }
 
-/* ─── INDICE DE CAPACIDADES ──────────────────────────────── */
+/* ─── ÍNDICE DE CAPACIDADES ──────────────────────────────── */
 /*
  * Mobile: lista mono full-width, debajo del CTA.
- * Desktop: col 9-12, alineada al centro vertical del headline.
- * Se lee como ficha tecnica de estudio — no bullets, no cards, no iconos.
+ * Desktop: col 9-12, alineada verticalmente al centro del headline.
  */
 .hero-capabilities {
   position: relative;
@@ -387,24 +404,23 @@ const { t } = Astro.props;
 
 .hero-capabilities__item {
   display: block;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
+  font-weight: 500;
+  color: var(--tinta-suave);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   line-height: 2;
 }
 
 .hero-capabilities__num {
   display: inline;
-  /* Alineacion de numeracion: tabular para que 001/002/003/004 queden en columna */
   font-variant-numeric: tabular-nums;
 }
 
 .hero-capabilities__sep {
-  color: var(--taupe);
-  opacity: 0.5;
+  color: var(--tinta-suave);
+  opacity: 0.4;
 }
 
 .hero-capabilities__label {
@@ -424,12 +440,6 @@ const { t } = Astro.props;
     row-gap: 0;
   }
 
-  /* Lomo solo mobile */
-  .hero-notebook-spine {
-    display: none;
-  }
-
-  /* Col 6 visible en tablet */
   .grid-line[data-col="6"] {
     display: block;
   }
@@ -437,15 +447,13 @@ const { t } = Astro.props;
   .hero-kicker {
     grid-column: 1 / 7;
     margin-bottom: var(--space-s);
-    /* En tablet el kicker va arriba, ocupa toda la fila */
   }
 
   .hero-h1 {
     grid-column: 1 / 7;
     align-self: start;
-    /* Tablet: preferred 4.8vw → ~37px en 768px. ~5-6 líneas, CTA entra en el fold. */
+    /* Tablet: preferred 4.8vw → ~37px en 768px */
     font-size: clamp(2rem, 4.8vw, 3.8rem);
-    font-variation-settings: 'wdth' 105;
     hyphens: none;
     overflow-wrap: normal;
     text-wrap: balance;
@@ -463,19 +471,13 @@ const { t } = Astro.props;
     align-self: start;
   }
 
-  /* Capacidades: debajo del subhead en tablet, 4 columnas */
   .hero-capabilities {
     grid-column: 1 / 7;
     margin-top: var(--space-m);
-    /* En tablet las capacidades van en columna, debajo del CTA */
   }
 
-  /*
-   * Franja roja tablet: vertical 2px sobre col 5/6
-   * Separa el bloque de contenido de la columna derecha (aunque colapsada).
-   * left = margen + 4/6 del interior del grid (4 columnas de 6 = 66.6%)
-   */
-  .hero-red-bar {
+  /* Franja terracota tablet: vertical 1px en col 5/6 */
+  .hero-terracota-bar {
     left: calc(var(--margin) + (100% - 2 * var(--margin)) * 0.667);
     right: auto;
     width: 1px;
@@ -497,27 +499,36 @@ const { t } = Astro.props;
     align-items: start;
   }
 
-  /* Col 3/6/9 visibles */
   .grid-line[data-col="3"],
   .grid-line[data-col="6"],
   .grid-line[data-col="9"] {
     display: block;
   }
 
-  /* Kicker: fila superior, col 1-8 (izquierda) */
+  /* Kicker: fila superior, col 1-9 (izquierda) */
   .hero-kicker {
-    grid-column: 1 / 9;
+    grid-column: 1 / 10;
     grid-row: 1;
     margin-bottom: var(--space-m);
   }
 
-  /* H1: col 1-8, fila 2 */
+  /* Índice de estudio: col 10-12, fila 1, desktop */
+  .hero-studio-index {
+    display: block;
+    grid-column: 10 / 13;
+    grid-row: 1;
+    align-self: end;
+    margin-bottom: 0;
+    padding-bottom: var(--space-xs);
+  }
+
+  /* H1: col 1-9, fila 2 */
   .hero-h1 {
-    grid-column: 1 / 9;
+    grid-column: 1 / 10;
     grid-row: 2;
     align-self: start;
-    font-size: clamp(3.5rem, 4.8vw, 6rem);
-    font-variation-settings: 'wdth' 110;
+    /* Desktop: clamp ancho — 88-112px según ART_DIRECTION §3 tabla escala */
+    font-size: clamp(3.5rem, 5.5vw, 7rem);
     text-wrap: unset;
     hyphens: none;
     overflow-wrap: normal;
@@ -540,29 +551,26 @@ const { t } = Astro.props;
   }
 
   /*
-   * Indice de capacidades: col 9-12, fila 2.
+   * Índice de capacidades: col 10-12, fila 2-4.
    * Alineado verticalmente al centro del headline.
-   * Se lee como documento editorial de estudio — NO lista con bullets.
+   * Sistema de índices mono — lectura como ficha técnica.
    */
   .hero-capabilities {
-    grid-column: 9 / 13;
+    grid-column: 10 / 13;
     grid-row: 2 / 5;
     align-self: center;
     margin-top: 0;
-    padding-left: var(--gutter);
   }
 
   .hero-capabilities__item {
     line-height: 2.4;
-    /* En desktop hay mas aire entre items — se ve como indice editorial */
   }
 
   /*
-   * Franja roja desktop: vertical 2px sobre eje col 9 (costura diseno/sistema).
-   * Col 9 = 8/12 del interior = 66.6% + margen.
-   * Tramo alineado al bloque de contenido (no recorre toda la pagina).
+   * Franja terracota desktop: vertical 1px sobre eje col 9.
+   * Col 9 de 12 = 8/12 del interior = 66.6%.
    */
-  .hero-red-bar {
+  .hero-terracota-bar {
     left: calc(var(--margin) + (100% - 2 * var(--margin)) * 0.6667);
     right: auto;
     width: 1px;
@@ -576,88 +584,60 @@ const { t } = Astro.props;
 
 <script>
   /**
-   * Animacion GSAP del hero — Concepto B (2026-06-07).
+   * Hero V3 — Animación GSAP (Momento 1, ART_DIRECTION_V3_FINAL.md §6)
    *
    * PROGRESSIVE ENHANCEMENT:
-   * Todo el hero es HTML/CSS visible por defecto. Este script es enhancement.
-   * Si falla: el hero se ve completo estatico. Nunca invisible.
+   * El H1 es HTML server-rendered visible sin JS.
+   * Este script es enhancement: si falla, el hero se ve completo y estático.
    *
-   * Secuencia aprobada:
-   * 1. Grilla/lomo (scaleY 0→1, expo.out)
-   * 2. Kicker (fade)
-   * 3. H1 word-reveal lineas 1+2+3 (yPercent 110→0, stagger)
-   *    3a. El "+" entra AL FINAL de line1 con scale 0.6→1 + fade (beat propio)
-   * 4. Indice de capacidades 001-004 (fade + leve translateY, stagger — "imprime linea por linea")
-   * 5. Franja roja costura (scale 0→1)
+   * SECUENCIA:
+   * 1. Líneas de grilla (scaleY 0→1, expo.out, 1.1s)
+   * 2. Kicker + índice de estudio (fade, 0.6s)
+   * 3. H1 line-reveal: CADA LÍNEA completa entra con máscara (clip abajo→arriba)
+   *    - .h1-line[data-line="1"]: translateY(100%)→0, 0.9s expo.out
+   *    - .h1-line[data-line="2"]: stagger +0.12s
+   *    - .h1-line[data-line="3"] sin itálica: stagger +0.12s
+   *    - La palabra .italic-acento dentro de line 3: delay extra +0.2s — aterriza ÚLTIMA
+   *      (el gesto de marca como firma: "SHARP"/"MEJOR" en terracota llega al final)
+   * 4. Franja terracota (scale 0→1, 0.5s)
+   * 5. Índice de capacidades (fade + translateY, stagger 0.08s)
    * 6. Subhead + CTA (fade)
    *
-   * INTERACCION (solo desktop pointer:fine):
-   * Micro-pulso scale en el "+" al hover cercano — GSAP quickTo.
-   * Muy sutil. Solo el "+", no todo el hero.
+   * IMPLEMENTACIÓN DEL LINE-REVEAL:
+   * No usamos SplitText de GSAP Club (no disponible en OSS).
+   * Envolvemos cada .h1-line en un .line-mask (overflow:hidden) y animamos
+   * el .line-inner (el span del contenido) con translateY 100%→0.
+   * La itálica está DENTRO del line-inner de line3 — al animar line3 entra sola.
+   * Para el delay extra de la itálica: animamos el span.italic-acento por separado
+   * desde el mismo frame de inicio que line3, pero con ese +0.2s de offset.
    *
-   * REDUCED-MOTION: todo estatico visible, sin animacion.
+   * REDUCED-MOTION: todo estático visible de inmediato, sin masks, sin animación.
    */
 
   import { gsap } from 'gsap';
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ── Helper: posicion de la franja roja mobile ── */
-  /*
-   * En mobile la franja es horizontal. La posicionamos entre el subhead y
-   * el indice de capacidades. Se calcula una vez al cargar.
-   */
-  function positionRedBarMobile(redBar: HTMLElement | null, subhead: HTMLElement | null) {
-    if (!redBar || !subhead) return;
-    const subheadRect = subhead.getBoundingClientRect();
+  /* Helper: posiciona la franja terracota en mobile (horizontal, entre H1 y subhead) */
+  function positionTerracotaBarMobile(
+    bar: HTMLElement | null,
+    h1: HTMLElement | null
+  ) {
+    if (!bar || !h1) return;
+    const h1Rect = h1.getBoundingClientRect();
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    redBar.style.top = `${subheadRect.bottom + scrollTop + 20}px`;
-    redBar.style.bottom = 'auto';
+    bar.style.top = `${h1Rect.bottom + scrollTop + 16}px`;
+    bar.style.bottom = 'auto';
   }
 
   if (!reducedMotion) {
-    /* ── Word-split del H1 ── */
-    const heroH1 = document.querySelector<HTMLElement>('.hero-h1');
-    let wordInners: HTMLElement[] = [];
-    let plusInner: HTMLElement | null = null;
-
-    if (heroH1) {
-      try {
-        const wordSpans = heroH1.querySelectorAll<HTMLElement>('.h1-word');
-        wordSpans.forEach((wordEl) => {
-          const isRojo = wordEl.classList.contains('h1-word--rojo');
-          const isPlus = wordEl.dataset.plus === 'true';
-          const text = wordEl.textContent ?? '';
-
-          const clip = document.createElement('span');
-          clip.className = 'word-clip';
-
-          const inner = document.createElement('span');
-          inner.className = 'word-inner';
-          if (isRojo) inner.style.color = 'var(--rojo)';
-          inner.textContent = text;
-
-          clip.appendChild(inner);
-          wordEl.replaceWith(clip);
-
-          if (isPlus) {
-            /* El "+" se anima separado: no va al array wordInners */
-            plusInner = inner;
-          } else {
-            wordInners.push(inner);
-          }
-        });
-      } catch (_) {
-        wordInners = [];
-        plusInner = null;
-      }
-    }
-
     /* ── Referencias DOM ── */
+    const heroH1 = document.querySelector<HTMLElement>('.hero-h1');
+    const h1Lines = document.querySelectorAll<HTMLElement>('.h1-line');
     const gridLines = document.querySelectorAll<HTMLElement>('.grid-line');
-    const spine = document.querySelector<HTMLElement>('.hero-notebook-spine');
-    const redBar = document.querySelector<HTMLElement>('.hero-red-bar');
+    const terracotaBar = document.querySelector<HTMLElement>('.hero-terracota-bar');
     const kicker = document.querySelector<HTMLElement>('.hero-kicker');
+    const studioIndex = document.querySelector<HTMLElement>('.hero-studio-index');
     const heroSubhead = document.querySelector<HTMLElement>('.hero-subhead');
     const heroCta = document.querySelector<HTMLElement>('.hero-cta');
     const capabilityItems = document.querySelectorAll<HTMLElement>('.hero-capabilities__item');
@@ -665,71 +645,150 @@ const { t } = Astro.props;
 
     const isMobile = window.innerWidth < 768;
 
+    /*
+     * Construir las masks de línea ANTES de agregar .hero-animating.
+     * Para cada .h1-line: crear .line-mask que la envuelve y .line-inner con el contenido.
+     *
+     * Estructura resultante:
+     *   <span class="h1-line" data-line="1">
+     *     <span class="line-mask">
+     *       <span class="line-inner">DESIGN + TECHNOLOGY</span>
+     *     </span>
+     *   </span>
+     *
+     * La itálica dentro de line3 queda DENTRO del line-inner — el span.italic-acento
+     * es un inline dentro del texto, no una línea separada.
+     */
+    const lineInners: HTMLElement[] = [];
+
+    h1Lines.forEach((lineEl) => {
+      try {
+        /* Extraer el contenido HTML de la línea */
+        const originalContent = lineEl.innerHTML;
+
+        /* Crear la máscara */
+        const mask = document.createElement('span');
+        mask.className = 'line-mask';
+
+        /* Crear el inner animado */
+        const inner = document.createElement('span');
+        inner.className = 'line-inner';
+        inner.innerHTML = originalContent;
+
+        mask.appendChild(inner);
+        lineEl.innerHTML = '';
+        lineEl.appendChild(mask);
+
+        lineInners.push(inner);
+      } catch (_) {
+        /* Si falla la construcción de una línea, la dejamos como está */
+      }
+    });
+
+    /*
+     * Activar .hero-animating AHORA (después de construir las masks).
+     * Esta clase oculta .h1-line via visibility:hidden en CSS.
+     * Luego GSAP anima los line-inner que SÍ son visibles (están dentro del mask).
+     *
+     * Nota: usamos visibility:hidden en .h1-line.hero-animating (ver CSS arriba)
+     * pero los line-inner dentro del mask NO heredan esa visibility si les
+     * hacemos un set explícito. En su lugar, el estado inicial de los line-inner
+     * es translateY(100%) que los manda debajo del overflow:hidden del mask.
+     */
+    if (heroH1) heroH1.classList.add('hero-animating');
+
     /* ── Estados iniciales ── */
     gsap.set(gridLines, { opacity: 1, scaleY: 0, transformOrigin: 'top center' });
-    if (spine) gsap.set(spine, { opacity: 1, scaleY: 0, transformOrigin: 'top center' });
 
     if (isMobile) {
-      positionRedBarMobile(redBar, heroSubhead);
-      if (redBar) gsap.set(redBar, { opacity: 1, scaleX: 0, transformOrigin: 'left center' });
+      positionTerracotaBarMobile(terracotaBar, heroH1);
+      if (terracotaBar) gsap.set(terracotaBar, { opacity: 1, scaleX: 0, transformOrigin: 'left center' });
     } else {
-      if (redBar) gsap.set(redBar, { opacity: 1, scaleY: 0, transformOrigin: 'top center' });
+      if (terracotaBar) gsap.set(terracotaBar, { opacity: 1, scaleY: 0, transformOrigin: 'top center' });
     }
 
     gsap.set(kicker, { opacity: 0 });
+    if (studioIndex) gsap.set(studioIndex, { opacity: 0 });
     gsap.set(heroSubhead, { opacity: 0 });
     gsap.set(heroCta, { opacity: 0 });
-    if (capabilities) gsap.set(capabilities, { opacity: 1 });
+    if (capabilities) gsap.set(capabilities, { opacity: 1 }); /* el container es visible */
     gsap.set(capabilityItems, { opacity: 0, y: 8 });
 
-    if (wordInners.length > 0) {
-      gsap.set(wordInners, { yPercent: 110 });
-    }
-    if (plusInner) {
-      /* El "+" empieza invisible y pequeno — entra con beat propio */
-      gsap.set(plusInner, { opacity: 0, scale: 0.6, transformOrigin: 'center center' });
+    /* Líneas del H1: empiezan debajo de la máscara */
+    if (lineInners.length > 0) {
+      gsap.set(lineInners, { yPercent: 102 });
+      /* Hacerlos visibles AHORA (la máscara los oculta, no visibility:hidden) */
+      gsap.set(lineInners, { visibility: 'visible' });
     }
 
     /* ── Timeline principal ── */
     const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
 
-    /* 1. Grilla / lomo */
-    const spineVisible = spine !== null && spine.offsetParent !== null;
-    if (spineVisible) {
-      tl.to(spine, { scaleY: 1, duration: 1.1 });
-    } else {
-      tl.to(gridLines, { scaleY: 1, duration: 1.1, stagger: 0.06 });
-    }
+    /* 1. Líneas de grilla */
+    tl.to(gridLines, { scaleY: 1, duration: 1.1, stagger: 0.06 });
 
-    /* 2. Kicker */
+    /* 2. Kicker + índice de estudio */
     tl.to(kicker, { opacity: 1, duration: 0.6 }, '-=0.5');
+    if (studioIndex) tl.to(studioIndex, { opacity: 1, duration: 0.6 }, '<');
 
-    /* 3. H1 word-reveal (todas las palabras excepto el "+") */
-    if (wordInners.length > 0) {
-      tl.to(wordInners, { yPercent: 0, duration: 0.85, stagger: 0.07 }, '-=0.3');
-    }
-
-    /* 3a. El "+" entra al final de line1 con su beat propio: scale + fade */
-    if (plusInner) {
+    /* 3. H1 line-reveal — líneas 1, 2, 3 con stagger 0.12s
+     *    Cada línea entra como bloque (toda la línea de una vez).
+     *    La itálica dentro de line3 viene dentro del line-inner[2] — no necesita
+     *    tratamiento separado para el reveal de línea.
+     *
+     *    Para el gesto de marca (la itálica aterriza "última"):
+     *    La línea 3 entra como bloque. Inmediatamente después, la palabra .italic-acento
+     *    hace un micro-refuerzo: scale 0.92→1 + un leve color-fade desde tinta a terracota
+     *    (ya tiene terracota desde el CSS, así que el "aterrizaje" es el scale).
+     *    Esto da el efecto de "la firma llega al final" sin separar la línea en piezas.
+     */
+    if (lineInners.length >= 3) {
+      /* Las 3 líneas entran con stagger */
       tl.to(
-        plusInner,
-        { opacity: 1, scale: 1, duration: 0.55, ease: 'expo.out' },
-        /* Entra 0.2s despues de que arranca el stagger de line1 (~2 palabras ya mostraron) */
-        wordInners.length > 0 ? '<+0.2' : '-=0.3'
+        lineInners,
+        {
+          yPercent: 0,
+          duration: 0.9,
+          stagger: 0.12,
+        },
+        '-=0.2'
       );
+
+      /* La itálica dentro de line3: micro-refuerzo (scale 0.94→1) con +0.2s de delay
+       * respecto al inicio del reveal de line3.
+       * lineInners[2] es la línea 3; buscamos el .italic-acento dentro de ella. */
+      const italicEl = lineInners[2]?.querySelector<HTMLElement>('.italic-acento');
+      if (italicEl) {
+        /* Estado inicial: ligeramente reducida y sin color visible (hereda el color del
+         * parent que aún no entró — el mask lo ocultaba). Al entrar el line-inner, la
+         * itálica ya es terracota (CSS), pero con scale 0.94 parece que "se asienta". */
+        gsap.set(italicEl, { scale: 0.94, transformOrigin: 'left bottom' });
+        /* El label '<+0.2' es relativo al inicio del último tween que arrancó en el tl,
+         * que fue el stagger de los 3 lineInners. El tercer inner empieza en t + 0.24s
+         * (2 × stagger 0.12s). '<+0.2' cuenta desde ese mismo inicio → +0.2s después
+         * de que el stagger arrancó, es decir ~0.44s desde que comenzó el reveal de líneas. */
+        tl.to(
+          italicEl,
+          { scale: 1, duration: 0.6, ease: 'expo.out' },
+          `<+${0.12 * 2 + 0.2}`
+        );
+      }
+    } else if (lineInners.length > 0) {
+      /* Fallback: si por alguna razón no se construyeron los 3 inners */
+      tl.to(lineInners, { yPercent: 0, duration: 0.9, stagger: 0.12 }, '-=0.2');
     }
 
-    /* 4. Franja roja costura */
+    /* 4. Franja terracota */
     if (isMobile) {
-      tl.to(redBar, { scaleX: 1, duration: 0.5, ease: 'expo.out' }, '+=0.1');
+      tl.to(terracotaBar, { scaleX: 1, duration: 0.5, ease: 'expo.out' }, '+=0.05');
     } else {
-      tl.to(redBar, { scaleY: 1, duration: 0.8, ease: 'expo.out' }, '-=0.6');
+      tl.to(terracotaBar, { scaleY: 1, duration: 0.8, ease: 'expo.out' }, '-=0.7');
     }
 
-    /* 5. Indice de capacidades — "se imprime linea por linea" */
+    /* 5. Índice de capacidades */
     tl.to(
       capabilityItems,
-      { opacity: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'expo.out' },
+      { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'expo.out' },
       '-=0.4'
     );
 
@@ -737,56 +796,23 @@ const { t } = Astro.props;
     tl.to(heroSubhead, { opacity: 1, duration: 0.7 }, '+=0.05');
     tl.to(heroCta, { opacity: 1, duration: 0.5 }, '<+0.15');
 
-    /* ── Micro-interaccion en el "+" (solo desktop pointer:fine) ── */
-    /*
-     * Pulso scale sutil al pasar cerca del "+".
-     * NO magnetico en todo el hero — SOLO el "+".
-     * Progressive enhancement: si el "+" no existe, no pasa nada.
-     */
-    const isPointerFine = window.matchMedia('(pointer: fine)').matches;
-    /* Captura en const para que TS pueda estrechar el tipo dentro de los callbacks */
-    const plusInnerRef: HTMLElement | null = plusInner;
-    if (isPointerFine && plusInnerRef) {
-      const plusInnerEl: HTMLElement = plusInnerRef;
-      const plusClip = plusInnerEl.parentElement;
-      if (plusClip) {
-        let pulseTween: gsap.core.Tween | null = null;
-
-        plusClip.addEventListener('mouseenter', () => {
-          if (pulseTween) pulseTween.kill();
-          pulseTween = gsap.to(plusInnerEl, {
-            scale: 1.12,
-            duration: 0.35,
-            ease: 'expo.out',
-          });
-        });
-
-        plusClip.addEventListener('mouseleave', () => {
-          if (pulseTween) pulseTween.kill();
-          pulseTween = gsap.to(plusInnerEl, {
-            scale: 1,
-            duration: 0.55,
-            ease: 'expo.out',
-          });
-        });
-      }
-    }
+    /* Al terminar la animación, remover .hero-animating (no es necesaria ya) */
+    tl.call(() => {
+      if (heroH1) heroH1.classList.remove('hero-animating');
+    });
 
   } else {
     /* ── reduced-motion: todo visible de inmediato ── */
     const allAnimated = document.querySelectorAll<HTMLElement>(
-      '.grid-line, .hero-notebook-spine, .hero-red-bar, .hero-kicker, .hero-subhead, .hero-cta'
+      '.grid-line, .hero-terracota-bar, .hero-kicker, .hero-studio-index, .hero-subhead, .hero-cta'
     );
     gsap.set(allAnimated, { opacity: 1 });
 
     const gridLinesRM = document.querySelectorAll<HTMLElement>('.grid-line');
     gsap.set(gridLinesRM, { scaleY: 1 });
 
-    const spineRM = document.querySelector<HTMLElement>('.hero-notebook-spine');
-    if (spineRM) gsap.set(spineRM, { scaleY: 1 });
-
-    const redBarRM = document.querySelector<HTMLElement>('.hero-red-bar');
-    if (redBarRM) gsap.set(redBarRM, { scaleX: 1, scaleY: 1 });
+    const barRM = document.querySelector<HTMLElement>('.hero-terracota-bar');
+    if (barRM) gsap.set(barRM, { scaleX: 1, scaleY: 1 });
 
     const capRM = document.querySelectorAll<HTMLElement>('.hero-capabilities__item');
     gsap.set(capRM, { opacity: 1, y: 0 });
@@ -794,7 +820,7 @@ const { t } = Astro.props;
     const capContainerRM = document.querySelector<HTMLElement>('.hero-capabilities');
     if (capContainerRM) gsap.set(capContainerRM, { opacity: 1 });
 
-    /* H1 y su "+" son HTML plano visible por defecto — no necesitan set */
-    /* El "+" tiene color --rojo en CSS via .h1-word--rojo */
+    /* H1 es HTML plano visible por defecto en reduced-motion — no necesita set */
+    /* La itálica terracota es CSS puro — visible siempre */
   }
 </script>
