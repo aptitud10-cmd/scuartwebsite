@@ -143,24 +143,19 @@ video {
   color: var(--terracota);
 }
 
-/* ── LEGADO: word-clip/word-inner del sistema viejo ─────────────────
- * Conservado: ManifestoSection usa .word-inner--rojo vía JS.
- * Se puede eliminar cuando Manifiesto sea migrado a V3.
+/* ── V3: grain-strong — grano fuerte sobre secciones oscuras/saturadas ─
+ * Clase utilitaria para pseudo-elementos de grano adicional sobre fondos
+ * como --terracota o --barro-oscuro donde el grano global (overlay 0.06)
+ * no es suficiente para dar la textura "barro prensado".
+ * Uso: aplicar como mixin de propiedades en el pseudo-elemento de la sección.
+ * ART_DIRECTION_V3_FINAL.md §2: opacidad 0.06–0.09 sobre oscuro/saturado.
  * ─────────────────────────────────────────────────────────────────── */
-.word-clip {
-  display: inline-block;
-  overflow: hidden;
-  vertical-align: bottom;
-  padding-bottom: 0.05em;
-  margin-bottom: -0.05em;
-}
-
-.word-inner {
-  display: inline-block;
-}
-
-.word-inner--rojo {
-  color: var(--rojo);
+.grain-strong {
+  pointer-events: none;
+  opacity: 0.08;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
 }
 
 /* ── Selección ───────────────────────────────────────────────────── */

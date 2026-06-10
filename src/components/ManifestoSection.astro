@@ -1,27 +1,17 @@
 ---
 /**
- * ManifestoSection.astro — Statement editorial entre hero y portfolio.
- * Sección 1.5 del sitio SCUART.
+ * ManifestoSection.astro — LA sección de marca de SCUART.
+ * V3: fondo terracota full-bleed, grano fuerte, Fraunces display.
  *
- * Copy aprobado por William:
- *   EN: "We don't build websites. / We build [competitive advantages]."
- *   ES: "No hacemos webs. / Construimos [ventajas competitivas]."
- *   "[...]" = --rojo, única instancia de acento en esta sección.
- *
- * Composición:
- * - Fondo: --carbon. Continuidad con el hero — el cambio de plano llega en portfolio (--carbon-elev).
- * - Kicker mono arriba-izquierda: "N°·01 / MANIFESTO" (igual en ambos idiomas).
- * - 2 líneas Archivo 900, alineación izquierda dura.
- * - Tamaño máximo: clamp(2rem, 5.5vw, 4.5rem) — menor que el hero (~6rem desktop).
- * - Espacio negativo generoso arriba/abajo (--space-3xl): el aire ES el diseño.
- * - Mobile: texto entero, nunca cortado. "competitive advantages" (22 chars)
- *   rompe naturalmente a 2 líneas — correcto.
- *
- * Reveal: IntersectionObserver + CSS transition. Fade + translateY(20px→0).
- * Progressive enhancement: visible sin JS (sin opacity:0 inicial en CSS base).
- * reduced-motion: estático, sin transición.
- *
- * HTML server-rendered — indexable por SEO sin JS.
+ * ART_DIRECTION_V3_FINAL.md §5-MANIFESTO:
+ * - Fondo --terracota (#A4471F) a pantalla completa con grano más fuerte (soft-light 0.08).
+ * - Tipografía: Fraunces light 300, leading 1.02, letra hueso.
+ * - Acento: --ambar en Fraunces itálica 400 (sobre terracota ~3.5:1 a 32px+ — OK display).
+ * - Kicker: Hanken 500 uppercase tracking +0.14em, hueso 65%.
+ * - Composición escalonada: line1 izquierda, line2 sangrada → rompe la grilla.
+ * - Motion: máscara por líneas (patrón V3 del hero), una sola vez. Sin parallax.
+ * - Corte directo hero→terracota: sin border-top (la alternancia ES el diseño).
+ * - prefers-reduced-motion: todo estático y visible.
  */
 
 import type { Translations } from '../i18n/en';
@@ -36,21 +26,34 @@ const { t } = Astro.props;
 <section class="manifesto" aria-label={t.manifesto.ariaLabel}>
 
   <!--
-    Kicker — mono uppercase arriba-izquierda.
-    Coherente con el sistema: mismo tratamiento que hero-kicker y portfolio-kicker.
+    Capa de grano fuerte: pseudo-elemento posicionado dentro de .manifesto.
+    Complementa el grano global (body::after overlay 0.06) con soft-light 0.08
+    sobre el fondo terracota saturado — da la textura "barro prensado" que
+    distingue la sección del resto del sitio.
+    Se implementa vía un div con aria-hidden para que no interfiera con el DOM
+    semántico; position:absolute cubierto por z-index menor al contenido.
+  -->
+  <div class="manifesto-grain" aria-hidden="true"></div>
+
+  <!--
+    Kicker — Hanken 500 uppercase, tracking +0.14em.
+    Sistema de índices V3: "N°·01 / MANIFESTO".
+    Color: hueso al 65% de opacidad sobre terracota.
+    Igual en EN y ES (coherencia del sistema técnico).
   -->
   <p class="manifesto-kicker">{t.manifesto.kicker}</p>
 
   <!--
-    Statement — 2 líneas Archivo 900.
+    Statement — Fraunces light 300, escalonado intencionalmente.
+    Line1: alineada al margen izquierdo (col 1).
+    Line2: sangrada hacia la derecha — rompe la grilla (spec §5).
     HTML real server-rendered: indexable sin JS.
-    line2a + line2red = la segunda línea completa con el acento rojo al final.
-    No se usa array de tokens (más simple para 1 acento fijo al final de línea 2).
+    El acento (line2red) va en Fraunces itálica ambar — NO rojo (V3).
   -->
-  <div class="manifesto-statement" aria-hidden="false">
+  <div class="manifesto-statement">
     <p class="manifesto-line manifesto-line--1">{t.manifesto.line1}</p>
     <p class="manifesto-line manifesto-line--2">
-      {t.manifesto.line2a}<span class="manifesto-accent">{t.manifesto.line2red}</span>
+      {t.manifesto.line2a}<em class="manifesto-accent">{t.manifesto.line2red}</em>
     </p>
   </div>
 
@@ -58,233 +61,291 @@ const { t } = Astro.props;
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   MANIFESTO SECTION
+   MANIFESTO SECTION — V3
    Mobile-first: 375px base. md: 768px. lg: 1280px.
-   Fondo: --carbon (continuidad con el hero).
+   Fondo: --terracota. LA sección de marca del sitio.
+   Corte directo con el hero (hueso→terracota): sin border.
    ═══════════════════════════════════════════════════════════ */
 
 .manifesto {
-  background-color: var(--carbon);
+  background-color: var(--terracota);
+  position: relative;        /* contiene el pseudo-elemento de grano */
+  overflow: hidden;          /* evita que el grano se derrame */
   padding-top: var(--space-3xl);
   padding-bottom: var(--space-3xl);
   padding-left: var(--margin);
   padding-right: var(--margin);
   /*
-   * Separador superior del hero: línea editorial --linea 1px.
-   * El hero termina en --carbon, el manifesto empieza en --carbon —
-   * la línea marca el cambio de bloque sin cambiar el plano de color.
+   * Sin border-top: el corte directo hero(hueso)→manifiesto(terracota)
+   * ES la decisión de diseño. ART_DIRECTION §5: "alternancia, el corte es directo".
    */
-  border-top: 1px solid var(--linea);
+}
+
+/* ─── GRANO FUERTE ──────────────────────────────────────── */
+/*
+ * Capa de grano adicional sobre terracota.
+ * El grano global (body::after) usa overlay 0.06 — apto para hueso y barro-oscuro.
+ * Sobre terracota saturado, soft-light da la "textura de barro prensado" más intensa.
+ * Opacidad 0.08: perceptible como material, no como suciedad.
+ * Sin drift: el grano es material, no efecto (ART_DIRECTION §2 "regla dura").
+ */
+.manifesto-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;               /* bajo el contenido (z-index: 1 en .manifesto-kicker y .manifesto-statement) */
+  opacity: 0.08;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
 }
 
 /* ─── KICKER ─────────────────────────────────────────────── */
-
+/*
+ * Hanken 500 uppercase +0.14em tracking — sistema de índices V3.
+ * Color: hueso rgba con 65% opacidad — legible sobre terracota, no compite con el statement.
+ * z-index: 1 para quedar sobre el grano (z-index:0).
+ */
 .manifesto-kicker {
-  font-family: var(--font-mono);
-  font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
+  position: relative;
+  z-index: 1;
+  font-family: var(--font-body);   /* Hanken Grotesk */
+  font-size: var(--text-mono);     /* clamp(0.6875rem, 0.3vw + 0.6rem, 0.8125rem) = 11-13px */
+  font-weight: 500;
+  color: rgba(240, 233, 220, 0.65); /* --hueso al 65% */
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;           /* sistema de índices V3: +0.14em exacto */
   line-height: 1.4;
   margin-bottom: var(--space-l);
-  /*
-   * Estado inicial para el reveal (JS-driven via IntersectionObserver).
-   * opacity:0 + translateY se setean en JS, NO en CSS:
-   * → el HTML es visible sin JS (progressive enhancement, P4).
-   * Clase .is-hidden se agrega en JS antes del observe.
-   */
 }
 
 /* ─── STATEMENT ─────────────────────────────────────────── */
-
+/*
+ * Contenedor de las 2 líneas del manifiesto.
+ * z-index: 1 para quedar sobre el grano.
+ */
 .manifesto-statement {
-  /* Sin max-width forzado: el texto fluye izquierda, el aire del margen lo contiene */
+  position: relative;
+  z-index: 1;
 }
 
+/* ─── LÍNEAS ─────────────────────────────────────────────── */
+/*
+ * Fraunces Variable weight 300 (light) — en tamaño display grande el peso bajo es elegante.
+ * Leading 1.02: apretado editorial (ART_DIRECTION §3: "1.0–1.05").
+ * Tracking: -0.025em (ART_DIRECTION §3: "-0.02 a -0.03em en display grande").
+ * Color: hueso (#F0E9DC) sobre terracota → contraste ~5:1 (OK para display ≥24px).
+ * Escala: clamp(2rem, 5.5vw, 4.5rem) — Display L del doc. En Fraunces sin wdth axis.
+ */
 .manifesto-line {
-  font-family: var(--font-display);
-  font-weight: var(--display-weight-heavy); /* 900 */
-  /*
-   * Clamp calibrado para quedar MENOR que el hero:
-   * - Hero desktop max: ~6rem (clamp(3.5rem, 4.8vw, 6rem) en desktop)
-   * - Manifesto: max 4.5rem — visualmente apoya, no compite.
-   * - Mobile min 2rem (32px): "competitive advantages" a 32px rompe a 2 líneas
-   *   en 390px pero nunca se corta (overflow-wrap: anywhere).
-   * - leading 0.95: display tight, igual que el hero. Editorial.
-   */
+  font-family: var(--font-display);   /* Fraunces Variable */
+  font-weight: 300;                   /* light — elegante en gigante */
+  font-style: normal;
   font-size: clamp(2rem, 5.5vw, 4.5rem);
-  line-height: 0.95;
+  line-height: 1.02;
   letter-spacing: -0.025em;
-  font-variation-settings: 'wdth' 105;
-  color: var(--crema);
+  color: var(--hueso);
   margin: 0;
-  /*
-   * Anti-overflow mobile: garantiza que texto largo ("competitive advantages")
-   * nunca se desborde del viewport. Rompe a la siguiente línea entero.
-   */
-  overflow-wrap: anywhere;
+  overflow-wrap: anywhere;           /* anti-overflow mobile: "ventajas competitivas." */
   hyphens: manual;
-  text-transform: none; /* copy ya está en sentence case — correcto */
 }
 
 .manifesto-line--1 {
-  margin-bottom: 0.1em; /* aire mínimo entre las 2 líneas — no excesivo */
+  /*
+   * Line1 alineada al margen izquierdo.
+   * "We don't build websites." / "No hacemos webs."
+   * El margen --margin ya provee el indentado base.
+   */
+  margin-bottom: 0.05em;
 }
 
-/* ─── ACENTO ROJO ────────────────────────────────────────── */
+.manifesto-line--2 {
+  /*
+   * Line2 sangrada hacia la derecha — ESCALONADO INTENCIONAL.
+   * "We build [competitive advantages.]" / "Construimos [ventajas competitivas.]"
+   * Rompe la grilla (ART_DIRECTION §5): la frase se desalinea a propósito.
+   * Mobile: sangría sutil (2rem) para no asfixiar el texto en 375px.
+   * Sube en desktop via media query.
+   */
+  padding-left: clamp(1.5rem, 5vw, 3rem);
+}
+
+/* ─── ACENTO ÁMBAR ──────────────────────────────────────── */
 /*
- * Única instancia roja en esta sección.
- * Presupuesto rojo: coherente con el sistema (max 4/viewport).
- * No añade ningún estilo de layout — solo el color.
+ * Antes: var(--rojo) #D70321 — ELIMINADO en V3.
+ * Ahora: Fraunces itálica weight 400, var(--ambar) #D99A4E.
+ * Sobre terracota #A4471F: contraste ~3.5:1 a font-size ≥32px → aceptable para
+ * texto display grande (WCAG: 3:1 para textos grandes en negrita/display).
+ * <em> es correcto semánticamente: el acento es énfasis tipográfico.
+ * font-style: italic activa la itálica variable de Fraunces.
  */
 .manifesto-accent {
-  color: var(--rojo);
+  font-style: italic;
+  font-weight: 400;      /* itálica con más expresión que el 300 upright */
+  color: var(--ambar);
 }
 
-/* ─── REVEAL — clases manejadas por JS ─────────────────────
- * .is-hidden: estado inicial antes del reveal.
- *   opacity:0 + translateY(20px). Transition definida aquí.
- * .is-visible: estado final (clase añadida por IntersectionObserver).
- *   opacity:1 + translateY(0).
+/* ─── REVEAL — sistema V3 de máscara por líneas ────────────
+ * Patrón heredado del hero (Momento 1): line-mask + line-inner.
+ * El JS crea las máscaras dinámicamente y anima con GSAP/CSS.
+ * Estado por defecto (sin clases JS): texto plano visible — progressive enhancement.
  *
- * El estado por defecto (sin clases) es visible — progressive enhancement.
- * JS añade .is-hidden ANTES de observar, luego alterna a .is-visible.
+ * .manifesto-animating: añadido por JS al <section> antes del reveal.
+ *   Activa las máscaras para ocultar las líneas antes de la animación.
  * ─────────────────────────────────────────────────────────── */
 
-.manifesto-kicker.is-hidden,
-.manifesto-line.is-hidden {
-  opacity: 0;
-  transform: translateY(20px);
+/* Sin .manifesto-animating: todo visible (progressive enhancement) */
+
+/* Con .manifesto-animating activo: las líneas esperan el reveal */
+.manifesto-animating .line-inner {
+  transform: translateY(105%);
 }
 
-.manifesto-kicker.is-visible,
-.manifesto-line.is-visible {
-  opacity: 1;
+/* Clase .is-visible añadida por JS línea por línea: la máscara se levanta */
+.manifesto-animating .line-inner.is-visible {
   transform: translateY(0);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Stagger: cada línea tiene un delay incremental seteado vía JS (inline style) */
+
+/* ─── reduced-motion ─────────────────────────────────────── */
 /*
- * Stagger visual: la segunda línea entra 0.12s después del kicker / la primera.
- * Se logra con transition-delay en la clase, no con JS.
+ * Sin motion: el reveal NO se activa.
+ * El color terracota, el grano y la tipografía SE MANTIENEN (son identidad, no motion).
+ * El sitio queda 100% legible y navegable sin ninguna animación.
  */
-.manifesto-kicker.is-visible {
-  transition-delay: 0s;
-}
-
-.manifesto-line--1.is-visible {
-  transition-delay: 0.08s;
-}
-
-.manifesto-line--2.is-visible {
-  transition-delay: 0.18s;
-}
-
-/* ─── reduced-motion: override — sin transición ─────────── */
 @media (prefers-reduced-motion: reduce) {
-  .manifesto-kicker.is-hidden,
-  .manifesto-line.is-hidden {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .manifesto-kicker.is-visible,
-  .manifesto-line.is-visible {
-    transition: none;
-    transition-delay: 0s;
+  .manifesto-animating .line-inner {
+    transform: translateY(0) !important;
+    transition: none !important;
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   TABLET (768px+) — escala intermedia, aire generoso
+   TABLET (768px+) — escala intermedia
    ═══════════════════════════════════════════════════════════ */
 @media (min-width: 768px) {
-  .manifesto {
-    /* El clamp de padding ya escala — no se necesita override */
-  }
-
   .manifesto-line {
-    /* wdth sube a 108 en tablet (coherente con la progresión del hero) */
-    font-variation-settings: 'wdth' 108;
     hyphens: none;
     overflow-wrap: normal;
   }
+
+  .manifesto-line--2 {
+    /* Sangría más pronunciada en tablet */
+    padding-left: clamp(3rem, 7vw, 5rem);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   DESKTOP (1280px+) — col 1-9, aire máximo
+   DESKTOP (1280px+) — sangría dramática, escala máxima
    ═══════════════════════════════════════════════════════════ */
 @media (min-width: 1280px) {
   .manifesto-line {
     /*
-     * Desktop: el texto ocupa col 1-9 implícitamente (el margen --margin
-     * a 7.5rem crea el aire derecho natural). wdth 110 = mismo eje que el hero.
-     * max-width 75% = ~9 columnas de 12 sin usar grid explícito.
-     * Más simple (P6) y produce el mismo resultado que grid: 1/10.
+     * Desktop: line1 ocupa col 1-8 implícitamente (el margen --margin 7.5rem
+     * crea el aire natural). max-width 70% encuadra la frase en 9 columnas aprox.
+     * Más simple (P6) y produce el mismo resultado que grid explícito.
      */
-    font-variation-settings: 'wdth' 110;
-    max-width: 75%;
+    max-width: 70%;
     hyphens: none;
     overflow-wrap: normal;
+  }
+
+  .manifesto-line--2 {
+    /*
+     * Sangría dramática en desktop: la segunda línea arranca a ~8rem del margen.
+     * Con el margen de 7.5rem del body + 7rem aquí, "We build" empieza casi en col 4.
+     * El escalonado es la composición: rompe la grilla intencionalmente.
+     */
+    padding-left: clamp(5rem, 8vw, 8rem);
+    max-width: 80%; /* la línea 2 puede ser más ancha porque empieza más adentro */
   }
 }
 </style>
 
 <script>
   /**
-   * ManifestoSection — Reveal con IntersectionObserver.
+   * ManifestoSection — Reveal con máscara por líneas (patrón V3).
    *
    * PROGRESSIVE ENHANCEMENT:
-   * El HTML es visible sin JS (sin opacity:0 inicial en CSS base).
-   * JS añade .is-hidden ANTES de observar → el estado inicial invisible
-   * solo existe si JS está disponible.
+   * El HTML es visible sin JS. JS añade .manifesto-animating al <section>
+   * y envuelve el texto en line-mask/line-inner SOLO si JS está disponible.
    *
    * Secuencia:
-   * 1. JS añade .is-hidden a kicker y líneas (opacity:0 + translateY(20px)).
-   * 2. IntersectionObserver detecta cuando la sección entra al viewport.
-   * 3. Se reemplaza .is-hidden por .is-visible → CSS transition hace el reveal.
-   * 4. Stagger visual: transition-delay en CSS (0s kicker / 0.08s línea1 / 0.18s línea2).
+   * 1. JS envuelve cada .manifesto-line en .line-mask > .line-inner.
+   * 2. Añade .manifesto-animating a la sección (activa las máscaras).
+   * 3. IntersectionObserver detecta cuando la sección entra al viewport.
+   * 4. Línea por línea: añade .is-visible + transition-delay incremental.
    *
-   * reduced-motion: las clases se añaden igual pero el CSS override elimina
-   * la transición → aparición instantánea.
+   * Stagger: kicker 0s → line1 0.1s → line2 0.22s.
+   * El acento itálico ámbar entra con line2 (no tiene delay propio).
+   *
+   * reduced-motion: el @media override en CSS garantiza transform:0 y transition:none.
+   * Las clases se añaden pero no producen animación.
    */
 
-  /*
-   * reduced-motion: el CSS override (.manifesto-kicker.is-visible, .manifesto-line.is-visible
-   * con transition:none) maneja el caso sin JS. No se necesita branch aquí.
-   */
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   const section = document.querySelector<HTMLElement>('.manifesto');
-  if (section) {
+  if (section && !prefersReduced) {
     const kicker = section.querySelector<HTMLElement>('.manifesto-kicker');
-    const lines = section.querySelectorAll<HTMLElement>('.manifesto-line');
+    const lines = Array.from(section.querySelectorAll<HTMLElement>('.manifesto-line'));
 
-    const targets = [kicker, ...Array.from(lines)].filter(Boolean) as HTMLElement[];
+    /**
+     * wrapInLineMask: envuelve un elemento en .line-mask > .line-inner.
+     * El contenido original pasa al .line-inner; el .line-mask es el clipper.
+     * Preserva las clases del elemento original.
+     */
+    function wrapInLineMask(el: HTMLElement): HTMLElement {
+      const mask = document.createElement('div');
+      mask.className = 'line-mask';
 
-    /* Añadir estado inicial oculto ANTES de observar */
-    targets.forEach((el) => {
-      el.classList.add('is-hidden');
-    });
+      const inner = document.createElement('div');
+      inner.className = 'line-inner';
+
+      // Mover el contenido del elemento al inner
+      while (el.firstChild) {
+        inner.appendChild(el.firstChild);
+      }
+      mask.appendChild(inner);
+
+      // Reemplazar el elemento original con la estructura mask>inner
+      el.appendChild(mask);
+
+      return inner;
+    }
+
+    // Envolver kicker en mask si existe
+    const kickerInner = kicker ? wrapInLineMask(kicker) : null;
+    // Envolver cada línea en mask
+    const lineInners = lines.map((line) => wrapInLineMask(line));
+
+    // Activar el modo animación (las máscaras ocultan el contenido)
+    section.classList.add('manifesto-animating');
+
+    // Delays de stagger en segundos
+    const delays: number[] = [0, 0.1, 0.22]; // kicker, line1, line2
+    const targets: (HTMLElement | null)[] = [kickerInner, ...lineInners];
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            /* Revelar todos los targets */
-            targets.forEach((el) => {
-              el.classList.remove('is-hidden');
-              el.classList.add('is-visible');
+            targets.forEach((inner, i) => {
+              if (!inner) return;
+              inner.style.transitionDelay = `${delays[i] ?? 0}s`;
+              inner.classList.add('is-visible');
             });
-            /* Una sola vez — desconectar después del reveal */
+            // Una sola vez
             observer.disconnect();
           }
         });
       },
       {
         /*
-         * threshold: 0.15 — la sección debe estar al menos 15% visible
-         * antes de triggerear el reveal. Evita el disparo en scroll rápido
-         * cuando la sección apenas aparece 1px en pantalla.
+         * threshold 0.15: la sección debe estar al menos 15% visible.
+         * Evita el disparo en scroll rápido cuando apenas aparece 1px.
          */
         threshold: 0.15,
       }
