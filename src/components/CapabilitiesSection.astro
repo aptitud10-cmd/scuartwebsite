@@ -1,125 +1,79 @@
 ---
 /**
- * CapabilitiesSection.astro — Sección Capabilities (entre Portfolio y Método)
- * SCUART — Alcance comercial expandido, tratamiento editorial.
+ * CapabilitiesSection.astro — V3 "Terracota cálida en alternancia"
+ * SCUART — ART_DIRECTION_V3_FINAL.md §5-CAPABILITIES
  *
- * CONCEPTO: Lista numerada editorial 01-06. NO cards. NO grid simétrico.
- * Cada fila = número mono (03) + nombre capability (N1, Archivo display) +
- *             línea "qué resuelve" (N2, DM Sans taupe → crema en hover).
- * Separadas por reglas finas --linea. Hover: fila activa crema, demás taupe.
+ * CONCEPTO V3: Lista editorial vertical de 6 servicios.
+ * Numerales gigantes Fraunces light (01–06) solapados con el nombre —
+ * elemento gráfico-arquitectónico, no etiqueta. Fondo hueso.
  *
- * DIFERENCIACIÓN respecto a las otras secciones:
- *   - Hero: índice 001-004, comprimido, sin "qué resuelve" — presentación.
- *   - Método: stepCapabilities por paso dentro de un panel interactivo — proceso.
- *   - Portfolio: nombres display gigantes + imagen reveal — prueba de trabajo.
- *   - CAPABILITIES: 01-06 en filas editoriales, nombre mediano-grande +
- *     línea de valor visible — alcance completo del estudio.
- *   Las 4 diferencias técnicas: numeración distinta (01 vs 001), sin imagen,
- *   sin interactividad de panel, "qué resuelve" siempre visible.
+ * COMPOSICIÓN:
+ *   - Numeral: position:absolute, Fraunces 300, clamp(4rem→7rem),
+ *     color terracota al 15% opacidad (elemento gráfico de fondo).
+ *   - Nombre del servicio: Fraunces 400, Display M, tinta.
+ *     Se solapa con el numeral — composición editorial superpuesta.
+ *   - resolves: Hanken 400, tinta-suave.
+ *   - Divisores hairline --borde.
  *
- * JERARQUÍA VISUAL (≤3 niveles, R10):
- *   N1 — nombre capability (Archivo 700, crema, display mediano-grande)
- *         protagonista de cada fila. ≥40% del peso visual por fila.
- *   N2 — línea "qué resuelve" (DM Sans, taupe en reposo / crema hover)
- *   N3 — número mono (01-06, IBM Plex Mono, taupe, terciario)
+ * ASIMETRÍA DESKTOP: filas pares tienen padding-left extra —
+ * la lista NO es una tabla centrada monótona.
  *
- * PRESUPUESTO ROJO (máx 4 instancias/viewport):
- *   Instancia única: barra 2px superior de la fila en hover desktop (--rojo).
- *   Las demás secciones ya usan su presupuesto. Acá: 1 instancia. Dentro del máx.
+ * REVEAL: IntersectionObserver + stagger. Sin GSAP.
+ * Progressive enhancement: visible sin JS.
+ * prefers-reduced-motion: estático.
  *
- * FONDO: --carbon (oscuro base). El portfolio usa --carbon-elev (elevado).
- *   capabilities vuelve a --carbon → contraste de plano vs portfolio.
- *   El método también es --carbon → la regla editorial entre sections los separa.
- *
- * RESPONSIVE (mobile-first):
- *   Mobile 375: apilado vertical. Número pequeño + nombre grande + línea.
- *               Regla fina entre filas. Touch-friendly.
- *   Tablet 768: layout horizontal en fila — número col-izq, nombre+línea col-der.
- *   Desktop 1280: layout en grilla 3 col (número | nombre | resolves).
- *                 Hover: la fila se resalta (crema), las demás taupe.
- *
- * REVEAL: IntersectionObserver + stagger por fila. Idéntico al manifesto.
- *   Progressive enhancement: visible sin JS.
- *   reduced-motion: estático.
- *
- * HTML server-rendered — indexable por SEO sin JS.
+ * TOKENS USADOS (todos V3): --hueso, --tinta, --tinta-suave, --terracota,
+ *   --borde, --font-display, --font-body, --font-mono, --text-mono.
+ * PROHIBIDOS en este archivo: --carbon, --crema, --taupe, --rojo, --linea.
  */
 
 import type { Translations, CapabilityService } from '../i18n/en';
 
-interface Props {
-  t: Translations;
-}
-
-const { t } = Astro.props;
+// Props tipado via Astro.props — consumida por el runtime de Astro
+const { t } = Astro.props as { t: Translations };
 const items: CapabilityService[] = t.capabilities.items;
 const kicker: string = t.capabilities.kicker;
 ---
 
-<!--
-  Sección CAPABILITIES — id="capabilities" para anclaje de nav (futuro).
-  aria-label describe el contenido a lectores de pantalla.
--->
 <section
-  class="capabilities"
+  class="cap"
   id="capabilities"
   aria-label={t.capabilities.ariaLabel}
 >
 
-  <!--
-    HEADER: kicker mono + regla editorial superior.
-    Coherente con hero, portfolio y método.
-  -->
-  <div class="capabilities-header">
-    <p class="capabilities-kicker">{kicker}</p>
+  <div class="cap-header">
+    <p class="cap-kicker">{kicker}</p>
   </div>
 
-  <!--
-    LISTA EDITORIAL — 6 filas, una por capability.
-    ol semántico: el orden importa (01-06 es el sistema visual del estudio).
-    Cada li = una fila editorial con 3 zonas: número / nombre / resolves.
-    El hover afecta la fila completa, no solo un elemento.
-  -->
-  <ol class="capabilities-list" role="list" aria-label={kicker}>
+  <ol class="cap-list" role="list" aria-label={kicker}>
     {items.map((item, index) => (
       <li
-        class="capabilities-row"
+        class="cap-row"
         data-row-index={index}
+        data-even={index % 2 === 1 ? 'true' : 'false'}
       >
         <!--
-          Número — N3, terciario, coordenada del sistema.
-          2 dígitos: "01"-"06". Distinto a "001"-"004" del hero/método.
-          IBM Plex Mono, taupe, pequeño.
+          Numeral gigante: elemento gráfico-arquitectónico.
+          aria-hidden: no aporta info semántica (el número está implícito en el orden de lista).
+          position:absolute dentro de .cap-row (position:relative).
+          Color terracota al 15% = presente como textura, no protagonista.
         -->
-        <span class="capabilities-num" aria-hidden="true">{item.num}</span>
+        <span class="cap-num" aria-hidden="true">{item.num}</span>
 
-        <!--
-          Bloque nombre + resolves — zona derecha (desktop/tablet) o abajo (mobile).
-          El nombre es N1 protagonista. Resolves es N2 subordinado.
-        -->
-        <div class="capabilities-content">
+        <div class="cap-content">
           <!--
-            Nombre de la capability — N1.
-            Archivo variable, peso fuerte, crema. Mediano-grande.
-            Términos técnicos en inglés en ambos idiomas (coherente con el sistema).
+            Nombre del servicio: N1, Fraunces 400, tinta.
+            El nombre se solapa con la parte inferior del numeral — solapamiento editorial.
+            No es un bug; es la composición intencional (ver §5 capabilities).
           -->
-          <p class="capabilities-name">{item.name}</p>
+          <p class="cap-name">{item.name}</p>
 
           <!--
-            Línea "qué resuelve" — N2.
-            La pieza diferenciadora: no existe en hero ni en método.
-            DM Sans, taupe en reposo, crema suave en hover (desktop).
-            1 línea idealmente, máx 2 en mobile.
+            resolves: N2, Hanken, tinta-suave.
+            La diferenciadora — siempre visible (no hover-only).
           -->
-          <p class="capabilities-resolves">{item.resolves}</p>
+          <p class="cap-resolves">{item.resolves}</p>
         </div>
-
-        <!--
-          Barra roja de hover — instancia única del presupuesto rojo.
-          2px top. Solo visible en hover desktop.
-          aria-hidden: decorativo.
-        -->
-        <span class="capabilities-row__bar" aria-hidden="true"></span>
       </li>
     ))}
   </ol>
@@ -128,52 +82,45 @@ const kicker: string = t.capabilities.kicker;
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   CAPABILITIES SECTION
-   Mobile-first: 375px base. md: 768px. lg: 1280px.
-   Fondo: --carbon (base oscuro, distinto a --carbon-elev del portfolio).
+   CAPABILITIES SECTION — V3 "Terracota cálida en alternancia"
+   Fondo: --hueso. Mobile-first: 375px → 768px → 1280px.
    ═══════════════════════════════════════════════════════════ */
 
 /* ─── SECCIÓN ────────────────────────────────────────────── */
 
-.capabilities {
-  background-color: var(--carbon);
+.cap {
+  background-color: var(--hueso);
   padding-top: var(--space-xl);
   padding-bottom: var(--space-2xl);
   padding-left: var(--margin);
   padding-right: var(--margin);
   position: relative;
   overflow-x: clip;
-  /* Nav fixed 72px: evitar que el header tape el anclaje */
   scroll-margin-top: 72px;
 }
 
 /* ─── HEADER / KICKER ────────────────────────────────────── */
 
-.capabilities-header {
-  /*
-   * Regla editorial superior: quiebre visual entre portfolio (--carbon-elev)
-   * y capabilities (--carbon). La línea marca el cambio de bloque.
-   * Coherente con manifesto y portfolio.
-   */
-  border-top: 1px solid var(--linea);
+.cap-header {
+  border-top: 1px solid var(--borde);
   padding-top: var(--space-m);
   margin-bottom: var(--space-l);
 }
 
-.capabilities-kicker {
+.cap-kicker {
   font-family: var(--font-mono);
   font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
+  font-weight: 500;
+  color: var(--tinta-suave);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   line-height: 1.4;
   margin: 0;
 }
 
 /* ─── LISTA EDITORIAL ────────────────────────────────────── */
 
-.capabilities-list {
+.cap-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -182,78 +129,84 @@ const kicker: string = t.capabilities.kicker;
   gap: 0;
 }
 
-/* ─── FILA (mobile base: apilado vertical) ───────────────── */
+/* ─── FILA — mobile base ─────────────────────────────────── */
 
 /*
- * Mobile: cada fila = bloque vertical compacto.
- * Número pequeño arriba-izquierda como coordenada editorial.
- * Nombre grande debajo. Resolves debajo del nombre.
- * Regla fina entre filas (border-top en cada li excepto el primero).
- *
- * Asimetría intencional (R2): número chico / nombre grande crea
- * la tensión editorial que distingue de una lista plana.
+ * Mobile (375px):
+ * El numeral position:absolute arriba-izquierda.
+ * El contenido (nombre + resolves) tiene padding-top suficiente para
+ * que el nombre se solape con la parte INFERIOR del numeral gigante.
+ * El solapamiento es la composición intencional — el numeral "asoma"
+ * por encima del nombre como elemento gráfico de fondo.
  */
-.capabilities-row {
+.cap-row {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
   padding-top: var(--space-m);
   padding-bottom: var(--space-m);
-  border-top: 1px solid var(--linea);
+  border-top: 1px solid var(--borde);
+  /* Overflow visible para que el numeral gigante sobresalga si hace falta */
+  overflow: visible;
 }
 
-.capabilities-row:last-child {
-  border-bottom: 1px solid var(--linea);
+.cap-row:last-child {
+  border-bottom: 1px solid var(--borde);
 }
 
-/* Barra roja top: oculta en mobile, activada en hover desktop */
-.capabilities-row__bar {
-  display: none;
-}
+/* ─── NUMERAL GIGANTE — elemento gráfico-arquitectónico ─── */
 
-/* ─── NÚMERO — N3 terciario ──────────────────────────────── */
-
-.capabilities-num {
-  font-family: var(--font-mono);
-  font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  line-height: 1.4;
+/*
+ * Fraunces 300 light, tamaño display.
+ * Color: terracota al 15% de opacidad — presente como textura, no protagonista.
+ * position:absolute en mobile: se ubica arriba-izquierda, el contenido se solapa.
+ */
+.cap-num {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(3.5rem, 8vw, 6.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: rgba(164, 71, 31, 0.15); /* --terracota al 15% */
   font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
-  /* En mobile el número queda arriba del nombre — coordenada de expediente */
+  font-style: normal;
+  /* Mobile: numeral como fondo del bloque — position relative para flujo */
+  position: relative;
+  display: block;
+  pointer-events: none;
+  /* Negativo margin-bottom para que el nombre "suba" y se solape */
+  margin-bottom: calc(-1 * clamp(1.5rem, 3.5vw, 3rem));
+  /* El numeral define la altura mínima del bloque superior */
+  min-height: clamp(2.5rem, 6vw, 5rem);
 }
 
-/* ─── BLOQUE CONTENIDO ───────────────────────────────────── */
+/* ─── CONTENIDO (nombre + resolves) ─────────────────────── */
 
-.capabilities-content {
+.cap-content {
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);
+  /* z-index positivo para solaparse sobre el numeral */
+  position: relative;
+  z-index: 1;
+  padding-top: 0;
 }
 
 /* ─── NOMBRE — N1 protagonista ───────────────────────────── */
 
 /*
- * El nombre es el elemento de mayor peso visual (N1).
- * Archivo variable, peso 700 (bold pero no 900 — hay que dejar
- * el 900 para los H1/titulos de otras secciones).
- * Clamp calibrado para que en mobile sea legible y en desktop imponga.
- * La asimetría con el número (pequeño mono) y el resolves (body)
- * crea los 3 niveles de jerarquía sin añadir color extra.
+ * Fraunces 400 (normal, no light) — más presencia que el numeral en 300.
+ * Display M: clamp(1.75rem→2.5rem).
+ * tinta (casi-negro cálido) sobre hueso — contraste AAA.
  */
-.capabilities-name {
+.cap-name {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  line-height: 1;
+  font-weight: 400;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.0;
   letter-spacing: -0.02em;
-  font-variation-settings: 'wdth' 110;
-  color: var(--crema);
-  text-transform: uppercase;
+  color: var(--tinta);
+  font-style: normal;
   margin: 0;
   hyphens: none;
 }
@@ -261,264 +214,189 @@ const kicker: string = t.capabilities.kicker;
 /* ─── RESOLVES — N2 subordinado ──────────────────────────── */
 
 /*
- * La línea de "qué resuelve": la pieza diferenciadora.
- * DM Sans body (no mono): contrasta con el nombre display y el número mono.
- * Taupe: subordinado visualmente al nombre crema (N1 vs N2).
- * max-width en desktop evita líneas demasiado largas (55ch ~óptimo).
+ * Hanken 400, tinta-suave, body.
+ * Contraste tinta-suave #6B5D4F sobre hueso #F0E9DC: ~5.2:1 (AA).
  */
-.capabilities-resolves {
+.cap-resolves {
   font-family: var(--font-body);
   font-size: var(--text-body);
   font-weight: 400;
-  color: var(--taupe);
+  color: var(--tinta-suave);
   line-height: 1.55;
   margin: 0;
-  max-width: 55ch;
+  max-width: 52ch;
 }
 
-/* ─── REVEAL: estado para JS ─────────────────────────────── */
+/* ─── REVEAL: estados para IntersectionObserver ──────────── */
 
 /*
- * Estado inicial oculto (añadido por JS con .is-hidden).
- * Estado visible (añadido por JS con .is-visible).
- * Progressive enhancement: sin JS → visible por defecto (sin opacity:0 aquí).
- * Idéntico al pattern del manifesto.
+ * Progressive enhancement: sin JS → visible (sin opacity:0 en base).
+ * JS añade .is-hidden antes de observar.
  */
-.capabilities-row.is-hidden {
+.cap-row.is-hidden {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(20px);
 }
 
-.capabilities-row.is-visible {
+.cap-row.is-visible {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* reduced-motion: override — sin transición */
 @media (prefers-reduced-motion: reduce) {
-  .capabilities-row.is-hidden {
+  .cap-row.is-hidden {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
-  .capabilities-row.is-visible {
+  .cap-row.is-visible {
     transition: none;
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   TABLET (768px+) — layout horizontal número + contenido
+   TABLET (768px+)
    ═══════════════════════════════════════════════════════════ */
 @media (min-width: 768px) {
-  .capabilities {
+  .cap {
     padding-top: var(--space-2xl);
     padding-bottom: var(--space-2xl);
   }
 
   /*
    * Tablet: fila horizontal.
-   * Número: columna fija izquierda (~48px, alineado top).
-   * Contenido: nombre + resolves, ocupa el resto.
-   * align-items: flex-start → número y nombre alinean a la misma baseline.
+   * Numeral position:absolute anclado izquierda, grande.
+   * Contenido (nombre + resolves) arranca con padding-left para no tapar
+   * el numeral, pero el nombre "sube" con margin-top negativo para solaparse.
    */
-  .capabilities-row {
+  .cap-row {
     flex-direction: row;
     align-items: flex-start;
-    gap: var(--space-m);
-    padding-top: var(--space-m);
+    padding-top: var(--space-l);
     padding-bottom: var(--space-m);
+    overflow: visible;
   }
 
-  .capabilities-num {
-    /* Ancho fijo para alinear verticalmente los nombres entre filas */
-    min-width: 2.5rem;
-    padding-top: 0.25em; /* alinear óptica con la cap-height del nombre */
+  .cap-num {
+    position: absolute;
+    top: calc(var(--space-l) * 0.4);
+    left: 0;
+    margin-bottom: 0;
+    min-height: unset;
+    font-size: clamp(4rem, 9vw, 7rem);
+    z-index: 0;
   }
 
-  .capabilities-content {
+  .cap-content {
+    /* Empuja el contenido a la derecha del numeral */
+    padding-left: clamp(4.5rem, 10vw, 8rem);
     flex: 1;
-    gap: var(--space-2xs);
+    /* El nombre sube para solaparse con la parte inferior del numeral */
+    margin-top: calc(-1 * clamp(0.5rem, 1.5vw, 1.5rem));
+  }
+
+  .cap-name {
+    font-size: clamp(1.875rem, 3.5vw, 2.625rem);
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   DESKTOP (1280px+) — grilla 3 col con hover inteligente
+   DESKTOP (1280px+) — asimetría editorial izq/der alternada
    ═══════════════════════════════════════════════════════════ */
 @media (min-width: 1280px) {
-  .capabilities {
+  .cap {
     padding-top: var(--space-2xl);
     padding-bottom: var(--space-2xl);
   }
 
-  /*
-   * Desktop: fila en grid 2 col.
-   * Col 1: número mono (ancho fijo 4rem)
-   * Col 2: bloque contenido (nombre apilado sobre resolves) — ocupa el resto.
-   *
-   * Asimetría intencional (R2): número pequeño anclado izquierda,
-   * bloque contenido dominante derecha. No es simétrico — el nombre
-   * display grande contrasta visualmente con el número mono diminuto.
-   *
-   * Nota: el resolves podría ir en una 3ra columna separada pero el resultado
-   * editorial es más limpio con nombre+resolves apilados (jerarquía vertical
-   * dentro de la col derecha). Más legible, menos fragmentado.
-   */
-  .capabilities-row {
-    display: grid;
-    grid-template-columns: 4rem 1fr;
-    align-items: center;
-    gap: 0 var(--space-l);
-    /*
-     * Desktop: padding reducido vs tablet para que las 6 filas
-     * se sientan como una lista cohesiva, no como secciones separadas.
-     * --space-s = ~16-24px. Suficiente respiración sin dispersión.
-     */
-    padding-top: var(--space-s);
-    padding-bottom: var(--space-s);
-    cursor: default;
-    /* Transición para el dimming de las filas inactivas */
+  .cap-row {
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-m);
+    /* Transición de hover sutil */
     transition: opacity 0.2s ease;
-    position: relative;
+    cursor: default;
   }
 
   /*
-   * Barra roja top — instancia única del presupuesto rojo.
-   * 2px, visible solo en hover. Posición absolute relativa a la fila.
-   * Marca la fila activa con la mínima cantidad de rojo posible.
+   * Asimetría editorial: filas pares (índice 1,3,5) sangran a la derecha.
+   * La lista no es una tabla centrada monótona — alternancia intencional.
    */
-  .capabilities-row__bar {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: var(--rojo);
-    opacity: 0;
-    transition: opacity 0.15s ease;
+  .cap-row[data-even="true"] .cap-content {
+    padding-left: clamp(6rem, 14vw, 12rem);
+    max-width: 72ch;
   }
 
-  /*
-   * Hover en una fila:
-   *   1. La fila hovered: plena opacidad (ya la tiene). La barra roja aparece.
-   *   2. Las otras filas: se dimean a 0.35 (taupe implícito).
-   *
-   * Mecanismo: el hover en la lista activa .is-dimmed en todos los siblings.
-   * En CSS puro: usamos .capabilities-list:has(.capabilities-row:hover) para
-   * dimear toda la lista, y la fila hovered recupera opacidad 1.
-   * El :has() es soportado en todos los browsers modernos (2023+).
-   */
-
-  /* Cuando alguna fila está hovered: dimear toda la lista */
-  .capabilities-list:has(.capabilities-row:hover) .capabilities-row {
-    opacity: 0.35;
+  .cap-row[data-even="false"] .cap-content {
+    padding-left: clamp(4.5rem, 9vw, 8rem);
+    max-width: 64ch;
   }
 
-  /* La fila hovered recupera opacidad total y activa la barra roja */
-  .capabilities-list:has(.capabilities-row:hover) .capabilities-row:hover {
+  .cap-num {
+    font-size: clamp(4.5rem, 10vw, 8rem);
+    top: calc(var(--space-xl) * 0.35);
+  }
+
+  .cap-name {
+    font-size: clamp(2rem, 3vw, 3rem);
+  }
+
+  .cap-resolves {
+    max-width: 52ch;
+  }
+
+  /* Hover: dimear la lista excepto la fila hovered */
+  .cap-list:has(.cap-row:hover) .cap-row {
+    opacity: 0.4;
+  }
+
+  .cap-list:has(.cap-row:hover) .cap-row:hover {
     opacity: 1;
   }
 
-  .capabilities-row:hover .capabilities-row__bar {
-    opacity: 1;
-  }
-
-  /* El nombre se vuelve ligeramente más prominente en hover */
-  .capabilities-row:hover .capabilities-name {
-    color: var(--crema);
-  }
-
-  /* El resolves sube un tono en hover (taupe → más claro) */
-  .capabilities-row:hover .capabilities-resolves {
-    color: rgba(232, 226, 214, 0.7); /* --crema con 70% opacidad */
-  }
-
-  /* Focus visible para teclado */
-  .capabilities-row:focus-visible {
-    outline: 2px solid var(--crema);
-    outline-offset: -2px;
-  }
-
-  .capabilities-num {
-    min-width: unset;
-    padding-top: 0;
-  }
-
-  /*
-   * Nombre desktop: escala máxima.
-   * clamp ajustado para que en 1280px sea ~2.5rem y crezca hasta 3.5rem en pantallas grandes.
-   * El nombre más largo ("ORDERING · BOOKING · WORKFLOWS") debe caber en una línea a 1280px.
-   */
-  .capabilities-name {
-    font-size: clamp(1.75rem, 2.5vw, 3rem);
-    /*
-     * Sin nowrap: si en alguna pantalla el nombre más largo rompe,
-     * que rompa bien (no se corte con ellipsis).
-     * En 1280px todos los nombres caben en una línea verificado por screenshot.
-     */
-  }
-
-  .capabilities-resolves {
-    max-width: 48ch;
-    transition: color 0.2s ease;
+  /* Focus visible teclado */
+  .cap-row:focus-visible {
+    outline: 2px solid var(--tinta);
+    outline-offset: 4px;
   }
 }
 </style>
 
 <script>
   /**
-   * CapabilitiesSection — Reveal con IntersectionObserver + stagger por fila.
+   * CapabilitiesSection — Reveal IntersectionObserver + stagger.
    *
-   * PROGRESSIVE ENHANCEMENT:
-   * El HTML es visible sin JS (sin opacity:0 en CSS base).
-   * JS añade .is-hidden ANTES de observar → estado inicial invisible
-   * solo existe si JS está disponible. Idéntico al pattern del manifesto.
+   * Progressive enhancement:
+   * Sin JS → filas visibles (sin opacity:0 en CSS base).
+   * Con JS → se añade .is-hidden antes de observar, luego .is-visible con stagger.
    *
-   * STAGGER:
-   * Las 6 filas entran escalonadas. Se usan transition-delay inline
-   * (no CSS estático) para que el stagger se calcule por índice de fila.
-   * Delay por fila: índice * 0.07s.
-   *
-   * reduced-motion:
-   * Si el usuario prefiere movimiento reducido, .is-hidden no oculta
-   * (el CSS override lo maneja). No se necesita branch aquí.
+   * prefers-reduced-motion: el CSS override maneja — no hace falta branch aquí.
    */
 
-  const section = document.querySelector<HTMLElement>('.capabilities');
+  const section = document.querySelector<HTMLElement>('.cap');
   if (section) {
-    const rows = section.querySelectorAll<HTMLElement>('.capabilities-row');
+    const rows = section.querySelectorAll<HTMLElement>('.cap-row');
 
-    /* Añadir estado inicial oculto + delay de stagger ANTES de observar */
     rows.forEach((row, i) => {
       row.classList.add('is-hidden');
-      /* Stagger: 70ms por fila. La primera entra al instante, la última +350ms. */
-      row.style.transitionDelay = `${i * 0.07}s`;
+      /* Stagger: 80ms por fila. Más lento que el V1 (70ms) — más editorial. */
+      row.style.transitionDelay = `${i * 0.08}s`;
     });
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            /* Revelar todas las filas (el delay se encarga del stagger) */
             rows.forEach((row) => {
               row.classList.remove('is-hidden');
               row.classList.add('is-visible');
             });
-            /* Una sola vez */
             observer.disconnect();
           }
         });
       },
-      {
-        /*
-         * threshold 0.1: la sección debe estar al menos 10% visible.
-         * Menor que el manifesto (0.15) porque capabilities es más alta —
-         * un threshold menor garantiza que el reveal empieza antes de que
-         * el usuario tenga que scrollear hasta el fondo de la sección.
-         */
-        threshold: 0.1,
-      }
+      { threshold: 0.08 }
     );
 
     observer.observe(section);

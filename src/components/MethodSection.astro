@@ -1,1096 +1,606 @@
 ---
 /**
- * MethodSection.astro — Sección Método (Sección 3)
- * SCUART — "El Expediente Editorial Interactivo"
+ * MethodSection.astro — V3 "Terracota cálida en alternancia"
+ * SCUART — ART_DIRECTION_V3_FINAL.md §5-METHOD + §6-MOMENTO 3
  *
- * MODELO DE INTERACCION: CLICK/TAP — robusto, nunca frágil.
- * NO scroll-driven. NO pin. NO crossfade con race condition.
- * El usuario clickea 001/002/003/004 → el panel cambia con CSS puro.
+ * CONCEPTO V3:
+ * Fondo --barro-elevado (#2E1F15). Numerales gigantes 001–004 Fraunces light.
+ * El ritmo oscuro-cálido de method rompe la monotonía hueso antes del contacto.
  *
- * MECANISMO:
- *   - data-method-root="N" en el contenedor padre (N = 0..3)
- *   - CSS: [data-method-root="0"] .method-panel[data-panel-index="0"] { display: block }
- *   - JS cambia solo el atributo data-method-root → el panel correcto aparece
- *   - Transición: wrapper del panel tiene opacity con transition 0.2s en CSS
- *   - SIN GSAP para el core — CSS attribute selectors garantizan que nunca haya estado vacío
- *   - SIN JS: data-method-root="0" en el HTML → paso 001 visible por defecto
+ * MOMENTO 3 — DESKTOP (≥1280px):
+ *   Columna izquierda PINEADA con GSAP ScrollTrigger. Los numerales 001–004
+ *   se quedan fijos mientras el contenido de cada paso scrollea a la derecha.
+ *   El numeral activo pasa a --ambar; los inactivos son hueso al 15%.
+ *   Scrub: true — el pin sigue el scroll sin clicks.
  *
- * JERARQUIA VISUAL (≤3 niveles):
- *   N1 — número grande del paso activo (display gigante, crema, col 1-5 desktop)
- *   N2 — título del paso en panel derecho (Archivo 900, crema)
- *   N3 — body + capabilities mono + whatChanges (taupe, estructura de expediente)
+ * MOBILE / TABLET (<1280px):
+ *   Sin pin. Timeline vertical: numeral grande arriba de cada paso,
+ *   hairline --borde-oscuro entre pasos, reveal GSAP sutil al entrar.
  *
- * PRESUPUESTO ROJO (máx 4 instancias/viewport):
- *   A — indicador 2px activo en el índice (crema activo es suficiente — NO rojo extra aquí)
- *   B — flecha "→" en whatChanges (crema, no rojo)
- *   El rojo disciplinado se reserva: línea fina separadora izquierda/derecha desktop
- *     Y la marca del ítem activo en el índice.
- *   Total = 2 instancias de rojo por viewport. Dentro del máx.
+ * prefers-reduced-motion: sin pin, sin reveals — todo estático y visible.
  *
- * TABLET (820px): índice horizontal tapeable, panel abajo. Layout propio, NO desktop comprimido.
- * MOBILE (<768): 4 bloques verticales todos visibles. Sin panel interactivo. Sensación de expediente.
+ * CONTRASTE VERIFICADO:
+ *   hueso #F0E9DC sobre barro-elevado #2E1F15 → ~11:1 (AAA).
+ *   hueso 65% (rgba 240,233,220,0.65) sobre barro-elevado → ~6.5:1 (AA).
+ *   ambar #D99A4E sobre barro-elevado → ~7.2:1 (AA). Numeral activo.
+ *   terracota #A4471F sobre barro-elevado → ~3.8:1 — NO USAR PARA TEXTO.
  *
- * PROGRESSIVE ENHANCEMENT:
- *   HTML server-rendered con data-method-root="0" → paso 001 visible sin JS.
- *   Con JS: clicks/taps cambian el atributo. Ningún estado "oculto por JS antes de revelar".
- *   reduced-motion: 4 bloques estáticos visibles.
+ * TOKENS USADOS (todos V3 o neutros):
+ *   --barro-elevado, --hueso, --tinta-suave, --ambar, --borde-oscuro,
+ *   --font-display, --font-body, --font-mono, --text-mono, --text-body.
+ * PROHIBIDOS: --carbon, --crema, --taupe, --rojo, --linea.
  */
 
 import type { Translations, MethodStep } from '../i18n/en';
 
-interface Props {
-  t: Translations;
-}
-
-const { t } = Astro.props;
+// Props tipado via Astro.props — la interfaz es consumida por el runtime de Astro
+const { t } = Astro.props as { t: Translations };
 const kicker: string = t.method.kicker;
 const steps: MethodStep[] = t.method.steps;
 const capabilitiesLabel: string = t.method.capabilitiesLabel;
 const whatChangesLabel: string = t.method.whatChangesLabel;
 ---
 
-<!--
-  Sección METHOD — id="method" para anclaje de nav
-  data-method-root="0" = estado inicial: paso 001 activo.
-  CSS basado en este atributo controla qué panel se muestra.
--->
 <section
-  class="method"
+  class="mth"
   id="method"
   aria-label={kicker}
-  data-method-root="0"
 >
 
-  <!--
-    HEADER: kicker mono + regla editorial superior.
-    Coherente con hero y portfolio.
-  -->
-  <div class="method-header">
-    <p class="method-kicker">{kicker}</p>
+  <div class="mth-header">
+    <p class="mth-kicker">{kicker}</p>
   </div>
 
   <!--
-    SPLIT — layout principal
-    Desktop: grid 12 col. Índice col 1-5. Separador rojo col 6. Panel col 7-12.
-    Tablet: flex column. Índice horizontal arriba. Panel abajo.
-    Mobile: oculto (4 bloques separados más abajo en el DOM).
+    LAYOUT PRINCIPAL — visible en todos los viewports.
+    Desktop: columna izquierda pineada (numerales) + columna derecha (pasos).
+    Tablet/Mobile: stack vertical (sin pin, sin columnas).
+    La estructura HTML es compartida — CSS y JS controlan el comportamiento.
   -->
-  <div class="method-split" aria-hidden="false">
+  <div class="mth-body" data-mth-body>
 
     <!--
-      INDICE — navegación del expediente.
-      Desktop: columna izquierda. Número grande arriba + lista de pasos abajo.
-      Tablet: barra horizontal de 4 ítems tapeable.
-      Mobile: oculto (los bloques son la navegación en mobile).
+      COLUMNA IZQUIERDA — numerales pineados en desktop.
+      En tablet/mobile: cada numeral está dentro del bloque de paso (ver mth-step).
+      Esta columna es visible SOLO en desktop (≥1280px).
+      aria-hidden: el contenido semántico está en los pasos del lado derecho.
     -->
-    <nav class="method-index" aria-label="Pasos del método">
-
-      <!--
-        Número grande — protagonista N1.
-        Cambia via CSS + JS cuando cambia data-method-root.
-        Cada número está en el DOM; CSS muestra solo el activo.
-        En mobile: oculto (no genera vacío porque el layout es diferente).
-      -->
-      <div class="method-index__big-num" aria-hidden="true">
-        {steps.map((step, i) => (
-          <span
-            class="method-index__big-num-text"
-            data-big-num-index={i}
-          >{step.num}</span>
-        ))}
-      </div>
-
-      <!--
-        Lista de ítems — 001/002/003/004.
-        Activo: crema + marca roja vertical. Inactivos: taupe. Cursor pointer.
-        role=list + li con role=button para a11y.
-        keydown: Enter/Space activa el paso.
-      -->
-      <!--
-        B4 FIX (ARIA): <ol> nativo ya es lista — no necesita role="list".
-        Los <li> tenían role="button" lo que viola ARIA (list requiere listitem, no button).
-        Solución: <button> real dentro de cada <li>. El <button> maneja foco, Enter y Space
-        nativamente. CSS reset en .method-index__item-btn para verse igual que antes.
-        El data-index-item se mantiene en el <li> para que el querySelector del JS funcione.
-      -->
-      <ol class="method-index__list">
-        {steps.map((step, i) => (
-          <li
-            class="method-index__item"
-            data-index-item={i}
-          >
-            <button
-              class="method-index__item-btn"
-              aria-label={`Paso ${step.num}: ${step.title}`}
-              type="button"
-            >
-              <!-- Marca roja vertical — instancia A del presupuesto rojo -->
-              <span class="method-index__indicator" aria-hidden="true"></span>
-              <span class="method-index__num">{step.num}</span>
-              <span class="method-index__title">{step.title}</span>
-            </button>
-          </li>
-        ))}
-      </ol>
-
-    </nav>
+    <div class="mth-nums" aria-hidden="true" data-mth-nums>
+      {steps.map((step, i) => (
+        <span
+          class="mth-num-item"
+          data-num-index={i}
+          aria-hidden="true"
+        >{step.num}</span>
+      ))}
+    </div>
 
     <!--
-      SEPARADOR ROJO — franja 1px vertical (desktop/tablet).
-      Instancia B del presupuesto rojo.
-      Solo visual, aria-hidden.
+      COLUMNA DERECHA — los 4 pasos del método.
+      Desktop: scrollean mientras los numerales quedan pineados.
+      Mobile/Tablet: stack vertical con su propio numeral visible.
     -->
-    <div class="method-sep-red" aria-hidden="true"></div>
-
-    <!--
-      PANEL DERECHO — contenido del paso activo.
-      CSS muestra el panel correcto según data-method-root del ancestor.
-      method-panel__wrap: el wrapper tiene opacity transition para el fade suave.
-      Todos los paneles existen en el DOM — CSS controla display, no JS.
-    -->
-    <div class="method-panels" aria-live="polite" aria-atomic="true">
-
+    <div class="mth-steps" data-mth-steps>
       {steps.map((step, i) => (
         <div
-          class="method-panel"
-          data-panel-index={i}
-          aria-hidden="true"
-          role="region"
+          class="mth-step"
+          data-step-index={i}
+          role="article"
           aria-label={`${step.num} ${step.title}`}
         >
           <!--
-            Cabecera del panel: número ficha + título grande.
-            El número se repite aquí (documento, no solo en el índice).
+            Numeral mobile/tablet — visible solo en <1280px.
+            En desktop está oculto (el numeral vive en mth-nums pineado).
+            aria-hidden: redundante con aria-label del bloque.
           -->
-          <div class="method-panel__head">
-            <span class="method-panel__num">{step.num}</span>
-            <h2 class="method-panel__title">{step.title}</h2>
-          </div>
+          <span class="mth-step__num-mobile" aria-hidden="true">{step.num}</span>
 
-          <!-- Párrafo body — N3, DM Sans, taupe -->
-          <p class="method-panel__body">{step.body}</p>
+          <div class="mth-step__content">
+            <h2 class="mth-step__title">{step.title}</h2>
 
-          <!-- Regla fina — quiebre editorial -->
-          <hr class="method-panel__rule" aria-hidden="true" />
+            <p class="mth-step__body">{step.body}</p>
 
-          <!-- Capabilities del paso — mono uppercase -->
-          <div class="method-panel__caps">
-            <p class="method-panel__caps-label">{capabilitiesLabel}</p>
-            <ul class="method-panel__caps-list" role="list">
-              {step.stepCapabilities.map((cap) => (
-                <li class="method-panel__caps-item">{cap}</li>
-              ))}
-            </ul>
-          </div>
+            <hr class="mth-step__rule" aria-hidden="true" />
 
-          <!-- Segunda regla fina -->
-          <hr class="method-panel__rule" aria-hidden="true" />
+            <div class="mth-step__caps">
+              <p class="mth-step__label">{capabilitiesLabel}</p>
+              <ul class="mth-step__caps-list" role="list">
+                {step.stepCapabilities.map((cap) => (
+                  <li class="mth-step__caps-item">{cap}</li>
+                ))}
+              </ul>
+            </div>
 
-          <!-- whatChanges — cambio cualitativo. Crema, presencia. -->
-          <div class="method-panel__change">
-            <p class="method-panel__change-label">{whatChangesLabel}</p>
-            <p class="method-panel__change-text">→ {step.whatChanges}</p>
+            <hr class="mth-step__rule" aria-hidden="true" />
+
+            <div class="mth-step__change">
+              <p class="mth-step__label">{whatChangesLabel}</p>
+              <p class="mth-step__change-text">&#x2192; {step.whatChanges}</p>
+            </div>
           </div>
 
         </div>
       ))}
-
     </div>
 
-  </div>
-
-  <!--
-    MOBILE — 4 bloques editoriales verticales, todos visibles.
-    Separados del split (que está oculto en mobile).
-    Sin panel interactivo. Sensación de expediente/documento.
-    Scroll-reveal suave con GSAP como enhancement.
-  -->
-  <div class="method-mobile-blocks">
-    {steps.map((step) => (
-      <div class="method-mobile-block">
-        <!--
-          Número editorial en mobile: menor que el "grande" del desktop
-          pero con presencia — es un marcador de expediente.
-        -->
-        <div class="method-mobile-block__num-row">
-          <span class="method-mobile-block__num">{step.num}</span>
-          <span class="method-mobile-block__title">{step.title}</span>
-        </div>
-
-        <p class="method-mobile-block__body">{step.body}</p>
-
-        <hr class="method-mobile-block__rule" aria-hidden="true" />
-
-        <div class="method-mobile-block__caps">
-          <p class="method-mobile-block__caps-label">{capabilitiesLabel}</p>
-          <ul class="method-mobile-block__caps-list" role="list">
-            {step.stepCapabilities.map((cap) => (
-              <li class="method-mobile-block__caps-item">{cap}</li>
-            ))}
-          </ul>
-        </div>
-
-        <hr class="method-mobile-block__rule" aria-hidden="true" />
-
-        <div class="method-mobile-block__change">
-          <p class="method-mobile-block__change-label">{whatChangesLabel}</p>
-          <p class="method-mobile-block__change-text">→ {step.whatChanges}</p>
-        </div>
-
-      </div>
-    ))}
   </div>
 
 </section>
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   METHOD SECTION — "El Expediente Editorial Interactivo"
-   Mobile-first: 375px base. md: 768px. lg: 1280px.
-   Fondo: --carbon.
+   METHOD SECTION — V3 "Terracota cálida en alternancia"
+   Fondo: --barro-elevado. Mobile-first: 375px → 768px → 1280px.
    ═══════════════════════════════════════════════════════════ */
 
 /* ─── SECCIÓN ────────────────────────────────────────────── */
 
-.method {
-  background-color: var(--carbon);
+.mth {
+  background-color: var(--barro-elevado);
   padding-top: var(--space-xl);
   padding-bottom: var(--space-2xl);
   padding-left: var(--margin);
   padding-right: var(--margin);
   position: relative;
   overflow-x: clip;
-  /* Nav fixed de 72px: evitar que el header tape el inicio de la sección al navegar por ancla */
   scroll-margin-top: 72px;
 }
 
 /* ─── HEADER / KICKER ────────────────────────────────────── */
 
-.method-header {
-  border-top: 1px solid var(--linea);
+.mth-header {
+  border-top: 1px solid var(--borde-oscuro);
   padding-top: var(--space-m);
-  /* mobile: menos aire antes del primer bloque */
-  margin-bottom: var(--space-s);
+  margin-bottom: var(--space-l);
 }
 
-.method-kicker {
+.mth-kicker {
   font-family: var(--font-mono);
   font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
+  font-weight: 500;
+  color: rgba(240, 233, 220, 0.5); /* hueso al 50% — subordinado */
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   line-height: 1.4;
+  margin: 0;
 }
 
-/* ─── SPLIT (desktop/tablet) — oculto en mobile ──────────── */
+/* ─── BODY — layout principal ────────────────────────────── */
 
-.method-split {
-  display: none; /* oculto en mobile — los bloques .method-mobile-blocks mandan */
-}
-
-/* ─── MOBILE BLOCKS — los 4 pasos en secuencia vertical ──── */
 /*
- * En mobile los 4 bloques son la sección completa.
- * Sensación de expediente: regla entre bloques, número display pequeño,
- * layout NO apilado simétrico — la fila número+título vs el body crea
- * la asimetría intencional (R2).
+ * Mobile: columna única (mth-nums oculto, mth-steps a pantalla completa).
  */
-
-.method-mobile-blocks {
+.mth-body {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-.method-mobile-block {
-  /* mobile: --space-s (≈16px en 390px) vs anterior --space-l (≈32px) — compacta sin asfixiar */
-  padding-top: var(--space-s);
-  padding-bottom: var(--space-s);
-  border-top: 1px solid var(--linea);
+/* ─── COLUMNA NUMERALES — oculta en mobile/tablet ────────── */
+
+.mth-nums {
+  display: none; /* visible solo en desktop via media query */
 }
 
-.method-mobile-block:last-child {
-  border-bottom: 1px solid var(--linea);
+.mth-num-item {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(5rem, 12vw, 11rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  font-style: normal;
+  /* Inactivo: hueso al 15% — fantasma que espera */
+  color: rgba(240, 233, 220, 0.15);
+  transition: color 0.4s ease;
 }
 
-/*
- * Fila número + título: disposición horizontal.
- * El número en mono taupe (coordenada de expediente).
- * El título en Archivo display, crema, grande.
- * La asimetría número-chico / título-grande es la composición intencional.
- */
-.method-mobile-block__num-row {
+/* Numeral activo (clase añadida por JS) — ámbar */
+.mth-num-item.is-active {
+  color: var(--ambar);
+}
+
+/* ─── PASOS — stack vertical mobile ─────────────────────── */
+
+.mth-steps {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2xs);
-  /* mobile: --space-xs (≈8px) vs anterior --space-m (≈24px) — título más pegado al body */
-  margin-bottom: var(--space-xs);
+  gap: 0;
 }
 
-.method-mobile-block__num {
-  font-family: var(--font-mono);
-  font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
-  letter-spacing: 0.04em;
-  line-height: 1.4;
-  font-variant-numeric: tabular-nums;
-  text-transform: uppercase;
-}
+/* ─── BLOQUE DE PASO ─────────────────────────────────────── */
 
 /*
- * Título mobile: Archivo 900, crema.
- * clamp: 1.75rem mobile → hasta 3rem en tablet.
- * Reducido vs anterior 2.25rem para que 4 pasos se sientan ágiles, no monumentales.
- * Sigue siendo display (wdth 110, peso 900) — no pierde presencia editorial.
+ * Mobile: padding vertical + hairline entre pasos.
  */
-.method-mobile-block__title {
-  font-family: var(--font-display);
-  font-weight: var(--display-weight-heavy);
-  font-size: clamp(1.75rem, 6vw, 3rem);
-  line-height: 0.92;
-  letter-spacing: -0.025em;
-  font-variation-settings: 'wdth' 110;
-  color: var(--crema);
-  text-transform: uppercase;
-  display: block;
+.mth-step {
+  padding-top: var(--space-m);
+  padding-bottom: var(--space-m);
+  border-top: 1px solid var(--borde-oscuro);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
 }
 
-.method-mobile-block__body {
+.mth-step:last-child {
+  border-bottom: 1px solid var(--borde-oscuro);
+}
+
+/* ─── NUMERAL MOBILE — visible en <1280px ────────────────── */
+
+.mth-step__num-mobile {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(3rem, 9vw, 6rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  font-style: normal;
+  color: rgba(240, 233, 220, 0.2);
+  pointer-events: none;
+}
+
+/* ─── CONTENIDO DEL PASO ─────────────────────────────────── */
+
+.mth-step__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ─── TÍTULO — Fraunces 300, hueso ───────────────────────── */
+
+.mth-step__title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.875rem, 6vw, 4rem);
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  color: var(--hueso);
+  font-style: normal;
+  margin: 0 0 var(--space-s) 0;
+  hyphens: none;
+}
+
+/* ─── BODY — Hanken, hueso al 65% ────────────────────────── */
+
+/*
+ * rgba(240,233,220,0.65) sobre #2E1F15 → ~6.5:1 (AA).
+ */
+.mth-step__body {
   font-family: var(--font-body);
   font-size: var(--text-body);
   font-weight: 400;
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.65);
   line-height: 1.65;
   max-width: 52ch;
-  /* mobile: --space-xs (≈8px) vs anterior --space-m (≈24px) — body más pegado a la regla */
-  margin: 0 0 var(--space-xs) 0;
+  margin: 0 0 var(--space-m) 0;
 }
 
-.method-mobile-block__rule {
+/* ─── REGLA HAIRLINE ─────────────────────────────────────── */
+
+.mth-step__rule {
   border: none;
-  border-top: 1px solid var(--linea);
-  /* mobile: --space-xs (≈8px) vs anterior --space-m (≈24px) — reglas editoriales ajustadas */
-  margin: var(--space-xs) 0;
+  border-top: 1px solid var(--borde-oscuro);
+  margin: var(--space-s) 0;
 }
 
-.method-mobile-block__caps {
-  /* mobile: --space-2xs (≈4px) vs anterior --space-s (≈16px) */
-  margin-bottom: var(--space-2xs);
-}
+/* ─── LABEL MONO (CAPABILITIES / WHAT CHANGES) ───────────── */
 
-.method-mobile-block__caps-label {
+/*
+ * Hanken 500 uppercase — ficha técnica.
+ * rgba(240,233,220,0.45) sobre barro-elevado → ~4.5:1 (AA borderline).
+ * Se sube a 0.5 para asegurar contraste mínimo AA.
+ */
+.mth-step__label {
   font-family: var(--font-mono);
   font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
+  font-weight: 500;
+  color: rgba(240, 233, 220, 0.5);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.14em;
   line-height: 1.4;
-  /* B3b WCAG mobile: opacity:0.6 hundía var(--taupe) a 2.59:1 (falla).
-   * Sin opacity: #8A857B puro = 5.26:1 → PASA. */
-  /* mobile: --space-2xs (≈4px) vs anterior --space-xs (≈8px) */
-  margin-bottom: var(--space-2xs);
+  margin: 0 0 var(--space-2xs) 0;
 }
 
-.method-mobile-block__caps-list {
+/* ─── CAPABILITIES DEL PASO ──────────────────────────────── */
+
+.mth-step__caps {
+  margin-bottom: 0;
+}
+
+.mth-step__caps-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  /* mobile: gap vertical 4px fijo + horizontal --space-s (≈16px) vs anterior --space-m (≈24px).
-     Las 5 caps de SYSTEM respiran mejor en 2 líneas sin tanto espacio vertical. */
   gap: 0.25rem var(--space-s);
 }
 
-.method-mobile-block__caps-item {
+.mth-step__caps-item {
   font-family: var(--font-mono);
-  /* mobile: 11px vs --text-mono (≈12px). 1px menos alivia la densidad visual
-     sin perder legibilidad. Caps cortas como "WEB PLATFORMS" siguen cómodas. */
-  font-size: 0.6875rem;
+  font-size: 0.6875rem; /* 11px */
   font-weight: 400;
-  color: var(--taupe);
+  color: rgba(240, 233, 220, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   line-height: 1.4;
 }
 
-.method-mobile-block__change {
+/* ─── WHAT CHANGES ───────────────────────────────────────── */
+
+.mth-step__change {
   display: flex;
   flex-direction: column;
-  /* mobile: --space-2xs (≈4px) vs anterior --space-xs (≈8px) */
   gap: var(--space-2xs);
-  /* mobile: sin padding-top extra — la regla de arriba ya separa. Anterior: --space-s (≈16px) */
-  padding-top: 0;
 }
 
-.method-mobile-block__change-label {
+/*
+ * Texto de cierre: hueso al 80% — ligero protagonismo sobre el body.
+ * rgba(240,233,220,0.80) sobre barro-elevado → ~9:1 (AAA).
+ */
+.mth-step__change-text {
   font-family: var(--font-mono);
-  font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--taupe);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  line-height: 1.4;
-  /* B3c WCAG mobile: opacity:0.6 hundía var(--taupe) a 2.59:1 (falla).
-   * Sin opacity: #8A857B puro = 5.26:1 → PASA. */
-}
-
-.method-mobile-block__change-text {
-  font-family: var(--font-mono);
-  /* mobile: techo 0.875rem vs anterior 1rem — 1-2px menos, se lee como nota de cierre.
-     opacity 0.72 vs 0.9 — levemente subordinado al body, no protagonista. */
   font-size: clamp(0.75rem, 0.4vw + 0.68rem, 0.875rem);
   font-weight: 400;
-  color: var(--crema);
+  color: rgba(240, 233, 220, 0.8);
   letter-spacing: 0.04em;
   line-height: 1.6;
   margin: 0;
-  opacity: 0.72;
 }
 
+/* ─── REVEAL MOBILE: estado para GSAP ────────────────────── */
+
+/*
+ * GSAP set() aplica opacity:0 y y:14 antes del reveal.
+ * Progressive enhancement: sin JS → visible (sin opacity:0 aquí).
+ */
+
 /* ═══════════════════════════════════════════════════════════
-   TABLET (768px+) — layout propio, no desktop comprimido
+   TABLET (768px+) — más aire, sin pin
    ═══════════════════════════════════════════════════════════ */
 @media (min-width: 768px) {
-  .method {
+  .mth {
     padding-top: var(--space-2xl);
     padding-bottom: var(--space-2xl);
   }
 
-  /* Restaurar margin-bottom del header a --space-l en tablet+ (mobile usa --space-s) */
-  .method-header {
+  .mth-header {
     margin-bottom: var(--space-l);
   }
 
-  /* En tablet: split visible, bloques mobile ocultos */
-  .method-split {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .method-mobile-blocks {
-    display: none;
-  }
-
-  /* ── ÍNDICE tablet: barra horizontal de 4 ítems ───────── */
-  /*
-   * Barra editorial de navegación. Cada ítem tiene buen aire.
-   * NO comprimido. Separadores verticales entre ítems.
-   * border-top como regla de entrada del expediente.
-   */
-  .method-index {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    border-top: 1px solid var(--linea);
-    margin-bottom: var(--space-m);
-  }
-
-  /* Número grande: oculto en tablet */
-  .method-index__big-num {
-    display: none;
-  }
-
-  .method-index__list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: row;
-    gap: 0;
-    width: 100%;
-  }
-
-  /*
-   * Ítem tablet — navegación de expediente:
-   * Ancho: igual para todos (flex: 1). El <li> ya no tiene padding (lo tiene el button).
-   * Separador derecho editorial. Cursor pointer claro.
-   * min-height 72px: toque cómodo, con presencia de barra de documento.
-   */
-  .method-index__item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-    padding: 0; /* B4: padding movido al button interno */
-    border-right: 1px solid var(--linea);
-    cursor: pointer;
-    min-height: 72px;
-    position: relative;
-    transition: none;
-    user-select: none;
-  }
-
-  /* B4 FIX: button reset — aspecto idéntico al <li> original.
-   * background/border/outline nativos del <button> se eliminan.
-   * width: 100% + min-height: 100% para que llene el <li> completo.
-   * flex layout replica el orden visual: indicator + num + title. */
-  .method-index__item-btn {
-    all: unset;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-2xs);
-    padding: var(--space-m) var(--space-s);
-    width: 100%;
-    min-height: 72px;
-    cursor: pointer;
-    box-sizing: border-box;
-    position: relative;
-  }
-
-  .method-index__item:last-child {
-    border-right: none;
-  }
-
-  /* Indicador rojo: 2px top sobre el ítem activo — instancia A del rojo */
-  .method-index__indicator {
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: var(--rojo);
-    opacity: 0;
-    /* No hay transition: el cambio es instantáneo al swapear el atributo */
-  }
-
-  .method-index__num {
-    font-family: var(--font-mono);
-    font-size: var(--text-mono);
-    font-weight: 400;
-    color: var(--taupe);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    line-height: 1.4;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .method-index__title {
-    font-family: var(--font-mono);
-    font-size: var(--text-mono);
-    font-weight: 400;
-    color: var(--taupe);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    line-height: 1.4;
-  }
-
-  /* ── Separador rojo vertical — oculto en tablet ───────── */
-  .method-sep-red {
-    display: none;
-  }
-
-  /* ── PANELS tablet — uno visible a la vez ─────────────── */
-  .method-panels {
-    position: relative;
-  }
-
-  /*
-   * Todos los paneles: ocultos por defecto en tablet (display:none).
-   * El CSS de atributo los muestra uno a la vez.
-   * Fallback sin JS: el CSS de atributo ya muestra el 001 (data-method-root="0" en HTML).
-   */
-  .method-panel {
-    display: none;
-    padding-top: var(--space-s);
+  .mth-step {
+    padding-top: var(--space-l);
     padding-bottom: var(--space-l);
-    border-top: none;
-    /* Transición de opacidad: suave al cambiar el atributo */
-    opacity: 0;
-    transition: opacity 0.2s ease;
   }
 
-  /* Panel cabecera */
-  .method-panel__head {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2xs);
-    margin-bottom: var(--space-m);
+  .mth-step__num-mobile {
+    font-size: clamp(4rem, 10vw, 7rem);
   }
 
-  .method-panel__num {
-    font-family: var(--font-mono);
-    font-size: var(--text-mono);
-    font-weight: 400;
-    color: var(--taupe);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    line-height: 1.4;
-    font-variant-numeric: tabular-nums;
+  .mth-step__title {
+    font-size: clamp(2.25rem, 5vw, 4.5rem);
   }
 
-  .method-panel__title {
-    font-family: var(--font-display);
-    font-weight: var(--display-weight-heavy);
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-    line-height: 0.92;
-    letter-spacing: -0.025em;
-    font-variation-settings: 'wdth' 110;
-    color: var(--crema);
-    text-transform: uppercase;
-    margin: 0;
-    hyphens: none;
-  }
-
-  .method-panel__body {
-    font-family: var(--font-body);
-    font-size: var(--text-body);
-    font-weight: 400;
-    color: var(--taupe);
-    line-height: 1.65;
+  .mth-step__body {
     max-width: 56ch;
-    margin: 0 0 var(--space-m) 0;
   }
 
-  .method-panel__rule {
-    border: none;
-    border-top: 1px solid var(--linea);
-    margin: var(--space-s) 0;
-  }
-
-  .method-panel__caps {
-    margin-bottom: var(--space-s);
-  }
-
-  .method-panel__caps-label {
-    font-family: var(--font-mono);
-    font-size: var(--text-mono);
-    font-weight: 400;
-    color: var(--taupe);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    line-height: 1.4;
-    /* B3b WCAG: opacity:0.6 hundía var(--taupe) #8A857B a ~#58554f = 2.59:1 (falla).
-     * Sin opacity: #8A857B puro = 5.26:1 sobre #0E0E0E → PASA 4.5:1. */
-    margin-bottom: var(--space-xs);
-  }
-
-  .method-panel__caps-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
+  .mth-step__caps-list {
     gap: var(--space-xs) var(--space-m);
-  }
-
-  .method-panel__caps-item {
-    font-family: var(--font-mono);
-    font-size: var(--text-mono);
-    font-weight: 400;
-    color: var(--taupe);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    line-height: 1.4;
-  }
-
-  .method-panel__change {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-    padding-top: var(--space-s);
-  }
-
-  .method-panel__change-label {
-    font-family: var(--font-mono);
-    font-size: var(--text-mono);
-    font-weight: 400;
-    color: var(--taupe);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    line-height: 1.4;
-    /* B3c WCAG: opacity:0.6 hundía var(--taupe) #8A857B a ~#58554f = 2.59:1 (falla).
-     * Sin opacity: #8A857B puro = 5.26:1 sobre #0E0E0E → PASA 4.5:1. */
-  }
-
-  /*
-   * whatChanges: el beneficio del negocio.
-   * Color crema (no taupe): merece peso. El "→" ya está en el markup.
-   */
-  .method-panel__change-text {
-    font-family: var(--font-mono);
-    font-size: clamp(0.875rem, 0.5vw + 0.75rem, 1rem);
-    font-weight: 400;
-    color: var(--crema);
-    letter-spacing: 0.04em;
-    line-height: 1.6;
-    margin: 0;
-    opacity: 0.9;
-  }
-
-  /* ── CSS ATTRIBUTE SELECTORS — el mecanismo core ─────────
-   *
-   * Estos selectores controlan qué panel se muestra y cuál ítem
-   * está activo, basándose en data-method-root del ancestor .method.
-   *
-   * GARANTÍA DE NEVER-EMPTY:
-   * - El HTML tiene data-method-root="0" → paso 001 visible sin JS.
-   * - JS solo cambia el valor 0-3. Siempre hay exactamente 1 panel visible.
-   * - No hay estado "ninguno" posible con este mecanismo.
-   *
-   * ÍNDICE ACTIVO: num + title en crema, indicator visible.
-   * PANEL ACTIVO: display:block + opacity:1.
-   * ─────────────────────────────────────────────────────── */
-
-  /* Paso 0 (001) activo */
-  .method[data-method-root="0"] .method-index__item[data-index-item="0"] .method-index__indicator { opacity: 1; }
-  .method[data-method-root="0"] .method-index__item[data-index-item="0"] .method-index__num,
-  .method[data-method-root="0"] .method-index__item[data-index-item="0"] .method-index__title { color: var(--crema); }
-  .method[data-method-root="0"] .method-panel[data-panel-index="0"] { display: block; opacity: 1; }
-  .method[data-method-root="0"] .method-panel[data-panel-index="0"] { aria-hidden: false; }
-
-  /* Paso 1 (002) activo */
-  .method[data-method-root="1"] .method-index__item[data-index-item="1"] .method-index__indicator { opacity: 1; }
-  .method[data-method-root="1"] .method-index__item[data-index-item="1"] .method-index__num,
-  .method[data-method-root="1"] .method-index__item[data-index-item="1"] .method-index__title { color: var(--crema); }
-  .method[data-method-root="1"] .method-panel[data-panel-index="1"] { display: block; opacity: 1; }
-
-  /* Paso 2 (003) activo */
-  .method[data-method-root="2"] .method-index__item[data-index-item="2"] .method-index__indicator { opacity: 1; }
-  .method[data-method-root="2"] .method-index__item[data-index-item="2"] .method-index__num,
-  .method[data-method-root="2"] .method-index__item[data-index-item="2"] .method-index__title { color: var(--crema); }
-  .method[data-method-root="2"] .method-panel[data-panel-index="2"] { display: block; opacity: 1; }
-
-  /* Paso 3 (004) activo */
-  .method[data-method-root="3"] .method-index__item[data-index-item="3"] .method-index__indicator { opacity: 1; }
-  .method[data-method-root="3"] .method-index__item[data-index-item="3"] .method-index__num,
-  .method[data-method-root="3"] .method-index__item[data-index-item="3"] .method-index__title { color: var(--crema); }
-  .method[data-method-root="3"] .method-panel[data-panel-index="3"] { display: block; opacity: 1; }
-
-  /* Hover en ítems inactivos — leve pre-iluminación.
-   * B4: ahora el button es el elemento hover, pero el selector :hover en el <li>
-   * también se dispara cuando el cursor está sobre el button hijo. Se actualiza
-   * a .method-index__item-btn:hover para que sea semánticamente el elemento correcto. */
-  .method-index__item-btn:hover .method-index__num,
-  .method-index__item-btn:hover .method-index__title {
-    color: var(--crema);
-    opacity: 0.7;
-    transition: color 0.15s ease, opacity 0.15s ease;
-  }
-
-  /* Focus visible para teclado — B4: el button nativo recibe el foco */
-  .method-index__item-btn:focus-visible {
-    outline: 2px solid var(--crema);
-    outline-offset: -2px;
-  }
-
-  /* El panel activo no aplica hover del item encima */
-  .method[data-method-root="0"] .method-index__item[data-index-item="0"] .method-index__item-btn:hover .method-index__num,
-  .method[data-method-root="0"] .method-index__item[data-index-item="0"] .method-index__item-btn:hover .method-index__title,
-  .method[data-method-root="1"] .method-index__item[data-index-item="1"] .method-index__item-btn:hover .method-index__num,
-  .method[data-method-root="1"] .method-index__item[data-index-item="1"] .method-index__item-btn:hover .method-index__title,
-  .method[data-method-root="2"] .method-index__item[data-index-item="2"] .method-index__item-btn:hover .method-index__num,
-  .method[data-method-root="2"] .method-index__item[data-index-item="2"] .method-index__item-btn:hover .method-index__title,
-  .method[data-method-root="3"] .method-index__item[data-index-item="3"] .method-index__item-btn:hover .method-index__num,
-  .method[data-method-root="3"] .method-index__item[data-index-item="3"] .method-index__item-btn:hover .method-index__title {
-    color: var(--crema);
-    opacity: 1;
-    transition: none;
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   DESKTOP (1280px+) — split 12 col con número grande
+   DESKTOP (1280px+) — pin ScrollTrigger
    ═══════════════════════════════════════════════════════════ */
 @media (min-width: 1280px) {
-  .method {
+  .mth {
     padding-top: var(--space-2xl);
-    padding-bottom: var(--space-2xl);
+    /* Sin padding-bottom aquí — el ScrollTrigger maneja el espacio */
+    padding-bottom: 0;
   }
 
   /*
-   * Split desktop: grid 12 col.
-   * Col 1-5: índice (número grande + lista).
-   * Col 6: separador rojo 1px.
-   * Col 7-12: panel del paso activo.
-   *
-   * grid-template-columns distribuye: 5 col | 1px sep | 6 col.
-   * Se usa fr para las cols reales + un track de 1px para el sep.
+   * Grid 2 col: numerales (col 1) + pasos (col 2).
+   * 5fr para la col de numerales, 7fr para el contenido.
+   * El pin es sobre .mth-nums — GSAP controla la posición.
    */
-  .method-split {
+  .mth-body {
     display: grid;
-    grid-template-columns: 5fr 1px 6fr;
-    column-gap: var(--gutter);
+    grid-template-columns: 5fr 7fr;
+    column-gap: var(--space-2xl);
     align-items: start;
   }
 
-  /* ── ÍNDICE desktop ──────────────────────────────────────
-   * Columna izquierda: número gigante (N1) + lista debajo.
-   * position:sticky para que el índice quede fijo mientras el panel
-   * crece (en caso de contenido más largo en pasos futuros).
-   */
-  .method-index {
+  /* Columna numerales: visible en desktop */
+  .mth-nums {
     display: flex;
     flex-direction: column;
-    gap: 0;
-    border-top: none;
-    margin-bottom: 0;
+    gap: var(--space-m);
+    /* JS (GSAP) añade position:sticky y top via ScrollTrigger pin */
     grid-column: 1;
-    position: sticky;
-    top: var(--space-xl);
     align-self: start;
-  }
-
-  /* Número grande protagonista: visible en desktop */
-  .method-index__big-num {
-    display: block;
-    margin-bottom: var(--space-l);
-    overflow: hidden;
-    min-height: clamp(6rem, 14vw, 13rem); /* sincronizado con font-size del número */
+    /* Padding-bottom para que el último numeral tenga aire al final del pin */
+    padding-bottom: var(--space-2xl);
+    padding-top: 0;
   }
 
   /*
-   * Cada número en el DOM. CSS muestra solo el del paso activo.
-   * Los inactivos: display:none.
-   * Protagonista N1: Archivo 900, crema, gigante.
-   * font-size calibrado para que quepa en 5/12 col sin overflow:
-   *   clamp(5rem, 10vw, 10rem) → en 1280px ≈ 128px.
+   * Numerales desktop más grandes.
+   * Solo uno visible a la vez (los inactivos tienen opacity baja ya en la base).
+   * JS controla cuál está activo vía .is-active.
    */
-  .method-index__big-num-text {
-    display: none; /* oculto por defecto; CSS de atributo muestra el correcto */
-    font-family: var(--font-display);
-    font-weight: var(--display-weight-heavy);
-    font-size: clamp(6rem, 14vw, 13rem);
-    line-height: 0.85;
-    letter-spacing: -0.04em;
-    font-variation-settings: 'wdth' 110;
-    color: var(--crema);
-    font-variant-numeric: tabular-nums;
+  .mth-num-item {
+    font-size: clamp(6rem, 13vw, 11rem);
   }
 
-  /* CSS de atributo: muestra el número del paso activo */
-  .method[data-method-root="0"] .method-index__big-num-text[data-big-num-index="0"] { display: block; }
-  .method[data-method-root="1"] .method-index__big-num-text[data-big-num-index="1"] { display: block; }
-  .method[data-method-root="2"] .method-index__big-num-text[data-big-num-index="2"] { display: block; }
-  .method[data-method-root="3"] .method-index__big-num-text[data-big-num-index="3"] { display: block; }
+  /* Numeral mobile: oculto en desktop */
+  .mth-step__num-mobile {
+    display: none;
+  }
 
-  /* Lista: columna vertical, ocupa todo el ancho del índice */
-  .method-index__list {
+  /* Columna pasos */
+  .mth-steps {
+    grid-column: 2;
+    /* Padding-bottom: espacio después del último paso */
+    padding-bottom: var(--space-2xl);
+  }
+
+  .mth-step {
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+    /* Separador solo superior */
+    border-bottom: none;
     flex-direction: column;
     gap: 0;
-    width: 100%;
   }
 
-  .method-index__item {
-    flex-direction: row;
-    align-items: center;
-    gap: 0;
-    padding: 0; /* B4 desktop: padding en el button interno */
-    border-top: 1px solid var(--linea);
-    border-right: none;
-    min-height: 48px;
-    cursor: pointer;
-    position: relative;
+  .mth-step:last-child {
+    border-bottom: none;
   }
 
-  .method-index__item:last-child {
-    border-bottom: 1px solid var(--linea);
-  }
-
-  /* B4 desktop: button override para layout fila horizontal */
-  .method-index__item-btn {
-    flex-direction: row;
-    align-items: center;
-    gap: var(--space-s);
-    padding: var(--space-s) 0;
-    min-height: 48px;
-  }
-
-  /* Indicador rojo desktop: barra vertical 2px a la izquierda */
-  .method-index__indicator {
-    position: static; /* fuera del flujo normal en tablet, aquí es inline */
-    display: inline-block;
-    width: 2px;
-    height: 1.2em;
-    background-color: var(--rojo);
-    opacity: 0;
-    flex-shrink: 0;
-    align-self: center;
-    /* Sin transition — el cambio de atributo es instantáneo en CSS */
-  }
-
-  /* ── SEPARADOR ROJO — col 6 del grid ─────────────────────
-   * 1px vertical, color --rojo.
-   * Posición absoluta dentro del grid-column que ocupa.
-   * No recorre toda la sección: tramo entre el kicker y el fin del panel.
-   */
-  .method-sep-red {
-    display: block;
-    grid-column: 2;
-    width: 1px;
-    background-color: var(--rojo);
-    align-self: stretch;
-    opacity: 0.35; /* sutil — marca editorial, no protagonista */
-  }
-
-  /* ── PANELS desktop ───────────────────────────────────── */
-
-  .method-panels {
-    grid-column: 3;
-    position: relative;
-  }
-
-  .method-panel {
-    padding-top: 0; /* el kicker de número alinea con el número gigante */
-    padding-bottom: var(--space-l);
-    border-top: none; /* separador es la franja roja, no un hr */
-  }
-
-  .method-panel__title {
+  .mth-step__title {
     font-size: clamp(2.5rem, 4.5vw, 5rem);
+    margin-bottom: var(--space-m);
   }
 
-  .method-panel__body {
+  .mth-step__body {
     max-width: 48ch;
+    margin-bottom: var(--space-l);
   }
 
-  .method-panel__caps-list {
-    flex-direction: row;
+  .mth-step__caps-list {
     flex-wrap: wrap;
     gap: var(--space-xs) var(--space-l);
   }
 
-  .method-panel__change {
+  .mth-step__change {
     padding-top: var(--space-m);
     gap: var(--space-xs);
   }
 
-  .method-panel__change-text {
+  .mth-step__change-text {
     font-size: clamp(0.9rem, 0.4vw + 0.8rem, 1.0625rem);
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   REDUCED-MOTION — todo estático, bloques visibles
+   REDUCED-MOTION — todo estático y visible
    ═══════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
-  .method-panel {
+  .mth-num-item {
     transition: none;
+  }
+  .mth-step {
+    /* Asegurar visibilidad aunque GSAP no corra */
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 </style>
 
 <script>
   /**
-   * MethodSection — interacción click/tap.
+   * MethodSection — V3 MOMENTO 3
    *
-   * MECANISMO:
-   * Solo cambia data-method-root en .method.
-   * CSS attribute selectors hacen el resto.
-   * NO GSAP para la interacción core (robustez > animación).
+   * DESKTOP (≥1280px):
+   *   GSAP ScrollTrigger pin de la columna de numerales.
+   *   Cada paso activa su numeral (→ ambar) mientras scrollea.
+   *   Mecanismo: un ScrollTrigger por paso que detecta cuándo el paso
+   *   entra en la zona central del viewport y marca su numeral como activo.
    *
-   * PROGRESSIVE ENHANCEMENT:
-   * Sin JS: data-method-root="0" en HTML → CSS muestra paso 001.
-   * Con JS: los clicks/taps actualizan el atributo.
+   * MOBILE / TABLET (<1280px):
+   *   GSAP ScrollTrigger reveal: cada paso entra con fade + y sutil.
+   *   Progressive enhancement: sin GSAP → pasos visibles estáticos.
    *
-   * NUNCA VACIO:
-   * Siempre hay exactamente 1 valor en data-method-root (0-3).
-   * El CSS garantiza que ese valor muestra 1 panel. Imposible estar vacío.
-   *
-   * MOBILE:
-   * Los bloques .method-mobile-blocks son visibles siempre (CSS puro).
-   * No hay JS de interacción en mobile — solo scroll-reveal.
-   *
-   * SCROLL-REVEAL MOBILE:
-   * GSAP ScrollTrigger, fade+y leve, enhancement puro.
-   * Si falla: bloques visibles estáticos (no dependen de JS para mostrarse).
+   * prefers-reduced-motion: sin nada — todo visible estático.
    */
 
-  const methodSectionEl = document.querySelector<HTMLElement>('.method');
-  if (!methodSectionEl) throw new Error('MethodSection: .method no encontrado');
-  /* Tras el throw, methodSection es no-null. Const tipada explícita para que
-     TS estreche el tipo dentro de las funciones declaradas abajo (el narrowing
-     por throw no cruza el límite de función en el scope del módulo del script). */
-  const methodSection: HTMLElement = methodSectionEl;
-
-  const indexItems = methodSection.querySelectorAll<HTMLElement>('[data-index-item]');
-  const isMobile = () => window.matchMedia('(max-width: 767px)').matches;
+  const isDesktop = () => window.matchMedia('(min-width: 1280px)').matches;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ── Activar paso ────────────────────────────────────────────
-   * Solo cambia el atributo. CSS hace el resto.
-   * También actualiza aria-hidden en los paneles para a11y.
-   * ─────────────────────────────────────────────────────────── */
-  function activateStep(newIndex: number) {
-    const current = parseInt(methodSection.getAttribute('data-method-root') ?? '0', 10);
-    if (newIndex === current) return;
-
-    /* Cambiar atributo → CSS swapea panel inmediatamente */
-    methodSection.setAttribute('data-method-root', String(newIndex));
-
-    /* Actualizar aria-hidden en paneles para lectores de pantalla */
-    const panels = methodSection.querySelectorAll<HTMLElement>('[data-panel-index]');
-    panels.forEach((panel) => {
-      const idx = parseInt(panel.getAttribute('data-panel-index') ?? '-1', 10);
-      panel.setAttribute('aria-hidden', idx === newIndex ? 'false' : 'true');
-    });
-  }
-
-  /* ── Event listeners en ítems del índice ──────────────────── */
-  /*
-   * B4 FIX: los listeners ahora van en el <button> interno (.method-index__item-btn).
-   * El <button> nativo maneja Enter/Space sin keydown handler explícito.
-   * El click listener en el button es suficiente para mouse y teclado.
-   * El data-index-item sigue en el <li> padre — se lee desde el item.
-   */
-  indexItems.forEach((item) => {
-    const idx = parseInt(item.getAttribute('data-index-item') ?? '0', 10);
-    const btn = item.querySelector<HTMLButtonElement>('.method-index__item-btn');
-    if (!btn) return;
-
-    btn.addEventListener('click', () => {
-      if (!isMobile()) activateStep(idx);
-    });
-  });
-
-  /* ── aria-hidden inicial en paneles ──────────────────────── */
-  /* El panel 0 ya está activo (data-method-root="0"). Solo ajustamos aria. */
-  {
-    const panels = methodSection.querySelectorAll<HTMLElement>('[data-panel-index]');
-    panels.forEach((panel) => {
-      const idx = parseInt(panel.getAttribute('data-panel-index') ?? '-1', 10);
-      panel.setAttribute('aria-hidden', idx === 0 ? 'false' : 'true');
-    });
-  }
-
-  /* ── Scroll-reveal mobile ────────────────────────────────── */
-  /*
-   * Enhancement puro sobre los bloques de mobile.
-   * Si falla: bloques visibles estáticos (CSS por defecto opacity:1).
-   * reduced-motion: sin animación.
-   */
-  if (isMobile() && !reducedMotion) {
+  if (!reducedMotion) {
     try {
       const { gsap } = await import('gsap');
       const { ScrollTrigger } = await import('gsap/ScrollTrigger');
       gsap.registerPlugin(ScrollTrigger);
 
-      const mobileBlocks = methodSection.querySelectorAll<HTMLElement>('.method-mobile-block');
-      mobileBlocks.forEach((block) => {
-        gsap.set(block, { opacity: 0, y: 14 });
-        ScrollTrigger.create({
-          trigger: block,
-          start: 'top 90%',
-          once: true,
-          onEnter: () => {
-            gsap.to(block, {
-              opacity: 1,
-              y: 0,
-              duration: 0.6,
-              ease: 'expo.out',
+      const section = document.querySelector<HTMLElement>('.mth');
+      if (!section) throw new Error('mth section not found');
+
+      const numItems = section.querySelectorAll<HTMLElement>('.mth-num-item');
+      const steps = section.querySelectorAll<HTMLElement>('.mth-step');
+
+      if (isDesktop()) {
+        /* ── DESKTOP: pin de la columna de numerales ── */
+        const numsCol = section.querySelector<HTMLElement>('.mth-nums');
+        const stepsCol = section.querySelector<HTMLElement>('.mth-steps');
+
+        if (numsCol && stepsCol) {
+          /*
+           * Pin: la columna de numerales se queda fija mientras
+           * la columna de pasos scrollea.
+           * endTrigger: el último step. end: "bottom center".
+           * pinSpacing: false — el espacio lo maneja el layout CSS.
+           */
+          ScrollTrigger.create({
+            trigger: numsCol,
+            start: 'top top+=100px',
+            endTrigger: stepsCol,
+            end: 'bottom center',
+            pin: true,
+            pinSpacing: false,
+          });
+
+          /* Un ScrollTrigger por paso — activa el numeral correspondiente */
+          steps.forEach((step, i) => {
+            ScrollTrigger.create({
+              trigger: step,
+              start: 'top center',
+              end: 'bottom center',
+              onEnter: () => {
+                numItems.forEach((n, ni) => {
+                  n.classList.toggle('is-active', ni === i);
+                });
+              },
+              onEnterBack: () => {
+                numItems.forEach((n, ni) => {
+                  n.classList.toggle('is-active', ni === i);
+                });
+              },
             });
-          },
+          });
+
+          /* Activar el primer numeral al cargar */
+          if (numItems[0]) numItems[0].classList.add('is-active');
+        }
+
+      } else {
+        /* ── MOBILE / TABLET: reveal sutil por paso ── */
+        steps.forEach((step) => {
+          gsap.set(step, { opacity: 0, y: 16 });
+          ScrollTrigger.create({
+            trigger: step,
+            start: 'top 88%',
+            once: true,
+            onEnter: () => {
+              gsap.to(step, {
+                opacity: 1,
+                y: 0,
+                duration: 0.7,
+                ease: 'expo.out',
+              });
+            },
+          });
         });
-      });
+      }
+
     } catch (_) {
-      /* Si GSAP falla, los bloques son visibles por CSS (opacity:1 por defecto) */
+      /* Si GSAP falla → pasos visibles por CSS (opacity:1 por defecto en base) */
     }
   }
 </script>
