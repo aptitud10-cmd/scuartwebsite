@@ -1,9 +1,19 @@
 ---
 /**
- * Nav.astro — Navegacion minima para el hero
- * v2 (i18n): recibe lang + t (traducciones) para selector EN/ES y labels.
- * Nav completo (hamburger mobile, overlay) se implementa en hito siguiente.
- * DESIGN_RESPONSIVE §8: height 72px, transparente, Mono uppercase taupe.
+ * Nav.astro — Barra de navegación global (sticky reducida)
+ *
+ * DECISIÓN CERRADA (William / HERO_DESKTOP_SPEC.md §3 "DECISIÓN CERRADA"):
+ * La navegación principal vive DENTRO del hero (banda TOP), como parte de su
+ * composición — gesto Locomotive. Esta Nav.astro es la versión REDUCIDA que
+ * aparece sticky solo DESPUÉS de que el hero sale del viewport.
+ *
+ * Comportamiento por IntersectionObserver:
+ *   - Mientras el hero está en viewport → nav oculta (opacity:0, translateY:-100%)
+ *   - Cuando el hero sale del viewport → nav aparece (opacity:1, translateY:0, sticky)
+ *
+ * Así NUNCA hay dos navs visibles simultáneamente en el primer viewport.
+ * Verificación: en 1280px y 1920px, cargar la home → debe haber exactamente
+ * UN wordmark y UN juego de links hasta que el usuario scrollee fuera del hero.
  */
 
 import type { Lang } from '../i18n/index';
@@ -17,28 +27,27 @@ interface Props {
 const { lang, t } = Astro.props;
 ---
 
-<nav class="nav" aria-label="Navegacion principal">
-  <a href={`/${lang}`} class="nav__logo" aria-label="SCUART — Inicio">
-    SCUART
+<!-- nav global — sticky, solo visible cuando el hero salió del viewport -->
+<nav class="nav-global" aria-label="Navegación principal" data-nav-global>
+  <a href={`/${lang}`} class="nav-global__logo" aria-label="SCUART — Inicio">
+    SCUART<sup class="nav-global__reg" aria-hidden="true">®</sup>
   </a>
 
-  <div class="nav__right">
-    <!-- Placeholder links — se expanden en hito nav completo -->
-    <ul class="nav__links" role="list">
-      <li><a href={`/${lang}#portfolio`} class="nav__link">{t.nav.portfolio}</a></li>
-      <li><a href={`/${lang}#method`} class="nav__link">{t.nav.method}</a></li>
-      <li><a href={`/${lang}#contact`} class="nav__link">{t.nav.contact}</a></li>
+  <div class="nav-global__right">
+    <ul class="nav-global__links" role="list">
+      <li><a href={`/${lang}#portfolio`} class="nav-global__link">{t.nav.portfolio}</a></li>
+      <li><a href={`/${lang}#method`} class="nav-global__link">{t.nav.method}</a></li>
+      <li><a href={`/${lang}#contact`} class="nav-global__link">{t.nav.contact}</a></li>
     </ul>
 
-    <!-- Selector de idioma EN/ES -->
-    <div class="nav__lang" role="navigation" aria-label="Selector de idioma">
-      <span class="nav__lang-active" aria-current="true">
+    <div class="nav-global__lang" role="navigation" aria-label="Selector de idioma">
+      <span class="nav-global__lang-active" aria-current="true">
         {lang.toUpperCase()}
       </span>
-      <span class="nav__lang-sep" aria-hidden="true">/</span>
+      <span class="nav-global__lang-sep" aria-hidden="true">|</span>
       <a
         href={t.nav.langHref}
-        class="nav__lang-other"
+        class="nav-global__lang-other"
         hreflang={t.nav.langLabel.toLowerCase()}
         aria-label={`Cambiar idioma a ${t.nav.langLabel}`}
       >
@@ -49,202 +58,166 @@ const { lang, t } = Astro.props;
 </nav>
 
 <style>
-  .nav {
+  /*
+   * Nav global reducida — aparece sticky SOLO tras salir del hero.
+   * Estado inicial: oculta (translateY -100%, opacity 0, pointer-events none).
+   * Al activarse (JS): transición suave a visible.
+   * B1 "Arquitecto": fondo yeso --bg, tinta --ink, hairline inferior.
+   */
+  .nav-global {
+    /*
+     * position: fixed — NO ocupa espacio en el flujo del documento.
+     * El hero empieza en y=0 (no desplazado por la nav).
+     * La nav aparece sobre el hero solo cuando el hero sale del viewport.
+     */
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 100;
-    height: 72px;
+    height: clamp(64px, 9vh, 80px);
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 var(--margin);
-    /*
-     * V3: transparente sobre hueso. El fondo del hero es claro (#F0E9DC)
-     * así que el nav arranca con texto oscuro (tinta) para legibilidad.
-     * Al scrollear hacia secciones oscuras (barro-oscuro), se aplica .scrolled
-     * que invierte los colores — ver abajo.
-     */
-    background-color: transparent;
-    border-bottom: 1px solid transparent;
-    transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease;
+    background-color: var(--bg);
+    border-bottom: 1px solid var(--border);
+    /* Estado inicial: oculta arriba del viewport. */
+    opacity: 0;
+    transform: translateY(-100%);
+    pointer-events: none;
+    transition:
+      opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
   }
 
   /*
-   * Al scrollear: fondo barro-oscuro + borde hairline oscuro.
-   * Aplica cuando el JS detecta scroll > 20px.
-   * Nota futura: si se quiere inversión precisa por sección, usar
-   * IntersectionObserver con las secciones — por ahora .scrolled es suficiente.
+   * Estado activo — cuando el JS detecta que el hero salió del viewport.
+   * IntersectionObserver en el <script> agrega .is-visible al salir del hero.
    */
-  .nav.scrolled {
-    background-color: var(--barro-oscuro);
-    border-bottom-color: var(--borde-oscuro);
+  .nav-global.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
   }
 
-  .nav__logo {
+  /* ── Wordmark ──────────────────────────────────────────────────── */
+  .nav-global__logo {
     font-family: var(--font-display);
-    font-weight: var(--display-weight-light);
-    font-size: 1.125rem;
-    letter-spacing: var(--display-tracking);
-    /* V3: tinta sobre hueso (nav transparente sobre hero claro) */
-    color: var(--tinta);
+    font-weight: 500;
+    font-size: 1.0625rem; /* 17px — Fraunces 500, mismo que en el hero */
+    letter-spacing: -0.01em;
+    color: var(--ink);
     text-decoration: none;
     line-height: 1;
-    transition: color 0.35s ease;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.1em;
   }
 
-  /* Logo en scrolled: hueso sobre barro-oscuro */
-  .nav.scrolled .nav__logo {
-    color: var(--hueso);
+  .nav-global__reg {
+    font-size: 0.55em;
+    color: var(--accent); /* ® en verde botella — sello de marca */
+    vertical-align: super;
+    font-style: normal;
   }
 
-  /* Contenedor derecho: links + selector idioma */
-  .nav__right {
+  /* ── Contenedor derecho ────────────────────────────────────────── */
+  .nav-global__right {
     display: flex;
     align-items: center;
-    gap: var(--space-m);
+    gap: 2.5rem;
   }
 
-  .nav__links {
-    display: none; /* oculto en mobile — se muestra en tablet+ */
+  /* ── Links de nav ──────────────────────────────────────────────── */
+  .nav-global__links {
+    display: none;
     list-style: none;
-    gap: var(--space-m);
+    gap: 2.5rem;
     align-items: center;
   }
 
-  .nav__link {
+  .nav-global__link {
     font-family: var(--font-body);
     font-size: var(--text-mono);
     font-weight: 500;
-    /* V3: tinta-suave sobre hueso — 5.2:1, pasa AA */
-    color: var(--tinta-suave);
+    color: var(--ink);
     text-decoration: none;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
-    line-height: 1.4;
+    letter-spacing: 0.12em;
+    line-height: 1;
     position: relative;
-    /* Subrayado terracota en hover — scaleX 0→1 */
     padding-bottom: 2px;
-    transition: color 0.35s ease;
   }
 
-  .nav__link::after {
+  /* Subrayado accent verde — se dibuja en hover (scaleX 0→1) */
+  .nav-global__link::after {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 1px;
-    background-color: var(--terracota);
+    background-color: var(--accent);
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .nav__link:hover {
-    color: var(--tinta);
-  }
-
-  .nav__link:hover::after {
+  .nav-global__link:hover::after {
     transform: scaleX(1);
   }
 
-  /* En scrolled (sobre barro-oscuro): links en hueso/tinta-suave claro */
-  .nav.scrolled .nav__link {
-    color: rgba(240, 233, 220, 0.65); /* hueso al 65% = legible sobre barro */
+  .nav-global__link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 
-  .nav.scrolled .nav__link:hover {
-    color: var(--hueso);
-  }
-
-  /* ── Selector de idioma ──────────────────────────────────── */
-  /*
-   * V3 sobre hueso: usar tinta/tinta-suave para legibilidad.
-   * Contraste WCAG:
-   *   - .nav__lang-active: var(--tinta) #1C140E sobre --hueso #F0E9DC = ~13.5:1 (AAA)
-   *   - .nav__lang-other: var(--tinta-suave) #6B5D4F sobre --hueso #F0E9DC = ~5.2:1 (AA)
-   * En .scrolled (sobre barro-oscuro):
-   *   - active: var(--hueso) sobre --barro-oscuro = ~12:1 (AAA)
-   *   - other: rgba(hueso, 0.65) sobre barro-oscuro = ~7:1 (AA)
-   */
-  .nav__lang {
+  /* ── Toggle idioma ─────────────────────────────────────────────── */
+  .nav-global__lang {
     display: flex;
     align-items: center;
-    gap: 0.3em;
+    gap: 0.35em;
     font-family: var(--font-body);
     font-size: var(--text-mono);
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.14em;
-    line-height: 1.4;
+    letter-spacing: 0.12em;
+    line-height: 1;
   }
 
-  /* Idioma activo — tinta sobre hueso, no clickeable */
-  .nav__lang-active {
-    color: var(--tinta);
+  /* Idioma activo — tinta, no clickeable */
+  .nav-global__lang-active {
+    color: var(--ink);
     cursor: default;
-    transition: color 0.35s ease;
   }
 
-  /* Separador / — decorativo, aria-hidden */
-  .nav__lang-sep {
-    color: var(--tinta-suave);
+  /* Separador | — en --mid al 40% */
+  .nav-global__lang-sep {
+    color: var(--mid);
     opacity: 0.4;
   }
 
-  /* Idioma alternativo — tinta-suave sobre hueso: 5.2:1 pasa AA */
-  .nav__lang-other {
-    color: var(--tinta-suave);
+  /* Idioma alternativo */
+  .nav-global__lang-other {
+    color: var(--mid);
     text-decoration: none;
-    transition: color 0.25s ease;
-    position: relative;
-    padding-bottom: 2px;
+    transition: color 0.2s ease;
   }
 
-  .nav__lang-other::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background-color: var(--terracota);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  .nav-global__lang-other:hover {
+    color: var(--ink);
   }
 
-  .nav__lang-other:hover {
-    color: var(--tinta);
+  .nav-global__lang-other:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 
-  .nav__lang-other:hover::after {
-    transform: scaleX(1);
-  }
-
-  /* En scrolled (sobre barro-oscuro): invertir a claro */
-  .nav.scrolled .nav__lang-active {
-    color: var(--hueso);
-  }
-
-  .nav.scrolled .nav__lang-sep {
-    color: var(--hueso);
-    opacity: 0.3;
-  }
-
-  .nav.scrolled .nav__lang-other {
-    color: rgba(240, 233, 220, 0.65);
-  }
-
-  .nav.scrolled .nav__lang-other:hover {
-    color: var(--hueso);
-  }
-
-  /* Tablet+: mostrar links inline */
+  /* ── Tablet+: mostrar links ────────────────────────────────────── */
   @media (min-width: 768px) {
-    .nav__links {
+    .nav-global__links {
       display: flex;
     }
   }
@@ -252,72 +225,51 @@ const { lang, t } = Astro.props;
 
 <script>
   /**
-   * Nav scroll — clase .scrolled al scrollear.
+   * Nav global — IntersectionObserver sobre el hero.
    *
-   * Con Lenis activo: escucha el evento 'scroll' de Lenis via el objeto
-   * expuesto en window.__lenis. Lenis 1.3+ no usa translateY en el body
-   * (mueve el scroll real del documento), por lo que window.scrollY sigue
-   * siendo válido. El evento de Lenis es más preciso: se dispara en cada
-   * tick del RAF sincronizado, no en el evento nativo del browser.
+   * Mientras el hero está en viewport → nav oculta.
+   * Cuando el hero sale del viewport (threshold 0) → nav aparece.
+   * Esto garantiza que NO haya dos navs visibles simultáneamente.
    *
-   * Sin Lenis (reduced-motion o fallo de carga): fallback a window.scroll nativo.
+   * IntersectionObserver es más confiable que scroll event para este uso:
+   * - No requiere calcular alturas manualmente.
+   * - Funciona con Lenis smooth scroll sin necesidad de sincronización.
+   * - Eficiente: solo dispara en cambios de visibilidad, no en cada frame.
    */
-  const nav = document.querySelector('.nav');
-  if (nav) {
-    const applyScrolled = (y: number) => {
-      if (y > 20) {
-        nav.classList.add('scrolled');
-      } else {
-        nav.classList.remove('scrolled');
-      }
-    };
+  const navGlobal = document.querySelector<HTMLElement>('[data-nav-global]');
 
-    /*
-     * Flag único: garantiza que SOLO se ata una fuente de scroll (Lenis O nativo),
-     * nunca las dos. Sin esto había una carrera: si Lenis llega tarde (>200ms en
-     * un device lento), el timeout ataba el listener nativo Y después lenis:ready
-     * ataba el de Lenis → doble cálculo de .scrolled.
-     */
-    let connected = false;
+  if (navGlobal) {
+    /* El hero tiene aria-label específico — lo buscamos por la sección */
+    const heroSection = document.querySelector<HTMLElement>('.hero-v3');
 
-    /* Intentar conectar al evento de Lenis. Devuelve true si conectó. */
-    const connectLenis = () => {
-      if (connected) return true;
-      const lenis = (window as unknown as Record<string, unknown>)['__lenis'];
-      if (lenis && typeof (lenis as { on?: unknown }).on === 'function') {
-        /* Lenis emite { scroll: number, ... } en el evento 'scroll' */
-        (lenis as { on: (event: string, cb: (e: { scroll: number }) => void) => void })
-          .on('scroll', ({ scroll }: { scroll: number }) => {
-            applyScrolled(scroll);
-          });
-        connected = true;
-        return true;
-      }
-      return false;
-    };
-
-    /* Fallback a scroll nativo. No-op si ya hay una fuente atada. */
-    const connectNative = () => {
-      if (connected) return;
-      connected = true;
-      window.addEventListener('scroll', () => applyScrolled(window.scrollY), { passive: true });
-    };
-
-    /* Si Lenis ya está inicializado (script de Layout corrió primero), listo. */
-    if (!connectLenis()) {
-      /* Esperar el evento lenis:ready (puede conectar Lenis o no-op si ya conectó). */
-      window.addEventListener(
-        'lenis:ready',
-        () => {
-          if (!connectLenis()) connectNative();
+    if (heroSection) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              /* Hero en viewport → nav oculta */
+              navGlobal.classList.remove('is-visible');
+            } else {
+              /* Hero fuera del viewport → nav visible */
+              navGlobal.classList.add('is-visible');
+            }
+          }
         },
-        { once: true }
+        {
+          /* threshold:0 → dispara en cuanto el primer pixel del hero sale/entra */
+          threshold: 0,
+          /* rootMargin negativo: la nav aparece solo cuando el hero salió del todo */
+          rootMargin: '0px 0px 0px 0px',
+        }
       );
 
-      /* Red de seguridad: si lenis:ready nunca llega (reduced-motion: Lenis no
-         se inicializa), atar el nativo a los 200ms. El flag 'connected' evita
-         el doble-atado si Lenis termina conectando justo después. */
-      setTimeout(connectNative, 200);
+      observer.observe(heroSection);
+    } else {
+      /*
+       * Si no hay hero con .hero-v3 (página interior, etc.),
+       * la nav aparece directamente sin animación de reveal.
+       */
+      navGlobal.classList.add('is-visible');
     }
   }
 </script>

@@ -1,33 +1,38 @@
 ---
 /**
- * HeroSection.astro — Hero V3 "Terracota cálida en alternancia"
- * ART_DIRECTION_V3_FINAL.md §5-HERO
+ * HeroSection.astro — Hero V3 "Locomotive" — VIDEO FULL-BLEED
  *
- * Composición:
- * - Fondo hueso (#F0E9DC) con grano obligatorio
- * - Kicker mono arriba-izquierda: "SCUART / DESIGN STUDIO · BOGOTÁ · 2026"
- * - Índice mono arriba-derecha col 10-12 (desktop)
- * - H1: Fraunces 300 light, 3 líneas, tinta sobre hueso.
- *   La palabra "SHARP" (EN) / "MEJOR" (ES) en Fraunces 400 itálica terracota — gesto de marca.
- * - Subhead: Hanken Grotesk tinta-suave, max 38ch, col 1-6
- * - CTA: "START A PROJECT →" / "EMPEZAR UN PROYECTO →"
- * - Franja terracota 1px vertical (col 9 desktop) / horizontal (mobile)
+ * PATRÓN (referencia: locomotive.ca, traída por William 2026-06-16):
+ *   Un video ocupa TODA la pantalla (full-bleed, 100svh).
+ *   El texto va ENCIMA del video, no al lado:
+ *     - Nav minimal arriba: wordmark + links + "Let's talk" (CTA).
+ *     - Wordmark grande abajo-izquierda: nombre del estudio en Fraunces, naranja.
+ *   Cero grid de 12 columnas, cero ficha técnica, cero coordenadas, cero numeral.
+ *   Es una sola imagen viva con tipografía sobreimpresa.
  *
- * MOTION — Momento 1 (ART_DIRECTION_V3_FINAL.md §6):
- * H1 entra por líneas con máscara (line-mask/line-inner, clip de abajo hacia arriba),
- * expo.out, ~0.9s, stagger 0.12s entre líneas.
- * La palabra itálica terracota entra con delay +0.2s extra — el gesto de marca aterriza último.
- * prefers-reduced-motion: todo estático visible, sin máscara, sin animación.
+ * COLOR — copia el esquema Locomotive (decisión de William):
+ *   Cyan/celeste sobre el video para TODO el texto (nav + wordmark), igual que
+ *   Locomotive usa un solo color de acento. Token AISLADO aquí (--hero-accent),
+ *   NO toca la paleta global (yeso + verde botella del resto del sitio).
+ *   ⚠️ El cuerpo del sitio sigue en su paleta — el hero es la "portada" cyan.
  *
- * PROGRESSIVE ENHANCEMENT:
- * El H1 es HTML server-rendered visible por defecto.
- * GSAP agrega .hero-animating al <h1> para activar las máscaras (opacity: 0 inicial).
- * Si el script falla: texto plano visible completo.
+ * VIDEO — placeholder hasta que William lo cree/consiga:
+ *   <video> apunta a /video/hero.mp4 (+ .webm opcional). MIENTRAS no exista,
+ *   el atributo poster="/images/hero-portrait.jpg" muestra la imagen actual,
+ *   así el hero se ve completo HOY. Cuando William ponga el archivo en
+ *   /public/video/hero.mp4, arranca solo — CERO cambios de código.
+ *   autoplay muted loop playsinline = autoplay permitido en todos los browsers.
  *
- * Copy e i18n keys: CONSERVADOS de Concepto B (aprobado 2026-06-07).
- * isRed sigue disponible en los tokens pero NO se usa en V3 (el rojo fue reemplazado
- * por terracota/itálica como gesto de marca — preservado en la interfaz para no romper
- * la forma del diccionario).
+ * --font-display: "Fraunces Variable", serif
+ *   SWAP A PP EDITORIAL NEW: cambiar SOLO el token en tokens.css.
+ *
+ * MOTION — GSAP:
+ *   - Video/poster: scale 1.06 → 1, opacity in, 1.6s expo.out (entra como telón).
+ *   - Nav: fade + y, 0.6s.
+ *   - Wordmark: line-reveal por líneas con máscara (yPercent 110→0), stagger.
+ *   prefers-reduced-motion: todo estático visible, sin scale.
+ *
+ * .hero-v3 — clase conservada: el IntersectionObserver de Nav.astro la usa.
  */
 
 import type { Translations } from '../i18n/en';
@@ -37,790 +42,555 @@ interface Props {
 }
 
 const { t } = Astro.props;
+
+const lang = t.nav.langHref === '/es' ? 'en' : 'es';
+
+/*
+ * Wordmark abajo-izquierda — RÉPLICA LITERAL del copy de Locomotive
+ * ("Locomotive® / Digital-first Design Agency"), cambiando solo el nombre.
+ * Dos líneas, MISMA serif, casi el mismo tamaño grande, redonda (no itálica),
+ * Title Case en la segunda línea. Igual en ambos idiomas (término de marca).
+ */
+const wordmarkName = 'SCUART';
+const wordmarkDescriptor = 'Digital-first Design Agency';
+
+/* CTA superior derecha — "Let's talk" / "Hablemos" */
+const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
 ---
 
-<!--
-  HERO V3 — fondo hueso, Fraunces light, grano obligatorio
-  Layout:
-  - mobile 375: flex column, margen lateral var(--margin)
-  - tablet 768: grid 6 col
-  - desktop 1280: grid 12 col, H1 col 1-9, índice col 10-12
--->
-<section class="hero" aria-label={t.hero.ariaLabel}>
+<section class="hero-v3" aria-label={t.hero.ariaLabel}>
 
-  <!--
-    Líneas editoriales de grilla: 1px tinta 8% opacidad.
-    Col 3/6/9 desktop. Ocultas en mobile.
-    GSAP gestiona el estado inicial y el reveal.
-  -->
-  <div class="grid-lines" aria-hidden="true">
-    <div class="grid-line" data-col="3"></div>
-    <div class="grid-line" data-col="6"></div>
-    <div class="grid-line" data-col="9"></div>
+  <!-- ────────────────────────────────────────────────────────────────
+       VIDEO FULL-BLEED — el fondo es la composición
+       ──────────────────────────────────────────────────────────────── -->
+  <div class="hero-media" aria-hidden="true">
+    <!--
+      SWAP A VIDEO REAL: poné el archivo en /public/video/hero.mp4
+      (opcional /public/video/hero.webm para mejor compresión) y arranca solo.
+      Mientras no exista, poster muestra hero-portrait.jpg → el hero se ve completo.
+    -->
+    <video
+      class="hero-video"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster="/images/hero-portrait.jpg"
+    >
+      <source src="/video/hero.webm" type="video/webm" />
+      <source src="/video/hero.mp4" type="video/mp4" />
+    </video>
   </div>
 
-  <!--
-    Franja terracota costura (gesto de marca estructural):
-    - Desktop/tablet: vertical 1px sobre eje col 9
-    - Mobile: horizontal 1px, separa headline del resto
-  -->
-  <div class="hero-terracota-bar" aria-hidden="true"></div>
+  <!-- ────────────────────────────────────────────────────────────────
+       NAV MINIMAL — sobre el video, arriba
+       ──────────────────────────────────────────────────────────────── -->
+  <header class="hero-nav" role="navigation" aria-label="Navegación principal">
+    <a href={`/${lang}`} class="hero-nav__brand" aria-label="SCUART — Inicio">
+      SCUART<sup class="hero-nav__reg" aria-hidden="true">®</sup>
+    </a>
 
-  <!--
-    Kicker — mono uppercase arriba-izquierda
-    Muestra el índice editorial del estudio.
-  -->
-  <p class="hero-kicker">
-    {t.hero.kicker}
-  </p>
+    <!--
+      Links centrales — patrón Locomotive: una sola tira separada por comas
+      ("Work, Agency, Careers, Store"). Las comas son pseudo-elementos ::after
+      (CSS) con su propio margin — no dependen del whitespace del HTML, que
+      el flex colapsa. En blanco (no acento), como la referencia.
+    -->
+    <nav class="hero-nav__center" aria-label="Secciones">
+      <a href={`/${lang}#portfolio`} class="hero-nav__link" data-comma>{t.nav.portfolio}</a>
+      <a href={`/${lang}#method`} class="hero-nav__link" data-comma>{t.nav.method}</a>
+      <a href={`/${lang}#contact`} class="hero-nav__link">{t.nav.contact}</a>
+    </nav>
 
-  <!--
-    Índice de estudio — col 10-12 desktop (arriba-derecha).
-    Coordenadas reales de Bogotá (ART_DIRECTION_V3_FINAL.md §7.2).
-    Oculto en mobile/tablet.
-  -->
-  <p class="hero-studio-index" aria-hidden="true">
-    SCUART / DESIGN STUDIO<br />
-    4.7110° N, 74.0721° W<br />
-    BOGOTÁ · 2026
-  </p>
+    <div class="hero-nav__right">
+      <!-- Switch de idioma movido al footer (decisión William 2026-06-16):
+           hero más limpio; el usuario cambia idioma desde el pie de página. -->
+      <a href={`/${lang}#contact`} class="hero-nav__cta">{letsTalk}</a>
+    </div>
+  </header>
 
-  <!--
-    H1 — texto real server-rendered, visible por defecto (progressive enhancement).
-    Fraunces 300 light. 3 líneas fijas en desktop.
-    La palabra con isItalicAccent=true recibe la clase .italic-acento (Fraunces 400 itálica terracota).
-    isRed conservado en la interfaz pero ignorado en V3 (no se renderiza --rojo aquí).
-    GSAP envuelve cada .h1-line en .line-mask > .line-inner para el line-reveal.
-  -->
-  <h1 class="hero-h1">
-    <span class="h1-line" data-line="1">
-      {t.hero.line1.map((token, i) => (
-        <>
-          {i > 0 && <span class="h1-space" aria-hidden="true"> </span>}
-          <span
-            class={`h1-word${token.isItalicAccent ? ' italic-acento' : ''}`}
-          >{token.word}</span>
-        </>
-      ))}
-    </span>
-    <span class="h1-line" data-line="2">
-      {t.hero.line2.map((token, i) => (
-        <>
-          {i > 0 && <span class="h1-space" aria-hidden="true"> </span>}
-          <span
-            class={`h1-word${token.isItalicAccent ? ' italic-acento' : ''}`}
-          >{token.word}</span>
-        </>
-      ))}
-    </span>
-    <span class="h1-line" data-line="3">
-      {t.hero.line3.map((token, i) => (
-        <>
-          {i > 0 && <span class="h1-space" aria-hidden="true"> </span>}
-          <span
-            class={`h1-word${token.isItalicAccent ? ' italic-acento' : ''}`}
-          >{token.word}</span>
-        </>
-      ))}
-    </span>
-  </h1>
+  <!-- ────────────────────────────────────────────────────────────────
+       WORDMARK — abajo-izquierda, grande, sobre el video.
+       Patrón Locomotive: recuadro de disciplinas + nombre + descriptor + asterisco.
+       El recuadro (DIS/DEV/AI) es el equivalente SCUART del OPS/DES/DEV de ellos.
+       ──────────────────────────────────────────────────────────────── -->
+  <div class="hero-wordmark">
+    <h1 class="hero-wordmark__name">
+      <!--
+        Recuadro de disciplinas — SVG, geometría de Locomotive (OPS | DES/DEV):
+        · marco exterior apaisado
+        · VERTICAL completa al ~55% → separa DIS (izquierda, centrada en toda la altura)
+          de la zona derecha
+        · HORIZONTAL solo en la mitad DERECHA (de la vertical al borde) → separa DEV/AI
+        DIS NO es cruzado por ninguna línea (queda en su celda alta intacto).
+        viewBox apaisado 200×76, stroke grueso (4 ≈ líneas de Locomotive).
+      -->
+      <svg class="hero-disc" viewBox="0 0 200 76" role="img"
+           aria-label="Disciplinas: Diseño, Desarrollo, AI" preserveAspectRatio="xMidYMid meet">
+        <!-- marco exterior -->
+        <rect x="2" y="2" width="196" height="72" fill="none" stroke="#fff" stroke-width="4"/>
+        <!-- HORQUILLA ⊣ como Locomotive: vertical larga + brazo horizontal a la DERECHA -->
+        <!-- VERTICAL LARGA: de arriba a abajo. Separa DIS de DEV/AI -->
+        <line x1="100" y1="8" x2="100" y2="68" stroke="#fff" stroke-width="4"/>
+        <!-- BRAZO HORIZONTAL: a la DERECHA, largo, casi hasta el borde (separa DEV de AI). -->
+        <line x1="100" y1="38" x2="192" y2="38" stroke="#fff" stroke-width="4"/>
+        <!-- textos: DIS centrado en la mitad izquierda, DEV/AI a la derecha de la vertical -->
+        <text x="50"  y="39" fill="#fff" text-anchor="middle" dominant-baseline="central" class="hero-disc__txt">DIS</text>
+        <text x="150" y="22" fill="#fff" text-anchor="middle" dominant-baseline="central" class="hero-disc__txt">DEV</text>
+        <text x="150" y="56" fill="#fff" text-anchor="middle" dominant-baseline="central" class="hero-disc__txt">AI</text>
+      </svg>
+      <span class="hero-wordmark__word" data-reveal>{wordmarkName}<sup class="hero-wordmark__reg" aria-hidden="true">®</sup></span>
+    </h1>
+    <p class="hero-wordmark__descriptor" data-reveal>
+      {wordmarkDescriptor}<span class="hero-wordmark__star" aria-hidden="true">✳</span>
+    </p>
+  </div>
 
-  <!--
-    Subhead — Hanken Grotesk tinta-suave, col 1-6 desktop
-  -->
-  <p class="hero-subhead">
-    {t.hero.subhead}
-  </p>
-
-  <!--
-    CTA — "START A PROJECT →" / "EMPEZAR UN PROYECTO →"
-    Borde hairline borde, texto tinta. Hover: terracota.
-    Touch target mínimo 48px (P9).
-  -->
-  <a class="hero-cta" href="#contact">
-    {t.hero.cta} <span aria-hidden="true">→</span>
-  </a>
-
-  <!--
-    Índice de capacidades 001-004.
-    Desktop: col 9-12 alineado verticalmente al centro del headline.
-    Mobile/tablet: lista mono full-width debajo del CTA.
-    Se lee como ficha técnica de estudio, NO lista de servicios con bullets.
-  -->
-  <ul class="hero-capabilities" aria-label="Capacidades del estudio">
-    {t.hero.capabilities.map((item) => (
-      <li class="hero-capabilities__item">
-        <span class="hero-capabilities__num">{item.num}</span>
-        <span class="hero-capabilities__sep" aria-hidden="true"> / </span>
-        <span class="hero-capabilities__label">{item.label}</span>
-      </li>
-    ))}
-  </ul>
+  <!-- Scroll cue — esquina inferior derecha -->
+  <span class="hero-scroll-cue" aria-hidden="true">↓</span>
 
 </section>
 
 <style>
-/* ═══════════════════════════════════════════════════════════
-   HERO V3 — fondo hueso, Fraunces light
-   Mobile-first: 375px base. md: 768px. lg: 1280px.
-   ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════
+   HERO "LOCOMOTIVE" — RÉPLICA EXACTA del sistema tipográfico de locomotive.ca
+   Valores extraídos del sitio real (computed styles @1440px, 2026-06-16):
+     - Nav:      HelveticaNowDisplay 26px / 400 / sin tracking / Title Case
+                 → acá: Geist Sans (sans neutra equivalente).
+     - Wordmark: LocomotiveNew (serif custom) 70px / 400 / line-height 1.1
+                 → acá: Fraunces (tu serif licenciada).
+     - left: 40px exacto (brand y wordmark). Wordmark pegado al fondo.
+     - COLOR: el texto es BLANCO. NO tiene color propio: el efecto de color que
+       cambia según el video lo da `mix-blend-mode: difference` en el contenedor
+       (.hero-nav y .hero-wordmark). Sobre claro → oscuro; sobre rojo → cyan; etc.
+       Esto es EXACTAMENTE lo que hace Locomotive (clases .c-header y
+       .c-home-hero_content tienen mix-blend-mode: difference).
+   Mobile-first: 375px base → md:768px → lg:1280px.
+   ═══════════════════════════════════════════════════════════════════ */
 
-.hero {
+.hero-v3 {
+  /* left exacto de Locomotive = 40px. Lo usamos como margen del hero. */
+  --hero-edge: 40px;
+
   position: relative;
   min-height: 100svh;
+  height: 100svh;
+  overflow: hidden;
+  background-color: #0b0b0a;      /* base oscura mientras carga el video/poster */
+  isolation: isolate;             /* CRÍTICO: aísla el mix-blend al hero, no a toda la página */
   display: flex;
   flex-direction: column;
-  padding-left: var(--margin);
-  padding-right: var(--margin);
-  padding-top: 0;
-  padding-bottom: var(--space-2xl);
-  max-width: 100%;
-  overflow-x: clip;
-  /* V3: fondo hueso. El grano viene de body::after (fixed, lo atraviesa). */
-  background-color: var(--hueso);
-  color: var(--tinta);
 }
 
-/* ─── GRILLA EDITORIAL ───────────────────────────────────── */
-
-.grid-lines {
+/* ── Video full-bleed ─────────────────────────────────────────────── */
+.hero-media {
   position: absolute;
   inset: 0;
-  pointer-events: none;
   z-index: 0;
+  overflow: hidden;
 }
 
-.grid-line {
+.hero-video {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  /* Línea editorial V3: tinta al 8% sobre hueso */
-  background-color: var(--linea-claro);
-  opacity: 0; /* GSAP revela en la entrada */
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  will-change: transform, opacity;
 }
 
-.grid-line[data-col="3"] {
-  left: 25%;
-  display: none;
-}
+/* Sin scrim: mix-blend-mode: difference ya garantiza contraste contra cualquier fondo. */
 
-.grid-line[data-col="6"] {
-  left: 50%;
-  display: none;
-}
-
-.grid-line[data-col="9"] {
-  left: 75%;
-  display: none;
-}
-
-/* ─── FRANJA TERRACOTA — costura estructura ──────────────── */
-/*
- * Mobile: regla horizontal 1px, full-width desde el margen,
- *         debajo del H1 (JS la posiciona).
- * Desktop/tablet: vertical 1px sobre eje col 9.
- * El terracota como estructura visible = el sitio "es" terracota.
- */
-.hero-terracota-bar {
-  position: absolute;
-  background-color: var(--terracota);
-  pointer-events: none;
-  z-index: 2;
-  opacity: 0; /* GSAP revela */
-
-  /* Mobile: horizontal */
-  left: var(--margin);
-  right: var(--margin);
-  height: 1px;
-  width: auto;
-  top: auto;
-  bottom: auto;
-}
-
-/* ─── KICKER ─────────────────────────────────────────────── */
-
-.hero-kicker {
+/* ════════════════════════════════════════════════════════════════════
+   NAV — réplica Locomotive: 26px, blanco, mix-blend difference
+   ════════════════════════════════════════════════════════════════════ */
+.hero-nav {
   position: relative;
-  z-index: 2;
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  line-height: 1.4;
-  color: var(--tinta-suave);
-  margin-top: clamp(88px, 14vh, 120px);
-  margin-bottom: var(--space-m);
-  flex-shrink: 0;
-  opacity: 0; /* GSAP revela */
-}
-
-/* ─── ÍNDICE DE ESTUDIO — solo desktop ───────────────────── */
-
-.hero-studio-index {
-  display: none; /* solo desktop — ver breakpoint 1280px */
-  position: absolute;
-  z-index: 2;
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  line-height: 1.8;
-  color: var(--tinta-suave);
-  opacity: 0; /* GSAP revela */
-  text-align: right;
-}
-
-/* ─── H1 ─────────────────────────────────────────────────── */
-/*
- * Fraunces 300 light. Leading 1.02, tracking -0.025em.
- * 3 líneas fijas en desktop.
- * Sentence/title case editorial (NO caps condensadas del diseño bloqueado).
- * .italic-acento hereda de global.css: itálica 400 terracota — el gesto de marca.
- *
- * PROGRESSIVE ENHANCEMENT:
- * Por defecto el H1 es texto plano visible (no se oculta con opacity:0).
- * El script agrega .hero-animating al <h1> ANTES de crear las máscaras,
- * lo que oculta el contenido original. Luego crea los line-mask/line-inner
- * y anima desde abajo. Sin JS: texto visible sin ninguna máscara.
- */
-.hero-h1 {
-  position: relative;
-  z-index: 2;
-  font-family: var(--font-display);
-  font-weight: var(--display-weight-light);
-  /* Mobile: 6vw preferred — con copy de 3 líneas largas queda 5-6 líneas manejables */
-  font-size: clamp(1.6rem, 6vw, 2.8rem);
-  line-height: var(--display-leading);
-  letter-spacing: var(--display-tracking);
-  color: var(--tinta);
-  hyphens: manual;
-  overflow-wrap: anywhere;
-  flex-shrink: 0;
-  margin-bottom: 0;
-  margin-top: 0;
-}
-
-/*
- * .hero-h1.hero-animating — estado durante la animación GSAP.
- * El script vacía el contenido de cada .h1-line y lo mete en .line-mask > .line-inner.
- * No usamos visibility:hidden porque se hereda a los hijos: en su lugar el GSAP
- * pone los .line-inner en yPercent:102 (fuera del overflow:hidden del .line-mask),
- * lo que los oculta sin afectar la herencia de visibilidad.
- * Esta clase se agrega antes de construir las masks y se remueve al finalizar el tl.
- */
-.hero-h1.hero-animating {
-  /* Solo necesaria como hook de JS — sin estilos propios. */
-}
-
-.h1-line {
-  display: block;
-}
-
-.h1-word {
-  display: inline;
-}
-
-/* La palabra itálica (italic-acento) dentro del H1:
- * Como es display:inline junto al resto de la línea, necesitamos
- * que el inline-block del ancestor no rompa el layout.
- * Se mantiene inline para preservar el flujo natural del texto. */
-.hero-h1 .italic-acento {
-  display: inline;
-}
-
-.h1-space {
-  display: inline;
-}
-
-/* ─── SUBHEAD ────────────────────────────────────────────── */
-
-.hero-subhead {
-  position: relative;
-  z-index: 2;
-  font-family: var(--font-body);
-  font-size: var(--text-subhead);
-  font-weight: 400;
-  color: var(--tinta-suave);
-  line-height: 1.55;
-  letter-spacing: 0;
-  margin-top: var(--space-xl);
-  max-width: 38ch;
-  flex-shrink: 0;
-  opacity: 0; /* GSAP revela */
-}
-
-/* ─── CTA ────────────────────────────────────────────────── */
-
-.hero-cta {
-  position: relative;
-  z-index: 2;
-  display: inline-flex;
+  z-index: 3;
+  display: flex;
   align-items: center;
-  gap: 0.5em;
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  color: var(--tinta);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  line-height: 1.4;
+  justify-content: space-between;
+  gap: 1rem;
+  padding:
+    max(var(--hero-edge), env(safe-area-inset-top))
+    max(var(--hero-edge), env(safe-area-inset-right))
+    0
+    max(var(--hero-edge), env(safe-area-inset-left));
+  /* EL EFECTO: el texto blanco se invierte según el video que tiene detrás */
+  mix-blend-mode: difference;
+  color: #fff;
+  opacity: 0; /* GSAP revela */
+}
+
+/* Todo el texto del nav es BLANCO — el color lo crea el blend, no el texto. */
+.hero-nav__brand {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.625rem;          /* 26px exacto */
+  letter-spacing: -0.01em;
+  color: #fff;
   text-decoration: none;
-  margin-top: var(--space-l);
-  padding: 0.75em 1.5em;
-  /* Borde hairline borde sobre hueso */
-  border: 1px solid var(--borde);
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.06em;
   flex-shrink: 0;
-  opacity: 0; /* GSAP revela */
-  /* Touch target mínimo 48px (P9) */
-  min-height: 48px;
-  align-self: flex-start;
-  transition: border-color 0.25s ease, color 0.25s ease, background-color 0.25s ease;
 }
 
-.hero-cta:hover {
-  border-color: var(--terracota);
-  color: var(--hueso);
-  background-color: var(--terracota);
+.hero-nav__reg {
+  font-size: 0.5em;
+  color: #fff;
+  vertical-align: super;
 }
 
-/* ─── ÍNDICE DE CAPACIDADES ──────────────────────────────── */
 /*
- * Mobile: lista mono full-width, debajo del CTA.
- * Desktop: col 9-12, alineada verticalmente al centro del headline.
+ * Links centrales — "Work, Services, Contact": una tira, Title Case, blanco, 26px.
+ * Posición a la DERECHA-centro (como Locomotive: el bloque de links vive cerca
+ * del CTA, no pegado al brand). margin-left:auto los empuja a la derecha;
+ * el gap con .hero-nav__right los separa del "Let's talk".
+ * Ocultos en mobile.
  */
-.hero-capabilities {
-  position: relative;
-  z-index: 2;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  margin-top: var(--space-l);
-  flex-shrink: 0;
-  opacity: 0; /* GSAP revela */
+.hero-nav__center {
+  display: none;
+  align-items: baseline;
+  margin-left: auto;            /* empuja el bloque de links a la derecha */
+  margin-right: clamp(2rem, 6vw, 5rem);  /* separación del CTA "Let's talk" */
 }
 
-.hero-capabilities__item {
-  display: block;
+.hero-nav__link {
   font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  color: var(--tinta-suave);
+  font-size: 1.625rem;          /* 26px exacto */
+  font-weight: 400;
+  color: #fff;
+  text-decoration: none;
+  /* Los labels YA vienen en Title Case desde i18n — sin transform */
+  letter-spacing: 0;
+  line-height: 1.2;
+  position: relative;
+  background-image: linear-gradient(#fff, #fff);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding-bottom: 2px;
+}
+
+/* Coma + espacio entre links (no en el último) */
+.hero-nav__link[data-comma]::after {
+  content: ',\00a0';
+  color: #fff;
+}
+
+.hero-nav__link:hover {
+  background-size: 100% 1px;
+}
+
+.hero-nav__link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+.hero-nav__right {
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+
+.hero-nav__lang {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3em;
+  font-family: var(--font-body);
+  font-size: 1.625rem;          /* 26px exacto */
+  font-weight: 400;
+  text-transform: uppercase;     /* "EN"/"ES" códigos de idioma */
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+
+.hero-nav__lang-active {
+  color: #fff;
+}
+
+.hero-nav__lang-sep {
+  color: #fff;
+  opacity: 0.5;
+}
+
+.hero-nav__lang-other {
+  color: #fff;
+  opacity: 0.55;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.hero-nav__lang-other:hover {
+  opacity: 1;
+}
+
+.hero-nav__lang-other:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* CTA "Let's talk" — blanco, Title Case, 26px, igual que los links */
+.hero-nav__cta {
+  font-family: var(--font-body);
+  font-size: 1.625rem;          /* 26px exacto */
+  font-weight: 400;
+  color: #fff;
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.2;
+  position: relative;
+  background-image: linear-gradient(#fff, #fff);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding-bottom: 2px;
+}
+
+.hero-nav__cta:hover {
+  background-size: 100% 1px;
+}
+
+.hero-nav__cta:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   WORDMARK — abajo-izquierda. Réplica Locomotive: serif 70px, blanco, blend.
+   ════════════════════════════════════════════════════════════════════ */
+.hero-wordmark {
+  position: relative;
+  z-index: 3;
+  margin-top: auto; /* pegado al fondo */
+  padding:
+    0
+    var(--hero-edge)
+    max(var(--hero-edge), calc(env(safe-area-inset-bottom) + 1.5rem))
+    max(var(--hero-edge), env(safe-area-inset-left));
+  /* MISMO efecto que el nav: el wordmark blanco reacciona al video */
+  mix-blend-mode: difference;
+  color: #fff;
+}
+
+/*
+ * Wordmark — DOS líneas de la MISMA serif, MISMO tamaño (70px @desktop),
+ * peso 400, line-height 1.1. Blanco (el blend le da el color).
+ * Es UN bloque tipográfico sólido, como "Locomotive® / Digital-first Design Agency".
+ */
+.hero-wordmark__name,
+.hero-wordmark__descriptor {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-style: normal;
+  font-size: clamp(2.5rem, 11vw, 4.375rem);   /* 70px @desktop */
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+  color: #fff;
+  margin: 0;
+}
+
+.hero-wordmark__name {
+  display: flex;
+  align-items: center;          /* recuadro centrado a la altura de la mayúscula */
+  gap: 0.3em;
+}
+
+.hero-wordmark__word {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.04em;
+}
+
+.hero-wordmark__reg {
+  font-size: 0.32em;
+  font-weight: 400;
+  color: #fff;
+  vertical-align: super;
+  margin-top: 0.3em;
+}
+
+/* ── Recuadro de disciplinas DIS/DEV/AI ──────────────────────────────
+ * RÉPLICA EXACTA del OPS/DES/DEV de Locomotive. Medidas reales extraídas
+ * del DevTools de locomotive.ca (wordmark 70px): recuadro 176.92 × 88.48 px.
+ *   → altura  = 88.48/70  = 1.264em (relativo al font-size del wordmark)
+ *   → ancho   = 176.92/70 = 2.527em
+ *   → ratio apaisado ~2:1. Celda izquierda alta (DIS) + columna derecha (DEV/AI).
+ * El recuadro se mide en `em` del wordmark, NO en su propio font-size,
+ * para que escale 1:1 con la palabra en todos los breakpoints.
+ */
+.hero-disc {
+  /* Altura ≈ cap-height de "SCUART" en PP Editorial New Light.
+     Esta serif tiene mayúsculas más altas que Fraunces → subimos a 0.92em
+     para que el recuadro iguale la altura de la palabra. Ancho lo da el viewBox 200:76. */
+  height: 0.92em;
+  width: auto;
+  flex-shrink: 0;
+  align-self: center;
+  overflow: visible;
+}
+
+/* Texto dentro del SVG — sans del sitio, tamaño en unidades del viewBox (200×76) */
+.hero-disc__txt {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 22px;              /* coords del viewBox */
+  letter-spacing: 0.5px;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  line-height: 2;
 }
 
-.hero-capabilities__num {
-  display: inline;
-  font-variant-numeric: tabular-nums;
+.hero-disc__col .hero-disc__cell--sm:first-child {
+  border-bottom: 1px solid #fff;
 }
 
-.hero-capabilities__sep {
-  color: var(--tinta-suave);
-  opacity: 0.4;
+/* ── Asterisco después del descriptor (gesto Locomotive) ── */
+.hero-wordmark__star {
+  display: inline-block;
+  margin-left: 0.25em;
+  font-size: 0.7em;
+  vertical-align: middle;
+  font-weight: 300;
 }
 
-.hero-capabilities__label {
-  display: inline;
+/* ── Scroll cue ───────────────────────────────────────────────────── */
+.hero-scroll-cue {
+  position: absolute;
+  z-index: 3;
+  right: var(--hero-edge);
+  bottom: max(var(--hero-edge), calc(env(safe-area-inset-bottom) + 1rem));
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: #fff;
+  mix-blend-mode: difference;
+  opacity: 0.85;
+  display: none; /* se muestra desde tablet */
 }
 
-/* ═══════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════════════════
    TABLET (768px+)
-   ═══════════════════════════════════════════════════════════ */
+   ════════════════════════════════════════════════════════════════════ */
 @media (min-width: 768px) {
-  .hero {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    grid-template-rows: auto auto auto auto auto;
-    column-gap: var(--gutter);
-    align-items: start;
-    row-gap: 0;
+  .hero-nav__center {
+    display: flex;
   }
 
-  .grid-line[data-col="6"] {
-    display: block;
+  .hero-scroll-cue {
+    display: inline;
   }
 
-  .hero-kicker {
-    grid-column: 1 / 7;
-    margin-bottom: var(--space-s);
-  }
-
-  .hero-h1 {
-    grid-column: 1 / 7;
-    align-self: start;
-    /* Tablet: preferred 4.8vw → ~37px en 768px */
-    font-size: clamp(2rem, 4.8vw, 3.8rem);
-    hyphens: none;
-    overflow-wrap: normal;
-    text-wrap: balance;
-  }
-
-  .hero-subhead {
-    grid-column: 1 / 5;
-    max-width: none;
-    margin-top: var(--space-l);
-  }
-
-  .hero-cta {
-    grid-column: 1 / 4;
-    margin-top: var(--space-m);
-    align-self: start;
-  }
-
-  .hero-capabilities {
-    grid-column: 1 / 7;
-    margin-top: var(--space-m);
-  }
-
-  /* Franja terracota tablet: vertical 1px en col 5/6 */
-  .hero-terracota-bar {
-    left: calc(var(--margin) + (100% - 2 * var(--margin)) * 0.667);
-    right: auto;
-    width: 1px;
-    height: auto;
-    top: 22%;
-    bottom: 12%;
-    transform-origin: top center;
+  .hero-wordmark__name,
+  .hero-wordmark__descriptor {
+    font-size: clamp(3.5rem, 8vw, 4.375rem);
   }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   DESKTOP (1280px+)
-   ═══════════════════════════════════════════════════════════ */
+/* ════════════════════════════════════════════════════════════════════
+   DESKTOP (1280px+) — 70px exacto como Locomotive
+   ════════════════════════════════════════════════════════════════════ */
 @media (min-width: 1280px) {
-  .hero {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    grid-template-rows: auto auto auto auto;
-    min-height: 100svh;
-    align-items: start;
+  .hero-wordmark__name,
+  .hero-wordmark__descriptor {
+    font-size: 4.375rem;   /* 70px exacto */
   }
+}
 
-  .grid-line[data-col="3"],
-  .grid-line[data-col="6"],
-  .grid-line[data-col="9"] {
-    display: block;
+/* Ultrawide: Locomotive escala un poco; mantenemos proporción sobria */
+@media (min-width: 1920px) {
+  .hero-wordmark__name,
+  .hero-wordmark__descriptor {
+    font-size: 5.5rem;
   }
+}
 
-  /* Kicker: fila superior, col 1-9 (izquierda) */
-  .hero-kicker {
-    grid-column: 1 / 10;
-    grid-row: 1;
-    margin-bottom: var(--space-m);
-  }
+/* ── Máscaras de line-reveal (las inserta el script) ──────────────── */
+.line-mask {
+  display: block;
+  overflow: hidden;
+}
 
-  /* Índice de estudio: col 10-12, fila 1, desktop */
-  .hero-studio-index {
-    display: block;
-    grid-column: 10 / 13;
-    grid-row: 1;
-    align-self: end;
-    margin-bottom: 0;
-    padding-bottom: var(--space-xs);
-  }
+.line-inner {
+  display: block;
+}
 
-  /* H1: col 1-9, fila 2 */
-  .hero-h1 {
-    grid-column: 1 / 10;
-    grid-row: 2;
-    align-self: start;
-    /* Desktop: clamp ancho — 88-112px según ART_DIRECTION §3 tabla escala */
-    font-size: clamp(3.5rem, 5.5vw, 7rem);
-    text-wrap: unset;
-    hyphens: none;
-    overflow-wrap: normal;
-  }
-
-  /* Subhead: col 1-6, fila 3 */
-  .hero-subhead {
-    grid-column: 1 / 7;
-    grid-row: 3;
-    max-width: 50ch;
-    margin-top: var(--space-l);
-  }
-
-  /* CTA: col 1-3, fila 4 */
-  .hero-cta {
-    grid-column: 1 / 4;
-    grid-row: 4;
-    margin-top: var(--space-m);
-    align-self: start;
-  }
-
-  /*
-   * Índice de capacidades: col 10-12, fila 2-4.
-   * Alineado verticalmente al centro del headline.
-   * Sistema de índices mono — lectura como ficha técnica.
-   */
-  .hero-capabilities {
-    grid-column: 10 / 13;
-    grid-row: 2 / 5;
-    align-self: center;
-    margin-top: 0;
-  }
-
-  .hero-capabilities__item {
-    line-height: 2.4;
-  }
-
-  /*
-   * Franja terracota desktop: vertical 1px sobre eje col 9.
-   * Col 9 de 12 = 8/12 del interior = 66.6%.
-   */
-  .hero-terracota-bar {
-    left: calc(var(--margin) + (100% - 2 * var(--margin)) * 0.6667);
-    right: auto;
-    width: 1px;
-    height: auto;
-    top: 20%;
-    bottom: 18%;
-    transform-origin: top center;
-  }
+/* ── reduced-motion: estático, sin scale ──────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-nav { opacity: 1; }
+  .hero-video { transform: none !important; opacity: 1 !important; }
 }
 </style>
 
 <script>
   /**
-   * Hero V3 — Animación GSAP (Momento 1, ART_DIRECTION_V3_FINAL.md §6)
+   * Hero V3 "Locomotive" — Motion GSAP.
    *
-   * PROGRESSIVE ENHANCEMENT:
-   * El H1 es HTML server-rendered visible sin JS.
-   * Este script es enhancement: si falla, el hero se ve completo y estático.
+   * PROGRESSIVE ENHANCEMENT: wordmark y nav son HTML server-rendered;
+   * sin JS se ven igual (CSS deja .hero-nav en opacity:0 → el script lo revela;
+   * si el script no corre, el bloque reduced-motion del CSS lo deja visible).
    *
    * SECUENCIA:
-   * 1. Líneas de grilla (scaleY 0→1, expo.out, 1.1s)
-   * 2. Kicker + índice de estudio (fade, 0.6s)
-   * 3. H1 line-reveal: CADA LÍNEA completa entra con máscara (clip abajo→arriba)
-   *    - .h1-line[data-line="1"]: translateY(100%)→0, 0.9s expo.out
-   *    - .h1-line[data-line="2"]: stagger +0.12s
-   *    - .h1-line[data-line="3"] sin itálica: stagger +0.12s
-   *    - La palabra .italic-acento dentro de line 3: delay extra +0.2s — aterriza ÚLTIMA
-   *      (el gesto de marca como firma: "SHARP"/"MEJOR" en terracota llega al final)
-   * 4. Franja terracota (scale 0→1, 0.5s)
-   * 5. Índice de capacidades (fade + translateY, stagger 0.08s)
-   * 6. Subhead + CTA (fade)
+   * 1. Video/poster: scale 1.06→1 + opacity 0→1, 1.6s expo.out. Telón que entra.
+   * 2. Nav: fade + y -8→0, 0.6s.
+   * 3. Wordmark: line-reveal por líneas (máscara real, yPercent 110→0), stagger.
+   * 4. Scroll cue: loop sutil.
    *
-   * IMPLEMENTACIÓN DEL LINE-REVEAL:
-   * No usamos SplitText de GSAP Club (no disponible en OSS).
-   * Envolvemos cada .h1-line en un .line-mask (overflow:hidden) y animamos
-   * el .line-inner (el span del contenido) con translateY 100%→0.
-   * La itálica está DENTRO del line-inner de line3 — al animar line3 entra sola.
-   * Para el delay extra de la itálica: animamos el span.italic-acento por separado
-   * desde el mismo frame de inicio que line3, pero con ese +0.2s de offset.
-   *
-   * REDUCED-MOTION: todo estático visible de inmediato, sin masks, sin animación.
+   * prefers-reduced-motion: todo visible de inmediato (CSS ya lo cubre; el JS no corre).
    */
 
   import { gsap } from 'gsap';
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* Helper: posiciona la franja terracota en mobile (horizontal, entre H1 y subhead) */
-  function positionTerracotaBarMobile(
-    bar: HTMLElement | null,
-    h1: HTMLElement | null
-  ) {
-    if (!bar || !h1) return;
-    const h1Rect = h1.getBoundingClientRect();
-    const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    bar.style.top = `${h1Rect.bottom + scrollTop + 16}px`;
-    bar.style.bottom = 'auto';
-  }
-
   if (!reducedMotion) {
-    /* ── Referencias DOM ── */
-    const heroH1 = document.querySelector<HTMLElement>('.hero-h1');
-    const h1Lines = document.querySelectorAll<HTMLElement>('.h1-line');
-    const gridLines = document.querySelectorAll<HTMLElement>('.grid-line');
-    const terracotaBar = document.querySelector<HTMLElement>('.hero-terracota-bar');
-    const kicker = document.querySelector<HTMLElement>('.hero-kicker');
-    const studioIndex = document.querySelector<HTMLElement>('.hero-studio-index');
-    const heroSubhead = document.querySelector<HTMLElement>('.hero-subhead');
-    const heroCta = document.querySelector<HTMLElement>('.hero-cta');
-    const capabilityItems = document.querySelectorAll<HTMLElement>('.hero-capabilities__item');
-    const capabilities = document.querySelector<HTMLElement>('.hero-capabilities');
+    const heroNav    = document.querySelector<HTMLElement>('.hero-nav');
+    const heroVideo  = document.querySelector<HTMLElement>('.hero-video');
+    const revealEls  = document.querySelectorAll<HTMLElement>('[data-reveal]');
+    const scrollCue  = document.querySelector<HTMLElement>('.hero-scroll-cue');
 
-    const isMobile = window.innerWidth < 768;
-
-    /*
-     * Construir las masks de línea ANTES de agregar .hero-animating.
-     * Para cada .h1-line: crear .line-mask que la envuelve y .line-inner con el contenido.
-     *
-     * Estructura resultante:
-     *   <span class="h1-line" data-line="1">
-     *     <span class="line-mask">
-     *       <span class="line-inner">DESIGN + TECHNOLOGY</span>
-     *     </span>
-     *   </span>
-     *
-     * La itálica dentro de line3 queda DENTRO del line-inner — el span.italic-acento
-     * es un inline dentro del texto, no una línea separada.
-     */
-    const lineInners: HTMLElement[] = [];
-
-    h1Lines.forEach((lineEl) => {
+    /* ── Construir máscaras de line-reveal sobre cada elemento [data-reveal] ── */
+    const inners: HTMLElement[] = [];
+    revealEls.forEach((el) => {
       try {
-        /* Extraer el contenido HTML de la línea */
-        const originalContent = lineEl.innerHTML;
-
-        /* Crear la máscara */
+        const original = el.innerHTML;
         const mask = document.createElement('span');
         mask.className = 'line-mask';
-
-        /* Crear el inner animado */
         const inner = document.createElement('span');
         inner.className = 'line-inner';
-        inner.innerHTML = originalContent;
-
+        inner.innerHTML = original;
         mask.appendChild(inner);
-        lineEl.innerHTML = '';
-        lineEl.appendChild(mask);
-
-        lineInners.push(inner);
+        el.innerHTML = '';
+        el.appendChild(mask);
+        inners.push(inner);
       } catch (_) {
-        /* Si falla la construcción de una línea, la dejamos como está */
+        /* Fallback: queda el texto plano visible */
       }
     });
 
-    /*
-     * Activar .hero-animating AHORA (después de construir las masks).
-     * Esta clase oculta .h1-line via visibility:hidden en CSS.
-     * Luego GSAP anima los line-inner que SÍ son visibles (están dentro del mask).
-     *
-     * Nota: usamos visibility:hidden en .h1-line.hero-animating (ver CSS arriba)
-     * pero los line-inner dentro del mask NO heredan esa visibility si les
-     * hacemos un set explícito. En su lugar, el estado inicial de los line-inner
-     * es translateY(100%) que los manda debajo del overflow:hidden del mask.
-     */
-    if (heroH1) heroH1.classList.add('hero-animating');
+    /* ── Estados iniciales ──────────────────────────────── */
+    if (heroVideo) gsap.set(heroVideo, { scale: 1.06, opacity: 0, transformOrigin: 'center center' });
+    if (heroNav) gsap.set(heroNav, { opacity: 0, y: -8 });
+    if (inners.length) gsap.set(inners, { yPercent: 110 });
 
-    /* ── Estados iniciales ── */
-    gsap.set(gridLines, { opacity: 1, scaleY: 0, transformOrigin: 'top center' });
-
-    if (isMobile) {
-      positionTerracotaBarMobile(terracotaBar, heroH1);
-      if (terracotaBar) gsap.set(terracotaBar, { opacity: 1, scaleX: 0, transformOrigin: 'left center' });
-    } else {
-      if (terracotaBar) gsap.set(terracotaBar, { opacity: 1, scaleY: 0, transformOrigin: 'top center' });
-    }
-
-    gsap.set(kicker, { opacity: 0 });
-    if (studioIndex) gsap.set(studioIndex, { opacity: 0 });
-    gsap.set(heroSubhead, { opacity: 0 });
-    gsap.set(heroCta, { opacity: 0 });
-    if (capabilities) gsap.set(capabilities, { opacity: 1 }); /* el container es visible */
-    gsap.set(capabilityItems, { opacity: 0, y: 8 });
-
-    /* Líneas del H1: empiezan debajo de la máscara */
-    if (lineInners.length > 0) {
-      gsap.set(lineInners, { yPercent: 102 });
-      /* Hacerlos visibles AHORA (la máscara los oculta, no visibility:hidden) */
-      gsap.set(lineInners, { visibility: 'visible' });
-    }
-
-    /* ── Timeline principal ── */
+    /* ── Timeline ───────────────────────────────────────── */
     const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
 
-    /* 1. Líneas de grilla */
-    tl.to(gridLines, { scaleY: 1, duration: 1.1, stagger: 0.06 });
+    tl.to(heroVideo, { scale: 1, opacity: 1, duration: 1.6 }, 0);
+    tl.to(heroNav, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 0.25);
+    tl.to(inners, { yPercent: 0, duration: 1.1, stagger: 0.12 }, 0.45);
 
-    /* 2. Kicker + índice de estudio */
-    tl.to(kicker, { opacity: 1, duration: 0.6 }, '-=0.5');
-    if (studioIndex) tl.to(studioIndex, { opacity: 1, duration: 0.6 }, '<');
-
-    /* 3. H1 line-reveal — líneas 1, 2, 3 con stagger 0.12s
-     *    Cada línea entra como bloque (toda la línea de una vez).
-     *    La itálica dentro de line3 viene dentro del line-inner[2] — no necesita
-     *    tratamiento separado para el reveal de línea.
-     *
-     *    Para el gesto de marca (la itálica aterriza "última"):
-     *    La línea 3 entra como bloque. Inmediatamente después, la palabra .italic-acento
-     *    hace un micro-refuerzo: scale 0.92→1 + un leve color-fade desde tinta a terracota
-     *    (ya tiene terracota desde el CSS, así que el "aterrizaje" es el scale).
-     *    Esto da el efecto de "la firma llega al final" sin separar la línea en piezas.
-     */
-    if (lineInners.length >= 3) {
-      /* Las 3 líneas entran con stagger */
-      tl.to(
-        lineInners,
-        {
-          yPercent: 0,
-          duration: 0.9,
-          stagger: 0.12,
-        },
-        '-=0.2'
-      );
-
-      /* La itálica dentro de line3: micro-refuerzo (scale 0.94→1) con +0.2s de delay
-       * respecto al inicio del reveal de line3.
-       * lineInners[2] es la línea 3; buscamos el .italic-acento dentro de ella. */
-      const italicEl = lineInners[2]?.querySelector<HTMLElement>('.italic-acento');
-      if (italicEl) {
-        /* Estado inicial: ligeramente reducida y sin color visible (hereda el color del
-         * parent que aún no entró — el mask lo ocultaba). Al entrar el line-inner, la
-         * itálica ya es terracota (CSS), pero con scale 0.94 parece que "se asienta". */
-        gsap.set(italicEl, { scale: 0.94, transformOrigin: 'left bottom' });
-        /* El label '<+0.2' es relativo al inicio del último tween que arrancó en el tl,
-         * que fue el stagger de los 3 lineInners. El tercer inner empieza en t + 0.24s
-         * (2 × stagger 0.12s). '<+0.2' cuenta desde ese mismo inicio → +0.2s después
-         * de que el stagger arrancó, es decir ~0.44s desde que comenzó el reveal de líneas. */
-        tl.to(
-          italicEl,
-          { scale: 1, duration: 0.6, ease: 'expo.out' },
-          `<+${0.12 * 2 + 0.2}`
-        );
-      }
-    } else if (lineInners.length > 0) {
-      /* Fallback: si por alguna razón no se construyeron los 3 inners */
-      tl.to(lineInners, { yPercent: 0, duration: 0.9, stagger: 0.12 }, '-=0.2');
-    }
-
-    /* 4. Franja terracota */
-    if (isMobile) {
-      tl.to(terracotaBar, { scaleX: 1, duration: 0.5, ease: 'expo.out' }, '+=0.05');
-    } else {
-      tl.to(terracotaBar, { scaleY: 1, duration: 0.8, ease: 'expo.out' }, '-=0.7');
-    }
-
-    /* 5. Índice de capacidades */
-    tl.to(
-      capabilityItems,
-      { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'expo.out' },
-      '-=0.4'
-    );
-
-    /* 6. Subhead + CTA */
-    tl.to(heroSubhead, { opacity: 1, duration: 0.7 }, '+=0.05');
-    tl.to(heroCta, { opacity: 1, duration: 0.5 }, '<+0.15');
-
-    /* Al terminar la animación, remover .hero-animating (no es necesaria ya) */
+    /* Scroll cue — loop sutil al terminar */
     tl.call(() => {
-      if (heroH1) heroH1.classList.remove('hero-animating');
+      if (scrollCue) {
+        gsap.to(scrollCue, { y: 7, duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+      }
     });
-
-  } else {
-    /* ── reduced-motion: todo visible de inmediato ── */
-    const allAnimated = document.querySelectorAll<HTMLElement>(
-      '.grid-line, .hero-terracota-bar, .hero-kicker, .hero-studio-index, .hero-subhead, .hero-cta'
-    );
-    gsap.set(allAnimated, { opacity: 1 });
-
-    const gridLinesRM = document.querySelectorAll<HTMLElement>('.grid-line');
-    gsap.set(gridLinesRM, { scaleY: 1 });
-
-    const barRM = document.querySelector<HTMLElement>('.hero-terracota-bar');
-    if (barRM) gsap.set(barRM, { scaleX: 1, scaleY: 1 });
-
-    const capRM = document.querySelectorAll<HTMLElement>('.hero-capabilities__item');
-    gsap.set(capRM, { opacity: 1, y: 0 });
-
-    const capContainerRM = document.querySelector<HTMLElement>('.hero-capabilities');
-    if (capContainerRM) gsap.set(capContainerRM, { opacity: 1 });
-
-    /* H1 es HTML plano visible por defecto en reduced-motion — no necesita set */
-    /* La itálica terracota es CSS puro — visible siempre */
   }
 </script>

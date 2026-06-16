@@ -1,98 +1,132 @@
 /**
  * tokens.css — Sistema de design tokens
  *
- * PALETA ACTIVA: V3 "Terracota cálida en alternancia" (ART_DIRECTION_V3_FINAL.md §2)
- * Los tokens V1 "Declaración en Rojo" se conservan al final como legado.
- *
- * TIPOGRAFÍA ACTIVA: Fraunces (display) + Hanken Grotesk (cuerpo/ficha).
- * Los tokens --font-* anteriores se conservan al final como legado.
+ * PALETA ACTIVA: B1 "Arquitecto" claro (ART_DIRECTION.md §3)
+ * Fondo yeso, tinta casi-negra, único acento verde botella.
+ * El token --accent es aislado para afinación en vivo por William.
  */
 
 :root {
   /* ══════════════════════════════════════════════════════════════
-     §V3 PALETA — "Terracota cálida en alternancia"
-     ART_DIRECTION_V3_FINAL.md §2
+     PALETA B1 "ARQUITECTO" CLARO
+     ~95% neutrales (yeso + tinta), <5% verde botella.
+     ART_DIRECTION.md §3
      ══════════════════════════════════════════════════════════════ */
 
-  /* Bases claras (~50% del scroll) */
-  --hueso:           #F0E9DC;   /* fondo claro dominante. Hero, portfolio, capabilities, method */
-  --tinta:           #1C140E;   /* texto/titulares sobre hueso. Contraste ~13.5:1 (AAA) */
-  --tinta-suave:     #6B5D4F;   /* texto secundario, metadatos, captions sobre hueso. ~5.2:1 (AA) */
+  /* Fondos neutros — el papel del plano (~82%) */
+  --bg: #f5f4f0; /* yeso dominante. Hero, portfolio, capabilities, footer. NUNCA #FFF */
+  --surface: #eceae4; /* superficie elevada, secciones alternadas, plano sin sombras */
 
-  /* Bases oscuras cálidas (~35% del scroll) */
-  --barro-oscuro:    #241710;   /* fondo oscuro cálido. Manifiesto, contacto, footer */
-  --barro-elevado:   #2E1F15;   /* bloques/cards sobre barro-oscuro (profundidad de plano) */
+  /* Tinta — el grafito (~10%) */
+  --ink: #131312; /* texto y titulares. Casi-negro cálido. NUNCA #000 */
+  --ink-mid: rgba(19, 19, 18, 0.7); /* tinta 70% — lead/subhead sobre --bg */
 
-  /* Terracota — el gesto de marca (~12% de superficie) */
-  --terracota:       #A4471F;   /* color de marca. Fondo manifiesto, CTA primario, acento hero */
-  --terracota-prof:  #7E3415;   /* hover/pressed del CTA terracota */
+  /* Gris UI — metadatos, labels, hairlines (~3%) */
+  --mid: #888783; /* solo texto ≥18.66px bold o ≥24px regular, o no-texto */
 
-  /* Ámbar — el brillo (≤3% de superficie, 1-2 apariciones por pantalla) */
-  --ambar:           #D99A4E;   /* solo sobre fondos oscuros o como elemento gráfico */
+  /* Acento — la única línea verde (<5%) — TOKEN AISLADO para afinación en vivo */
+  --accent: #1a3a2a; /* verde botella. CTA, itálica de énfasis, hover portfolio, franja */
+  --accent-press: #12281d; /* hover/pressed del CTA — oscurece, nunca aclara */
+  --on-accent: #f5f4f0; /* texto sobre relleno verde (= --bg). Contraste ~10:1 (AAA) */
 
-  /* Bordes cálidos (derivados cálidos, jamás grises fríos) */
-  --borde:           #D8C9B4;   /* hairlines sobre hueso */
-  --borde-oscuro:    #473321;   /* hairlines sobre barro-oscuro */
-
-  /* Líneas editoriales contextuales (derivados de los fondos activos) */
-  --linea-claro:     rgba(28, 20, 14, 0.08);    /* guía editorial sobre hueso */
-  --linea-oscuro:    rgba(240, 233, 220, 0.08); /* guía editorial sobre barro-oscuro */
-
-  /* ── §V3 FAMILIAS TIPOGRÁFICAS ─────────────────────────────── */
-  /* Swap premium: --font-display: 'Canela', serif; (1:1 con Fraunces, solo cambiar este token) */
-  --font-display:  'Fraunces Variable', serif;
-  --font-body:     'Hanken Grotesk', sans-serif;
-  /* Mono sigue como tercera familia de apoyo (IBM Plex Mono self-hosted) */
-  --font-mono:     'IBM Plex Mono', monospace;
-
-  /* Pesos display (Fraunces variable: eje wght 100-900, WONK/SOFT) */
-  --display-weight-light:  300;   /* titulares gigantes — H1, H2 (peso bajo = elegante en grande) */
-  --display-weight-normal: 400;   /* itálica de acento + H3/nombres portfolio */
-  /* Legado: --display-weight-heavy conservado en 900 para los componentes
-     no migrados (Footer wordmark, Method numerales, Contact statement, etc.).
-     NO bajar a 700 hasta que esos componentes sean migrados a V3. */
-  --display-weight-heavy:  900;
-
-  /* Tracking y leading display */
-  --display-tracking: -0.025em;   /* -0.02 a -0.03em según ART_DIRECTION §3 */
-  --display-leading:  1.02;       /* 1.0–1.05 leading apretado editorial */
+  /* Bordes y guías editoriales (derivados neutros) */
+  --border: #d8d5cc; /* hairlines sobre --bg */
+  --grid-line: rgba(
+    19,
+    19,
+    18,
+    0.08
+  ); /* guías editoriales de grilla, muy sutiles */
 
   /* ══════════════════════════════════════════════════════════════
-     LEGADO V1 "Declaración en Rojo" — CONSERVADOS para retro-compat
-     Se usan en ManifestoSection, Nav (scrolled), skip-link inlined.
-     NO eliminar hasta que esos componentes sean migrados a V3.
+     FAMILIAS TIPOGRÁFICAS
+     Fraunces (display: hero, manifiesto, nombres, wordmark)
+     Geist Sans (cuerpo, UI, índices, nav, botones)
+     ART_DIRECTION.md §4
+     ══════════════════════════════════════════════════════════════ */
+  /*
+   * SWAP HECHO (2026-06-16): William licenció PP Editorial New (Light, web).
+   * Self-hosted en /public/fonts, declarada en fonts.css.
+   * Fraunces queda como fallback si la web font no carga.
+   */
+  --font-display: "PP Editorial New", "Fraunces Variable", serif;
+  --font-body: "Geist Sans", sans-serif;
+
+  /* Pesos display (Fraunces variable: eje wght 100-900) */
+  --display-weight-light: 300; /* titulares gigantes — peso bajo = elegante en grande */
+  --display-weight-normal: 400; /* itálica de acento verde, H3/nombres portfolio */
+  --display-weight-heavy: 500; /* nombres de proyecto, numerales de sección */
+
+  /* Tracking y leading display */
+  --display-tracking: -0.025em; /* titulares grandes casi tocándose en horizontal */
+  --display-leading: 1.02; /* editorial apretado, no interlineado de cuerpo */
+
+  /* ══════════════════════════════════════════════════════════════
+     ESCALA TIPOGRÁFICA FLUIDA (ART_DIRECTION.md §4, tabla de escala)
+     Mobile-first: mínimo en 375px, máximo en 1440px+.
      ══════════════════════════════════════════════════════════════ */
 
-  --carbon:        #0E0E0E;
-  --carbon-elev:   #1A1A18;
-  --crema:         #E8E2D6;
-  --rojo:          #D70321;
-  --taupe:         #8A857B;
-  --linea:         rgba(232, 226, 214, 0.09);
-  --linea-hover:   rgba(232, 226, 214, 0.14);
-  /* Legado: wdth axis Archivo (no aplica a Fraunces — ignorado en práctica) */
-  --display-wdth:  110;
+  /* Display XXL — Hero H1, Manifiesto */
+  --text-h1: clamp(3rem, 9vw, 9rem); /* 48px → ~144px */
+  /* Display XL — H2 de sección */
+  --text-h2: clamp(2.25rem, 5.5vw, 5rem); /* 36px → 80px */
+  /* Display L — H3, nombre de proyecto */
+  --text-names: clamp(1.75rem, 3.5vw, 3rem); /* 28px → 48px */
+  /* Lead/subhead */
+  --text-subhead: clamp(1.125rem, 1.6vw, 1.375rem); /* 18px → 22px */
+  /* Body */
+  --text-body: clamp(1rem, 1.1vw, 1.0625rem); /* 16px → 17px */
+  /* Índice mono / metadatos */
+  --text-mono: clamp(0.6875rem, 0.3vw + 0.6rem, 0.8125rem); /* 11px → 13px */
+  /* CTA contact */
+  --text-cta: clamp(2.5rem, 10vw, 8rem);
 
-  /* ── §6 SPACING FLUIDO ───────────────────────────────────────── */
-  --space-2xs: clamp(0.25rem, 1vw, 0.5rem);     /* 4px → 8px   */
-  --space-xs:  clamp(0.5rem, 1.5vw, 1rem);      /* 8px → 16px  */
-  --space-s:   clamp(1rem, 2.5vw, 1.5rem);      /* 16px → 24px */
-  --space-m:   clamp(1.5rem, 4vw, 2.5rem);      /* 24px → 40px */
-  --space-l:   clamp(2rem, 6vw, 4rem);          /* 32px → 64px */
-  --space-xl:  clamp(3rem, 9vw, 6rem);          /* 48px → 96px */
-  --space-2xl: clamp(4rem, 12vw, 9rem);         /* 64px → 144px */
-  --space-3xl: clamp(6rem, 16vw, 12.5rem);      /* 96px → 200px */
+  /* ══════════════════════════════════════════════════════════════
+     SPACING FLUIDO (8-base)
+     ══════════════════════════════════════════════════════════════ */
+  --space-2xs: clamp(0.25rem, 1vw, 0.5rem);
+  --space-xs: clamp(0.5rem, 1.5vw, 1rem);
+  --space-s: clamp(1rem, 2.5vw, 1.5rem);
+  --space-m: clamp(1.5rem, 4vw, 2.5rem);
+  --space-l: clamp(2rem, 6vw, 4rem);
+  --space-xl: clamp(3rem, 9vw, 6rem);
+  --space-2xl: clamp(4rem, 12vw, 9rem);
+  --space-3xl: clamp(6rem, 16vw, 12.5rem);
 
-  /* ── §4 GRID ─────────────────────────────────────────────────── */
-  --gutter:  clamp(1rem, 2vw, 2rem);     /* 16px → 32px */
-  --margin:  clamp(1.25rem, 5vw, 7.5rem); /* 20px → 120px */
+  /* ══════════════════════════════════════════════════════════════
+     GRID
+     ══════════════════════════════════════════════════════════════ */
+  --gutter: clamp(1rem, 2vw, 2rem);
+  --margin: clamp(
+    1.25rem,
+    5vw,
+    7rem
+  ); /* márgenes amplios — el contenido NO llega al borde */
 
-  /* ── §5 ESCALA TIPOGRÁFICA FLUIDA ───────────────────────────── */
-  --text-h1:      clamp(2.4rem, 10.5vw, 13rem);               /* H1 hero — mobile/tablet ajustado iter.4: min 2.75→2.4, preferred 13→10.5vw */
-  --text-h2:      clamp(2rem, 9vw, 7rem);                     /* H2 sección */
-  --text-names:   clamp(1.75rem, 8vw, 6rem);                  /* nombres portfolio */
-  --text-cta:     clamp(2.5rem, 10vw, 8rem);                  /* "Hablemos." */
-  --text-subhead: clamp(1.125rem, 1.4vw + 0.7rem, 1.375rem); /* subhead-filtro */
-  --text-body:    clamp(1rem, 0.4vw + 0.9rem, 1.125rem);     /* body */
-  --text-mono:    clamp(0.6875rem, 0.3vw + 0.6rem, 0.8125rem); /* índices mono */
+  /* ══════════════════════════════════════════════════════════════
+     LEGADO — tokens de la dirección terracota anterior.
+     Se conservan para que los componentes no migrados (ManifestoSection,
+     ContactSection, Footer) no rompan hasta ser rediseñados.
+     NO usar en código nuevo. NO eliminar hasta migrar esos componentes.
+     ══════════════════════════════════════════════════════════════ */
+  --hueso: #f5f4f0; /* mapeado a --bg para compatibilidad */
+  --tinta: #131312; /* mapeado a --ink */
+  --tinta-suave: #888783; /* mapeado a --mid */
+  --barro-oscuro: #1e1e1c; /* fondo oscuro: ahora tinta casi-negra (sin terracota) */
+  --barro-elevado: #2a2a28;
+  --terracota: #1a3a2a; /* MAPEADO A ACENTO VERDE — los comp viejos usaban terracota como acento */
+  --terracota-prof: #12281d;
+  --ambar: #888783; /* degradado a gris neutro */
+  --borde: #d8d5cc; /* mapeado a --border */
+  --borde-oscuro: #2a2a28;
+  --linea-claro: rgba(19, 19, 18, 0.08);
+  --linea-oscuro: rgba(245, 244, 240, 0.08);
+  --carbon: #131312;
+  --carbon-elev: #1a1a18;
+  --crema: #f5f4f0;
+  --rojo: #131312; /* el rojo queda mapeado a tinta — no hay rojo en B1 */
+  --taupe: #888783;
+  --linea: rgba(245, 244, 240, 0.09);
+  --linea-hover: rgba(245, 244, 240, 0.14);
+  --display-wdth: 110;
 }

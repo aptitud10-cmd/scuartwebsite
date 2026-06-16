@@ -244,84 +244,86 @@ export interface Translations {
 export const en: Translations = {
   /* ── SEO / metadata ─────────────────────────────────────── */
   meta: {
-    title: 'SCUART — Bilingual Design & Tech Studio',
+    title: "SCUART — Bilingual Design & Tech Studio",
     description:
-      'A bilingual studio building premium websites, platforms and digital systems for ambitious businesses across the US and LATAM.',
-    ogTitle: 'SCUART — Bilingual Design & Tech Studio',
+      "A bilingual studio building premium websites, platforms and digital systems for ambitious businesses across the US and LATAM.",
+    ogTitle: "SCUART — Bilingual Design & Tech Studio",
     ogDescription:
-      'Premium web design and digital systems for businesses in the US and LATAM.',
+      "Premium web design and digital systems for businesses in the US and LATAM.",
   },
 
-  /* ── Nav ────────────────────────────────────────────────── */
+  /* ── Nav ──────────────────────────────────────────────────
+   * Labels alineados a investigación de navs de agencias de élite 2026
+   * (Work/Studio/Services es el patrón dominante; "Method" descartado —
+   * 0/10 agencias top lo usan). Las KEYS no cambian (las usan Nav.astro y
+   * Footer); solo el texto visible. Los hrefs siguen apuntando a secciones reales.
+   *   portfolio → "Work"     (ancla #portfolio — sección real)
+   *   method    → "Services" (ancla #method — describe los servicios)
+   *   contact   → "Contact"  (ancla #contact — sección real)
+   */
   nav: {
-    portfolio: 'PORTFOLIO',
-    method: 'METHOD',
-    contact: 'CONTACT',
-    langLabel: 'ES',
-    langHref: '/es',
+    portfolio: "Work",
+    method: "Services",
+    contact: "Contact",
+    langLabel: "ES",
+    langHref: "/es",
   },
 
-  /* ── Hero — Concepto B ──────────────────────────────────── */
+  /* ── Hero — B1 "Arquitecto" (aprobado 2026-06-14) ─────────── */
   hero: {
-    /** Kicker: linea editorial arriba-izquierda, mono uppercase */
-    kicker: 'SCUART — DESIGN & TECHNOLOGY STUDIO',
+    /** Kicker: índice editorial arriba-izquierda, Geist 500 uppercase */
+    kicker: "SCUART — DESIGN + TECHNOLOGY STUDIO",
 
     /**
-     * line1: "DESIGN [+] TECHNOLOGY"
-     * El "+" es el UNICO elemento rojo del headline.
-     * Mismo peso/tamaño/baseline que las palabras — signo tipografico, no icono.
+     * line1: "Design you notice."
+     * "notice" en Fraunces 400 itálica verde — el gesto de marca.
+     * Copy elegido por William (ART_DIRECTION.md §6 sección 1).
      */
     line1: [
-      { word: 'DESIGN', isRed: false },
-      { word: '+', isRed: true },
-      { word: 'TECHNOLOGY', isRed: false },
-    ],
-
-    /** line2: "FOR BUSINESSES THAT NEED TO" */
-    line2: [
-      { word: 'FOR', isRed: false },
-      { word: 'BUSINESSES', isRed: false },
-      { word: 'THAT', isRed: false },
-      { word: 'NEED', isRed: false },
-      { word: 'TO', isRed: false },
-    ],
-
-    /** line3: "LOOK SHARP AND WORK BETTER." — "SHARP" en itálica terracota (gesto de marca V3) */
-    line3: [
-      { word: 'LOOK', isRed: false },
-      { word: 'SHARP', isRed: false, isItalicAccent: true },
-      { word: 'AND', isRed: false },
-      { word: 'WORK', isRed: false },
-      { word: 'BETTER.', isRed: false },
+      { word: "Design", isRed: false },
+      { word: "you", isRed: false },
+      { word: "notice.", isRed: false, isItalicAccent: true },
     ],
 
     /**
-     * Indice de capacidades: col 9-12 desktop, lista mono debajo en mobile.
-     * Terminos tecnicos se mantienen en ingles en ambos idiomas (como PORTFOLIO).
+     * line2: "Technology that works."
+     * "works" en Fraunces 400 itálica verde — firma del estudio.
      */
-    capabilities: [
-      { num: '001', label: 'WEB PLATFORMS' },
-      { num: '002', label: 'SAAS + SYSTEMS' },
-      { num: '003', label: 'AI AUTOMATION' },
-      { num: '004', label: 'ORDERING · BOOKING · WORKFLOWS' },
+    line2: [
+      { word: "Technology", isRed: false },
+      { word: "that", isRed: false },
+      { word: "works.", isRed: false, isItalicAccent: true },
     ],
 
-    ariaLabel:
-      'Design and Technology for businesses that need to look sharp and work better.',
+    /** line3: vacía — el hero nuevo tiene 2 líneas, no 3 */
+    line3: [],
+
+    /**
+     * Índice de capacidades: col 10-12 desktop, lista mono debajo en mobile.
+     * Términos técnicos en inglés en ambos idiomas (coherente con el sistema).
+     */
+    capabilities: [
+      { num: "001", label: "WEB PLATFORMS" },
+      { num: "002", label: "SAAS + SYSTEMS" },
+      { num: "003", label: "AI AUTOMATION" },
+      { num: "004", label: "ORDERING · BOOKING · WORKFLOWS" },
+    ],
+
+    ariaLabel: "Design you notice. Technology that works.",
     subhead:
-      'A studio building premium websites, platforms and digital systems for ambitious businesses across the US and LATAM.',
-    cta: 'START A PROJECT',
+      "A studio building premium websites, platforms and digital systems for ambitious businesses across the US and LATAM.",
+    cta: "START A PROJECT",
 
     /* Campo conservado para compatibilidad — no se renderiza en el hero */
-    index: 'SCUART / DESIGN & TECH STUDIO · US·LATAM · 2026',
+    index: "SCUART / DESIGN + TECHNOLOGY STUDIO · BOGOTÁ · 2026",
   },
 
   /* ── Meta columna derecha (campo conservado, no renderizado en hero) ── */
   meta_col: {
-    number: 'N°·01',
-    label: 'STATEMENT',
-    coords: 'GASTRO · WEB',
-    type: 'DIGITAL DESIGN',
+    number: "N°·01",
+    label: "STATEMENT",
+    coords: "GASTRO · WEB",
+    type: "DIGITAL DESIGN",
   },
 
   /* ── Manifesto — Sección 1.5 (entre hero y portfolio) ───── */
@@ -331,11 +333,12 @@ export const en: Translations = {
    * Kicker: MANIFESTO en ambos idiomas — coherencia del sistema técnico.
    */
   manifesto: {
-    kicker: 'N°·01 / MANIFESTO',
-    line1: 'We don\'t build websites.',
-    line2a: 'We build ',
-    line2red: 'competitive advantages.',
-    ariaLabel: 'Manifesto — We don\'t build websites. We build competitive advantages.',
+    kicker: "N°·01 / MANIFESTO",
+    line1: "We don't build websites.",
+    line2a: "We build ",
+    line2red: "competitive advantages.",
+    ariaLabel:
+      "Manifesto — We don't build websites. We build competitive advantages.",
   },
 
   /* ── Capabilities — Sección entre portfolio y método ───── */
@@ -346,38 +349,45 @@ export const en: Translations = {
    * E-COMMERCE y BRAND IDENTITY existen aquí pero NO en el hero (hero tiene 4; aquí 6).
    */
   capabilities: {
-    kicker: 'CAPABILITIES',
-    ariaLabel: 'Capabilities — what SCUART builds and what problems each one solves.',
+    kicker: "CAPABILITIES",
+    ariaLabel:
+      "Capabilities — what SCUART builds and what problems each one solves.",
     items: [
       {
-        num: '01',
-        name: 'WEB PLATFORMS',
-        resolves: 'Sites that load fast, rank on search, and turn visitors into clients.',
+        num: "01",
+        name: "WEB PLATFORMS",
+        resolves:
+          "Sites that load fast, rank on search, and turn visitors into clients.",
       },
       {
-        num: '02',
-        name: 'SAAS + SYSTEMS',
-        resolves: 'Full products — auth, billing, dashboards, APIs. From zero to launch.',
+        num: "02",
+        name: "SAAS + SYSTEMS",
+        resolves:
+          "Full products — auth, billing, dashboards, APIs. From zero to launch.",
       },
       {
-        num: '03',
-        name: 'AI AUTOMATION',
-        resolves: 'Automate the repetitive work so the team focuses on what actually matters.',
+        num: "03",
+        name: "AI AUTOMATION",
+        resolves:
+          "Automate the repetitive work so the team focuses on what actually matters.",
       },
       {
-        num: '04',
-        name: 'E-COMMERCE',
-        resolves: 'Stores built to sell — fast checkout, inventory, ready to grow.',
+        num: "04",
+        name: "E-COMMERCE",
+        resolves:
+          "Stores built to sell — fast checkout, inventory, ready to grow.",
       },
       {
-        num: '05',
-        name: 'ORDERING · BOOKING · WORKFLOWS',
-        resolves: 'Take orders, manage bookings and run operations without the manual chaos.',
+        num: "05",
+        name: "ORDERING · BOOKING · WORKFLOWS",
+        resolves:
+          "Take orders, manage bookings and run operations without the manual chaos.",
       },
       {
-        num: '06',
-        name: 'BRAND IDENTITY',
-        resolves: 'A visual system that looks consistent everywhere — not assembled by accident.',
+        num: "06",
+        name: "BRAND IDENTITY",
+        resolves:
+          "A visual system that looks consistent everywhere — not assembled by accident.",
       },
     ],
   },
@@ -390,46 +400,46 @@ export const en: Translations = {
    * NO se inventó: stack, resultados, descripción, tipo de proyecto, fecha.
    */
   portfolio: {
-    sectionLabel: 'SELECTED WORK',
+    sectionLabel: "SELECTED WORK",
     /**
      * NOTA DE IMPLEMENTACIÓN:
      * Las páginas de caso individuales NO existen todavía (hito futuro).
      * El enlace "VIEW CASE ↓" se renderiza como elemento visual pero
      * no navega a ningún lado. Ver PortfolioSection.astro para el manejo JS.
      */
-    viewCase: 'VIEW CASE ↓',
+    viewCase: "VIEW CASE ↓",
     projects: [
       {
-        name: 'JAMÓN CASERO',
-        num: '001',
-        category: 'WEB · GASTRO BRAND',
-        year: '2017',
-        image: '/images/portfolio-jamon-casero.webp',
-        alt: 'JAMÓN CASERO — proyecto SCUART',
+        name: "JAMÓN CASERO",
+        num: "001",
+        category: "WEB · GASTRO BRAND",
+        year: "2017",
+        image: "/images/portfolio-jamon-casero.webp",
+        alt: "JAMÓN CASERO — proyecto SCUART",
       },
       {
-        name: 'MENIUS',
-        num: '002',
-        category: 'SAAS · OWN PRODUCT',
-        year: '2025',
-        image: '/images/portfolio-menius-real.webp',
-        alt: 'MENIUS — proyecto SCUART',
+        name: "MENIUS",
+        num: "002",
+        category: "SAAS · OWN PRODUCT",
+        year: "2025",
+        image: "/images/portfolio-menius-real.webp",
+        alt: "MENIUS — proyecto SCUART",
       },
       {
-        name: 'HEALTHY CHOICE NY',
-        num: '003',
-        category: 'WEB · RESTAURANT',
-        year: '2019',
-        image: '/images/portfolio-healthy-choice-real.webp',
-        alt: 'HEALTHY CHOICE NY — proyecto SCUART',
+        name: "HEALTHY CHOICE NY",
+        num: "003",
+        category: "WEB · RESTAURANT",
+        year: "2019",
+        image: "/images/portfolio-healthy-choice-real.webp",
+        alt: "HEALTHY CHOICE NY — proyecto SCUART",
       },
       {
-        name: 'ARRIBA GOLD',
-        num: '004',
-        category: 'E-COMMERCE',
-        year: '2021',
-        image: '/images/portfolio-arriba-gold-real.webp',
-        alt: 'ARRIBA GOLD — proyecto SCUART',
+        name: "ARRIBA GOLD",
+        num: "004",
+        category: "E-COMMERCE",
+        year: "2021",
+        image: "/images/portfolio-arriba-gold-real.webp",
+        alt: "ARRIBA GOLD — proyecto SCUART",
       },
     ],
   },
@@ -442,46 +452,54 @@ export const en: Translations = {
    * Capacidades técnicas: iguales en ambos idiomas (términos técnicos).
    */
   method: {
-    kicker: 'METHOD',
-    indexLabel: 'WE WORK WITH:',
+    kicker: "METHOD",
+    indexLabel: "WE WORK WITH:",
     capabilities: [
-      'WEB PLATFORMS',
-      'SAAS + SYSTEMS',
-      'AI AUTOMATION',
-      'E-COMMERCE',
-      'WORKFLOWS',
-      'BRAND IDENTITY',
+      "WEB PLATFORMS",
+      "SAAS + SYSTEMS",
+      "AI AUTOMATION",
+      "E-COMMERCE",
+      "WORKFLOWS",
+      "BRAND IDENTITY",
     ],
-    capabilitiesLabel: 'CAPABILITIES',
-    whatChangesLabel: 'WHAT CHANGES',
+    capabilitiesLabel: "CAPABILITIES",
+    whatChangesLabel: "WHAT CHANGES",
     steps: [
       {
-        num: '001',
-        title: 'DISCOVER',
-        body: 'We understand the business, the customer, the market — and what\'s holding back trust, conversion or operations.',
-        stepCapabilities: ['RESEARCH', 'POSITIONING', 'BRAND IDENTITY'],
-        whatChanges: 'The business gets clarity on what actually needs to change.',
+        num: "001",
+        title: "DISCOVER",
+        body: "We understand the business, the customer, the market — and what's holding back trust, conversion or operations.",
+        stepCapabilities: ["RESEARCH", "POSITIONING", "BRAND IDENTITY"],
+        whatChanges:
+          "The business gets clarity on what actually needs to change.",
       },
       {
-        num: '002',
-        title: 'DIRECTION',
-        body: 'We define positioning, copy, visual direction, bilingual EN/ES structure and the editorial system before designing.',
-        stepCapabilities: ['BRAND IDENTITY', 'COPY', 'UX'],
-        whatChanges: 'Every decision after this points the same way.',
+        num: "002",
+        title: "DIRECTION",
+        body: "We define positioning, copy, visual direction, bilingual EN/ES structure and the editorial system before designing.",
+        stepCapabilities: ["BRAND IDENTITY", "COPY", "UX"],
+        whatChanges: "Every decision after this points the same way.",
       },
       {
-        num: '003',
-        title: 'SYSTEM',
-        body: 'We build the right solution: web platform, SaaS, AI automation, e-commerce, ordering, booking, workflows — or a high-performance website.',
-        stepCapabilities: ['WEB PLATFORMS', 'SAAS + SYSTEMS', 'AI AUTOMATION', 'E-COMMERCE', 'WORKFLOWS'],
-        whatChanges: 'The business gets something that works, not just something that looks good.',
+        num: "003",
+        title: "SYSTEM",
+        body: "We build the right solution: web platform, SaaS, AI automation, e-commerce, ordering, booking, workflows — or a high-performance website.",
+        stepCapabilities: [
+          "WEB PLATFORMS",
+          "SAAS + SYSTEMS",
+          "AI AUTOMATION",
+          "E-COMMERCE",
+          "WORKFLOWS",
+        ],
+        whatChanges:
+          "The business gets something that works, not just something that looks good.",
       },
       {
-        num: '004',
-        title: 'LAUNCH',
-        body: 'We test responsive, performance, SEO, accessibility, tracking and conversion before going live.',
-        stepCapabilities: ['PERFORMANCE', 'SEO', 'QA'],
-        whatChanges: 'It goes live ready to perform, not just to exist.',
+        num: "004",
+        title: "LAUNCH",
+        body: "We test responsive, performance, SEO, accessibility, tracking and conversion before going live.",
+        stepCapabilities: ["PERFORMANCE", "SEO", "QA"],
+        whatChanges: "It goes live ready to perform, not just to exist.",
       },
     ],
   },
@@ -498,67 +516,69 @@ export const en: Translations = {
 
   /* ── Contact — Sección 4 ────────────────────────────────── */
   contact: {
-    kicker: 'START A PROJECT',
-    statement: 'LET\'S\nBUILD\nSOMETHING.',
-    subcopy: 'Tell us about the project. We\'ll respond within 24 hours.',
-    labelName: 'Name',
-    labelBusiness: 'Business or brand',
-    labelEmail: 'Email',
-    labelCountry: 'Country / Market',
-    labelWhatDoYouNeed: 'What do you need?',
-    labelBudget: 'Budget range',
-    labelTimeline: 'Timeline',
-    labelMessage: 'Message',
-    placeholderName: 'Your name',
-    placeholderBusiness: 'Company or brand name',
-    placeholderEmail: 'you@example.com',
-    placeholderCountry: 'US, Mexico, Argentina…',
-    placeholderMessage: 'Brief description of the project — the more context, the better.',
+    kicker: "START A PROJECT",
+    statement: "LET'S\nBUILD\nSOMETHING.",
+    subcopy: "Tell us about the project. We'll respond within 24 hours.",
+    labelName: "Name",
+    labelBusiness: "Business or brand",
+    labelEmail: "Email",
+    labelCountry: "Country / Market",
+    labelWhatDoYouNeed: "What do you need?",
+    labelBudget: "Budget range",
+    labelTimeline: "Timeline",
+    labelMessage: "Message",
+    placeholderName: "Your name",
+    placeholderBusiness: "Company or brand name",
+    placeholderEmail: "you@example.com",
+    placeholderCountry: "US, Mexico, Argentina…",
+    placeholderMessage:
+      "Brief description of the project — the more context, the better.",
     needOptions: [
-      { value: '', label: 'Select one' },
-      { value: 'website', label: 'Website' },
-      { value: 'saas', label: 'SaaS / Web platform' },
-      { value: 'ecommerce', label: 'E-commerce' },
-      { value: 'ordering', label: 'Ordering / Booking system' },
-      { value: 'automation', label: 'AI / Automation' },
-      { value: 'branding', label: 'Branding + Web' },
-      { value: 'other', label: 'Other / Not sure yet' },
+      { value: "", label: "Select one" },
+      { value: "website", label: "Website" },
+      { value: "saas", label: "SaaS / Web platform" },
+      { value: "ecommerce", label: "E-commerce" },
+      { value: "ordering", label: "Ordering / Booking system" },
+      { value: "automation", label: "AI / Automation" },
+      { value: "branding", label: "Branding + Web" },
+      { value: "other", label: "Other / Not sure yet" },
     ],
     budgetOptions: [
-      { value: '', label: 'Select range' },
-      { value: 'under5k', label: '< $5,000' },
-      { value: '5k-15k', label: '$5,000 – $15,000' },
-      { value: '15k-50k', label: '$15,000 – $50,000' },
-      { value: 'over50k', label: '$50,000+' },
-      { value: 'notsure', label: 'Not sure' },
+      { value: "", label: "Select range" },
+      { value: "under5k", label: "< $5,000" },
+      { value: "5k-15k", label: "$5,000 – $15,000" },
+      { value: "15k-50k", label: "$15,000 – $50,000" },
+      { value: "over50k", label: "$50,000+" },
+      { value: "notsure", label: "Not sure" },
     ],
     timelineOptions: [
-      { value: '', label: 'Select timeline' },
-      { value: 'asap', label: 'ASAP' },
-      { value: '1-3mo', label: '1 – 3 months' },
-      { value: '3-6mo', label: '3 – 6 months' },
-      { value: 'flexible', label: 'Flexible' },
+      { value: "", label: "Select timeline" },
+      { value: "asap", label: "ASAP" },
+      { value: "1-3mo", label: "1 – 3 months" },
+      { value: "3-6mo", label: "3 – 6 months" },
+      { value: "flexible", label: "Flexible" },
     ],
-    submitLabel: 'SEND PROJECT BRIEF →',
-    submitLoadingLabel: 'SENDING…',
-    successHeading: 'Brief received.',
-    successBody: 'We\'ll review it and get back to you within 24 hours.',
-    errorMessage: 'Something went wrong. Try again or write us directly.',
-    alternativeLabel: 'Prefer a quick message?',
-    whatsappLabel: 'WhatsApp',
+    submitLabel: "SEND PROJECT BRIEF →",
+    submitLoadingLabel: "SENDING…",
+    successHeading: "Brief received.",
+    successBody: "We'll review it and get back to you within 24 hours.",
+    errorMessage: "Something went wrong. Try again or write us directly.",
+    alternativeLabel: "Prefer a quick message?",
+    whatsappLabel: "WhatsApp",
     /* PLACEHOLDER — William reemplaza con su número real en formato internacional */
-    whatsappHref: 'https://wa.me/[WHATSAPP_NUMBER]',
-    emailLabel: 'Email',
-    emailHref: 'mailto:hello@scuart.com',
+    whatsappHref: "https://wa.me/[WHATSAPP_NUMBER]",
+    emailLabel: "Email",
+    emailHref: "mailto:hello@scuart.com",
   },
 
   /* ── Footer — cierre de marca ───────────────────────────── */
   footer: {
-    navLabel: 'NAVIGATION',
-    langSwitchLabel: 'LANGUAGE',
-    markets: 'Bogotá · US · LATAM',
-    builtBy: '© 2026 SCUART',
-    tagline: 'Design + Technology for businesses that need to look sharp and work better.',
-    ariaLabel: 'SCUART — Studio footer',
+    navLabel: "NAVIGATION",
+    langSwitchLabel: "LANGUAGE",
+    markets: "Bogotá · US · LATAM",
+    builtBy: "© 2026 SCUART",
+    tagline:
+      "Design + Technology for businesses that need to look sharp and work better.",
+    ariaLabel: "SCUART — Studio footer",
   },
 };

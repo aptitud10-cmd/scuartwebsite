@@ -1,62 +1,72 @@
 /**
- * fonts.css — Fuentes (OFL-1.1)
+ * fonts.css — Fuentes (OFL-1.1 / SIL)
  *
- * V3 — Fraunces variable + Hanken Grotesk (via @fontsource, instalado en node_modules)
- * Legado V1 — Archivo variable + DM Sans variable + IBM Plex Mono (self-hosted woff2)
+ * ACTIVAS (ART_DIRECTION.md §4):
+ *   Fraunces Variable — display con alma, self-hosted via @fontsource-variable
+ *   Geist Sans        — cuerpo + UI + índices, self-hosted via @fontsource/geist-sans
  *
- * Los imports de @fontsource son procesados por Vite/Astro como assets locales —
- * NO hacen peticiones a CDN externo. Los woff2 se sirven desde el bundle de build.
+ * LEGADO (self-hosted woff2 en /public/fonts):
+ *   Archivo, DM Sans, IBM Plex Mono — conservados para componentes no migrados.
+ *
+ * Los imports de @fontsource son procesados por Vite/Astro como assets locales.
+ * NO hacen peticiones CDN. Los woff2 se sirven desde el bundle de build.
  */
 
-/* ── V3: Fraunces Variable — display con alma (OFL-1.1) ──────────── */
-/*
- * Normal upright (wght 100-900, eje WONK/SOFT disponible):
- * Importamos el archivo variable completo para el upright (300/400/700).
- */
-@import '@fontsource-variable/fraunces/index.css';
+/* ── Fraunces Variable — display con alma (OFL-1.1) ──────────── */
+/* Upright (wght 100-900): para titulares 300 Light */
+@import "@fontsource-variable/fraunces/index.css";
+/* Italic variable (wght 100-900): itálica expresiva = gesto de marca */
+@import "@fontsource-variable/fraunces/wght-italic.css";
 
-/*
- * Italic variable (wght 100-900): la itálica con personalidad es el gesto de marca.
- * Importar separado garantiza que el browser descarga solo si se usa font-style:italic.
- */
-@import '@fontsource-variable/fraunces/wght-italic.css';
+/* ── Geist Sans — cuerpo y UI (Vercel font license, libre) ─────── */
+/* Solo pesos usados: 400 (body/nav/inputs/botones) + 500 (índices uppercase) */
+@import "@fontsource/geist-sans/400.css";
+@import "@fontsource/geist-sans/500.css";
 
-/* ── V3: Hanken Grotesk — cuerpo + ficha técnica (OFL-1.1) ─────────── */
-/*
- * Solo los pesos que usamos: 400 (body/nav/inputs) + 500 (índices uppercase tracking).
- * Evitamos importar toda la familia para no cargar pesos innecesarios.
- */
-@import '@fontsource/hanken-grotesk/400.css';
-@import '@fontsource/hanken-grotesk/500.css';
-
-/* ── LEGADO V1: Archivo Variable ──────────────────────────────────── */
-/*
- * Conservado para los componentes que aún usan var(--font-display) viejo
- * (ManifestoSection, skip-link, etc.) hasta que sean migrados a V3.
- * font-family 'Archivo' evita conflicto con la nueva 'Fraunces Variable'.
+/* ── ACTIVA: PP Editorial New (display — wordmark, titulares) ────────
+ * Serif de Pangram Pangram — la misma fuente del specimen de Locomotive.
+ * Licencia Web comprada por William (Light, 2026-06-16). Self-hosted.
+ * Reemplaza a Fraunces como --font-display (ver tokens.css).
+ * Solo el peso Light (400 mapeado): es el único que usa el wordmark/titulares.
  */
 @font-face {
-  font-family: 'Archivo';
-  src: url('/fonts/archivo-variable.woff2') format('woff2-variations');
+  font-family: "PP Editorial New";
+  src:
+    url("/fonts/ppeditorialnew-light.woff2") format("woff2"),
+    url("/fonts/ppeditorialnew-light.woff") format("woff");
+  font-weight: 300 400; /* el archivo es Light; cubrimos 300-400 para los usos display */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── LEGADO: Archivo Variable ──────────────────────────────────── */
+/* Conservado para componentes no migrados. No usar en código nuevo. */
+@font-face {
+  font-family: "Archivo";
+  src: url("/fonts/archivo-variable.woff2") format("woff2-variations");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
-/* ── LEGADO V1: DM Sans Variable ──────────────────────────────────── */
+/* ── LEGADO: DM Sans Variable ──────────────────────────────────── */
 @font-face {
-  font-family: 'DM Sans';
-  src: url('/fonts/dm-sans-variable.woff2') format('woff2-variations');
+  font-family: "DM Sans";
+  src: url("/fonts/dm-sans-variable.woff2") format("woff2-variations");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
-/* ── IBM Plex Mono 400 (V1 y V3 comparten: tercer registro tipográfico) ── */
+/* ── LEGADO: IBM Plex Mono 400 ─────────────────────────────────── */
 @font-face {
-  font-family: 'IBM Plex Mono';
-  src: url('/fonts/ibm-plex-mono-400.woff2') format('woff2');
+  font-family: "IBM Plex Mono";
+  src: url("/fonts/ibm-plex-mono-400.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
+
+/* ── LEGADO: Hanken Grotesk ────────────────────────────────────── */
+/* Conservado en declaración vacía para evitar FOUT en componentes no migrados.
+   Geist Sans actúa como fallback (misma categoría grotesca). */
