@@ -143,8 +143,8 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
       <span class="hero-wordmark__word" data-reveal>{wordmarkName}<sup class="hero-wordmark__reg" aria-hidden="true">®</sup></span>
     </h1>
     <p class="hero-wordmark__descriptor" data-reveal>
-      {wordmarkDescriptor}<span class="hero-wordmark__star" aria-hidden="true">✳</span>
-    </p>
+      {wordmarkDescriptor}<!-- Asterisco AUTÉNTICO de PP Editorial New (carácter de la fuente) -->
+      <span class="hero-wordmark__star" aria-hidden="true">*</span>
   </div>
 
   <!-- Scroll cue — esquina inferior derecha -->
@@ -400,7 +400,7 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
 
 .hero-wordmark__name {
   display: flex;
-  align-items: center;          /* recuadro centrado a la altura de la mayúscula */
+  align-items: flex-start;      /* recuadro alineado al TOPE (como Locomotive) */
   gap: 0.3em;
 }
 
@@ -428,13 +428,14 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
  * para que escale 1:1 con la palabra en todos los breakpoints.
  */
 .hero-disc {
-  /* Altura ≈ cap-height de "SCUART" en PP Editorial New Light.
-     Esta serif tiene mayúsculas más altas que Fraunces → subimos a 0.92em
-     para que el recuadro iguale la altura de la palabra. Ancho lo da el viewBox 200:76. */
-  height: 0.92em;
+  /* Locomotive: recuadro y palabra arrancan en el MISMO margen (sin sobresalir).
+     El recuadro alinea su tope y base con la mayúscula de la línea 1.
+     Altura = cap-height de "SCUART" (~57px = 0.82em @70px). */
+  height: 0.82em;
   width: auto;
   flex-shrink: 0;
-  align-self: center;
+  align-self: flex-start;
+  margin-top: 0.03em;          /* tope del recuadro = techo de la mayúscula */
   overflow: visible;
 }
 
@@ -442,7 +443,7 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
 .hero-disc__txt {
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: 22px;              /* coords del viewBox */
+  font-size: 17px;              /* más chico, con aire, como Locomotive */
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
@@ -451,13 +452,13 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
   border-bottom: 1px solid #fff;
 }
 
-/* ── Asterisco después del descriptor (gesto Locomotive) ── */
+/* ── Asterisco auténtico de PP Editorial New (carácter de la fuente) ── */
 .hero-wordmark__star {
-  display: inline-block;
-  margin-left: 0.25em;
-  font-size: 0.7em;
-  vertical-align: middle;
-  font-weight: 300;
+  font-family: var(--font-display);
+  font-weight: 400;
+  margin-left: -0.05em;
+  font-size: 1em;               /* mismo cuerpo que el descriptor */
+  line-height: 1;
 }
 
 /* ── Scroll cue ───────────────────────────────────────────────────── */

@@ -1,12 +1,11 @@
 /**
  * global.css — Reset, base y grain
- * V3: paleta terracota cálida en alternancia (ART_DIRECTION_V3_FINAL.md)
- * Import order: fonts → tokens → tailwind → este archivo
+ * B1 "Arquitecto" claro: yeso + tinta + único acento verde (ART_DIRECTION.md §2-§3)
  */
 
-@import './fonts.css';
-@import './tokens.css';
-@import 'tailwindcss';
+@import "./fonts.css";
+@import "./tokens.css";
+@import "tailwindcss";
 
 /* ── Reset base ───────────────────────────────────────────────────── */
 *,
@@ -17,22 +16,21 @@
   padding: 0;
 }
 
-/* Anti-overflow mobile (C7 DESIGN_RESPONSIVE §11) */
+/* Anti-overflow mobile */
 html,
 body {
-  overflow-x: clip; /* clip no rompe sticky, hidden sí */
+  overflow-x: clip;
   max-width: 100%;
 }
 
 html {
-  /* Smooth scroll base — Lenis lo reemplaza cuando se integre */
   scroll-behavior: smooth;
 }
 
 body {
-  /* V3: fondo hueso, tinta. El body arranca en la sección claro (hero). */
-  background-color: var(--hueso);
-  color: var(--tinta);
+  /* B1: yeso + tinta. El sitio es claro en todas las secciones. */
+  background-color: var(--bg);
+  color: var(--ink);
   font-family: var(--font-body);
   font-size: var(--text-body);
   line-height: 1.5;
@@ -40,67 +38,54 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── V3 GRAIN — capa única feTurbulence, sin animación ─────────────
- * El grano es MATERIAL, no efecto — NO se mueve (ART_DIRECTION_V3_FINAL.md §2).
- * Una sola capa con mix-blend-mode: overlay funciona sobre hueso Y sobre barro-oscuro.
- * Opacidad: 0.06 sobre hueso (perceptible como papel/barro prensado, no suciedad).
- * Opacidad ajustada por la sección: las secciones oscuras usan .grain-dark que sube a 0.08.
- * Tamaño físico constante 180px (no escala al viewport = sensación material real).
- *
- * Regla dura: sin este grano los fondos lisos parecen <div> de color plano = barato.
- * Sin drift/animación: el grano es textura de papel, no un screensaver.
+/* ── GRAIN — grano sutil sobre yeso ────────────────────────────────
+ * Material, no efecto. Anti "div de color plano" (R1 anti-slop).
+ * Opacidad 0.03: muchísimo más sutil que la dirección terracota anterior.
+ * El yeso B1 es "papel técnico liso", no papel prensado — el grano
+ * solo evita que #F5F4F0 se lea como un div vacío en pantallas grandes.
+ * SIN drift/animación (el grano es textura de papel, no screensaver).
+ * SIN capa ambar de calor (esa capa era para el mood gastronómico descartado).
  * ─────────────────────────────────────────────────────────────────── */
 body::after {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.06;
-  /* overlay: multiplica el grano sobre cualquier color de fondo (claro u oscuro) */
-  mix-blend-mode: overlay;
+  /* 0.03: sutil. Si se ve "sucio" en pantalla real, bajar a 0.02 (William calibra). */
+  opacity: 0.03;
+  mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
   background-size: 180px 180px;
 }
 
-/* Capa de calor sobre hueso: velo ambar-terracota muy suave da la sensación de
- * "papel tostado" en el fondo claro. NO sobre secciones oscuras (no se hereda). */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9998;
-  background: radial-gradient(
-    ellipse 100% 60% at 50% 0%,
-    rgba(164, 71, 31, 0.03) 0%,
-    transparent 70%
-  );
-}
-
-/* ── Tipografía base V3 ──────────────────────────────────────────── */
+/* ── Tipografía base ─────────────────────────────────────────────── */
 /*
- * Fraunces variable: eje wght 100-900, ejes opcionales WONK/SOFT/opsz.
- * Los headings usan weight 300 (light) por defecto — en tamaño gigante
- * el peso bajo es elegante (ART_DIRECTION_V3_FINAL.md §3).
- * font-style: normal aquí; la itálica se aplica solo en .italic-acento.
+ * Fraunces display: solo en momentos de máxima jerarquía.
+ * Geist Sans body: todo lo demás.
+ * Contraste extremo de escala — la brecha es el diseño.
  */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
   font-weight: var(--display-weight-light);
   line-height: var(--display-leading);
   letter-spacing: var(--display-tracking);
-  color: var(--tinta);
+  color: var(--ink);
 }
 
 p {
   font-family: var(--font-body);
   font-size: var(--text-body);
   line-height: 1.5;
-  color: var(--tinta);
+  color: var(--ink);
 }
 
-/* ── Imágenes (anti-overflow) ────────────────────────────────────── */
+/* ── Imágenes ────────────────────────────────────────────────────── */
 img,
 video {
   display: block;
@@ -108,18 +93,11 @@ video {
   height: auto;
 }
 
-/* ── V3: Hero line-reveal (GSAP por líneas con máscara — Momento 1) ── */
-/*
- * Progressive enhancement: el H1 es HTML real server-rendered visible por defecto.
- * GSAP agrega .hero-animating al <h1> para activar las máscaras y ocultar
- * las líneas antes del reveal. Sin JS: texto plano visible.
- *
- * .line-mask: contenedor de cada línea del H1. overflow:hidden clipa el reveal.
- *             Creado en JS via wrapEach() para no contaminar el SSR.
- * .line-inner: el bloque animado (translateY 100%→0) dentro de la máscara.
- *
- * Las clases de estado las inyecta el script de HeroSection.astro.
- */
+/* ── Hero line-reveal (GSAP por líneas con máscara — Momento 1) ─────
+ * Progressive enhancement: el H1 es HTML real server-rendered.
+ * GSAP construye .line-mask > .line-inner en JS, no en SSR.
+ * Sin JS: texto plano completo visible.
+ * ─────────────────────────────────────────────────────────────────── */
 .line-mask {
   display: block;
   overflow: hidden;
@@ -132,37 +110,21 @@ video {
   display: block;
 }
 
-/* Itálica terracota — gesto de marca en el primer scroll.
- * Clase utilitaria: se aplica al span que envuelve la palabra "sharp"/"precisa".
- * font-style italic activa la itálica variable de Fraunces (wght-italic.css).
- * weight 400 en itálica (más expressive que el 300 upright).
- */
+/* ── Itálica de acento — gesto de marca ─────────────────────────────
+ * .italic-acento: la palabra clave en el H1. Fraunces itálica 400 en verde botella.
+ * El color, no el peso, es lo que la señala — escasez deliberada (<5% de superficie).
+ * ─────────────────────────────────────────────────────────────────── */
 .italic-acento {
   font-style: italic;
   font-weight: var(--display-weight-normal);
-  color: var(--terracota);
-}
-
-/* ── V3: grain-strong — grano fuerte sobre secciones oscuras/saturadas ─
- * Clase utilitaria para pseudo-elementos de grano adicional sobre fondos
- * como --terracota o --barro-oscuro donde el grano global (overlay 0.06)
- * no es suficiente para dar la textura "barro prensado".
- * Uso: aplicar como mixin de propiedades en el pseudo-elemento de la sección.
- * ART_DIRECTION_V3_FINAL.md §2: opacidad 0.06–0.09 sobre oscuro/saturado.
- * ─────────────────────────────────────────────────────────────────── */
-.grain-strong {
-  pointer-events: none;
-  opacity: 0.08;
-  mix-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
+  color: var(--accent);
 }
 
 /* ── Selección ───────────────────────────────────────────────────── */
 ::selection {
-  /* V3: selección terracota sobre hueso */
-  background-color: var(--terracota);
-  color: var(--hueso);
+  /* B1: selección verde botella sobre yeso */
+  background-color: var(--accent);
+  color: var(--on-accent);
 }
 
 /* ── reduced-motion: anula todas las animaciones ─────────────────── */
