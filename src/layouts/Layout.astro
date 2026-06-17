@@ -161,7 +161,13 @@ const resolvedOgDesc = ogDescription ?? description;
       /* Respetar prefers-reduced-motion: sin Lenis, scroll nativo puro. */
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      if (!reducedMotion) {
+      /* Lenis SOLO en desktop (≥769px). En mobile: scroll nativo del body
+         (body-scroll-container). Conflicto crítico: Lenis asume window como
+         scroller, pero en mobile el scroller es document.body (directiva iOS).
+         Research 4.2: Estrategia A recomendada. */
+      const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+      if (!reducedMotion && !isMobile) {
         const lenis = new Lenis({
           /* lerp 0.1: sutil y elegante. No flotante exagerado. */
           lerp: 0.1,

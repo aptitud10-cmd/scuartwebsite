@@ -38,6 +38,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ── iOS Body Scroll Container (directiva global William) ──────────
+ * PROBLEMA: iOS Safari ignora overscroll-behavior en el root (<html>/<body>
+ * por defecto). El rubber-band deja un hueco que se queda al final de la
+ * página ("scroll eterno") — bug histórico de WebKit.
+ * SOLUCIÓN: mover el scroller del root al <body> en mobile.
+ * Solo en ≤768px: en desktop el scroll sigue en window (Lenis lo necesita).
+ * ─────────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  html {
+    height: 100%;
+    overflow-y: hidden; /* el html ya NO scrollea en mobile */
+  }
+
+  body {
+    height: 100%;
+    overflow-y: auto; /* el BODY es ahora el scroller en mobile */
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain; /* frena en seco sin scroll eterno */
+  }
+}
+
 /* ── GRAIN — grano sutil sobre yeso ────────────────────────────────
  * Material, no efecto. Anti "div de color plano" (R1 anti-slop).
  * Opacidad 0.03: muchísimo más sutil que la dirección terracota anterior.
@@ -111,20 +132,20 @@ video {
 }
 
 /* ── Itálica de acento — gesto de marca ─────────────────────────────
- * .italic-acento: la palabra clave en el H1. Fraunces itálica 400 en verde botella.
- * El color, no el peso, es lo que la señala — escasez deliberada (<5% de superficie).
+ * .italic-acento: la palabra clave en el H1. PP Editorial New itálica 400 en lima.
+ * El color, no el peso, es lo que la señala — escasez deliberada (<8% de superficie, V4 §4.2).
  * ─────────────────────────────────────────────────────────────────── */
 .italic-acento {
   font-style: italic;
   font-weight: var(--display-weight-normal);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 /* ── Selección ───────────────────────────────────────────────────── */
 ::selection {
-  /* B1: selección verde botella sobre yeso */
-  background-color: var(--accent);
-  color: var(--on-accent);
+  /* V4: selección lima sobre el negro del cuerpo */
+  background-color: var(--brand);
+  color: var(--on-brand);
 }
 
 /* ── reduced-motion: anula todas las animaciones ─────────────────── */

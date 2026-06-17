@@ -118,7 +118,7 @@ const { lang, t } = Astro.props;
 
   .nav-global__reg {
     font-size: 0.55em;
-    color: var(--accent); /* ® en verde botella — sello de marca */
+    color: var(--accent-text); /* ® — sello de marca (tinta sobre blanco, lima sobre negro) */
     vertical-align: super;
     font-style: normal;
   }
@@ -159,7 +159,7 @@ const { lang, t } = Astro.props;
     left: 0;
     width: 100%;
     height: 1px;
-    background-color: var(--accent);
+    background-color: var(--brand);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -170,7 +170,7 @@ const { lang, t } = Astro.props;
   }
 
   .nav-global__link:focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--brand);
     outline-offset: 3px;
   }
 
@@ -211,7 +211,7 @@ const { lang, t } = Astro.props;
   }
 
   .nav-global__lang-other:focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--brand);
     outline-offset: 3px;
   }
 

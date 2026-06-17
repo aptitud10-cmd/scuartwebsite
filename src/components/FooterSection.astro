@@ -46,14 +46,6 @@ const f = t.footer;
 <footer class="site-footer" aria-label={f.ariaLabel}>
 
   <!--
-    GRANO INTERNO — refuerzo soft-light sobre barro-oscuro.
-    (El grano global overlay 0.06 no es suficiente sobre fondos oscuros
-    para dar la textura "barro prensado" del concepto V3.)
-    aria-hidden: es puramente decorativo.
-  -->
-  <div class="footer-grain" aria-hidden="true"></div>
-
-  <!--
     BANDA DATOS/NAV — N2.
     Desktop: asimétrica — nav (flex:1 izquierda) | lang (derecha).
     Mobile: apilado dos filas (nav | lang), separados por gap.
@@ -109,12 +101,14 @@ const f = t.footer;
     Contenedor .footer-brand tiene el reveal fade-up (IntersectionObserver).
   -->
   <div class="footer-brand" aria-hidden="false">
-    <p class="footer-wordmark" aria-label="SCUART+">
+    <p class="footer-wordmark" aria-label="SCUART*">
       <span class="footer-wordmark__name">SCUART</span><span
         class="footer-wordmark__plus"
         aria-hidden="true"
-      >+</span>
+      >*</span>
     </p>
+    <!-- Lema de marca — el equivalente SCUART del "Tools of Expression" de Locomotive -->
+    <p class="footer-tagline">{f.tagline}</p>
   </div>
 
   <!--
@@ -157,7 +151,8 @@ const f = t.footer;
    ═══════════════════════════════════════════════════════════ */
 
 .site-footer {
-  background-color: var(--barro-oscuro);
+  /* Plano NEGRO — continúa del contacto SIN corte (ART_DIRECTION §4: la firma) */
+  background-color: var(--bg);
   /* padding-left/right son los --margin normales del sitio.
      El wordmark a sangre usa negative margin propio para romper. */
   padding-left: var(--margin);
@@ -166,29 +161,6 @@ const f = t.footer;
   padding-bottom: var(--space-l);
   position: relative;
   overflow-x: clip;
-}
-
-/* ─── GRANO — soft-light 0.08 sobre barro-oscuro ─────────── */
-/*
- * Refuerza el grano global (overlay 0.06) para dar textura
- * "barro prensado" sobre fondos oscuros (ART_DIRECTION §2).
- * Posición absolute (no fixed como el global) para confinarlo al footer.
- */
-.footer-grain {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.08;
-  mix-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
-}
-
-/* Todo el contenido sobre el grano */
-.site-footer > *:not(.footer-grain) {
-  position: relative;
-  z-index: 1;
 }
 
 /* ─── BANDA META/NAV — N2 ────────────────────────────────── */
@@ -210,14 +182,14 @@ const f = t.footer;
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
-  color: rgba(240, 233, 220, 0.55); /* hueso 55% */
+  color: var(--ink-62);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   line-height: 1.4;
 }
 
 .footer-nav__link {
-  color: rgba(240, 233, 220, 0.55);
+  color: var(--ink-62);
   text-decoration: none;
   /* Touch target mínimo 48px */
   padding: 0.5em 0;
@@ -225,7 +197,7 @@ const f = t.footer;
   position: relative;
 }
 
-/* Subrayado terracota que se dibuja en hover (ART_DIRECTION §6 micro-interacciones) */
+/* Underline lima que se dibuja en hover (V4 §4.2) */
 .footer-nav__link::after {
   content: '';
   position: absolute;
@@ -233,14 +205,14 @@ const f = t.footer;
   left: 0;
   width: 100%;
   height: 1px;
-  background-color: var(--terracota);
+  background-color: var(--brand);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .footer-nav__link:hover {
-  color: var(--hueso);
+  color: var(--ink);
 }
 
 .footer-nav__link:hover::after {
@@ -248,13 +220,13 @@ const f = t.footer;
 }
 
 .footer-nav__link:focus-visible {
-  outline: 1px solid var(--hueso);
+  outline: 1px solid var(--brand);
   outline-offset: 3px;
-  color: var(--hueso);
+  color: var(--ink);
 }
 
 .footer-nav__sep {
-  color: rgba(240, 233, 220, 0.55);
+  color: var(--ink-62);
   opacity: 0.4;
   padding: 0 0.6em;
   line-height: 1.4;
@@ -282,17 +254,17 @@ const f = t.footer;
 }
 
 .footer-lang__active {
-  color: var(--hueso);
+  color: var(--ink);
   cursor: default;
 }
 
 .footer-lang__sep {
-  color: rgba(240, 233, 220, 0.55);
+  color: var(--ink-62);
   opacity: 0.4;
 }
 
 .footer-lang__other {
-  color: rgba(240, 233, 220, 0.55);
+  color: var(--ink-62);
   text-decoration: none;
   transition: color 0.2s ease;
   position: relative;
@@ -306,14 +278,14 @@ const f = t.footer;
   left: 0;
   width: 100%;
   height: 1px;
-  background-color: var(--terracota);
+  background-color: var(--brand);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .footer-lang__other:hover {
-  color: var(--hueso);
+  color: var(--ink);
 }
 
 .footer-lang__other:hover::after {
@@ -321,9 +293,9 @@ const f = t.footer;
 }
 
 .footer-lang__other:focus-visible {
-  outline: 1px solid var(--hueso);
+  outline: 1px solid var(--brand);
   outline-offset: 3px;
-  color: var(--hueso);
+  color: var(--ink);
 }
 
 /* ─── HAIRLINE DIVISOR ───────────────────────────────────── */
@@ -334,7 +306,7 @@ const f = t.footer;
 .footer-divider {
   width: 100%;
   height: 1px;
-  background-color: var(--borde-oscuro);
+  background-color: var(--hairline);
   margin-bottom: var(--space-l);
 }
 
@@ -379,7 +351,7 @@ const f = t.footer;
   font-size: clamp(4rem, 14vw, 16rem);
   line-height: 0.85;
   letter-spacing: -0.03em;
-  color: var(--hueso);
+  color: var(--ink);
   text-transform: uppercase;
   margin: 0;
   /* Padding horizontal para dar respiro al desborde pero mantener lectura */
@@ -393,9 +365,23 @@ const f = t.footer;
   white-space: nowrap;
 }
 
-/* El "+" — ámbar, el sello del estudio (§7 detalle de personalidad) */
+/* El "*" — glifo-firma del estudio (acento de texto; tinta sobre blanco, lima sobre negro) */
 .footer-wordmark__plus {
-  color: var(--ambar);
+  color: var(--accent-text);
+}
+
+/* ─── TAGLINE / LEMA ─────────────────────────────────────── */
+/* "We don't decorate. We decide." — equivalente SCUART del "Tools of Expression".
+   PP Editorial New, debajo del wordmark a sangre. */
+.footer-tagline {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-style: italic;
+  font-size: clamp(1.125rem, 2.2vw, 1.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin: var(--space-s) 0 0 0;
 }
 
 /* ─── CRÉDITOS — N3 ──────────────────────────────────────── */
@@ -412,7 +398,7 @@ const f = t.footer;
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 400;
-  color: rgba(240, 233, 220, 0.50); /* hueso 50% */
+  color: var(--ink-62);
   letter-spacing: 0.03em;
   line-height: 1.4;
 }
@@ -432,20 +418,20 @@ const f = t.footer;
 }
 
 .footer-credits__link {
-  color: rgba(240, 233, 220, 0.50);
+  color: var(--ink-62);
   text-decoration: none;
   padding: 0.25em 0;
   transition: color 0.2s ease;
 }
 
 .footer-credits__link:hover {
-  color: var(--hueso);
+  color: var(--ink);
 }
 
 .footer-credits__link:focus-visible {
-  outline: 1px solid var(--hueso);
+  outline: 1px solid var(--brand);
   outline-offset: 2px;
-  color: var(--hueso);
+  color: var(--ink);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -528,14 +514,21 @@ const f = t.footer;
    * Fallback para reduced-motion: visible inmediato via CSS + JS guard.
    */
 
+  /**
+   * Footer reveal — WordMark fade-up + pulso único del asterisco.
+   *
+   * El wordmark (.footer-brand) entra con fade-up (IO, ya existía).
+   * El asterisco lima (.footer-wordmark__plus) hace un micro-pulso (escala 1→1.08→1)
+   * una sola vez al entrar — firma el cierre del sitio. [propuesta SCUART, cortable]
+   *
+   * prefers-reduced-motion: wordmark visible de inmediato, sin pulso.
+   */
   const brand = document.querySelector<HTMLElement>('.footer-brand');
 
   if (brand) {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     if (prefersReduced) {
-      /* reduced-motion: CSS ya lo pone visible (opacity:1, transform:none),
-         pero agregamos la clase igual por si el CSS no aplica por especificidad. */
       brand.classList.add('is-visible');
     } else {
       const observer = new IntersectionObserver(
@@ -544,6 +537,26 @@ const f = t.footer;
             if (entry.isIntersecting) {
               brand.classList.add('is-visible');
               observer.disconnect();
+
+              /* Pulso del asterisco — un solo latido al entrar, 0.6s después del fade */
+              const asterisco = brand.querySelector<HTMLElement>('.footer-wordmark__plus');
+              if (asterisco) {
+                setTimeout(() => {
+                  asterisco.style.display = 'inline-block'; /* necesario para transform */
+                  asterisco.animate(
+                    [
+                      { transform: 'scale(1)', offset: 0 },
+                      { transform: 'scale(1.08)', offset: 0.4 },
+                      { transform: 'scale(1)', offset: 1 },
+                    ],
+                    {
+                      duration: 600,
+                      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                      fill: 'forwards',
+                    }
+                  );
+                }, 600);
+              }
             }
           });
         },

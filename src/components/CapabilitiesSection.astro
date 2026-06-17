@@ -82,14 +82,16 @@ const kicker: string = t.capabilities.kicker;
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   CAPABILITIES SECTION — V3 "Terracota cálida en alternancia"
-   Fondo: --hueso. Mobile-first: 375px → 768px → 1280px.
+   CAPABILITIES SECTION — V4 "Restringido" (1 color + negro/hueso)
+   Fondo: --bg negro. Mobile-first: 375px → 768px → 1280px.
    ═══════════════════════════════════════════════════════════ */
 
 /* ─── SECCIÓN ────────────────────────────────────────────── */
 
 .cap {
-  background-color: var(--hueso);
+  /* Cuerpo OSCURO de punta a punta (V4 §4: el video del hero es el único color) */
+  background-color: var(--bg);
+  isolation: isolate;
   padding-top: var(--space-xl);
   padding-bottom: var(--space-2xl);
   padding-left: var(--margin);
@@ -102,16 +104,16 @@ const kicker: string = t.capabilities.kicker;
 /* ─── HEADER / KICKER ────────────────────────────────────── */
 
 .cap-header {
-  border-top: 1px solid var(--borde);
+  border-top: 1px solid var(--hairline);
   padding-top: var(--space-m);
   margin-bottom: var(--space-l);
 }
 
 .cap-kicker {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
-  color: var(--tinta-suave);
+  color: var(--ink-62);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   line-height: 1.4;
@@ -145,13 +147,13 @@ const kicker: string = t.capabilities.kicker;
   flex-direction: column;
   padding-top: var(--space-m);
   padding-bottom: var(--space-m);
-  border-top: 1px solid var(--borde);
+  border-top: 1px solid var(--hairline);
   /* Overflow visible para que el numeral gigante sobresalga si hace falta */
   overflow: visible;
 }
 
 .cap-row:last-child {
-  border-bottom: 1px solid var(--borde);
+  border-bottom: 1px solid var(--hairline);
 }
 
 /* ─── NUMERAL GIGANTE — elemento gráfico-arquitectónico ─── */
@@ -167,7 +169,7 @@ const kicker: string = t.capabilities.kicker;
   font-size: clamp(3.5rem, 8vw, 6.5rem);
   line-height: 0.9;
   letter-spacing: -0.03em;
-  color: rgba(164, 71, 31, 0.15); /* --terracota al 15% */
+  color: var(--ink-18);  /* hueso 18% — fantasma sobre negro */
   font-variant-numeric: tabular-nums;
   font-style: normal;
   /* Mobile: numeral como fondo del bloque — position relative para flujo */
@@ -205,7 +207,7 @@ const kicker: string = t.capabilities.kicker;
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   line-height: 1.0;
   letter-spacing: -0.02em;
-  color: var(--tinta);
+  color: var(--ink);
   font-style: normal;
   margin: 0;
   hyphens: none;
@@ -221,7 +223,7 @@ const kicker: string = t.capabilities.kicker;
   font-family: var(--font-body);
   font-size: var(--text-body);
   font-weight: 400;
-  color: var(--tinta-suave);
+  color: var(--ink-62);
   line-height: 1.55;
   margin: 0;
   max-width: 52ch;
@@ -357,7 +359,7 @@ const kicker: string = t.capabilities.kicker;
 
   /* Focus visible teclado */
   .cap-row:focus-visible {
-    outline: 2px solid var(--tinta);
+    outline: 2px solid var(--brand);
     outline-offset: 4px;
   }
 }

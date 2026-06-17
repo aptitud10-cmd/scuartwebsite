@@ -1,19 +1,22 @@
 ---
 /**
- * PortfolioSection.astro — Portfolio V3 · Work index tipográfico
+ * PortfolioSection.astro — Portfolio V4 · Work index tipográfico (patrón Locomotive)
  * SCUART — patrón "inline image en título" (referencia: locomotive.ca/en/work,
- * aprobado por William 2026-06-10) + redesign/RESEARCH_PORTFOLIO_2026.md
+ * aprobado por William 2026-06-10, reafirmado 2026-06-17)
  *
- * ARQUITECTURA:
+ * ARQUITECTURA (fiel a Locomotive /work):
  *   - Lista vertical de 4 proyectos, SIN featured: museo, los 4 uniformes
- *   - Nombre Fraunces light GIGANTE centrado, hairlines 1px de borde a borde
- *   - Ficha mono real (num / category · year) en los extremos de cada fila
+ *   - Nombre PP Editorial New light GIGANTE centrado, capitalización normal
+ *     (no mayúsculas), hairlines 1px borde a borde. SIN numeral ni ficha lateral.
  *   - Desktop hover/focus: la imagen se INCRUSTA inline dentro del nombre
  *     (entre la 1ª y 2ª palabra; prefijo si el nombre es una sola palabra)
- *   - Mobile/tablet: imagen SIEMPRE visible en reposo (bloqueante del critic)
- *   - Sin páginas de caso todavía → las filas NO son links (nada de href="#")
+ *   - Mobile/tablet: imagen SIEMPRE visible en reposo
+ *   - Sin páginas de caso todavía → las filas NO son links
  *
- * MOTION (restraint, P6 — sin GSAP/ScrollTrigger):
+ * COLOR V4 "Restringido": fondo negro --bg, nombres hueso --ink, hover → lima --brand.
+ * Imágenes: versiones -trim (mockup de navegador sin fondo blanco).
+ *
+ * MOTION (spec ART_DIRECTION_MOTION_V4.md, restraint):
  *   - Entrada: IntersectionObserver + transición CSS fade-up, stagger 80ms
  *   - Hover: width 0→1.6em + opacity de la imagen inline, 280ms ease-out
  *   - prefers-reduced-motion: todo estático; inline aparece sin animación
@@ -54,21 +57,17 @@ const rows = projects.map((p, i) => {
   <ol class="pf-list">
     {rows.map((row) => (
       <li class="pf-row" tabindex="0" style={`transition-delay: ${row.delay}`}>
-        <!-- Ficha mono — datos reales en los extremos de la fila -->
-        <span class="pf-meta pf-meta--num" aria-hidden="true">{row.num}</span>
-        <span class="pf-meta pf-meta--cat">{row.category} · {row.year}</span>
-
         <!-- Nombre gigante con la imagen incrustada inline (desktop) -->
         <!-- prettier-ignore — los spans van pegados: el único espacio del nombre
              es el explícito dentro del último pf-word (evita doble gap en reposo) -->
         <h3 class="pf-name">
           {row.isPrefix
-            ? <><span class="pf-inline" aria-hidden="true"><img src={row.image} alt="" loading="lazy" decoding="async" width="640" height="360" /></span><span class="pf-word">{row.after}</span></>
-            : <><span class="pf-word">{row.before}</span><span class="pf-inline" aria-hidden="true"><img src={row.image} alt="" loading="lazy" decoding="async" width="640" height="360" /></span><span class="pf-word">{` ${row.after}`}</span></>
+            ? <><span class="pf-inline" aria-hidden="true"><img src={row.image} alt="" loading="lazy" decoding="async" width="640" height="400" /></span><span class="pf-word">{row.after}</span></>
+            : <><span class="pf-word">{row.before}</span><span class="pf-inline" aria-hidden="true"><img src={row.image} alt="" loading="lazy" decoding="async" width="640" height="400" /></span><span class="pf-word">{` ${row.after}`}</span></>
           }
         </h3>
 
-        <!-- Imagen en reposo — mobile/tablet (regla dura del critic) -->
+        <!-- Imagen en reposo — mobile/tablet -->
         <div class="pf-stack-img">
           <img
             src={row.image}
@@ -76,7 +75,7 @@ const rows = projects.map((p, i) => {
             loading={row.eager ? 'eager' : 'lazy'}
             decoding="async"
             width="1280"
-            height="720"
+            height="800"
           />
         </div>
       </li>
@@ -86,7 +85,8 @@ const rows = projects.map((p, i) => {
 
 <style>
   .pf {
-    background-color: var(--hueso);
+    /* Cuerpo OSCURO de punta a punta (V4 §4: el video del hero es el único color) */
+    background-color: var(--bg);
     padding-block: clamp(4rem, 8vw, 7rem) 0;
   }
 
@@ -101,7 +101,7 @@ const rows = projects.map((p, i) => {
     font-size: 0.8125rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--tinta-suave);
+    color: var(--ink-62);
   }
 
   .pf-list {
@@ -109,13 +109,14 @@ const rows = projects.map((p, i) => {
     margin: 0;
     padding: 0;
     /* hairline superior del índice — full-bleed */
-    border-top: 1px solid var(--borde);
+    border-top: 1px solid var(--hairline);
   }
 
   .pf-row {
     position: relative;
-    border-bottom: 1px solid var(--borde);
-    padding: clamp(2rem, 4vw, 3.5rem) var(--margin);
+    border-bottom: 1px solid var(--hairline);
+    /* Filas densas — los nombres casi se tocan (patrón Locomotive /work) */
+    padding: clamp(1.5rem, 2.5vw, 2.25rem) var(--margin);
     /* entrada fade-up via IntersectionObserver */
     opacity: 0;
     transform: translateY(20px);
@@ -130,32 +131,21 @@ const rows = projects.map((p, i) => {
   }
 
   .pf-row:focus-visible {
-    outline: 2px solid var(--terracota);
+    outline: 2px solid var(--brand);
     outline-offset: -2px;
   }
 
-  /* ── Ficha mono ─────────────────────────────────────────── */
-  .pf-meta {
-    font-family: var(--font-body);
-    font-weight: 500;
-    font-size: 0.75rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--tinta-suave);
-    transition: color 0.28s ease;
-  }
-
-  /* ── Nombre gigante ─────────────────────────────────────── */
+  /* ── Nombre gigante — capitalización normal (como Locomotive) ─ */
   .pf-name {
     font-family: var(--font-display);
     font-weight: 300;
-    font-size: clamp(2.5rem, 10vw, 3rem);
+    font-size: clamp(3rem, 12vw, 3.5rem);
     line-height: 1.02;
     letter-spacing: -0.02em;
-    color: var(--tinta);
+    color: var(--ink);
     text-align: center;
+    text-transform: none; /* respeta las minúsculas del i18n */
     margin: 0;
-    transition: color 0.28s ease;
   }
 
   .pf-word {
@@ -177,32 +167,19 @@ const rows = projects.map((p, i) => {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 16 / 9;
+    /* 16:10 — encuadra el mockup de navegador (trim ~1.85:1) sin recortar la barra */
+    aspect-ratio: 16 / 10;
     object-fit: cover;
-  }
-
-  /* ── Mobile: ficha arriba de la fila, en los extremos ───── */
-  .pf-meta--num {
-    position: absolute;
-    top: 0.875rem;
-    left: var(--margin);
-  }
-
-  .pf-meta--cat {
-    position: absolute;
-    top: 0.875rem;
-    right: var(--margin);
-    text-align: right;
   }
 
   /* ── Tablet (769-1023): igual stack, título más grande ──── */
   @media (min-width: 769px) {
     .pf-name {
-      font-size: clamp(3.5rem, 8vw, 4rem);
+      font-size: clamp(4.5rem, 9vw, 5.5rem);
     }
 
     .pf-stack-img img {
-      max-width: 640px;
+      max-width: 720px;
       margin-inline: auto;
     }
   }
@@ -210,23 +187,17 @@ const rows = projects.map((p, i) => {
   /* ── Desktop (>=1024 + hover real): work index Locomotive ── */
   @media (min-width: 1024px) and (hover: hover) {
     .pf-row {
-      padding-block: clamp(3rem, 4.5vw, 4rem);
+      /* densidad Locomotive: filas apretadas, nombres casi tocándose */
+      padding-block: clamp(2rem, 2.8vw, 2.75rem);
     }
 
     .pf-name {
-      font-size: clamp(4.5rem, 5.5vw, 6.5rem);
+      font-size: clamp(6rem, 7vw, 8rem);
     }
 
     /* la imagen en reposo desaparece — el reposo desktop es tipográfico */
     .pf-stack-img {
       display: none;
-    }
-
-    /* ficha centrada verticalmente en los extremos de la fila */
-    .pf-meta--num,
-    .pf-meta--cat {
-      top: 50%;
-      transform: translateY(-50%);
     }
 
     /* imagen incrustada en el flujo del nombre */
@@ -246,26 +217,19 @@ const rows = projects.map((p, i) => {
     .pf-inline img {
       display: block;
       height: 100%;
-      width: calc(0.82em * 16 / 9);
+      width: calc(0.82em * 16 / 10);
       object-fit: cover;
     }
 
     .pf-row:hover .pf-inline,
     .pf-row:focus-visible .pf-inline {
-      width: calc(0.82em * 16 / 9);
+      width: calc(0.82em * 16 / 10);
       opacity: 1;
       margin-inline: 0.12em;
     }
 
-    .pf-row:hover .pf-name,
-    .pf-row:focus-visible .pf-name {
-      color: var(--terracota);
-    }
-
-    .pf-row:hover .pf-meta,
-    .pf-row:focus-visible .pf-meta {
-      color: var(--tinta);
-    }
+    /* hover: el nombre NO cambia de color (fiel a Locomotive — solo aparece
+       la imagen inline). El nombre queda hueso; el lima se reserva para el CTA. */
   }
 
   /* ── prefers-reduced-motion: todo estático y visible ────── */

@@ -26,16 +26,6 @@ const { t } = Astro.props;
 <section class="manifesto" aria-label={t.manifesto.ariaLabel}>
 
   <!--
-    Capa de grano fuerte: pseudo-elemento posicionado dentro de .manifesto.
-    Complementa el grano global (body::after overlay 0.06) con soft-light 0.08
-    sobre el fondo terracota saturado — da la textura "barro prensado" que
-    distingue la sección del resto del sitio.
-    Se implementa vía un div con aria-hidden para que no interfiera con el DOM
-    semántico; position:absolute cubierto por z-index menor al contenido.
-  -->
-  <div class="manifesto-grain" aria-hidden="true"></div>
-
-  <!--
     Kicker — Hanken 500 uppercase, tracking +0.14em.
     Sistema de índices V3: "N°·01 / MANIFESTO".
     Color: hueso al 65% de opacidad sobre terracota.
@@ -68,53 +58,30 @@ const { t } = Astro.props;
    ═══════════════════════════════════════════════════════════ */
 
 .manifesto {
-  background-color: var(--terracota);
-  position: relative;        /* contiene el pseudo-elemento de grano */
-  overflow: hidden;          /* evita que el grano se derrame */
+  /* V4 Restringido: cuerpo oscuro de punta a punta (ART_DIRECTION_V4_RESTRINGIDO §4.1) */
+  background-color: var(--bg);
+  position: relative;
+  overflow: hidden;
   padding-top: var(--space-3xl);
   padding-bottom: var(--space-3xl);
   padding-left: var(--margin);
   padding-right: var(--margin);
-  /*
-   * Sin border-top: el corte directo hero(hueso)→manifiesto(terracota)
-   * ES la decisión de diseño. ART_DIRECTION §5: "alternancia, el corte es directo".
-   */
-}
-
-/* ─── GRANO FUERTE ──────────────────────────────────────── */
-/*
- * Capa de grano adicional sobre terracota.
- * El grano global (body::after) usa overlay 0.06 — apto para hueso y barro-oscuro.
- * Sobre terracota saturado, soft-light da la "textura de barro prensado" más intensa.
- * Opacidad 0.08: perceptible como material, no como suciedad.
- * Sin drift: el grano es material, no efecto (ART_DIRECTION §2 "regla dura").
- */
-.manifesto-grain {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;               /* bajo el contenido (z-index: 1 en .manifesto-kicker y .manifesto-statement) */
-  opacity: 0.08;
-  mix-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
 }
 
 /* ─── KICKER ─────────────────────────────────────────────── */
 /*
- * Hanken 500 uppercase +0.14em tracking — sistema de índices V3.
- * Color: hueso rgba con 65% opacidad — legible sobre terracota, no compite con el statement.
- * z-index: 1 para quedar sobre el grano (z-index:0).
+ * Geist 500 uppercase +0.14em tracking — sistema de índices.
+ * Color: blanco 55% + difference (reacciona al plano azul, da un matiz legible).
  */
 .manifesto-kicker {
   position: relative;
   z-index: 1;
-  font-family: var(--font-body);   /* Hanken Grotesk */
+  font-family: var(--font-body);   /* Geist Sans */
   font-size: var(--text-mono);     /* clamp(0.6875rem, 0.3vw + 0.6rem, 0.8125rem) = 11-13px */
   font-weight: 500;
-  color: rgba(240, 233, 220, 0.65); /* --hueso al 65% */
+  color: var(--ink-62);            /* hueso 62% sobre negro */
   text-transform: uppercase;
-  letter-spacing: 0.14em;           /* sistema de índices V3: +0.14em exacto */
+  letter-spacing: 0.14em;           /* sistema de índices: +0.14em exacto */
   line-height: 1.4;
   margin-bottom: var(--space-l);
 }
@@ -138,13 +105,13 @@ const { t } = Astro.props;
  * Escala: clamp(2rem, 5.5vw, 4.5rem) — Display L del doc. En Fraunces sin wdth axis.
  */
 .manifesto-line {
-  font-family: var(--font-display);   /* Fraunces Variable */
+  font-family: var(--font-display);   /* PP Editorial New */
   font-weight: 300;                   /* light — elegante en gigante */
   font-style: normal;
   font-size: clamp(2rem, 5.5vw, 4.5rem);
   line-height: 1.02;
   letter-spacing: -0.025em;
-  color: var(--hueso);
+  color: var(--ink);                  /* hueso cálido sobre negro */
   margin: 0;
   overflow-wrap: anywhere;           /* anti-overflow mobile: "ventajas competitivas." */
   hyphens: manual;
@@ -170,19 +137,15 @@ const { t } = Astro.props;
   padding-left: clamp(1.5rem, 5vw, 3rem);
 }
 
-/* ─── ACENTO ÁMBAR ──────────────────────────────────────── */
-/*
- * Antes: var(--rojo) #D70321 — ELIMINADO en V3.
- * Ahora: Fraunces itálica weight 400, var(--ambar) #D99A4E.
- * Sobre terracota #A4471F: contraste ~3.5:1 a font-size ≥32px → aceptable para
- * texto display grande (WCAG: 3:1 para textos grandes en negrita/display).
- * <em> es correcto semánticamente: el acento es énfasis tipográfico.
- * font-style: italic activa la itálica variable de Fraunces.
+/* ─── ACENTO — ITÁLICA (no color) ───────────────────────────
+ * Sistema unificado (§5): el énfasis YA NO es un color distinto (ámbar muere).
+ * Es la ITÁLICA de PP Editorial New. El color lo da el difference, igual que el resto.
+ * <em> correcto semánticamente: el acento es énfasis tipográfico.
  */
 .manifesto-accent {
   font-style: italic;
   font-weight: 400;      /* itálica con más expresión que el 300 upright */
-  color: var(--ambar);
+  color: inherit;        /* hereda el blanco+difference de la línea */
 }
 
 /* ─── REVEAL — sistema V3 de máscara por líneas ────────────
@@ -266,66 +229,116 @@ const { t } = Astro.props;
 
 <script>
   /**
-   * ManifestoSection — Reveal con máscara por líneas (patrón V3).
+   * ManifestoSection — Reveal con máscara por líneas.
    *
-   * PROGRESSIVE ENHANCEMENT:
-   * El HTML es visible sin JS. JS añade .manifesto-animating al <section>
-   * y envuelve el texto en line-mask/line-inner SOLO si JS está disponible.
+   * DESKTOP (≥769px): SplitText type:'lines' + ScrollTrigger.
+   *   Cada línea del statement sube desde abajo dentro de su máscara (overflow:hidden).
+   *   yPercent 105→0, 0.9s expo.out, stagger 0.12s. Spec §A.2.
+   *   El kicker entra primero con fade simple 0.4s power2.out.
    *
-   * Secuencia:
-   * 1. JS envuelve cada .manifesto-line en .line-mask > .line-inner.
-   * 2. Añade .manifesto-animating a la sección (activa las máscaras).
-   * 3. IntersectionObserver detecta cuando la sección entra al viewport.
-   * 4. Línea por línea: añade .is-visible + transition-delay incremental.
+   * MOBILE (<769px): IntersectionObserver + CSS fade-up (sistema original V3).
+   *   Sin SplitText (performance + simplicidad en pantalla chica).
    *
-   * Stagger: kicker 0s → line1 0.1s → line2 0.22s.
-   * El acento itálico ámbar entra con line2 (no tiene delay propio).
-   *
-   * reduced-motion: el @media override en CSS garantiza transform:0 y transition:none.
-   * Las clases se añaden pero no producen animación.
+   * PROGRESSIVE ENHANCEMENT: el HTML es visible sin JS.
+   * REDUCED-MOTION: no se instancia SplitText ni IO de animación. Texto visible.
    */
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isDesktop = window.matchMedia('(min-width: 769px)').matches;
 
   const section = document.querySelector<HTMLElement>('.manifesto');
-  if (section && !prefersReduced) {
+  if (!section || prefersReduced) {
+    /* Sin motion: todo visible (CSS ya garantiza esto vía reduced-motion override). */
+  } else if (isDesktop) {
+    /* ── DESKTOP: SplitText + ScrollTrigger ── */
+    try {
+      const { gsap } = await import('gsap');
+      const { SplitText } = await import('gsap/SplitText');
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      gsap.registerPlugin(SplitText, ScrollTrigger);
+
+      const kicker = section.querySelector<HTMLElement>('.manifesto-kicker');
+      const statementEl = section.querySelector<HTMLElement>('.manifesto-statement');
+      const lines = Array.from(section.querySelectorAll<HTMLElement>('.manifesto-line'));
+
+      /* Kicker: fade simple, entra antes del statement */
+      if (kicker) {
+        gsap.set(kicker, { opacity: 0 });
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top 80%',
+          once: true,
+          onEnter: () => {
+            gsap.to(kicker, { opacity: 1, duration: 0.4, ease: 'power2.out' });
+          },
+        });
+      }
+
+      /* Statement: SplitText por línea con máscara */
+      if (lines.length && statementEl) {
+        /* Ocultar las líneas antes de aplicar SplitText */
+        gsap.set(lines, { opacity: 0 });
+
+        const splits = lines.map((line) => {
+          /* autoSplit: true — re-splits si el viewport cambia (responsive) */
+          return new SplitText(line, {
+            type: 'lines',
+            mask: 'lines', /* crea overflow:hidden automáticamente en el wrapper */
+            autoSplit: true,
+          });
+        });
+
+        /* Juntar todas las líneas de todos los SplitText en un array plano */
+        const allLines = splits.flatMap((s) => s.lines);
+
+        /* Hacer visibles los elementos padre antes de animar las líneas internas */
+        gsap.set(lines, { opacity: 1 });
+
+        /* Estado inicial: líneas abajo de su máscara */
+        gsap.set(allLines, { yPercent: 105 });
+
+        ScrollTrigger.create({
+          trigger: statementEl,
+          start: 'top 80%',
+          once: true,
+          onEnter: () => {
+            gsap.to(allLines, {
+              yPercent: 0,
+              duration: 0.9,
+              ease: 'expo.out',
+              stagger: 0.12,
+              delay: 0.15, /* pequeño delay para que el kicker entre primero */
+            });
+          },
+        });
+      }
+    } catch (_) {
+      /* Si GSAP falla: todo visible (progressive enhancement) */
+    }
+  } else {
+    /* ── MOBILE: IntersectionObserver + CSS fade-up (sistema V3 original) ── */
     const kicker = section.querySelector<HTMLElement>('.manifesto-kicker');
     const lines = Array.from(section.querySelectorAll<HTMLElement>('.manifesto-line'));
 
-    /**
-     * wrapInLineMask: envuelve un elemento en .line-mask > .line-inner.
-     * El contenido original pasa al .line-inner; el .line-mask es el clipper.
-     * Preserva las clases del elemento original.
-     */
     function wrapInLineMask(el: HTMLElement): HTMLElement {
       const mask = document.createElement('div');
       mask.className = 'line-mask';
-
       const inner = document.createElement('div');
       inner.className = 'line-inner';
-
-      // Mover el contenido del elemento al inner
       while (el.firstChild) {
         inner.appendChild(el.firstChild);
       }
       mask.appendChild(inner);
-
-      // Reemplazar el elemento original con la estructura mask>inner
       el.appendChild(mask);
-
       return inner;
     }
 
-    // Envolver kicker en mask si existe
     const kickerInner = kicker ? wrapInLineMask(kicker) : null;
-    // Envolver cada línea en mask
     const lineInners = lines.map((line) => wrapInLineMask(line));
 
-    // Activar el modo animación (las máscaras ocultan el contenido)
     section.classList.add('manifesto-animating');
 
-    // Delays de stagger en segundos
-    const delays: number[] = [0, 0.1, 0.22]; // kicker, line1, line2
+    const delays: number[] = [0, 0.1, 0.22];
     const targets: (HTMLElement | null)[] = [kickerInner, ...lineInners];
 
     const observer = new IntersectionObserver(
@@ -337,18 +350,11 @@ const { t } = Astro.props;
               inner.style.transitionDelay = `${delays[i] ?? 0}s`;
               inner.classList.add('is-visible');
             });
-            // Una sola vez
             observer.disconnect();
           }
         });
       },
-      {
-        /*
-         * threshold 0.15: la sección debe estar al menos 15% visible.
-         * Evita el disparo en scroll rápido cuando apenas aparece 1px.
-         */
-        threshold: 0.15,
-      }
+      { threshold: 0.15 }
     );
 
     observer.observe(section);

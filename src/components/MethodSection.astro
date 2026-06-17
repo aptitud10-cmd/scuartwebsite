@@ -129,14 +129,16 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   METHOD SECTION — V3 "Terracota cálida en alternancia"
-   Fondo: --barro-elevado. Mobile-first: 375px → 768px → 1280px.
+   METHOD SECTION — V4 "Restringido" (1 color + negro/hueso)
+   Fondo: --bg negro. Mobile-first: 375px → 768px → 1280px.
    ═══════════════════════════════════════════════════════════ */
 
 /* ─── SECCIÓN ────────────────────────────────────────────── */
 
 .mth {
-  background-color: var(--barro-elevado);
+  /* Cuerpo OSCURO de punta a punta (V4 §4: el video del hero es el único color) */
+  background-color: var(--bg);
+  isolation: isolate;
   padding-top: var(--space-xl);
   padding-bottom: var(--space-2xl);
   padding-left: var(--margin);
@@ -149,16 +151,16 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
 /* ─── HEADER / KICKER ────────────────────────────────────── */
 
 .mth-header {
-  border-top: 1px solid var(--borde-oscuro);
+  border-top: 1px solid var(--hairline);
   padding-top: var(--space-m);
   margin-bottom: var(--space-l);
 }
 
 .mth-kicker {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
-  color: rgba(240, 233, 220, 0.5); /* hueso al 50% — subordinado */
+  color: var(--ink-62);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   line-height: 1.4;
@@ -191,14 +193,14 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
   font-style: normal;
-  /* Inactivo: hueso al 15% — fantasma que espera */
-  color: rgba(240, 233, 220, 0.15);
+  /* Inactivo: hueso 18% — fantasma sobre negro */
+  color: var(--ink-18);
   transition: color 0.4s ease;
 }
 
-/* Numeral activo (clase añadida por JS) — ámbar */
+/* Numeral activo (clase añadida por JS) — acento de texto (tinta sobre blanco, lima sobre negro) */
 .mth-num-item.is-active {
-  color: var(--ambar);
+  color: var(--accent-text);
 }
 
 /* ─── PASOS — stack vertical mobile ─────────────────────── */
@@ -217,14 +219,14 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
 .mth-step {
   padding-top: var(--space-m);
   padding-bottom: var(--space-m);
-  border-top: 1px solid var(--borde-oscuro);
+  border-top: 1px solid var(--hairline);
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
 }
 
 .mth-step:last-child {
-  border-bottom: 1px solid var(--borde-oscuro);
+  border-bottom: 1px solid var(--hairline);
 }
 
 /* ─── NUMERAL MOBILE — visible en <1280px ────────────────── */
@@ -238,7 +240,7 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
   font-style: normal;
-  color: rgba(240, 233, 220, 0.2);
+  color: var(--ink-18);  /* hueso 18% — fantasma sobre negro */
   pointer-events: none;
 }
 
@@ -258,22 +260,19 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
   font-size: clamp(1.875rem, 6vw, 4rem);
   line-height: 1.0;
   letter-spacing: -0.025em;
-  color: var(--hueso);
+  color: var(--ink);
   font-style: normal;
   margin: 0 0 var(--space-s) 0;
   hyphens: none;
 }
 
-/* ─── BODY — Hanken, hueso al 65% ────────────────────────── */
+/* ─── BODY — Geist, hueso 62% ───────────────────────────── */
 
-/*
- * rgba(240,233,220,0.65) sobre #2E1F15 → ~6.5:1 (AA).
- */
 .mth-step__body {
   font-family: var(--font-body);
   font-size: var(--text-body);
   font-weight: 400;
-  color: rgba(240, 233, 220, 0.65);
+  color: var(--ink-62);
   line-height: 1.65;
   max-width: 52ch;
   margin: 0 0 var(--space-m) 0;
@@ -283,22 +282,18 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
 
 .mth-step__rule {
   border: none;
-  border-top: 1px solid var(--borde-oscuro);
+  border-top: 1px solid var(--hairline);
   margin: var(--space-s) 0;
 }
 
 /* ─── LABEL MONO (CAPABILITIES / WHAT CHANGES) ───────────── */
 
-/*
- * Hanken 500 uppercase — ficha técnica.
- * rgba(240,233,220,0.45) sobre barro-elevado → ~4.5:1 (AA borderline).
- * Se sube a 0.5 para asegurar contraste mínimo AA.
- */
+/* Geist 500 uppercase — ficha técnica. Hueso 62%. */
 .mth-step__label {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
-  color: rgba(240, 233, 220, 0.5);
+  color: var(--ink-62);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   line-height: 1.4;
@@ -321,10 +316,10 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
 }
 
 .mth-step__caps-item {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: 0.6875rem; /* 11px */
   font-weight: 400;
-  color: rgba(240, 233, 220, 0.5);
+  color: var(--ink-62);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   line-height: 1.4;
@@ -338,15 +333,12 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
   gap: var(--space-2xs);
 }
 
-/*
- * Texto de cierre: hueso al 80% — ligero protagonismo sobre el body.
- * rgba(240,233,220,0.80) sobre barro-elevado → ~9:1 (AAA).
- */
+/* Texto de cierre — hueso, ligero protagonismo. */
 .mth-step__change-text {
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
   font-size: clamp(0.75rem, 0.4vw + 0.68rem, 0.875rem);
   font-weight: 400;
-  color: rgba(240, 233, 220, 0.8);
+  color: var(--ink);
   letter-spacing: 0.04em;
   line-height: 1.6;
   margin: 0;
@@ -577,10 +569,34 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
 
           /* Activar el primer numeral al cargar */
           if (numItems[0]) numItems[0].classList.add('is-active');
+
+          /* Desktop: el título sube con el bloque del paso (fade simple — spec §A.5).
+             NO mask reveal en desktop para no pasar de 2 gestos sobre el pin. */
+          steps.forEach((step) => {
+            const title = step.querySelector<HTMLElement>('.mth-step__title');
+            if (!title) return;
+            gsap.set(title, { opacity: 0, y: 12 });
+            ScrollTrigger.create({
+              trigger: step,
+              start: 'top 75%',
+              once: true,
+              onEnter: () => {
+                gsap.to(title, {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.7,
+                  ease: 'expo.out',
+                });
+              },
+            });
+          });
         }
 
       } else {
-        /* ── MOBILE / TABLET: reveal sutil por paso ── */
+        /* ── MOBILE / TABLET: reveal sutil por paso + mask reveal del título ── */
+        const { SplitText } = await import('gsap/SplitText');
+        gsap.registerPlugin(SplitText);
+
         steps.forEach((step) => {
           gsap.set(step, { opacity: 0, y: 16 });
           ScrollTrigger.create({
@@ -594,6 +610,25 @@ const whatChangesLabel: string = t.method.whatChangesLabel;
                 duration: 0.7,
                 ease: 'expo.out',
               });
+
+              /* Mask reveal del título — solo en mobile/tablet (spec §A.5).
+                 En desktop ya hay pin + fade: solo 2 gestos. En mobile el título
+                 necesita más presencia porque no hay pin. */
+              const title = step.querySelector<HTMLElement>('.mth-step__title');
+              if (title) {
+                const split = new SplitText(title, {
+                  type: 'lines',
+                  mask: 'lines',
+                  autoSplit: true,
+                });
+                gsap.from(split.lines, {
+                  yPercent: 105,
+                  duration: 0.8,
+                  ease: 'expo.out',
+                  stagger: 0.08,
+                  delay: 0.1, /* pequeño delay para que el bloque entre primero */
+                });
+              }
             },
           });
         });

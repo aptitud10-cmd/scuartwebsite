@@ -65,10 +65,18 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
        ──────────────────────────────────────────────────────────────── -->
   <div class="hero-media" aria-hidden="true">
     <!--
+      FONDO PROVISIONAL — rojo Locomotive animado (decisión William 2026-06-16):
+      mientras no exista el video real (Runway → montaje en Premiere), esta capa
+      .hero-fallback muestra un rojo saturado con un brillo que se mueve lento.
+      El mix-blend-mode de nav/wordmark hace que el texto reaccione (sobre rojo → cyan),
+      así se ve la estética final HOY sin video.
+
       SWAP A VIDEO REAL: poné el archivo en /public/video/hero.mp4
       (opcional /public/video/hero.webm para mejor compresión) y arranca solo.
-      Mientras no exista, poster muestra hero-portrait.jpg → el hero se ve completo.
+      El <video> se monta ENCIMA del fallback (z-index) y lo tapa al cargar.
+      Si el video no existe, el <video> queda transparente y se ve el rojo.
     -->
+    <div class="hero-fallback"></div>
     <video
       class="hero-video"
       autoplay
@@ -76,7 +84,6 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
       loop
       playsinline
       preload="metadata"
-      poster="/images/hero-portrait.jpg"
     >
       <source src="/video/hero.webm" type="video/webm" />
       <source src="/video/hero.mp4" type="video/mp4" />
@@ -145,6 +152,7 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
     <p class="hero-wordmark__descriptor" data-reveal>
       {wordmarkDescriptor}<!-- Asterisco AUTÉNTICO de PP Editorial New (carácter de la fuente) -->
       <span class="hero-wordmark__star" aria-hidden="true">*</span>
+    </p>
   </div>
 
   <!-- Scroll cue — esquina inferior derecha -->
@@ -199,6 +207,52 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
   object-fit: cover;
   object-position: center center;
   will-change: transform, opacity;
+  z-index: 1;                      /* ENCIMA del fallback: al cargar el video real, lo tapa */
+  /* Oculto hasta que HAYA video real cargado (clase .is-ready la pone el JS en loadeddata).
+     Así un /video/hero.mp4 inexistente NO muestra un recuadro roto/negro: manda el rojo. */
+  opacity: 0;
+}
+
+.hero-video.is-ready {
+  opacity: 1;
+}
+
+/* ── Fondo provisional rojo Locomotive (sin video) ──────────────────
+ * Rojo saturado con un brillo radial que respira y se desplaza lento.
+ * Queda DEBAJO del <video> (z-index 0). Cuando el video real cargue,
+ * el <video> opaco lo tapa. Si no hay video, esto es lo que se ve.
+ * El mix-blend-mode de nav/wordmark convierte el blanco en cyan sobre este rojo.
+ */
+.hero-fallback {
+  position: absolute;
+  inset: -20%;                     /* más grande que el viewport: el brillo puede salir y entrar */
+  z-index: 0;
+  background-color: #d61f16;       /* rojo bombero Locomotive (base) */
+  background-image:
+    radial-gradient(60% 55% at 35% 35%, #ff5a3c 0%, rgba(255,90,60,0) 60%),
+    radial-gradient(70% 60% at 70% 70%, #ff3a24 0%, rgba(214,31,22,0) 65%),
+    linear-gradient(130deg, #b3140d 0%, #e7251c 50%, #b3140d 100%);
+  will-change: transform;
+  /* dos animaciones: el bloque entero deriva, y los brillos pulsan */
+  animation:
+    hero-drift 9s ease-in-out infinite alternate,
+    hero-pulse 5s ease-in-out infinite alternate;
+}
+
+/* Deriva del bloque — desplazamiento amplio y visible (el "brillo" cruza la pantalla) */
+@keyframes hero-drift {
+  0%   { transform: scale(1.1) translate3d(-6%, -4%, 0); }
+  100% { transform: scale(1.18) translate3d(6%, 4%, 0); }
+}
+
+/* Pulso de saturación/brillo — la luz "respira" notoriamente */
+@keyframes hero-pulse {
+  0%   { filter: saturate(0.95) brightness(0.92); }
+  100% { filter: saturate(1.25) brightness(1.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-fallback { animation: none; transform: scale(1.1); }
 }
 
 /* Sin scrim: mix-blend-mode: difference ya garantiza contraste contra cualquier fondo. */
@@ -547,12 +601,26 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
    */
 
   import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isDesktop = window.matchMedia('(min-width: 769px)').matches;
+
+  /* Video real: solo se vuelve visible (.is-ready) cuando carga de verdad.
+     Mientras /video/hero.mp4 no exista, queda oculto y manda el fondo rojo. */
+  const videoEl = document.querySelector<HTMLVideoElement>('.hero-video');
+  if (videoEl) {
+    const reveal = () => videoEl.classList.add('is-ready');
+    if (videoEl.readyState >= 2) reveal();
+    else videoEl.addEventListener('loadeddata', reveal, { once: true });
+  }
 
   if (!reducedMotion) {
     const heroNav    = document.querySelector<HTMLElement>('.hero-nav');
-    const heroVideo  = document.querySelector<HTMLElement>('.hero-video');
+    const heroVideo  = document.querySelector<HTMLElement>('.hero-video, .hero-fallback');
+    const heroMedia  = document.querySelector<HTMLElement>('.hero-media');
     const revealEls  = document.querySelectorAll<HTMLElement>('[data-reveal]');
     const scrollCue  = document.querySelector<HTMLElement>('.hero-scroll-cue');
 
@@ -575,17 +643,54 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
       }
     });
 
+    /* ── Bloquear scroll durante la secuencia de entrada (desktop: Lenis; mobile: body) ──
+       Lenis puede no estar listo al momento que corre este script (Layout.astro lo carga
+       en el body pero los scripts de componentes también son módulos). Esperamos el evento
+       'lenis:ready' para obtener la instancia, con fallback a window.__lenis si ya está. */
+    type LenisInstance = { stop: () => void; start: () => void };
+    let lenisInstance: LenisInstance | null = null;
+
+    const getLenis = (): LenisInstance | null =>
+      ((window as unknown as Record<string, unknown>)['__lenis'] as LenisInstance) ?? null;
+
+    const blockScroll = () => {
+      if (isDesktop) {
+        const l = getLenis();
+        if (l) l.stop();
+      } else {
+        /* Mobile: el scroller es document.body. Congelamos overflow temporalmente. */
+        document.body.style.overflow = 'hidden';
+      }
+    };
+
+    const unblockScroll = () => {
+      if (isDesktop) {
+        const l = getLenis();
+        if (l) l.start();
+      } else {
+        document.body.style.overflow = '';
+      }
+    };
+
     /* ── Estados iniciales ──────────────────────────────── */
-    if (heroVideo) gsap.set(heroVideo, { scale: 1.06, opacity: 0, transformOrigin: 'center center' });
+    const heroVideoEl = document.querySelector<HTMLElement>('.hero-video');
+    if (heroVideoEl) gsap.set(heroVideoEl, { scale: 1.06, transformOrigin: 'center center' });
     if (heroNav) gsap.set(heroNav, { opacity: 0, y: -8 });
     if (inners.length) gsap.set(inners, { yPercent: 110 });
 
     /* ── Timeline ───────────────────────────────────────── */
-    const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+    blockScroll();
 
-    tl.to(heroVideo, { scale: 1, opacity: 1, duration: 1.6 }, 0);
-    tl.to(heroNav, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 0.25);
-    tl.to(inners, { yPercent: 0, duration: 1.1, stagger: 0.12 }, 0.45);
+    const tl = gsap.timeline({
+      defaults: { ease: 'expo.out' },
+      onComplete: () => {
+        unblockScroll();
+      },
+    });
+
+    if (heroVideoEl) tl.to(heroVideoEl, { scale: 1, duration: 1.6 }, 0);
+    if (heroNav) tl.to(heroNav, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 0.25);
+    if (inners.length) tl.to(inners, { yPercent: 0, duration: 1.1, stagger: 0.12 }, 0.45);
 
     /* Scroll cue — loop sutil al terminar */
     tl.call(() => {
@@ -593,5 +698,24 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
         gsap.to(scrollCue, { y: 7, duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
       }
     });
+
+    /* ── Parallax de salida del hero video [propuesta SCUART, desktop only, cortable] ──
+       El video se desplaza más lento que el scroll al salir, creando profundidad.
+       RIESGO: con mix-blend-mode:difference activo, puede titilado del texto.
+       Si titila visualmente: eliminar este bloque ScrollTrigger. */
+    if (isDesktop && heroMedia) {
+      const heroSection = document.querySelector<HTMLElement>('.hero-v3');
+      if (heroSection) {
+        ScrollTrigger.create({
+          trigger: heroSection,
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true,
+          onUpdate: (self) => {
+            gsap.set(heroMedia, { yPercent: self.progress * -10 });
+          },
+        });
+      }
+    }
   }
 </script>

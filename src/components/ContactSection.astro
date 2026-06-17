@@ -312,7 +312,10 @@ const c = t.contact;
 /* ─── SECCIÓN ────────────────────────────────────────────── */
 
 .contact {
-  background-color: var(--barro-oscuro);
+  /* Plano NEGRO (ART_DIRECTION §4 — descanso + foco: pedir el proyecto).
+     Sobre negro, blanco directo y difference coinciden → uso blanco directo
+     (más predecible, sin riesgo del statement sticky + blend, §7 nota). */
+  background-color: var(--bg);
   padding-top: var(--space-xl);
   padding-bottom: var(--space-2xl);
   padding-left: var(--margin);
@@ -322,34 +325,10 @@ const c = t.contact;
   scroll-margin-top: 72px;
 }
 
-/*
- * Grano adicional sobre barro-oscuro (soft-light 0.08).
- * El grano global (overlay 0.06) es insuficiente sobre fondos oscuros
- * para dar la textura "barro prensado". Este pseudo-elemento lo refuerza.
- * Intacto en reduced-motion (el grano es material, no motion).
- */
-.contact::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.08;
-  mix-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
-}
-
-/* Todo el contenido interior sobre el grano */
-.contact > * {
-  position: relative;
-  z-index: 1;
-}
-
 /* ─── HEADER / KICKER ────────────────────────────────────── */
 
 .contact-header {
-  border-top: 1px solid var(--borde-oscuro);
+  border-top: 1px solid var(--hairline);
   padding-top: var(--space-m);
   margin-bottom: var(--space-l);
 }
@@ -358,7 +337,7 @@ const c = t.contact;
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
-  color: rgba(240, 233, 220, 0.65); /* hueso 65% */
+  color: var(--ink);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   line-height: 1.4;
@@ -386,7 +365,7 @@ const c = t.contact;
   font-size: clamp(2.75rem, 9vw, 7rem);
   line-height: 1.02;
   letter-spacing: -0.025em;
-  color: var(--hueso);
+  color: var(--ink);
   /* Preserva los \n del i18n */
   white-space: pre-line;
   hyphens: none;
@@ -401,7 +380,7 @@ const c = t.contact;
   font-family: var(--font-body);
   font-size: var(--text-subhead);
   font-weight: 400;
-  color: rgba(240, 233, 220, 0.70); /* hueso 70% */
+  color: var(--ink-62);
   line-height: 1.55;
   max-width: 36ch;
   margin: 0;
@@ -463,7 +442,7 @@ const c = t.contact;
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
-  color: rgba(240, 233, 220, 0.65); /* hueso 65% */
+  color: var(--ink);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   line-height: 1.4;
@@ -471,7 +450,7 @@ const c = t.contact;
 }
 
 .contact-form__required {
-  color: var(--terracota);
+  color: var(--ink);
   margin-left: 0.1em;
 }
 
@@ -486,10 +465,10 @@ const c = t.contact;
   font-family: var(--font-body);
   font-size: var(--text-body);
   font-weight: 400;
-  color: var(--hueso);
+  color: var(--ink);
   background-color: transparent;
   border: none;
-  border-bottom: 1px solid var(--borde-oscuro);
+  border-bottom: 1px solid var(--hairline);
   border-radius: 0;
   padding: var(--space-xs) 0;
   width: 100%;
@@ -502,25 +481,25 @@ const c = t.contact;
 }
 
 .contact-form__input::placeholder {
-  color: rgba(240, 233, 220, 0.40); /* hueso 40% */
+  color: var(--ink-42);
   opacity: 1; /* Firefox normaliza */
 }
 
-/* Focus: la línea pasa a terracota */
+/* Focus: la línea pasa a lima (--brand) */
 .contact-form__input:focus {
-  border-bottom-color: var(--terracota);
+  border-bottom-color: var(--brand);
 }
 
 .contact-form__input:focus-visible {
-  border-bottom-color: var(--terracota);
+  border-bottom-color: var(--brand);
   /* Outline extra visible para teclado */
   outline: none;
-  box-shadow: 0 2px 0 0 var(--terracota);
+  box-shadow: 0 2px 0 0 var(--brand);
 }
 
 /* Hover no-focus: línea sube levemente de luminosidad */
 .contact-form__input:hover:not(:focus) {
-  border-bottom-color: rgba(71, 51, 33, 0.70); /* borde-oscuro más visible */
+  border-bottom-color: var(--hairline-strong);
 }
 
 /* ─── SELECT — wrapper para la flecha custom ─────────────── */
@@ -535,8 +514,8 @@ const c = t.contact;
 }
 
 .contact-form__select option {
-  background-color: var(--barro-oscuro);
-  color: var(--hueso);
+  background-color: var(--bg);
+  color: #fff;
 }
 
 .contact-form__select-arrow {
@@ -546,7 +525,7 @@ const c = t.contact;
   transform: translateY(-50%);
   font-family: var(--font-body);
   font-size: 0.75rem;
-  color: rgba(240, 233, 220, 0.50); /* hueso 50% */
+  color: var(--ink-62);
   pointer-events: none;
   line-height: 1;
   display: flex;
@@ -567,24 +546,23 @@ const c = t.contact;
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 400;
-  color: var(--terracota);
+  color: var(--ink);
   line-height: 1.4;
   letter-spacing: 0.02em;
   padding: var(--space-xs) 0;
 }
 
-/* ─── BOTÓN SUBMIT — CTA terracota único ───────────────────
- * Fondo: terracota. Texto: hueso. Hover: terracota-profunda (oscurece).
- * border-radius: 0 (sin redondez grande).
- * WCAG: hueso (#F0E9DC) sobre terracota (#A4471F) = ~5.0:1 (AA, UI ≥18px).
+/* ─── BOTÓN SUBMIT — CTA lima, único bloque sólido de color del sitio ─
+ * V4 Restringido §4.2: relleno --brand, texto --on-brand (negro), hover --brand-press.
+ * WCAG: --on-brand (#0e0e0c) sobre --brand (#c6f24e) = ~13:1 (AAA).
  */
 .contact-form__submit {
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
-  color: var(--hueso);
-  background-color: var(--terracota);
-  border: 1px solid var(--terracota);
+  color: var(--on-brand);          /* negro sobre lima — contraste AAA */
+  background-color: var(--brand);  /* lima: el único relleno de color del sitio */
+  border: 1px solid var(--brand);
   border-radius: 0;
   padding: 0.85em 1.75em;
   min-height: 48px;
@@ -594,16 +572,17 @@ const c = t.contact;
   cursor: pointer;
   transition:
     background-color 0.25s ease,
-    border-color 0.25s ease;
+    border-color 0.25s ease,
+    opacity 0.25s ease;
   -webkit-appearance: none;
   appearance: none;
   align-self: flex-start;
 }
 
-/* Hover: oscurece (terracota-profunda), no aclara */
+/* Hover: lima se oscurece levemente */
 .contact-form__submit:hover {
-  background-color: var(--terracota-prof);
-  border-color: var(--terracota-prof);
+  background-color: var(--brand-press);
+  border-color: var(--brand-press);
 }
 
 .contact-form__submit:active {
@@ -611,7 +590,7 @@ const c = t.contact;
 }
 
 .contact-form__submit:focus-visible {
-  outline: 2px solid var(--hueso);
+  outline: 2px solid var(--brand);
   outline-offset: 3px;
 }
 
@@ -635,7 +614,7 @@ const c = t.contact;
   font-size: clamp(2rem, 5vw, 4rem);
   line-height: 1.02;
   letter-spacing: -0.025em;
-  color: var(--hueso);
+  color: var(--ink);
   margin: 0;
 }
 
@@ -643,7 +622,7 @@ const c = t.contact;
   font-family: var(--font-body);
   font-size: var(--text-body);
   font-weight: 400;
-  color: rgba(240, 233, 220, 0.70); /* hueso 70% */
+  color: var(--ink-62);
   line-height: 1.6;
   max-width: 40ch;
   margin: 0;
@@ -659,10 +638,10 @@ const c = t.contact;
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 400;
-  color: rgba(240, 233, 220, 0.55); /* hueso 55% */
+  color: var(--ink-62);
   letter-spacing: 0.03em;
   line-height: 1.4;
-  border-top: 1px solid var(--borde-oscuro);
+  border-top: 1px solid var(--hairline);
   padding-top: var(--space-m);
   margin-top: var(--space-xs);
 }
@@ -673,20 +652,20 @@ const c = t.contact;
 }
 
 .contact-alt__link {
-  color: rgba(240, 233, 220, 0.55);
+  color: var(--ink-62);
   text-decoration: none;
   transition: color 0.2s ease;
   padding: 0.2em 0;
 }
 
 .contact-alt__link:hover {
-  color: var(--hueso);
+  color: var(--ink);
 }
 
 .contact-alt__link:focus-visible {
-  outline: 1px solid var(--hueso);
+  outline: 1px solid var(--brand);
   outline-offset: 2px;
-  color: var(--hueso);
+  color: var(--ink);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -785,6 +764,110 @@ const c = t.contact;
    * 5. Si network error → muestra error inline
    */
 
+  /**
+   * ContactSection — Motion V4 (spec §A.6)
+   *
+   * G1 — Mask reveal del statement "LET'S / BUILD / SOMETHING." (SplitText).
+   *       yPercent 105→0, 0.9s expo.out, stagger 0.12s. ScrollTrigger top 80%.
+   *       Solo si !reducedMotion.
+   *       Mobile: IO fade-up del bloque completo.
+   *
+   * G2 — CTA lima entra último: campos del form con IO stagger sutil (0.5s, 0.05s),
+   *       el botón lima entra al final. IO, CSS. Sin GSAP (más simple).
+   *       REGLA DURA: nada se mueve mientras el usuario escribe.
+   *
+   * prefers-reduced-motion: sin motion, todo visible.
+   */
+  (async () => {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isDesktop = window.matchMedia('(min-width: 769px)').matches;
+
+    if (!reducedMotion) {
+      const statementEl = document.querySelector<HTMLElement>('.contact-statement__text');
+
+      if (statementEl) {
+        if (isDesktop) {
+          /* ── DESKTOP: SplitText mask reveal del statement ── */
+          try {
+            const { gsap } = await import('gsap');
+            const { SplitText } = await import('gsap/SplitText');
+            const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+            gsap.registerPlugin(SplitText, ScrollTrigger);
+
+            const split = new SplitText(statementEl, {
+              type: 'lines',
+              mask: 'lines',
+              autoSplit: true,
+            });
+
+            gsap.set(split.lines, { yPercent: 105 });
+
+            ScrollTrigger.create({
+              trigger: statementEl,
+              start: 'top 80%',
+              once: true,
+              onEnter: () => {
+                gsap.to(split.lines, {
+                  yPercent: 0,
+                  duration: 0.9,
+                  ease: 'expo.out',
+                  stagger: 0.12,
+                });
+              },
+            });
+          } catch (_) {
+            /* Si GSAP falla: texto visible */
+          }
+        }
+        /* Mobile: el bloque de statement es visible por defecto, sin motion especial */
+      }
+
+      /* ── G2: Campos del form con stagger sutil + botón lima entra último ──
+         IO en el form-wrap. Cada fila de campos hace un fade sutil (IO + CSS).
+         El botón tiene el delay más largo — es el punto final de la frase.
+         CRÍTICO: solo en reposo antes de que el usuario interactúe. */
+      const formWrap = document.querySelector<HTMLElement>('.contact-form-wrap');
+      const formRows = document.querySelectorAll<HTMLElement>('.contact-form__row');
+      const submitBtn = document.querySelector<HTMLElement>('[data-contact-submit]');
+
+      if (formWrap && formRows.length) {
+        /* Ocultar filas hasta que entren al viewport */
+        formRows.forEach((row, i) => {
+          row.style.opacity = '0';
+          row.style.transform = 'translateY(12px)';
+          row.style.transition = `opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s`;
+        });
+
+        /* El botón lima tiene delay extra — llega último */
+        if (submitBtn) {
+          const submitRow = submitBtn.closest('.contact-form__row');
+          if (submitRow) {
+            const lastDelay = formRows.length * 0.05 + 0.08;
+            (submitRow as HTMLElement).style.transition = `opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${lastDelay}s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${lastDelay}s`;
+          }
+        }
+
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                formRows.forEach((row) => {
+                  row.style.opacity = '1';
+                  row.style.transform = 'translateY(0)';
+                });
+                io.disconnect();
+              }
+            });
+          },
+          { threshold: 0.05 }
+        );
+
+        io.observe(formWrap);
+      }
+    }
+  })();
+
+  /* ── Formulario: lógica de envío (se conserva intacta — P5) ── */
   const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
   const submitBtn = document.querySelector<HTMLButtonElement>('[data-contact-submit]');
   const errorEl = document.querySelector<HTMLElement>('[data-contact-error]');
