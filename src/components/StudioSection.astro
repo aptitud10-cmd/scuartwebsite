@@ -1,0 +1,826 @@
+---
+/**
+ * StudioSection.astro — Sección "Estudio / Studio"
+ * Fusión de CapabilitiesSection + MethodSection (William 2026-06-18).
+ *
+ * ESTRUCTURA:
+ *   Parte 1 — QUÉ HACEMOS / WHAT WE DO
+ *     Lista editorial de 6 servicios (de capabilities.items).
+ *     Numerales gigantes 01-06 + nombre + resolves.
+ *     Reveal: IntersectionObserver + stagger.
+ *
+ *   Parte 2 — CÓMO TRABAJAMOS / HOW WE WORK
+ *     4 pasos del proceso (de method.steps).
+ *     Numerales 001-004 + título + body + "qué cambia".
+ *     SIN stepCapabilities (redundancia eliminada).
+ *     SIN barra "trabajamos con" (redundancia eliminada).
+ *     Pin GSAP de columna de numerales en desktop ≥1280px (conservado del Method).
+ *
+ * TOKENS V4 BLANCO ACTIVOS (NO modificar):
+ *   --bg, --ink, --ink-62, --ink-18, --hairline, --accent-text,
+ *   --font-display, --font-body, --text-mono, --text-body.
+ *
+ * RESPONSIVE:
+ *   Mobile (375px): stack vertical, sin pin.
+ *   Tablet (768px): más aire, sin pin.
+ *   Desktop (1280px): grid 2 col en Parte 2, numerales pineados con GSAP.
+ *   prefers-reduced-motion: todo estático y visible.
+ */
+
+import type { Translations, CapabilityService, MethodStep } from '../i18n/en';
+
+const { t } = Astro.props as { t: Translations };
+
+const kicker: string = t.studio.kicker;
+const whatWeDoLabel: string = t.studio.whatWeDoLabel;
+const howWeWorkLabel: string = t.studio.howWeWorkLabel;
+const whatChangesLabel: string = t.method.whatChangesLabel;
+
+const items: CapabilityService[] = t.capabilities.items;
+const steps: MethodStep[] = t.method.steps;
+---
+
+<section
+  class="stu"
+  id="studio"
+  aria-label={kicker}
+>
+
+  <!-- Kicker de sección -->
+  <div class="stu-header">
+    <p class="stu-kicker">{kicker}</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PARTE 1 — QUÉ HACEMOS (lista de 6 servicios)
+       ═══════════════════════════════════════════════ -->
+  <div class="stu-part" id="studio-what">
+    <p class="stu-part__label">{whatWeDoLabel}</p>
+
+    <ol class="stu-services" role="list" aria-label={whatWeDoLabel}>
+      {items.map((item, index) => (
+        <li
+          class="stu-svc"
+          data-row-index={index}
+          data-even={index % 2 === 1 ? 'true' : 'false'}
+        >
+          <!--
+            Numeral gigante: elemento gráfico-arquitectónico sobre la fila.
+            aria-hidden: el número está implícito en el orden de lista.
+          -->
+          <span class="stu-svc__num" aria-hidden="true">{item.num}</span>
+
+          <div class="stu-svc__content">
+            <p class="stu-svc__name">{item.name}</p>
+            <p class="stu-svc__resolves">{item.resolves}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PARTE 2 — CÓMO TRABAJAMOS (4 pasos del proceso)
+       ═══════════════════════════════════════════════ -->
+  <div class="stu-part" id="studio-how">
+    <p class="stu-part__label">{howWeWorkLabel}</p>
+
+    <div class="stu-method" data-stu-method>
+
+      <!--
+        COLUMNA IZQUIERDA — numerales pineados en desktop.
+        Oculta en mobile/tablet (solo desktop ≥1280px).
+        aria-hidden: el contenido semántico está en los pasos.
+      -->
+      <div class="stu-nums" aria-hidden="true" data-stu-nums>
+        {steps.map((step, i) => (
+          <span
+            class="stu-num-item"
+            data-num-index={i}
+            aria-hidden="true"
+          >{step.num}</span>
+        ))}
+      </div>
+
+      <!--
+        COLUMNA DERECHA — los 4 pasos.
+        Desktop: scrollean mientras los numerales quedan pineados.
+        Mobile/tablet: stack vertical con numeral propio visible.
+      -->
+      <div class="stu-steps" data-stu-steps>
+        {steps.map((step, i) => (
+          <div
+            class="stu-step"
+            data-step-index={i}
+            role="article"
+            aria-label={`${step.num} ${step.title}`}
+          >
+            <!--
+              Numeral mobile/tablet — visible solo en <1280px.
+              En desktop está oculto (vive en stu-nums pineado).
+            -->
+            <span class="stu-step__num-mobile" aria-hidden="true">{step.num}</span>
+
+            <div class="stu-step__content">
+              <h2 class="stu-step__title">{step.title}</h2>
+
+              <p class="stu-step__body">{step.body}</p>
+
+              <hr class="stu-step__rule" aria-hidden="true" />
+
+              <div class="stu-step__change">
+                <p class="stu-step__label">{whatChangesLabel}</p>
+                <p class="stu-step__change-text">&#x2192; {step.whatChanges}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
+<style>
+/* ═══════════════════════════════════════════════════════════
+   STUDIO SECTION — V4 "Restringido" (cuerpo blanco, 1 color)
+   Mobile-first: 375px → 768px → 1280px.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── SECCIÓN ────────────────────────────────────────────── */
+
+.stu {
+  background-color: var(--bg);
+  isolation: isolate;
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-2xl);
+  padding-left: var(--margin);
+  padding-right: var(--margin);
+  position: relative;
+  overflow-x: clip;
+  scroll-margin-top: 72px;
+}
+
+/* ─── HEADER / KICKER ────────────────────────────────────── */
+
+.stu-header {
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-m);
+  margin-bottom: var(--space-xl);
+}
+
+.stu-kicker {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-62);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ─── PARTES ─────────────────────────────────────────────── */
+
+.stu-part {
+  margin-bottom: var(--space-2xl);
+}
+
+.stu-part:last-child {
+  margin-bottom: 0;
+}
+
+/* Label sub-sección (QUÉ HACEMOS / CÓMO TRABAJAMOS) */
+.stu-part__label {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-62);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  margin: 0 0 var(--space-l) 0;
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: var(--space-s);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PARTE 1 — SERVICIOS (Capabilities)
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── LISTA EDITORIAL ────────────────────────────────────── */
+
+.stu-services {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ─── FILA — mobile base ─────────────────────────────────── */
+
+.stu-svc {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--space-m);
+  padding-bottom: var(--space-m);
+  border-top: 1px solid var(--hairline);
+  overflow: visible;
+}
+
+.stu-svc:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* ─── NUMERAL GIGANTE ────────────────────────────────────── */
+
+.stu-svc__num {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(3.5rem, 8vw, 6.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--ink-18);
+  font-variant-numeric: tabular-nums;
+  font-style: normal;
+  position: relative;
+  display: block;
+  pointer-events: none;
+  margin-bottom: calc(-1 * clamp(1.5rem, 3.5vw, 3rem));
+  min-height: clamp(2.5rem, 6vw, 5rem);
+}
+
+/* ─── CONTENIDO (nombre + resolves) ─────────────────────── */
+
+.stu-svc__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── NOMBRE ─────────────────────────────────────────────── */
+
+.stu-svc__name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-style: normal;
+  margin: 0;
+  hyphens: none;
+}
+
+/* ─── RESOLVES ───────────────────────────────────────────── */
+
+.stu-svc__resolves {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: 400;
+  color: var(--ink-62);
+  line-height: 1.55;
+  margin: 0;
+  max-width: 52ch;
+}
+
+/* ─── REVEAL: estados para IntersectionObserver ──────────── */
+
+.stu-svc.is-hidden {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.stu-svc.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stu-svc.is-hidden {
+    opacity: 1;
+    transform: none;
+  }
+  .stu-svc.is-visible {
+    transition: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PARTE 2 — PASOS DEL PROCESO (Method)
+   ═══════════════════════════════════════════════════════════ */
+
+/* ─── BODY — layout principal ────────────────────────────── */
+
+.stu-method {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ─── COLUMNA NUMERALES — oculta en mobile/tablet ────────── */
+
+.stu-nums {
+  display: none;
+}
+
+.stu-num-item {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(5rem, 12vw, 11rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  font-style: normal;
+  color: var(--ink-18);
+  transition: color 0.4s ease;
+}
+
+/* Numeral activo — acento de texto */
+.stu-num-item.is-active {
+  color: var(--accent-text);
+}
+
+/* ─── PASOS — stack vertical mobile ─────────────────────── */
+
+.stu-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ─── BLOQUE DE PASO ─────────────────────────────────────── */
+
+.stu-step {
+  padding-top: var(--space-m);
+  padding-bottom: var(--space-m);
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.stu-step:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* ─── NUMERAL MOBILE — visible en <1280px ────────────────── */
+
+.stu-step__num-mobile {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(3rem, 9vw, 6rem);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  font-style: normal;
+  color: var(--ink-18);
+  pointer-events: none;
+}
+
+/* ─── CONTENIDO DEL PASO ─────────────────────────────────── */
+
+.stu-step__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ─── TÍTULO ─────────────────────────────────────────────── */
+
+.stu-step__title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.875rem, 6vw, 4rem);
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  font-style: normal;
+  margin: 0 0 var(--space-s) 0;
+  hyphens: none;
+}
+
+/* ─── BODY ───────────────────────────────────────────────── */
+
+.stu-step__body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: 400;
+  color: var(--ink-62);
+  line-height: 1.65;
+  max-width: 52ch;
+  margin: 0 0 var(--space-m) 0;
+}
+
+/* ─── REGLA HAIRLINE ─────────────────────────────────────── */
+
+.stu-step__rule {
+  border: none;
+  border-top: 1px solid var(--hairline);
+  margin: var(--space-s) 0;
+}
+
+/* ─── LABEL MONO (WHAT CHANGES / QUÉ CAMBIA) ────────────── */
+
+.stu-step__label {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-62);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  margin: 0 0 var(--space-2xs) 0;
+}
+
+/* ─── WHAT CHANGES ───────────────────────────────────────── */
+
+.stu-step__change {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xs);
+}
+
+.stu-step__change-text {
+  font-family: var(--font-body);
+  font-size: clamp(0.75rem, 0.4vw + 0.68rem, 0.875rem);
+  font-weight: 400;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TABLET (768px+)
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 768px) {
+  .stu {
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+  }
+
+  /* Servicios: fila horizontal */
+  .stu-svc {
+    flex-direction: row;
+    align-items: flex-start;
+    padding-top: var(--space-l);
+    padding-bottom: var(--space-m);
+    overflow: visible;
+  }
+
+  .stu-svc__num {
+    position: absolute;
+    top: calc(var(--space-l) * 0.4);
+    left: 0;
+    margin-bottom: 0;
+    min-height: unset;
+    font-size: clamp(4rem, 9vw, 7rem);
+    z-index: 0;
+  }
+
+  .stu-svc__content {
+    padding-left: clamp(4.5rem, 10vw, 8rem);
+    flex: 1;
+    margin-top: calc(-1 * clamp(0.5rem, 1.5vw, 1.5rem));
+  }
+
+  .stu-svc__name {
+    font-size: clamp(1.875rem, 3.5vw, 2.625rem);
+  }
+
+  /* Pasos: más aire */
+  .stu-step {
+    padding-top: var(--space-l);
+    padding-bottom: var(--space-l);
+  }
+
+  .stu-step__num-mobile {
+    font-size: clamp(4rem, 10vw, 7rem);
+  }
+
+  .stu-step__title {
+    font-size: clamp(2.25rem, 5vw, 4.5rem);
+  }
+
+  .stu-step__body {
+    max-width: 56ch;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DESKTOP (1280px+) — pin ScrollTrigger + asimetría editorial
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 1280px) {
+  .stu {
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+  }
+
+  /* Parte 2: sin padding-bottom — ScrollTrigger maneja el espacio */
+  #studio-how {
+    padding-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  /* Servicios: asimetría editorial alternada */
+  .stu-svc {
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-m);
+    transition: opacity 0.2s ease;
+    cursor: default;
+  }
+
+  .stu-svc[data-even="true"] .stu-svc__content {
+    padding-left: clamp(6rem, 14vw, 12rem);
+    max-width: 72ch;
+  }
+
+  .stu-svc[data-even="false"] .stu-svc__content {
+    padding-left: clamp(4.5rem, 9vw, 8rem);
+    max-width: 64ch;
+  }
+
+  .stu-svc__num {
+    font-size: clamp(4.5rem, 10vw, 8rem);
+    top: calc(var(--space-xl) * 0.35);
+  }
+
+  .stu-svc__name {
+    font-size: clamp(2rem, 3vw, 3rem);
+  }
+
+  .stu-svc__resolves {
+    max-width: 52ch;
+  }
+
+  /* Hover: dimear lista excepto fila hovered */
+  .stu-services:has(.stu-svc:hover) .stu-svc {
+    opacity: 0.4;
+  }
+
+  .stu-services:has(.stu-svc:hover) .stu-svc:hover {
+    opacity: 1;
+  }
+
+  .stu-svc:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 4px;
+  }
+
+  /* Pasos: grid 2 col con pin */
+  .stu-method {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    column-gap: var(--space-2xl);
+    align-items: start;
+  }
+
+  /* Columna numerales: visible en desktop */
+  .stu-nums {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    grid-column: 1;
+    align-self: start;
+    padding-bottom: var(--space-2xl);
+    padding-top: 0;
+  }
+
+  .stu-num-item {
+    font-size: clamp(6rem, 13vw, 11rem);
+  }
+
+  /* Numeral mobile: oculto en desktop */
+  .stu-step__num-mobile {
+    display: none;
+  }
+
+  /* Columna pasos */
+  .stu-steps {
+    grid-column: 2;
+    padding-bottom: var(--space-2xl);
+  }
+
+  .stu-step {
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+    border-bottom: none;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .stu-step:last-child {
+    border-bottom: none;
+  }
+
+  .stu-step__title {
+    font-size: clamp(2.5rem, 4.5vw, 5rem);
+    margin-bottom: var(--space-m);
+  }
+
+  .stu-step__body {
+    max-width: 48ch;
+    margin-bottom: var(--space-l);
+  }
+
+  .stu-step__change {
+    padding-top: var(--space-m);
+    gap: var(--space-xs);
+  }
+
+  .stu-step__change-text {
+    font-size: clamp(0.9rem, 0.4vw + 0.8rem, 1.0625rem);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   REDUCED-MOTION — todo estático y visible
+   ═══════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .stu-num-item {
+    transition: none;
+  }
+  .stu-step {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+</style>
+
+<script>
+  /**
+   * StudioSection — scripts de interactividad.
+   *
+   * PARTE 1 — Servicios:
+   *   IntersectionObserver + stagger en las filas .stu-svc.
+   *   Progressive enhancement: sin JS → visible.
+   *
+   * PARTE 2 — Pasos del proceso:
+   *   DESKTOP (≥1280px): GSAP ScrollTrigger pin de columna de numerales.
+   *   MOBILE/TABLET (<1280px): GSAP ScrollTrigger reveal por paso.
+   *
+   * prefers-reduced-motion: sin nada — todo visible estático.
+   */
+
+  /* ─── PARTE 1: reveal de servicios ──────────────────────── */
+
+  const section = document.querySelector<HTMLElement>('.stu');
+  if (section) {
+    const rows = section.querySelectorAll<HTMLElement>('.stu-svc');
+
+    rows.forEach((row, i) => {
+      row.classList.add('is-hidden');
+      row.style.transitionDelay = `${i * 0.08}s`;
+    });
+
+    const svcObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            rows.forEach((row) => {
+              row.classList.remove('is-hidden');
+              row.classList.add('is-visible');
+            });
+            svcObserver.disconnect();
+          }
+        });
+      },
+      { threshold: 0.05 }
+    );
+
+    /* Observar el contenedor de la Parte 1 */
+    const part1 = section.querySelector<HTMLElement>('#studio-what');
+    if (part1) svcObserver.observe(part1);
+  }
+
+  /* ─── PARTE 2: pin y reveals de pasos ───────────────────── */
+
+  const isDesktop = () => window.matchMedia('(min-width: 1280px)').matches;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!reducedMotion) {
+    try {
+      const { gsap } = await import('gsap');
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      gsap.registerPlugin(ScrollTrigger);
+
+      const stuSection = document.querySelector<HTMLElement>('.stu');
+      if (!stuSection) throw new Error('stu section not found');
+
+      const numItems = stuSection.querySelectorAll<HTMLElement>('.stu-num-item');
+      const steps = stuSection.querySelectorAll<HTMLElement>('.stu-step');
+
+      if (isDesktop()) {
+        /* ── DESKTOP: pin de la columna de numerales ── */
+        const numsCol = stuSection.querySelector<HTMLElement>('.stu-nums');
+        const stepsCol = stuSection.querySelector<HTMLElement>('.stu-steps');
+
+        if (numsCol && stepsCol) {
+          ScrollTrigger.create({
+            trigger: numsCol,
+            start: 'top top+=100px',
+            endTrigger: stepsCol,
+            end: 'bottom center',
+            pin: true,
+            pinSpacing: false,
+          });
+
+          /* Un ScrollTrigger por paso — activa el numeral correspondiente */
+          steps.forEach((step, i) => {
+            ScrollTrigger.create({
+              trigger: step,
+              start: 'top center',
+              end: 'bottom center',
+              onEnter: () => {
+                numItems.forEach((n, ni) => {
+                  n.classList.toggle('is-active', ni === i);
+                });
+              },
+              onEnterBack: () => {
+                numItems.forEach((n, ni) => {
+                  n.classList.toggle('is-active', ni === i);
+                });
+              },
+            });
+          });
+
+          /* Activar el primer numeral al cargar */
+          if (numItems[0]) numItems[0].classList.add('is-active');
+
+          /* Fade del título al hacer scroll (desktop) */
+          steps.forEach((step) => {
+            const title = step.querySelector<HTMLElement>('.stu-step__title');
+            if (!title) return;
+            gsap.set(title, { opacity: 0, y: 12 });
+            ScrollTrigger.create({
+              trigger: step,
+              start: 'top 75%',
+              once: true,
+              onEnter: () => {
+                gsap.to(title, {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.7,
+                  ease: 'expo.out',
+                });
+              },
+            });
+          });
+        }
+
+      } else {
+        /* ── MOBILE / TABLET: reveal sutil + mask reveal del título ── */
+        const { SplitText } = await import('gsap/SplitText');
+        gsap.registerPlugin(SplitText);
+
+        steps.forEach((step) => {
+          gsap.set(step, { opacity: 0, y: 16 });
+          ScrollTrigger.create({
+            trigger: step,
+            start: 'top 88%',
+            once: true,
+            onEnter: () => {
+              gsap.to(step, {
+                opacity: 1,
+                y: 0,
+                duration: 0.7,
+                ease: 'expo.out',
+              });
+
+              const title = step.querySelector<HTMLElement>('.stu-step__title');
+              if (title) {
+                const split = new SplitText(title, {
+                  type: 'lines',
+                  mask: 'lines',
+                  autoSplit: true,
+                });
+                gsap.from(split.lines, {
+                  yPercent: 105,
+                  duration: 0.8,
+                  ease: 'expo.out',
+                  stagger: 0.08,
+                  delay: 0.1,
+                });
+              }
+            },
+          });
+        });
+      }
+
+    } catch (_) {
+      /* Si GSAP falla → pasos visibles por CSS */
+    }
+  }
+</script>

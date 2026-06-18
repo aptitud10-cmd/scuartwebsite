@@ -106,12 +106,14 @@ export const es: Translations = {
       "Manifiesto — No hacemos webs. Construimos ventajas competitivas.",
   },
 
-  /* ── Capabilities — Sección entre portfolio y método ───── */
-  /*
-   * C1/P4 — ANTI-INVENCIÓN:
-   * Copy "resolves" nativo ES, neutro LATAM — sin claims, sin métricas.
-   * Nombres de capability en inglés (términos técnicos, coherente con el sistema).
-   */
+  /* ── Studio — Sección fusionada (capabilities + method) ── */
+  studio: {
+    kicker: "ESTUDIO",
+    whatWeDoLabel: "QUÉ HACEMOS",
+    howWeWorkLabel: "CÓMO TRABAJAMOS",
+  },
+
+  /* ── Capabilities — datos conservados (reutilizados por StudioSection) ── */
   capabilities: {
     kicker: "CAPACIDADES",
     ariaLabel:

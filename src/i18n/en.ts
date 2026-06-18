@@ -167,6 +167,15 @@ export interface Translations {
     langLabel: string;
     langHref: string;
   };
+  /** Sección fusionada Estudio/Studio (reemplaza capabilities + method separados) */
+  studio: {
+    /** Kicker de sección — "ESTUDIO" / "STUDIO" */
+    kicker: string;
+    /** Label de la Parte 1 — "QUÉ HACEMOS" / "WHAT WE DO" */
+    whatWeDoLabel: string;
+    /** Label de la Parte 2 — "CÓMO TRABAJAMOS" / "HOW WE WORK" */
+    howWeWorkLabel: string;
+  };
   hero: {
     kicker: string;
     line1: HeroToken[];
@@ -341,13 +350,14 @@ export const en: Translations = {
       "Manifesto — We don't build websites. We build competitive advantages.",
   },
 
-  /* ── Capabilities — Sección entre portfolio y método ───── */
-  /*
-   * C1/P4 — ANTI-INVENCIÓN:
-   * Copy "resolves" directo y comercial — sin claims, sin métricas inventadas.
-   * Nombres de capability en inglés en ambos idiomas (términos técnicos del sistema).
-   * E-COMMERCE y BRAND IDENTITY existen aquí pero NO en el hero (hero tiene 4; aquí 6).
-   */
+  /* ── Studio — Sección fusionada (capabilities + method) ── */
+  studio: {
+    kicker: "STUDIO",
+    whatWeDoLabel: "WHAT WE DO",
+    howWeWorkLabel: "HOW WE WORK",
+  },
+
+  /* ── Capabilities — datos conservados (reutilizados por StudioSection) ── */
   capabilities: {
     kicker: "CAPABILITIES",
     ariaLabel:
