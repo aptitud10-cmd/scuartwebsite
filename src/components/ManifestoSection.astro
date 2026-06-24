@@ -118,23 +118,11 @@ const { t } = Astro.props;
 }
 
 .manifesto-line--1 {
-  /*
-   * Line1 alineada al margen izquierdo.
-   * "We don't build websites." / "No hacemos webs."
-   * El margen --margin ya provee el indentado base.
-   */
   margin-bottom: 0.05em;
 }
 
 .manifesto-line--2 {
-  /*
-   * Line2 sangrada hacia la derecha — ESCALONADO INTENCIONAL.
-   * "We build [competitive advantages.]" / "Construimos [ventajas competitivas.]"
-   * Rompe la grilla (ART_DIRECTION §5): la frase se desalinea a propósito.
-   * Mobile: sangría sutil (2rem) para no asfixiar el texto en 375px.
-   * Sube en desktop via media query.
-   */
-  padding-left: clamp(1.5rem, 5vw, 3rem);
+  /* V5: eje central simétrico puro — sin escalonado */
 }
 
 /* ─── ACENTO — ITÁLICA (no color) ───────────────────────────
@@ -193,11 +181,6 @@ const { t } = Astro.props;
     hyphens: none;
     overflow-wrap: normal;
   }
-
-  .manifesto-line--2 {
-    /* Sangría más pronunciada en tablet */
-    padding-left: clamp(3rem, 7vw, 5rem);
-  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -205,52 +188,63 @@ const { t } = Astro.props;
    ═══════════════════════════════════════════════════════════ */
 @media (min-width: 1280px) {
   .manifesto-line {
-    /*
-     * Desktop: line1 ocupa col 1-8 implícitamente (el margen --margin 7.5rem
-     * crea el aire natural). max-width 70% encuadra la frase en 9 columnas aprox.
-     * Más simple (P6) y produce el mismo resultado que grid explícito.
-     */
-    max-width: 70%;
     hyphens: none;
     overflow-wrap: normal;
-  }
-
-  .manifesto-line--2 {
-    /*
-     * Sangría dramática en desktop: la segunda línea arranca a ~8rem del margen.
-     * Con el margen de 7.5rem del body + 7rem aquí, "We build" empieza casi en col 4.
-     * El escalonado es la composición: rompe la grilla intencionalmente.
-     */
-    padding-left: clamp(5rem, 8vw, 8rem);
-    max-width: 80%; /* la línea 2 puede ser más ancha porque empieza más adentro */
   }
 }
 </style>
 
 <script>
-  /**
-   * ManifestoSection — Reveal con máscara por líneas.
-   *
-   * DESKTOP (≥769px): SplitText type:'lines' + ScrollTrigger.
-   *   Cada línea del statement sube desde abajo dentro de su máscara (overflow:hidden).
-   *   yPercent 105→0, 0.9s expo.out, stagger 0.12s. Spec §A.2.
-   *   El kicker entra primero con fade simple 0.4s power2.out.
-   *
-   * MOBILE (<769px): IntersectionObserver + CSS fade-up (sistema original V3).
-   *   Sin SplitText (performance + simplicidad en pantalla chica).
-   *
-   * PROGRESSIVE ENHANCEMENT: el HTML es visible sin JS.
-   * REDUCED-MOTION: no se instancia SplitText ni IO de animación. Texto visible.
-   */
-
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isDesktop = window.matchMedia('(min-width: 769px)').matches;
 
   const section = document.querySelector<HTMLElement>('.manifesto');
-  if (!section || prefersReduced) {
-    /* Sin motion: todo visible (CSS ya garantiza esto vía reduced-motion override). */
+  if (!section) { console.warn('[Manifesto] section not found'); }
+  else {
+
+  /* ── SCRAMBLE ON HOVER — se activa post-reveal para no chocar con GSAP SplitText ── */
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%&*?';
+
+  function attachScramble(els: HTMLElement[]) {
+    if (prefersReduced) return;
+    els.forEach((el) => {
+      /* Guardar el innerText original AHORA (post-GSAP, post-DOM-mutation) */
+      const originalText = el.innerText;
+      let running = false;
+
+      el.addEventListener('mouseenter', () => {
+        if (running) return;
+        running = true;
+        const steps = 10;
+        let step = 0;
+        const timer = setInterval(() => {
+          step++;
+          const progress = step / steps;
+          const resolved = Math.floor(progress * originalText.length);
+          /* Reemplazar innerHTML temporalmente con texto scrambleado */
+          el.innerText = originalText
+            .split('')
+            .map((char, i) => {
+              if (char === ' ' || char === '\n') return char;
+              if (i < resolved) return char;
+              return CHARS[Math.floor(Math.random() * CHARS.length)];
+            })
+            .join('');
+          if (step >= steps) {
+            clearInterval(timer);
+            el.innerText = originalText;
+            running = false;
+          }
+        }, 40);
+      });
+    });
+  }
+
+  /* ── REVEAL EN SCROLL ── */
+  if (prefersReduced) {
+    /* noop — CSS ya garantiza visibilidad */
   } else if (isDesktop) {
-    /* ── DESKTOP: SplitText + ScrollTrigger ── */
+    /* DESKTOP: SplitText + ScrollTrigger */
     try {
       const { gsap } = await import('gsap');
       const { SplitText } = await import('gsap/SplitText');
@@ -261,7 +255,6 @@ const { t } = Astro.props;
       const statementEl = section.querySelector<HTMLElement>('.manifesto-statement');
       const lines = Array.from(section.querySelectorAll<HTMLElement>('.manifesto-line'));
 
-      /* Kicker: fade simple, entra antes del statement */
       if (kicker) {
         gsap.set(kicker, { opacity: 0 });
         ScrollTrigger.create({
@@ -274,27 +267,15 @@ const { t } = Astro.props;
         });
       }
 
-      /* Statement: SplitText por línea con máscara */
       if (lines.length && statementEl) {
-        /* Ocultar las líneas antes de aplicar SplitText */
         gsap.set(lines, { opacity: 0 });
 
-        const splits = lines.map((line) => {
-          /* autoSplit: true — re-splits si el viewport cambia (responsive) */
-          return new SplitText(line, {
-            type: 'lines',
-            mask: 'lines', /* crea overflow:hidden automáticamente en el wrapper */
-            autoSplit: true,
-          });
-        });
+        const splits = lines.map((line) =>
+          new SplitText(line, { type: 'lines', mask: 'lines', autoSplit: true })
+        );
 
-        /* Juntar todas las líneas de todos los SplitText en un array plano */
         const allLines = splits.flatMap((s) => s.lines);
-
-        /* Hacer visibles los elementos padre antes de animar las líneas internas */
         gsap.set(lines, { opacity: 1 });
-
-        /* Estado inicial: líneas abajo de su máscara */
         gsap.set(allLines, { yPercent: 105 });
 
         ScrollTrigger.create({
@@ -307,16 +288,18 @@ const { t } = Astro.props;
               duration: 0.9,
               ease: 'expo.out',
               stagger: 0.12,
-              delay: 0.15, /* pequeño delay para que el kicker entre primero */
+              delay: 0.15,
+              onComplete: () => attachScramble(lines),
             });
           },
         });
       }
-    } catch (_) {
-      /* Si GSAP falla: todo visible (progressive enhancement) */
+    } catch (err) {
+      console.error('[Manifesto] GSAP error:', err);
+      attachScramble(Array.from(section.querySelectorAll<HTMLElement>('.manifesto-line')));
     }
   } else {
-    /* ── MOBILE: IntersectionObserver + CSS fade-up (sistema V3 original) ── */
+    /* MOBILE: IntersectionObserver + CSS fade-up */
     const kicker = section.querySelector<HTMLElement>('.manifesto-kicker');
     const lines = Array.from(section.querySelectorAll<HTMLElement>('.manifesto-line'));
 
@@ -325,9 +308,7 @@ const { t } = Astro.props;
       mask.className = 'line-mask';
       const inner = document.createElement('div');
       inner.className = 'line-inner';
-      while (el.firstChild) {
-        inner.appendChild(el.firstChild);
-      }
+      while (el.firstChild) inner.appendChild(el.firstChild);
       mask.appendChild(inner);
       el.appendChild(mask);
       return inner;
@@ -335,11 +316,10 @@ const { t } = Astro.props;
 
     const kickerInner = kicker ? wrapInLineMask(kicker) : null;
     const lineInners = lines.map((line) => wrapInLineMask(line));
-
     section.classList.add('manifesto-animating');
 
-    const delays: number[] = [0, 0.1, 0.22];
-    const targets: (HTMLElement | null)[] = [kickerInner, ...lineInners];
+    const delays = [0, 0.1, 0.22];
+    const targets = [kickerInner, ...lineInners];
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -351,6 +331,8 @@ const { t } = Astro.props;
               inner.classList.add('is-visible');
             });
             observer.disconnect();
+            /* Scramble disponible 800ms después del reveal */
+            setTimeout(() => attachScramble(lines), 800);
           }
         });
       },
@@ -359,4 +341,6 @@ const { t } = Astro.props;
 
     observer.observe(section);
   }
+
+  } /* end if section */
 </script>

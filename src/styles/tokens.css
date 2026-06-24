@@ -87,6 +87,8 @@
   --text-mono: clamp(0.6875rem, 0.3vw + 0.6rem, 0.8125rem); /* 11px → 13px */
   /* CTA contact */
   --text-cta: clamp(2.5rem, 10vw, 8rem);
+  /* Statement clímax de contacto — 1 línea siempre (white-space:nowrap, verificado 375px) */
+  --text-empecemos: clamp(2.75rem, 8vw, 9rem);
 
   /* ══════════════════════════════════════════════════════════════
      SPACING FLUIDO (8-base)

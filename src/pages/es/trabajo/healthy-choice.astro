@@ -1,0 +1,65 @@
+---
+import CaseStudyLayout from '../../../components/CaseStudyLayout.astro';
+import { getTranslations } from '../../../i18n/index';
+import type { CaseStudyData } from '../../../components/CaseStudyLayout.astro';
+
+const lang = 'es';
+const t = getTranslations(lang);
+
+const data: CaseStudyData = {
+  name: 'Healthy Choice NY',
+  tagline: 'Presencia digital para un restaurante de comida saludable en Nueva York.',
+  categories: ['Web', 'Restaurante'],
+  year: '2019',
+  client: 'Healthy Choice NY',
+  heroImage: '/images/portfolio-healthy-choice-real.webp',
+  heroImageAlt: 'Healthy Choice NY — sitio web diseñado por SCUART',
+  sections: [
+    {
+      label: 'Contexto',
+      body: 'Healthy Choice NY es un restaurante de comida saludable ubicado en Nueva York, con clientela local y comunidad latina. Operaba sin presencia digital significativa en un mercado donde Google Maps y el sitio web son el primer punto de contacto con nuevos clientes.',
+    },
+    {
+      label: 'Desafío',
+      body: 'Diseñar un sitio web que funcionara como herramienta de ventas real — no solo una tarjeta de presentación digital. El sitio necesitaba comunicar claramente el menú, los horarios, la ubicación, y la identidad del restaurante en inglés y español para su audiencia bilingüe.',
+    },
+    {
+      label: 'Solución',
+      body: 'Desarrollamos un sitio web mobile-first con menú actualizable, integración con Google Maps, y llamadas a la acción claras para pedidos y reservas. El diseño usó fotografía de producto real y una paleta fresca que comunicaba salud sin caer en los clichés del verde genérico.',
+    },
+    {
+      label: 'Resultado',
+      body: 'El sitio mejoró la visibilidad local del restaurante en búsquedas relacionadas con comida saludable en su zona de Nueva York. El propietario reportó un incremento notable en clientes nuevos que llegaron a través del sitio y Google Maps en los primeros 6 meses.',
+    },
+  ],
+  images: [
+    {
+      src: '/images/portfolio-healthy-choice-real-trim.webp',
+      alt: 'Healthy Choice NY — vista del sitio web',
+      wide: true,
+    },
+    {
+      src: '/images/portfolio-healthy-choice-real.webp',
+      alt: 'Healthy Choice NY — detalle del diseño',
+    },
+  ],
+  credits: [
+    { role: 'Dirección Creativa', name: 'William Cuartas' },
+    { role: 'Diseño Web', name: 'William Cuartas' },
+    { role: 'Desarrollo', name: 'William Cuartas' },
+  ],
+  next: {
+    name: 'Arriba Gold',
+    href: '/es/trabajo/arriba-gold',
+  },
+};
+---
+
+<CaseStudyLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Healthy Choice NY — SCUART"
+  description="Sitio web para restaurante de comida saludable en Nueva York. Diseño y desarrollo por SCUART."
+  canonicalURL="https://scuart.com/es/trabajo/healthy-choice"
+/>

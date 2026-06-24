@@ -1,0 +1,111 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import FooterSection from '../components/FooterSection.astro';
+import { getTranslations } from '../i18n/index';
+
+const lang = 'en';
+const t = getTranslations(lang);
+---
+
+<Layout
+  title="404 — SCUART"
+  description="Page not found."
+  lang={lang}
+>
+  <Nav lang={lang} t={t} />
+
+  <main class="notfound">
+    <div class="notfound__inner">
+      <p class="notfound__num">404</p>
+      <h1 class="notfound__title">Page not found.</h1>
+      <p class="notfound__body">The page you're looking for doesn't exist or has moved.</p>
+      <div class="notfound__actions">
+        <a href="/en" class="notfound__cta">Back to home</a>
+        <a href="/es" class="notfound__cta notfound__cta--ghost">Inicio en español</a>
+      </div>
+    </div>
+  </main>
+
+  <FooterSection t={t} lang={lang} />
+</Layout>
+
+<style>
+.notfound {
+  min-height: 70svh;
+  display: flex;
+  align-items: center;
+  padding-top: calc(var(--space-3xl) + 4rem);
+  padding-inline: var(--margin);
+  padding-bottom: var(--space-3xl);
+}
+
+.notfound__inner {
+  max-width: 60ch;
+}
+
+.notfound__num {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(6rem, 20vw, 14rem);
+  line-height: 1.0;
+  letter-spacing: -0.04em;
+  color: var(--hairline);
+  margin-bottom: var(--space-s);
+}
+
+.notfound__title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin-bottom: var(--space-m);
+}
+
+.notfound__body {
+  font-family: var(--font-body);
+  font-size: var(--text-subhead);
+  line-height: 1.6;
+  color: var(--ink-62);
+  margin-bottom: var(--space-xl);
+}
+
+.notfound__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+  align-items: center;
+}
+
+.notfound__cta {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.85em 1.5em;
+  border-radius: 2px;
+  transition: opacity 0.2s;
+  background-color: var(--brand);
+  color: var(--on-brand);
+}
+
+.notfound__cta--ghost {
+  background-color: transparent;
+  color: var(--ink-62);
+  border: 1px solid var(--hairline);
+}
+
+.notfound__cta:hover {
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notfound__cta {
+    transition: none;
+  }
+}
+</style>

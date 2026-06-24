@@ -1,0 +1,66 @@
+---
+import CaseStudyLayout from '../../../components/CaseStudyLayout.astro';
+import { getTranslations } from '../../../i18n/index';
+import type { CaseStudyData } from '../../../components/CaseStudyLayout.astro';
+
+const lang = 'es';
+const t = getTranslations(lang);
+
+const data: CaseStudyData = {
+  name: 'Menius',
+  tagline: 'SaaS de menús digitales para restaurantes. Producto propio de SCUART.',
+  categories: ['SaaS', 'Producto', 'Plataforma'],
+  year: '2025',
+  client: 'SCUART (producto propio)',
+  siteUrl: 'https://menius.app',
+  heroImage: '/images/portfolio-menius-real.webp',
+  heroImageAlt: 'Menius — plataforma SaaS para restaurantes diseñada y desarrollada por SCUART',
+  sections: [
+    {
+      label: 'Contexto',
+      body: 'Los restaurantes pequeños y medianos necesitaban una solución de menú digital asequible, sin comisiones por transacción y sin depender de plataformas de terceros. La pandemia aceleró la adopción de QR, pero las soluciones existentes eran costosas o genéricas.',
+    },
+    {
+      label: 'Desafío',
+      body: 'Construir un SaaS completo — desde la arquitectura multi-tenant hasta la experiencia de administración — que funcionara para restaurantes con distintos niveles de capacidad técnica. El producto tenía que ser suficientemente simple para que un dueño lo configurara solo, y suficientemente robusto para escalar.',
+    },
+    {
+      label: 'Solución',
+      body: 'Diseñamos y desarrollamos Menius desde cero: arquitectura Supabase multi-tenant con RLS, dashboard de administración en Next.js, menú público optimizado para mobile, y sistema de actualización en tiempo real. Cada restaurante recibe su propio subdominio y puede personalizar colores, tipografía y contenido sin tocar código.',
+    },
+    {
+      label: 'Resultado',
+      body: 'Menius opera con restaurantes activos en Colombia y Estados Unidos. El tiempo promedio de onboarding es menor a 15 minutos. El producto valida el modelo de agencia de SCUART: construimos sistemas digitales que generan valor a largo plazo, no solo sitios web.',
+    },
+  ],
+  images: [
+    {
+      src: '/images/portfolio-menius-real-trim.webp',
+      alt: 'Menius — interfaz de administración',
+      wide: true,
+    },
+    {
+      src: '/images/portfolio-menius-real.webp',
+      alt: 'Menius — vista del menú digital en mobile',
+    },
+  ],
+  credits: [
+    { role: 'Dirección de Producto', name: 'William Cuartas' },
+    { role: 'Diseño UX/UI', name: 'William Cuartas' },
+    { role: 'Arquitectura & Desarrollo', name: 'William Cuartas' },
+  ],
+  next: {
+    name: 'Healthy Choice NY',
+    href: '/es/trabajo/healthy-choice',
+  },
+};
+---
+
+<CaseStudyLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Menius — SCUART"
+  description="SaaS de menús digitales para restaurantes. Diseñado y desarrollado por SCUART."
+  canonicalURL="https://scuart.com/es/trabajo/menius"
+/>

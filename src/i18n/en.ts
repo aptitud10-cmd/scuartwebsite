@@ -32,6 +32,8 @@ export interface CapabilityService {
   num: string;
   /** Nombre de la capability — técnico, inglés en ambos idiomas. */
   name: string;
+  /** Declaración principal de Studio Parte 1 — voz primera persona. */
+  statement: string;
   /** Una línea que explica qué problema resuelve — nativo por idioma. */
   resolves: string;
 }
@@ -57,6 +59,8 @@ export interface PortfolioProject {
   image: string;
   /** Alt text descriptivo — usa el nombre real (no es invento, es el nombre propio) */
   alt: string;
+  /** URL de la página de caso — /es/trabajo/slug o /en/work/slug */
+  href: string;
 }
 
 export interface MethodStep {
@@ -138,6 +142,13 @@ export interface FooterTranslations {
   tagline: string;
   /** Aria-label del elemento <footer> */
   ariaLabel: string;
+  /** Links a páginas legales */
+  legal: {
+    privacyLabel: string;
+    privacyHref: string;
+    termsLabel: string;
+    termsHref: string;
+  };
 }
 
 export interface ManifestoTranslations {
@@ -175,6 +186,8 @@ export interface Translations {
     whatWeDoLabel: string;
     /** Label de la Parte 2 — "CÓMO TRABAJAMOS" / "HOW WE WORK" */
     howWeWorkLabel: string;
+    /** Frase editorial fusionada de la Parte 1 (About estilo Trionn) — un solo string largo por idioma. */
+    aboutStatement: string;
   };
   hero: {
     kicker: string;
@@ -355,9 +368,14 @@ export const en: Translations = {
     kicker: "STUDIO",
     whatWeDoLabel: "WHAT WE DO",
     howWeWorkLabel: "HOW WE WORK",
+    aboutStatement:
+      "We make your brand feel unforgettable, with websites that earn trust, not just attention — designed with intent, not trend.",
   },
 
-  /* ── Capabilities — datos conservados (reutilizados por StudioSection) ── */
+  /* ── Capabilities — datos conservados (reutilizados por StudioSection) ──
+     NOTA: tras el rediseño "About" (2026-06-24), las 3 `statement` se fusionaron
+     en `studio.aboutStatement`. Acá `statement` quedó SIN USO (deuda documentada).
+     `name` SÍ se sigue usando: alimenta el marquee divisor. No borrar items. */
   capabilities: {
     kicker: "CAPABILITIES",
     ariaLabel:
@@ -365,39 +383,21 @@ export const en: Translations = {
     items: [
       {
         num: "01",
-        name: "WEB PLATFORMS",
-        resolves:
-          "Sites that load fast, rank on search, and turn visitors into clients.",
+        name: "DESIGN+BRAND",
+        statement: "We make your brand feel unforgettable.",
+        resolves: "",
       },
       {
         num: "02",
-        name: "SAAS + SYSTEMS",
-        resolves:
-          "Full products — auth, billing, dashboards, APIs. From zero to launch.",
+        name: "WEB/PRODUCT",
+        statement: "Websites that earn trust, not just attention.",
+        resolves: "",
       },
       {
         num: "03",
-        name: "AI AUTOMATION",
-        resolves:
-          "Automate the repetitive work so the team focuses on what actually matters.",
-      },
-      {
-        num: "04",
-        name: "E-COMMERCE",
-        resolves:
-          "Stores built to sell — fast checkout, inventory, ready to grow.",
-      },
-      {
-        num: "05",
-        name: "ORDERING · BOOKING · WORKFLOWS",
-        resolves:
-          "Take orders, manage bookings and run operations without the manual chaos.",
-      },
-      {
-        num: "06",
-        name: "BRAND IDENTITY",
-        resolves:
-          "A visual system that looks consistent everywhere — not assembled by accident.",
+        name: "METHOD",
+        statement: "Design with intent, not trend.",
+        resolves: "",
       },
     ],
   },
@@ -426,6 +426,7 @@ export const en: Translations = {
         year: "2017",
         image: "/images/portfolio-jamon-casero-trim.webp",
         alt: "JAMÓN CASERO — proyecto SCUART",
+        href: "/en/work/jamon-casero",
       },
       {
         name: "Menius",
@@ -434,6 +435,7 @@ export const en: Translations = {
         year: "2025",
         image: "/images/portfolio-menius-real-trim.webp",
         alt: "MENIUS — proyecto SCUART",
+        href: "/en/work/menius",
       },
       {
         name: "Healthy Choice NY",
@@ -442,6 +444,7 @@ export const en: Translations = {
         year: "2019",
         image: "/images/portfolio-healthy-choice-real-trim.webp",
         alt: "HEALTHY CHOICE NY — proyecto SCUART",
+        href: "/en/work/healthy-choice",
       },
       {
         name: "Arriba Gold",
@@ -450,6 +453,7 @@ export const en: Translations = {
         year: "2021",
         image: "/images/portfolio-arriba-gold-real-trim.webp",
         alt: "ARRIBA GOLD — proyecto SCUART",
+        href: "/en/work/arriba-gold",
       },
     ],
   },
@@ -589,5 +593,11 @@ export const en: Translations = {
     builtBy: "© 2026 SCUART",
     tagline: "We don't decorate. We decide.",
     ariaLabel: "SCUART — Studio footer",
+    legal: {
+      privacyLabel: "Privacy",
+      privacyHref: "/en/privacy",
+      termsLabel: "Terms",
+      termsHref: "/en/terms",
+    },
   },
 };

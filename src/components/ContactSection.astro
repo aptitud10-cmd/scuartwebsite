@@ -43,20 +43,18 @@ const c = t.contact;
 
 <section class="contact" id="contact" aria-label={c.kicker}>
 
-  <!-- Kicker / regla de entrada -->
-  <div class="contact-header">
-    <p class="contact-kicker">{c.kicker}</p>
-  </div>
-
-  <!-- Layout principal: desktop split col 1-5 statement | col 7-12 form -->
+  <!-- Layout principal: kicker al margen izq, statement en eje central, form debajo -->
   <div class="contact-layout">
 
     <!--
-      STATEMENT — N1, protagonista.
-      Fraunces 300, hueso. Desktop: sticky mientras scrolleas el form.
-      Mobile: bloque arriba del form (full-width).
+      HEADER — V5: kicker anclado al margen izquierdo, statement en eje central.
+      Spec ART_DIRECTION_V5_ADN.md §Contacto:
+        - Kicker: Geist 500 uppercase, --ink-62, al borde izquierdo
+        - Statement EMPECEMOS.: PP Editorial New 300, --text-empecemos, white-space:nowrap
+      N1 visual: el statement domina. El kicker es la ficha técnica al margen.
     -->
     <div class="contact-statement">
+      <p class="contact-kicker">{c.kicker}</p>
       <h2 class="contact-statement__text">{c.statement}</h2>
       <p class="contact-statement__subcopy">{c.subcopy}</p>
     </div>
@@ -268,24 +266,9 @@ const c = t.contact;
         <p class="contact-success__body">{c.successBody}</p>
       </div>
 
-      <!--
-        BLOQUE SECUNDARIO — WhatsApp / Email — N3.
-        Discreto, al pie del form. Mono hueso 55%.
-        NO botón verde, NO flotante, NO protagonista.
-      -->
       <div class="contact-alt">
         <span class="contact-alt__label">{c.alternativeLabel}</span>
         <span class="contact-alt__sep" aria-hidden="true">—</span>
-        <a
-          class="contact-alt__link"
-          href={c.whatsappHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`${c.whatsappLabel} (abre en nueva ventana)`}
-        >
-          {c.whatsappLabel}
-        </a>
-        <span class="contact-alt__dot" aria-hidden="true">·</span>
         <a
           class="contact-alt__link"
           href={c.emailHref}
@@ -325,22 +308,21 @@ const c = t.contact;
   scroll-margin-top: 72px;
 }
 
-/* ─── HEADER / KICKER ────────────────────────────────────── */
-
-.contact-header {
-  border-top: 1px solid var(--hairline);
-  padding-top: var(--space-m);
-  margin-bottom: var(--space-l);
-}
-
+/* ─── KICKER — ficha técnica anclada al borde izquierdo (V5) ─
+ * Mobile: bloque normal, fluye arriba del statement (flex column).
+ * Desktop: position:absolute anclado al borde izquierdo del --margin,
+ * separado del flujo del statement para crear la asimetría real V5:
+ * ficha al margen izquierdo, voz en el eje central.
+ */
 .contact-kicker {
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
-  color: var(--ink);
+  color: var(--ink-62);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   line-height: 1.4;
+  margin-bottom: var(--space-s);
 }
 
 /* ─── LAYOUT PRINCIPAL (mobile: columna) ─────────────────── */
@@ -356,24 +338,21 @@ const c = t.contact;
 .contact-statement {
   display: flex;
   flex-direction: column;
-  gap: var(--space-s);
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-m);
 }
 
 .contact-statement__text {
   font-family: var(--font-display);
-  font-weight: 300; /* Fraunces light — peso bajo = elegante en grande */
-  font-size: clamp(2.75rem, 9vw, 7rem);
-  line-height: 1.02;
-  letter-spacing: -0.025em;
+  font-weight: 300;
+  font-size: var(--text-empecemos);
+  line-height: 0.88;
+  letter-spacing: -0.04em;
   color: var(--ink);
-  /* Preserva los \n del i18n */
-  white-space: pre-line;
   hyphens: none;
-  -webkit-hyphens: none;
-  overflow-wrap: break-word;
-  word-break: normal;
-  max-width: 100%;
-  margin: 0;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  margin: 0 0 var(--space-m) 0;
 }
 
 .contact-statement__subcopy {
@@ -442,7 +421,7 @@ const c = t.contact;
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
-  color: var(--ink);
+  color: var(--ink-62);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   line-height: 1.4;
@@ -515,7 +494,7 @@ const c = t.contact;
 
 .contact-form__select option {
   background-color: var(--bg);
-  color: #fff;
+  color: var(--ink);
 }
 
 .contact-form__select-arrow {
@@ -697,7 +676,11 @@ const c = t.contact;
 }
 
 /* ═══════════════════════════════════════════════════════════
-   DESKTOP (1280px+) — split asimétrico: statement col 1-5, form col 7-12
+   DESKTOP (1280px+)
+   V5: statement domina arriba (eje central), form debajo.
+   Kicker: position:absolute al borde izquierdo del --margin,
+   fuera del flujo del statement — asimetría real V5.
+   No hay split lateral — descartado #6.
    ═══════════════════════════════════════════════════════════ */
 @media (min-width: 1280px) {
   .contact {
@@ -705,32 +688,37 @@ const c = t.contact;
     padding-bottom: var(--space-2xl);
   }
 
-  /*
-   * Grid 12 col en 2 zonas:
-   * Col 1-5: statement (sticky).
-   * Col 6: gutter.
-   * Col 7-12: form.
-   */
-  .contact-layout {
-    display: grid;
-    grid-template-columns: 5fr 6fr;
-    column-gap: calc(var(--gutter) * 2);
-    row-gap: 0;
-    align-items: start;
+  /* El statement necesita position:relative para anclar el kicker absoluto */
+  .contact-statement {
+    position: relative;
   }
 
-  /* Statement: sticky desktop */
+  /* Kicker: se desprende del flujo y se ancla al borde izquierdo */
+  .contact-kicker {
+    position: absolute;
+    left: 0;
+    top: var(--space-m); /* alineado al padding-top del statement */
+    margin-bottom: 0;
+    writing-mode: horizontal-tb;
+    max-width: 12ch;
+    line-height: 1.4;
+  }
+
+  /* Statement: padding-top extra para bajar el texto por debajo del kicker (~2.5 líneas mono) */
   .contact-statement {
-    position: sticky;
-    top: calc(72px + var(--space-l));
-    align-self: start;
+    padding-top: calc(var(--space-m) + 2.5em); /* ~40px para que EMPECEMOS. no choque con el kicker */
+  }
+
+  .contact-statement__text {
+    font-size: var(--text-empecemos);
   }
 
   .contact-statement__subcopy {
-    max-width: 30ch;
+    max-width: 36ch;
   }
 
   .contact-form-wrap {
+    max-width: 700px;
     gap: var(--space-m);
   }
 }

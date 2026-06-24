@@ -1,0 +1,152 @@
+---
+/**
+ * CookieBanner.astro — Banner de consentimiento de cookies.
+ * Aparece en la primera visita. Guarda preferencia en localStorage.
+ * Sin tracking: solo cookies técnicas necesarias.
+ */
+
+interface Props {
+  lang: 'es' | 'en';
+}
+
+const { lang } = Astro.props;
+
+const copy = {
+  es: {
+    text: 'Usamos cookies técnicas necesarias para el funcionamiento del sitio.',
+    accept: 'Aceptar',
+    decline: 'Solo esenciales',
+    privacyLabel: 'Política de privacidad',
+    privacyHref: '/es/privacidad',
+  },
+  en: {
+    text: 'We use technical cookies necessary for the site to function.',
+    accept: 'Accept',
+    decline: 'Essential only',
+    privacyLabel: 'Privacy policy',
+    privacyHref: '/en/privacy',
+  },
+};
+
+const c = copy[lang];
+---
+
+<div class="cookie" id="cookie-banner" aria-live="polite" hidden>
+  <p class="cookie__text">
+    {c.text}
+    <a href={c.privacyHref} class="cookie__link">{c.privacyLabel}</a>.
+  </p>
+  <div class="cookie__actions">
+    <button class="cookie__btn cookie__btn--decline" id="cookie-decline">{c.decline}</button>
+    <button class="cookie__btn cookie__btn--accept" id="cookie-accept">{c.accept}</button>
+  </div>
+</div>
+
+<style>
+.cookie {
+  position: fixed;
+  bottom: max(var(--space-m), env(safe-area-inset-bottom));
+  left: var(--space-m);
+  right: var(--space-m);
+  z-index: 1000;
+  background-color: var(--ink);
+  color: var(--bg);
+  border-radius: 4px;
+  padding: var(--space-s) var(--space-m);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+  max-width: 480px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+.cookie[hidden] {
+  display: none;
+}
+
+.cookie__text {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  line-height: 1.5;
+  color: rgba(244, 242, 236, 0.8);
+}
+
+.cookie__link {
+  color: var(--bg);
+  text-underline-offset: 2px;
+}
+
+.cookie__actions {
+  display: flex;
+  gap: var(--space-xs);
+  justify-content: flex-end;
+}
+
+.cookie__btn {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.cookie__btn:hover {
+  opacity: 0.8;
+}
+
+.cookie__btn--decline {
+  background-color: transparent;
+  color: rgba(244, 242, 236, 0.6);
+  border: 1px solid rgba(244, 242, 236, 0.2);
+}
+
+.cookie__btn--accept {
+  background-color: var(--brand);
+  color: var(--on-brand);
+}
+
+@media (min-width: 640px) {
+  .cookie {
+    flex-direction: row;
+    align-items: center;
+    left: var(--space-l);
+    bottom: var(--space-l);
+    right: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie__btn {
+    transition: none;
+  }
+}
+</style>
+
+<script>
+  const COOKIE_KEY = 'scuart_cookies_consent';
+  const banner = document.getElementById('cookie-banner');
+  const acceptBtn = document.getElementById('cookie-accept');
+  const declineBtn = document.getElementById('cookie-decline');
+
+  if (banner && !localStorage.getItem(COOKIE_KEY)) {
+    /* Mostrar con micro-delay para no bloquear el LCP */
+    setTimeout(() => {
+      banner.removeAttribute('hidden');
+    }, 1200);
+  }
+
+  acceptBtn?.addEventListener('click', () => {
+    localStorage.setItem(COOKIE_KEY, 'accepted');
+    banner?.setAttribute('hidden', '');
+  });
+
+  declineBtn?.addEventListener('click', () => {
+    localStorage.setItem(COOKIE_KEY, 'essential');
+    banner?.setAttribute('hidden', '');
+  });
+</script>

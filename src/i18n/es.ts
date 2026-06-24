@@ -111,6 +111,8 @@ export const es: Translations = {
     kicker: "ESTUDIO",
     whatWeDoLabel: "QUÉ HACEMOS",
     howWeWorkLabel: "CÓMO TRABAJAMOS",
+    aboutStatement:
+      "Hacemos que tu marca se sienta memorable, con webs que transmiten confianza, no solo diseño — diseñadas con criterio, no por tendencia.",
   },
 
   /* ── Capabilities — datos conservados (reutilizados por StudioSection) ── */
@@ -121,38 +123,21 @@ export const es: Translations = {
     items: [
       {
         num: "01",
-        name: "WEB PLATFORMS",
-        resolves:
-          "Sitios que cargan rápido, posicionan en búsqueda y convierten visitantes en clientes.",
+        name: "DISEÑO+MARCA",
+        statement: "Hacemos que tu marca se sienta memorable.",
+        resolves: "",
       },
       {
         num: "02",
-        name: "SAAS + SYSTEMS",
-        resolves:
-          "Productos completos — login, pagos, paneles, APIs. De cero a producción.",
+        name: "WEB/PRODUCTO",
+        statement: "Webs que transmiten confianza, no solo diseño.",
+        resolves: "",
       },
       {
         num: "03",
-        name: "AI AUTOMATION",
-        resolves:
-          "Automatizamos lo repetitivo para que el equipo se enfoque en lo que importa.",
-      },
-      {
-        num: "04",
-        name: "E-COMMERCE",
-        resolves:
-          "Tiendas hechas para vender — checkout rápido, inventario, listas para crecer.",
-      },
-      {
-        num: "05",
-        name: "ORDERING · BOOKING · WORKFLOWS",
-        resolves: "Pedidos, reservas y operación sin el desorden manual.",
-      },
-      {
-        num: "06",
-        name: "BRAND IDENTITY",
-        resolves:
-          "Un sistema visual coherente en todo — no armado por accidente.",
+        name: "MÉTODO",
+        statement: "Diseño con criterio, no por tendencia.",
+        resolves: "",
       },
     ],
   },
@@ -181,6 +166,7 @@ export const es: Translations = {
         year: "2017",
         image: "/images/portfolio-jamon-casero-trim.webp",
         alt: "JAMÓN CASERO — proyecto SCUART",
+        href: "/es/trabajo/jamon-casero",
       },
       {
         name: "Menius",
@@ -189,6 +175,7 @@ export const es: Translations = {
         year: "2025",
         image: "/images/portfolio-menius-real-trim.webp",
         alt: "MENIUS — proyecto SCUART",
+        href: "/es/trabajo/menius",
       },
       {
         name: "Healthy Choice NY",
@@ -197,6 +184,7 @@ export const es: Translations = {
         year: "2019",
         image: "/images/portfolio-healthy-choice-real-trim.webp",
         alt: "HEALTHY CHOICE NY — proyecto SCUART",
+        href: "/es/trabajo/healthy-choice",
       },
       {
         name: "Arriba Gold",
@@ -205,6 +193,7 @@ export const es: Translations = {
         year: "2021",
         image: "/images/portfolio-arriba-gold-real-trim.webp",
         alt: "ARRIBA GOLD — proyecto SCUART",
+        href: "/es/trabajo/arriba-gold",
       },
     ],
   },
@@ -333,5 +322,11 @@ export const es: Translations = {
     builtBy: "© 2026 SCUART",
     tagline: "No decoramos. Decidimos.",
     ariaLabel: "SCUART — Pie de página del estudio",
+    legal: {
+      privacyLabel: "Privacidad",
+      privacyHref: "/es/privacidad",
+      termsLabel: "Términos",
+      termsHref: "/es/terminos",
+    },
   },
 };

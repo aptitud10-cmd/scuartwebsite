@@ -120,24 +120,15 @@ const f = t.footer;
   <div class="footer-credits">
     <span class="footer-credits__item">{f.builtBy}</span>
     <span class="footer-credits__dot" aria-hidden="true">·</span>
-    <span class="footer-credits__item">{f.markets}</span>
-    <span class="footer-credits__dot" aria-hidden="true">·</span>
-    <!-- Coordenadas reales del estudio (Bogotá) — consistentes con HeroSection.astro -->
-    <span class="footer-credits__coords">4.7110° N, 74.0721° W</span>
-    <span class="footer-credits__dot" aria-hidden="true">·</span>
     <a
       href={t.contact.emailHref}
       class="footer-credits__link"
       aria-label="Email del estudio"
     >hello@scuart.com</a>
     <span class="footer-credits__dot" aria-hidden="true">·</span>
-    <a
-      href={t.contact.whatsappHref}
-      class="footer-credits__link"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="WhatsApp del estudio (abre en nueva ventana)"
-    >WhatsApp</a>
+    <a href={f.legal.privacyHref} class="footer-credits__link">{f.legal.privacyLabel}</a>
+    <span class="footer-credits__dot" aria-hidden="true">·</span>
+    <a href={f.legal.termsHref} class="footer-credits__link">{f.legal.termsLabel}</a>
   </div>
 
 </footer>
@@ -348,9 +339,9 @@ const f = t.footer;
    * max 16rem: en desktop 1280px. 14vw = 179px → max 16rem=256px aplica.
    *   El wordmark a 256px con overflow y negative margin sangra correctamente.
    */
-  font-size: clamp(4rem, 14vw, 16rem);
-  line-height: 0.85;
-  letter-spacing: -0.03em;
+  font-size: clamp(5.5rem, 20vw, 16rem);
+  line-height: 0.82;
+  letter-spacing: -0.04em;
   color: var(--ink);
   text-transform: uppercase;
   margin: 0;
@@ -365,14 +356,13 @@ const f = t.footer;
   white-space: nowrap;
 }
 
-/* El "*" — glifo-firma del estudio (acento de texto; tinta sobre blanco, lima sobre negro) */
+/* El "*" — glifo-firma del estudio. Lima bisturí — regla V5: lima solo en 4 lugares */
 .footer-wordmark__plus {
-  color: var(--accent-text);
+  color: var(--brand);
 }
 
 /* ─── TAGLINE / LEMA ─────────────────────────────────────── */
-/* "We don't decorate. We decide." — equivalente SCUART del "Tools of Expression".
-   PP Editorial New, debajo del wordmark a sangre. */
+/* "No decoramos. Decidimos." — última palabra del estudio. PP Editorial New itálica. */
 .footer-tagline {
   font-family: var(--font-display);
   font-weight: 400;
@@ -380,8 +370,10 @@ const f = t.footer;
   font-size: clamp(1.125rem, 2.2vw, 1.75rem);
   line-height: 1.2;
   letter-spacing: -0.01em;
-  color: var(--ink);
+  color: var(--ink-62);
   margin: var(--space-s) 0 0 0;
+  padding-left: var(--margin);
+  padding-right: var(--margin);
 }
 
 /* ─── CRÉDITOS — N3 ──────────────────────────────────────── */

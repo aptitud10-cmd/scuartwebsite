@@ -1,0 +1,66 @@
+---
+import CaseStudyLayout from '../../../components/CaseStudyLayout.astro';
+import { getTranslations } from '../../../i18n/index';
+import type { CaseStudyData } from '../../../components/CaseStudyLayout.astro';
+
+const lang = 'en';
+const t = getTranslations(lang);
+
+const data: CaseStudyData = {
+  name: 'Menius',
+  tagline: 'Digital menu SaaS for restaurants. SCUART\'s own product.',
+  categories: ['SaaS', 'Product', 'Platform'],
+  year: '2025',
+  client: 'SCUART (own product)',
+  siteUrl: 'https://menius.app',
+  heroImage: '/images/portfolio-menius-real.webp',
+  heroImageAlt: 'Menius — restaurant SaaS platform designed and built by SCUART',
+  sections: [
+    {
+      label: 'Context',
+      body: 'Small and mid-sized restaurants needed an affordable digital menu solution — no transaction fees, no dependency on third-party platforms. The pandemic accelerated QR adoption, but existing solutions were either expensive or generic.',
+    },
+    {
+      label: 'Challenge',
+      body: 'Build a complete SaaS — from multi-tenant architecture to the admin experience — that would work for restaurants with varying levels of technical capability. The product had to be simple enough for an owner to configure alone, and robust enough to scale.',
+    },
+    {
+      label: 'Solution',
+      body: 'We designed and built Menius from scratch: Supabase multi-tenant architecture with RLS, Next.js admin dashboard, mobile-optimized public menu, and real-time update system. Each restaurant gets their own subdomain and can customize colors, typography, and content without touching code.',
+    },
+    {
+      label: 'Result',
+      body: 'Menius operates with active restaurants in Colombia and the United States. Average onboarding time is under 15 minutes. The product validates SCUART\'s agency model: we build digital systems that generate long-term value, not just websites.',
+    },
+  ],
+  images: [
+    {
+      src: '/images/portfolio-menius-real-trim.webp',
+      alt: 'Menius — admin dashboard',
+      wide: true,
+    },
+    {
+      src: '/images/portfolio-menius-real.webp',
+      alt: 'Menius — mobile digital menu view',
+    },
+  ],
+  credits: [
+    { role: 'Product Direction', name: 'William Cuartas' },
+    { role: 'UX/UI Design', name: 'William Cuartas' },
+    { role: 'Architecture & Development', name: 'William Cuartas' },
+  ],
+  next: {
+    name: 'Healthy Choice NY',
+    href: '/en/work/healthy-choice',
+  },
+};
+---
+
+<CaseStudyLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Menius — SCUART"
+  description="Digital menu SaaS for restaurants. Designed and built by SCUART."
+  canonicalURL="https://scuart.com/en/work/menius"
+/>

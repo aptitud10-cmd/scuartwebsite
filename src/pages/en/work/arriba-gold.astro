@@ -1,0 +1,65 @@
+---
+import CaseStudyLayout from '../../../components/CaseStudyLayout.astro';
+import { getTranslations } from '../../../i18n/index';
+import type { CaseStudyData } from '../../../components/CaseStudyLayout.astro';
+
+const lang = 'en';
+const t = getTranslations(lang);
+
+const data: CaseStudyData = {
+  name: 'Arriba Gold',
+  tagline: 'E-commerce for a Colombian artisan jewelry brand.',
+  categories: ['E-Commerce', 'Jewelry'],
+  year: '2021',
+  client: 'Arriba Gold',
+  heroImage: '/images/portfolio-arriba-gold-real.webp',
+  heroImageAlt: 'Arriba Gold — e-commerce designed by SCUART',
+  sections: [
+    {
+      label: 'Context',
+      body: 'Arriba Gold is a Colombian artisan jewelry brand looking to expand its reach beyond in-person sales and social media. The online jewelry market requires conveying trust and quality through a screen — a considerable design challenge.',
+    },
+    {
+      label: 'Challenge',
+      body: 'Create an e-commerce experience that justified the premium price point of artisan jewelry. Product photos needed absolute prominence, the purchase process had to be flawless on mobile, and the brand needed to stand out from the visual noise of the mass market.',
+    },
+    {
+      label: 'Solution',
+      body: 'We designed an online store with large-scale product imagery, elegant typography, and a simplified checkout process. The architecture prioritized mobile experience (where most purchases happen) and loading speed to avoid losing conversions.',
+    },
+    {
+      label: 'Result',
+      body: 'The e-commerce gave Arriba Gold their first direct-to-consumer sales channel, independent of third-party platforms. The conversion rate exceeded sector benchmarks for artisan jewelry in its first quarter of operation.',
+    },
+  ],
+  images: [
+    {
+      src: '/images/portfolio-arriba-gold-real-trim.webp',
+      alt: 'Arriba Gold — online store view',
+      wide: true,
+    },
+    {
+      src: '/images/portfolio-arriba-gold-real.webp',
+      alt: 'Arriba Gold — product design detail',
+    },
+  ],
+  credits: [
+    { role: 'Creative Direction', name: 'William Cuartas' },
+    { role: 'UX/UI Design', name: 'William Cuartas' },
+    { role: 'E-Commerce Development', name: 'William Cuartas' },
+  ],
+  next: {
+    name: 'Jamón Casero',
+    href: '/en/work/jamon-casero',
+  },
+};
+---
+
+<CaseStudyLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Arriba Gold — SCUART"
+  description="E-commerce for a Colombian artisan jewelry brand. Design and development by SCUART."
+  canonicalURL="https://scuart.com/en/work/arriba-gold"
+/>

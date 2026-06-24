@@ -1,0 +1,65 @@
+---
+import CaseStudyLayout from '../../../components/CaseStudyLayout.astro';
+import { getTranslations } from '../../../i18n/index';
+import type { CaseStudyData } from '../../../components/CaseStudyLayout.astro';
+
+const lang = 'en';
+const t = getTranslations(lang);
+
+const data: CaseStudyData = {
+  name: 'Jamón Casero',
+  tagline: 'Digital identity for a Colombian artisan charcuterie brand with decades of history.',
+  categories: ['Web', 'Brand', 'Food & Beverage'],
+  year: '2017',
+  client: 'Jamón Casero',
+  heroImage: '/images/portfolio-jamon-casero.webp',
+  heroImageAlt: 'Jamón Casero — website designed by SCUART',
+  sections: [
+    {
+      label: 'Context',
+      body: 'Jamón Casero is a Colombian artisan charcuterie brand with over 20 years of history. Their reputation lived in word-of-mouth; their digital presence was nonexistent. The challenge was to translate that trust into the digital world without losing the warmth of the product.',
+    },
+    {
+      label: 'Challenge',
+      body: 'Build a web presence that could compete with international brands in terms of design, while still feeling artisanal, local, and authentic. The brand needed to speak to both end consumers and distributors and restaurants.',
+    },
+    {
+      label: 'Solution',
+      body: 'We designed a complete visual identity with editorial typography, close-up product photography, and a warm palette that evoked the artisanal process. The website prioritized the product story over the catalog, building trust first.',
+    },
+    {
+      label: 'Result',
+      body: 'The website became the primary contact point for new distributors. The brand reported increased commercial inquiries in the 3 months following launch, and the resulting digital identity served as the foundation for point-of-sale materials and packaging.',
+    },
+  ],
+  images: [
+    {
+      src: '/images/portfolio-jamon-casero-trim.webp',
+      alt: 'Jamón Casero — website view',
+      wide: true,
+    },
+    {
+      src: '/images/portfolio-jamon-casero.webp',
+      alt: 'Jamón Casero — design detail',
+    },
+  ],
+  credits: [
+    { role: 'Creative Direction', name: 'William Cuartas' },
+    { role: 'Web Design', name: 'William Cuartas' },
+    { role: 'Development', name: 'William Cuartas' },
+  ],
+  next: {
+    name: 'Menius',
+    href: '/en/work/menius',
+  },
+};
+---
+
+<CaseStudyLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Jamón Casero — SCUART"
+  description="Digital identity and website for Jamón Casero, Colombian artisan charcuterie brand."
+  canonicalURL="https://scuart.com/en/work/jamon-casero"
+/>

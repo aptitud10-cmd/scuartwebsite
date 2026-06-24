@@ -1,0 +1,186 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import FooterSection from '../../components/FooterSection.astro';
+import { getTranslations } from '../../i18n/index';
+
+const lang = 'es';
+const t = getTranslations(lang);
+---
+
+<Layout
+  title="Política de Privacidad — SCUART"
+  description="Política de privacidad de SCUART, estudio de diseño y tecnología."
+  lang={lang}
+  canonicalURL="https://scuart.com/es/privacidad"
+>
+  <Nav lang={lang} t={t} />
+
+  <main class="legal">
+    <div class="legal__container">
+      <header class="legal__header">
+        <p class="legal__kicker">SCUART · LEGAL</p>
+        <h1 class="legal__title">Política de Privacidad</h1>
+        <p class="legal__date">Última actualización: junio 2026</p>
+      </header>
+
+      <div class="legal__body">
+        <section class="legal__section">
+          <h2>1. Quiénes somos</h2>
+          <p>SCUART es un estudio de diseño y tecnología. Construimos sitios web, plataformas digitales y sistemas para negocios. Pueden contactarnos en <a href="mailto:hola@scuart.com">hola@scuart.com</a>.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>2. Qué información recopilamos</h2>
+          <p>Recopilamos únicamente la información que nos proporcionan voluntariamente a través del formulario de contacto:</p>
+          <ul>
+            <li>Nombre</li>
+            <li>Nombre del negocio</li>
+            <li>Dirección de correo electrónico</li>
+            <li>País</li>
+            <li>Descripción del proyecto o consulta</li>
+          </ul>
+          <p>No recopilamos datos de pago, información sensible, ni datos de menores de 18 años.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>3. Cómo usamos tu información</h2>
+          <p>Usamos la información que nos proporcionan exclusivamente para:</p>
+          <ul>
+            <li>Responder a su consulta o solicitud de proyecto</li>
+            <li>Enviar información relevante sobre los servicios consultados</li>
+            <li>Coordinar el inicio de un proyecto si deciden trabajar con nosotros</li>
+          </ul>
+          <p>No vendemos, alquilamos ni compartimos su información con terceros para fines comerciales.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>4. Cookies y tecnologías de rastreo</h2>
+          <p>Este sitio utiliza cookies técnicas necesarias para su funcionamiento. Pueden gestionar sus preferencias de cookies a través del banner que aparece en la primera visita. No utilizamos cookies de rastreo publicitario.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>5. Retención de datos</h2>
+          <p>Conservamos la información de contacto mientras exista una relación comercial activa o potencial. Pueden solicitar la eliminación de sus datos en cualquier momento escribiéndonos a <a href="mailto:hola@scuart.com">hola@scuart.com</a>.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>6. Tus derechos</h2>
+          <p>Tienen derecho a:</p>
+          <ul>
+            <li>Acceder a los datos que tenemos sobre ustedes</li>
+            <li>Solicitar la corrección de datos incorrectos</li>
+            <li>Solicitar la eliminación de sus datos</li>
+            <li>Oponerse al tratamiento de sus datos</li>
+          </ul>
+          <p>Para ejercer cualquiera de estos derechos, escríbanos a <a href="mailto:hola@scuart.com">hola@scuart.com</a>.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>7. Seguridad</h2>
+          <p>Tomamos medidas razonables para proteger tu información personal contra acceso no autorizado, alteración o divulgación. Sin embargo, ninguna transmisión por internet es 100% segura.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>8. Cambios a esta política</h2>
+          <p>Podemos actualizar esta política ocasionalmente. Te notificaremos de cambios significativos publicando la nueva versión en esta página con la fecha de actualización.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>9. Contacto</h2>
+          <p>Para cualquier consulta sobre esta política de privacidad, escríbanos a <a href="mailto:hola@scuart.com">hola@scuart.com</a>.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <FooterSection t={t} lang={lang} />
+</Layout>
+
+<style>
+.legal {
+  padding-top: calc(var(--space-3xl) + 4rem);
+  padding-bottom: var(--space-3xl);
+}
+
+.legal__container {
+  padding-inline: var(--margin);
+  max-width: 72ch;
+  margin-inline: auto;
+}
+
+.legal__kicker {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-42);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: var(--space-s);
+}
+
+.legal__title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin-bottom: var(--space-s);
+}
+
+.legal__date {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  color: var(--ink-42);
+  margin-bottom: var(--space-2xl);
+}
+
+.legal__body {
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-xl);
+}
+
+.legal__section {
+  margin-bottom: var(--space-xl);
+}
+
+.legal__section h2 {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--text-body);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-62);
+  margin-bottom: var(--space-s);
+}
+
+.legal__section p,
+.legal__section li {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.legal__section ul {
+  padding-left: 1.5em;
+  margin-block: var(--space-s);
+}
+
+.legal__section li {
+  margin-bottom: 0.4em;
+}
+
+.legal__section a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--hairline);
+  transition: text-decoration-color 0.2s;
+}
+
+.legal__section a:hover {
+  text-decoration-color: var(--brand);
+}
+</style>

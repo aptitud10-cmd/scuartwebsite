@@ -1,0 +1,166 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import FooterSection from '../../components/FooterSection.astro';
+import { getTranslations } from '../../i18n/index';
+
+const lang = 'es';
+const t = getTranslations(lang);
+---
+
+<Layout
+  title="Términos y Condiciones — SCUART"
+  description="Términos y condiciones de los servicios de SCUART, estudio de diseño y tecnología."
+  lang={lang}
+  canonicalURL="https://scuart.com/es/terminos"
+>
+  <Nav lang={lang} t={t} />
+
+  <main class="legal">
+    <div class="legal__container">
+      <header class="legal__header">
+        <p class="legal__kicker">SCUART · LEGAL</p>
+        <h1 class="legal__title">Términos y Condiciones</h1>
+        <p class="legal__date">Última actualización: junio 2026</p>
+      </header>
+
+      <div class="legal__body">
+        <section class="legal__section">
+          <h2>1. Servicios</h2>
+          <p>SCUART ofrece servicios de diseño web, desarrollo de plataformas digitales y sistemas tecnológicos para negocios. Cada proyecto se rige por un acuerdo específico entre SCUART y el cliente, que detalla el alcance, los entregables, los plazos y los términos de pago.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>2. Propuestas y presupuestos</h2>
+          <p>Las propuestas y presupuestos de SCUART tienen una validez de 30 días desde su emisión. El inicio del proyecto se confirma con la aceptación escrita de la propuesta y el pago del primer hito acordado.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>3. Propiedad intelectual</h2>
+          <p>Al completar el pago total del proyecto, el cliente recibe los derechos de uso del trabajo final entregado. SCUART retiene el derecho de mostrar el trabajo en su portafolio y materiales de marketing, salvo acuerdo de confidencialidad firmado.</p>
+          <p>El código fuente, frameworks y herramientas de terceros utilizados pueden estar sujetos a sus propias licencias.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>4. Pagos</h2>
+          <p>Los proyectos se facturan por hitos acordados previamente. El incumplimiento en los pagos puede resultar en la suspensión del trabajo. SCUART no entrega archivos fuente o accesos de administrador hasta completar el pago total.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>5. Revisiones y cambios de alcance</h2>
+          <p>Cada proyecto incluye un número de rondas de revisión especificado en la propuesta. Los cambios de alcance que excedan lo acordado se cotizarán por separado antes de ejecutarse.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>6. Cancelación</h2>
+          <p>El cliente puede cancelar el proyecto con aviso escrito. El trabajo completado hasta la fecha de cancelación se factura proporcionalmente. Los pagos por trabajo ya realizado no son reembolsables.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>7. Limitación de responsabilidad</h2>
+          <p>SCUART no es responsable por pérdidas indirectas, pérdidas de negocio o daños consecuentes derivados del uso o incapacidad de usar los entregables. La responsabilidad máxima de SCUART no excederá el monto total pagado por el proyecto en cuestión.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>8. Ley aplicable</h2>
+          <p>Estos términos se rigen por las leyes de la República de Colombia. Cualquier disputa se resolverá en los tribunales competentes de Colombia.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>9. Contacto</h2>
+          <p>Para cualquier consulta sobre estos términos, escríbanos a <a href="mailto:hola@scuart.com">hola@scuart.com</a>.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <FooterSection t={t} lang={lang} />
+</Layout>
+
+<style>
+.legal {
+  padding-top: calc(var(--space-3xl) + 4rem);
+  padding-bottom: var(--space-3xl);
+}
+
+.legal__container {
+  padding-inline: var(--margin);
+  max-width: 72ch;
+  margin-inline: auto;
+}
+
+.legal__kicker {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-42);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: var(--space-s);
+}
+
+.legal__title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin-bottom: var(--space-s);
+}
+
+.legal__date {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  color: var(--ink-42);
+  margin-bottom: var(--space-2xl);
+}
+
+.legal__body {
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-xl);
+}
+
+.legal__section {
+  margin-bottom: var(--space-xl);
+}
+
+.legal__section h2 {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--text-body);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-62);
+  margin-bottom: var(--space-s);
+}
+
+.legal__section p,
+.legal__section li {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.legal__section ul {
+  padding-left: 1.5em;
+  margin-block: var(--space-s);
+}
+
+.legal__section li {
+  margin-bottom: 0.4em;
+}
+
+.legal__section a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--hairline);
+  transition: text-decoration-color 0.2s;
+}
+
+.legal__section a:hover {
+  text-decoration-color: var(--brand);
+}
+</style>

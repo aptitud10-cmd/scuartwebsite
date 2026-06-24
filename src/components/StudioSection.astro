@@ -5,25 +5,27 @@
  *
  * ESTRUCTURA:
  *   Parte 1 — QUÉ HACEMOS / WHAT WE DO
- *     Lista editorial de 6 servicios (de capabilities.items).
- *     Numerales gigantes 01-06 + nombre + resolves.
- *     Reveal: IntersectionObserver + stagger.
+ *     Tres declaraciones PP Editorial New centradas, mask-reveal por scroll.
+ *     Numeral anclado al margen izquierdo (absoluto en tablet+, estático en mobile).
+ *     Barra lima scaleX 0→1 post-reveal.
+ *
+ *   MARQUEE DIVISOR — nombres de servicio corriendo infinito.
+ *     Velocidad reactiva a Lenis velocity (frena/acelera con el scroll).
  *
  *   Parte 2 — CÓMO TRABAJAMOS / HOW WE WORK
  *     4 pasos del proceso (de method.steps).
  *     Numerales 001-004 + título + body + "qué cambia".
- *     SIN stepCapabilities (redundancia eliminada).
- *     SIN barra "trabajamos con" (redundancia eliminada).
- *     Pin GSAP de columna de numerales en desktop ≥1280px (conservado del Method).
+ *     whatChanges: PP Editorial New itálica + hairline corto derecha.
+ *     Pin GSAP de columna de numerales en desktop ≥1280px (conservado).
  *
  * TOKENS V4 BLANCO ACTIVOS (NO modificar):
- *   --bg, --ink, --ink-62, --ink-18, --hairline, --accent-text,
+ *   --bg, --ink, --ink-62, --ink-18, --brand, --hairline,
  *   --font-display, --font-body, --text-mono, --text-body.
  *
  * RESPONSIVE:
- *   Mobile (375px): stack vertical, sin pin.
- *   Tablet (768px): más aire, sin pin.
- *   Desktop (1280px): grid 2 col en Parte 2, numerales pineados con GSAP.
+ *   Mobile (375px): numeral estático arriba-izquierda, declaración centrada.
+ *   Tablet (768px): numeral absoluto al margen, más aire.
+ *   Desktop (1280px): declaración más grande + proceso con pin.
  *   prefers-reduced-motion: todo estático y visible.
  */
 
@@ -34,6 +36,7 @@ const { t } = Astro.props as { t: Translations };
 const kicker: string = t.studio.kicker;
 const whatWeDoLabel: string = t.studio.whatWeDoLabel;
 const howWeWorkLabel: string = t.studio.howWeWorkLabel;
+const aboutStatement: string = t.studio.aboutStatement;
 const whatChangesLabel: string = t.method.whatChangesLabel;
 
 const items: CapabilityService[] = t.capabilities.items;
@@ -46,44 +49,86 @@ const steps: MethodStep[] = t.method.steps;
   aria-label={kicker}
 >
 
-  <!-- Kicker de sección -->
-  <div class="stu-header">
-    <p class="stu-kicker">{kicker}</p>
+  <!-- ═══════════════════════════════════════════════
+       PARTE 1 — ABOUT (mecanismo real de trionn.com/about)
+       Video oscuro full-bleed + texto en mix-blend-difference
+       encima (el texto se invierte según el video que pasa
+       detrás — así Trionn cambia de color al scrollear).
+       Reveal por blur+opacity (no por máscara de líneas).
+       Fondo negro de fallback hasta que William suelte el
+       video en public/studio-bg.mp4 (como el hero).
+       ═══════════════════════════════════════════════ -->
+  <div class="stu-part stu-about" id="studio-what" aria-label={whatWeDoLabel}>
+
+    <!-- Video de fondo — fallback negro mientras no exista el archivo -->
+    <video
+      class="stu-about__video"
+      autoplay
+      loop
+      muted
+      playsinline
+      preload="metadata"
+      aria-hidden="true"
+      poster="/studio-bg-poster.jpg"
+    >
+      <source src="/studio-bg.webm" type="video/webm" />
+      <source src="/studio-bg.mp4" type="video/mp4" />
+    </video>
+
+    <div class="stu-about__inner">
+
+      <!-- Frase fusionada gigante en mix-blend-difference — sale de i18n -->
+      <p class="stu-about__statement" data-stu-about-statement>
+        {aboutStatement}
+      </p>
+
+      <!-- Anotaciones de esquina (placeholder Trionn — contenido real) -->
+      <div class="stu-about__values" data-stu-annotation>
+        <p class="stu-about__values-lead">WE DESIGN FOR LONGEVITY</p>
+        <p class="stu-about__values-list">CLARITY FIRST, CRAFT ALWAYS, BUILT TO SCALE</p>
+      </div>
+
+      <p class="stu-about__mission" data-stu-annotation>
+        Our mission is to make technology feel human by designing digital
+        products that are intuitive, purposeful, and meaningful to people.
+      </p>
+
+      <a class="stu-about__more" href="#studio-how" data-stu-annotation>
+        MORE ABOUT US <span aria-hidden="true">&#x2192;</span>
+      </a>
+    </div>
   </div>
 
   <!-- ═══════════════════════════════════════════════
-       PARTE 1 — QUÉ HACEMOS (lista de 6 servicios)
+       MARQUEE DIVISOR — nombres de servicio corriendo infinito.
+       Velocidad reactiva a Lenis (frena/acelera con el scroll).
+       aria-hidden: contenido decorativo, no semántico.
        ═══════════════════════════════════════════════ -->
-  <div class="stu-part" id="studio-what">
-    <p class="stu-part__label">{whatWeDoLabel}</p>
-
-    <ol class="stu-services" role="list" aria-label={whatWeDoLabel}>
-      {items.map((item, index) => (
-        <li
-          class="stu-svc"
-          data-row-index={index}
-          data-even={index % 2 === 1 ? 'true' : 'false'}
-        >
-          <!--
-            Numeral gigante: elemento gráfico-arquitectónico sobre la fila.
-            aria-hidden: el número está implícito en el orden de lista.
-          -->
-          <span class="stu-svc__num" aria-hidden="true">{item.num}</span>
-
-          <div class="stu-svc__content">
-            <p class="stu-svc__name">{item.name}</p>
-            <p class="stu-svc__resolves">{item.resolves}</p>
-          </div>
-        </li>
+  <div class="stu-marquee" aria-hidden="true" data-stu-marquee>
+    <div class="stu-marquee__track" data-stu-marquee-track>
+      {[0, 1].map(() => (
+        <span class="stu-marquee__group">
+          {items.map((item) => (
+            <>
+              <span class="stu-marquee__item">{item.name}</span>
+              <span class="stu-marquee__dot">·</span>
+            </>
+          ))}
+        </span>
       ))}
-    </ol>
+    </div>
   </div>
 
   <!-- ═══════════════════════════════════════════════
        PARTE 2 — CÓMO TRABAJAMOS (4 pasos del proceso)
+       Cambios vs. estado anterior:
+       - whatChanges: PP Editorial New itálica weight 400.
+       - hairline corto ~30% ancho, alineado a la derecha.
+       - Más espacio entre pasos en desktop.
+       El HTML de esta parte es INTACTO — solo CSS cambia.
        ═══════════════════════════════════════════════ -->
   <div class="stu-part" id="studio-how">
-    <p class="stu-part__label">{howWeWorkLabel}</p>
+    <p class="stu-part__label stu-part__label--how">{howWeWorkLabel}</p>
 
     <div class="stu-method" data-stu-method>
 
@@ -126,10 +171,18 @@ const steps: MethodStep[] = t.method.steps;
 
               <p class="stu-step__body">{step.body}</p>
 
+              <!--
+                hairline corto: ~30% del ancho alineado a la derecha del bloque.
+                Se implementa como elemento <hr> con class — ver CSS.
+              -->
               <hr class="stu-step__rule" aria-hidden="true" />
 
               <div class="stu-step__change">
                 <p class="stu-step__label">{whatChangesLabel}</p>
+                <!--
+                  whatChanges: PP Editorial New itálica weight 400.
+                  El → ya existía — se conserva como marca de avance.
+                -->
                 <p class="stu-step__change-text">&#x2192; {step.whatChanges}</p>
               </div>
             </div>
@@ -144,11 +197,11 @@ const steps: MethodStep[] = t.method.steps;
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   STUDIO SECTION — V4 "Restringido" (cuerpo blanco, 1 color)
+   STUDIO SECTION — Art direction V5.
+   Parte 1: numeral al margen + declaración serif centrada + mask-reveal.
+   Parte 2: proceso con pin de numerales en desktop.
    Mobile-first: 375px → 768px → 1280px.
    ═══════════════════════════════════════════════════════════ */
-
-/* ─── SECCIÓN ────────────────────────────────────────────── */
 
 .stu {
   background-color: var(--bg);
@@ -162,37 +215,22 @@ const steps: MethodStep[] = t.method.steps;
   scroll-margin-top: 72px;
 }
 
-/* ─── HEADER / KICKER ────────────────────────────────────── */
-
-.stu-header {
-  border-top: 1px solid var(--hairline);
-  padding-top: var(--space-m);
-  margin-bottom: var(--space-xl);
-}
-
-.stu-kicker {
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  color: var(--ink-62);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  line-height: 1.4;
-  margin: 0;
-}
-
 /* ─── PARTES ─────────────────────────────────────────────── */
 
 .stu-part {
-  margin-bottom: var(--space-2xl);
+  margin-bottom: calc(var(--space-2xl) * 1.5);
 }
 
 .stu-part:last-child {
   margin-bottom: 0;
 }
 
-/* Label sub-sección (QUÉ HACEMOS / CÓMO TRABAJAMOS) */
 .stu-part__label {
+  display: none;
+}
+
+.stu-part__label--how {
+  display: block;
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
@@ -200,135 +238,253 @@ const steps: MethodStep[] = t.method.steps;
   text-transform: uppercase;
   letter-spacing: 0.14em;
   line-height: 1.4;
-  margin: 0 0 var(--space-l) 0;
-  border-bottom: 1px solid var(--hairline);
+  margin: 0 0 var(--space-xl) 0;
   padding-bottom: var(--space-s);
+  border-bottom: 1px solid var(--hairline);
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PARTE 1 — SERVICIOS (Capabilities)
+   PARTE 1 — ABOUT (mecanismo real de trionn.com/about)
+   Video oscuro full-bleed + texto en mix-blend-difference encima.
+   El blend-difference es lo que hace el efecto: el texto se
+   invierte contra el video → cambia de color al moverse.
+   Full-bleed: rompe el padding-inline del .stu (padre tiene
+   overflow-x: clip, no genera scroll horizontal).
    ═══════════════════════════════════════════════════════════ */
 
-/* ─── LISTA EDITORIAL ────────────────────────────────────── */
-
-.stu-services {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-/* ─── FILA — mobile base ─────────────────────────────────── */
-
-.stu-svc {
+.stu-about {
   position: relative;
+  isolation: isolate;
+  background-color: #0a0a0a; /* fallback negro hasta que exista el video */
+
+  /* Full-bleed */
+  margin-left: calc(-1 * var(--margin));
+  margin-right: calc(-1 * var(--margin));
+  padding: 0; /* el contenido se posiciona dentro de __inner */
+
+  min-height: 100svh; /* la sección ocupa el viewport, como Trionn */
   display: flex;
-  flex-direction: column;
-  padding-top: var(--space-m);
-  padding-bottom: var(--space-m);
-  border-top: 1px solid var(--hairline);
-  overflow: visible;
+  align-items: flex-end; /* el contenido se ancla abajo */
+  overflow: hidden;
 }
 
-.stu-svc:last-child {
-  border-bottom: 1px solid var(--hairline);
-}
-
-/* ─── NUMERAL GIGANTE ────────────────────────────────────── */
-
-.stu-svc__num {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(3.5rem, 8vw, 6.5rem);
-  line-height: 0.9;
-  letter-spacing: -0.03em;
-  color: var(--ink-18);
-  font-variant-numeric: tabular-nums;
-  font-style: normal;
-  position: relative;
-  display: block;
+/* Video de fondo — cubre toda la sección */
+.stu-about__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
   pointer-events: none;
-  margin-bottom: calc(-1 * clamp(1.5rem, 3.5vw, 3rem));
-  min-height: clamp(2.5rem, 6vw, 5rem);
 }
 
-/* ─── CONTENIDO (nombre + resolves) ─────────────────────── */
-
-.stu-svc__content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs);
+/* Contenedor del texto — sobre el video, en blend-difference */
+.stu-about__inner {
   position: relative;
   z-index: 1;
+  width: 100%;
+  padding: var(--space-2xl) var(--margin);
+  /* mix-blend-difference: el truco de Trionn. El texto blanco se
+     invierte contra el video → legible sobre claro y oscuro. */
+  mix-blend-mode: difference;
 }
 
-/* ─── NOMBRE ─────────────────────────────────────────────── */
-
-.stu-svc__name {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-  line-height: 1.0;
+/* ── Frase gigante — réplica de trionn.com/about ──
+   Sans-serif bold, CENTRADA y ancha (clases reales de Trionn:
+   text-center mx-auto max-w-342 text-[#d8d8d8]).
+   Trionn usa Neue Haas; acá uso Geist (la sans del sitio) en bold.
+   IMPORTANTE: sin opacity en CSS base — lo aplica el JS, así sin
+   JS o si GSAP falla, todo se ve. */
+.stu-about__statement {
+  font-family: var(--font-body); /* Geist sans — como la sans de Trionn */
+  font-weight: 700;
+  font-size: clamp(2.25rem, 5.2vw, 5.5rem);
+  line-height: 1.08;
   letter-spacing: -0.02em;
-  color: var(--ink);
-  font-style: normal;
-  margin: 0;
-  hyphens: none;
+  color: #d8d8d8; /* gris claro base — exacto de Trionn */
+  text-align: center;
+  max-width: 21em; /* ancho generoso → ~3 líneas anchas, no columna angosta */
+  margin: 0 auto var(--space-2xl) auto; /* mx-auto: centrada en la página */
 }
 
-/* ─── RESOLVES ───────────────────────────────────────────── */
+/* ── Anotaciones de esquina ── */
+.stu-about__values-lead,
+.stu-about__values-list,
+.stu-about__more {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  margin: 0;
+  color: #ffffff;
+}
 
-.stu-svc__resolves {
+.stu-about__values-list {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.stu-about__mission {
   font-family: var(--font-body);
   font-size: var(--text-body);
-  font-weight: 400;
-  color: var(--ink-62);
-  line-height: 1.55;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
   margin: 0;
-  max-width: 52ch;
+  max-width: 34ch;
 }
 
-/* ─── REVEAL: estados para IntersectionObserver ──────────── */
-
-.stu-svc.is-hidden {
-  opacity: 0;
-  transform: translateY(20px);
+.stu-about__more {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  color: #ffffff;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
 }
 
-.stu-svc.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-  transition:
-    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+.stu-about__more:hover,
+.stu-about__more:focus-visible {
+  opacity: 0.6; /* en blend-difference el color hover no sirve — uso opacity */
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .stu-svc.is-hidden {
-    opacity: 1;
-    transform: none;
+/* ── MOBILE (<768px): anotaciones en flujo, apiladas bajo la frase ── */
+@media (max-width: 767px) {
+  .stu-about {
+    align-items: flex-start;
   }
-  .stu-svc.is-visible {
-    transition: none;
+  .stu-about__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-l);
+    padding-top: calc(var(--space-2xl) + 3rem); /* deja respiro bajo el nav */
+  }
+  .stu-about__statement {
+    max-width: 100%;
+    margin-bottom: var(--space-m);
+  }
+  .stu-about__mission {
+    max-width: 100%;
+  }
+}
+
+/* ── TABLET/DESKTOP (≥768px): anotaciones ancladas en esquinas ──
+   Layout tomado del HTML real de Trionn: frase arriba-izq,
+   valores abajo-izq, misión + link abajo-der. */
+@media (min-width: 768px) {
+  .stu-about__inner {
+    min-height: 100svh;
+    display: grid;
+    /* 2 columnas; la frase ocupa la fila de arriba (centrada vertical),
+       valores e (misión+link) ocupan la fila de abajo, en esquinas. */
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+    column-gap: var(--space-l);
+    row-gap: var(--space-2xl);
+    padding-top: calc(var(--space-2xl) + 2rem);
+    padding-bottom: var(--space-2xl);
+  }
+  .stu-about__statement {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    align-self: center;
+    margin-bottom: 0;
+  }
+  .stu-about__values {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+  }
+  /* columna derecha (fila 2): misión y link apilados, alineados a la derecha.
+     Para que no se solapen, los apilo con un flex en una sola celda. */
+  .stu-about__mission {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    align-self: end;
+    text-align: right;
+  }
+  .stu-about__more {
+    grid-column: 2;
+    grid-row: 3; /* fila propia debajo de la misión */
+    justify-self: end;
+    align-self: start;
+    margin-top: var(--space-m);
+  }
+  /* añade la fila 3 solo para el link */
+  .stu-about__inner {
+    grid-template-rows: 1fr auto auto;
+  }
+}
+
+/* ── reduced-motion: frase y anotaciones visibles desde el inicio ── */
+@media (prefers-reduced-motion: reduce) {
+  .stu-about__statement,
+  .stu-about [data-stu-annotation] {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   PARTE 2 — PASOS DEL PROCESO (Method)
+   MARQUEE DIVISOR — entre Parte 1 y Parte 2
+   Velocidad reactiva a Lenis via JS (--marquee-speed custom prop).
    ═══════════════════════════════════════════════════════════ */
 
-/* ─── BODY — layout principal ────────────────────────────── */
+.stu-marquee {
+  overflow: hidden;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+  padding: var(--space-s) 0;
+  margin-bottom: calc(var(--space-2xl) * 1.5);
+  position: relative;
+}
+
+.stu-marquee__track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.stu-marquee__group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-l);
+  padding-right: var(--space-l);
+  flex-shrink: 0;
+}
+
+.stu-marquee__item {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.5rem, 4vw, 3.5rem);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.stu-marquee__dot {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  color: var(--ink-42);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PARTE 2 — PROCESO (MOBILE FIRST)
+   whatChanges: PP Editorial New itálica.
+   hairline corto derecha del bloque.
+   ═══════════════════════════════════════════════════════════ */
 
 .stu-method {
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
-/* ─── COLUMNA NUMERALES — oculta en mobile/tablet ────────── */
-
+/* Columna numerales — solo desktop */
 .stu-nums {
   display: none;
 }
@@ -341,77 +497,76 @@ const steps: MethodStep[] = t.method.steps;
   line-height: 0.88;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
-  font-style: normal;
   color: var(--ink-18);
-  transition: color 0.4s ease;
+  transition: color 0.5s ease;
+  position: relative;
 }
 
-/* Numeral activo — acento de texto */
-.stu-num-item.is-active {
-  color: var(--accent-text);
+/* Tick lima — reemplaza el color brand del numeral activo */
+.stu-num-item::before {
+  content: "";
+  position: absolute;
+  left: -0.6em;
+  top: 50%;
+  transform: translateY(-50%) scaleY(0);
+  width: 2px;
+  height: 0.8em;
+  background-color: var(--brand);
+  transform-origin: top;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ─── PASOS — stack vertical mobile ─────────────────────── */
+.stu-num-item.is-active::before {
+  transform: translateY(-50%) scaleY(1);
+}
 
 .stu-steps {
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
-/* ─── BLOQUE DE PASO ─────────────────────────────────────── */
-
 .stu-step {
-  padding-top: var(--space-m);
-  padding-bottom: var(--space-m);
   border-top: 1px solid var(--hairline);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-xl);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-m);
 }
 
 .stu-step:last-child {
   border-bottom: 1px solid var(--hairline);
 }
 
-/* ─── NUMERAL MOBILE — visible en <1280px ────────────────── */
-
+/* Numeral visible en mobile/tablet — fantasma grande arriba */
 .stu-step__num-mobile {
   display: block;
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(3rem, 9vw, 6rem);
-  line-height: 0.88;
-  letter-spacing: -0.04em;
-  font-variant-numeric: tabular-nums;
-  font-style: normal;
+  font-size: clamp(4rem, 16vw, 10rem);
+  line-height: 0.82;
+  letter-spacing: -0.05em;
   color: var(--ink-18);
-  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: calc(-1 * var(--space-m));
 }
-
-/* ─── CONTENIDO DEL PASO ─────────────────────────────────── */
 
 .stu-step__content {
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
-/* ─── TÍTULO ─────────────────────────────────────────────── */
-
+/* Título del paso */
 .stu-step__title {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(1.875rem, 6vw, 4rem);
-  line-height: 1.0;
-  letter-spacing: -0.025em;
+  font-size: clamp(2.5rem, 9vw, 6rem);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
   color: var(--ink);
-  font-style: normal;
-  margin: 0 0 var(--space-s) 0;
+  margin: 0 0 var(--space-l) 0;
   hyphens: none;
 }
-
-/* ─── BODY ───────────────────────────────────────────────── */
 
 .stu-step__body {
   font-family: var(--font-body);
@@ -419,19 +574,19 @@ const steps: MethodStep[] = t.method.steps;
   font-weight: 400;
   color: var(--ink-62);
   line-height: 1.65;
-  max-width: 52ch;
-  margin: 0 0 var(--space-m) 0;
+  max-width: 44ch;
+  margin: 0 0 var(--space-l) 0;
 }
 
-/* ─── REGLA HAIRLINE ─────────────────────────────────────── */
-
+/* Hairline corto ~30% del ancho, alineado a la derecha del bloque */
 .stu-step__rule {
   border: none;
+  width: 30%;
+  margin-left: auto;
+  margin-right: 0;
   border-top: 1px solid var(--hairline);
-  margin: var(--space-s) 0;
+  margin-bottom: var(--space-m);
 }
-
-/* ─── LABEL MONO (WHAT CHANGES / QUÉ CAMBIA) ────────────── */
 
 .stu-step__label {
   font-family: var(--font-body);
@@ -444,7 +599,11 @@ const steps: MethodStep[] = t.method.steps;
   margin: 0 0 var(--space-2xs) 0;
 }
 
-/* ─── WHAT CHANGES ───────────────────────────────────────── */
+@media (min-width: 1280px) {
+  .stu-step__label {
+    display: none;
+  }
+}
 
 .stu-step__change {
   display: flex;
@@ -452,13 +611,14 @@ const steps: MethodStep[] = t.method.steps;
   gap: var(--space-2xs);
 }
 
+/* whatChanges: PP Editorial New itálica weight 400 — énfasis editorial */
 .stu-step__change-text {
-  font-family: var(--font-body);
-  font-size: clamp(0.75rem, 0.4vw + 0.68rem, 0.875rem);
+  font-family: var(--font-display);
+  font-style: italic;
   font-weight: 400;
+  font-size: var(--text-body);
   color: var(--ink);
-  letter-spacing: 0.04em;
-  line-height: 1.6;
+  line-height: 1.55;
   margin: 0;
 }
 
@@ -468,118 +628,37 @@ const steps: MethodStep[] = t.method.steps;
 @media (min-width: 768px) {
   .stu {
     padding-top: var(--space-2xl);
-    padding-bottom: var(--space-2xl);
+    padding-bottom: calc(var(--space-2xl) * 1.5);
   }
 
-  /* Servicios: fila horizontal */
-  .stu-svc {
-    flex-direction: row;
-    align-items: flex-start;
-    padding-top: var(--space-l);
-    padding-bottom: var(--space-m);
-    overflow: visible;
-  }
-
-  .stu-svc__num {
-    position: absolute;
-    top: calc(var(--space-l) * 0.4);
-    left: 0;
-    margin-bottom: 0;
-    min-height: unset;
-    font-size: clamp(4rem, 9vw, 7rem);
-    z-index: 0;
-  }
-
-  .stu-svc__content {
-    padding-left: clamp(4.5rem, 10vw, 8rem);
-    flex: 1;
-    margin-top: calc(-1 * clamp(0.5rem, 1.5vw, 1.5rem));
-  }
-
-  .stu-svc__name {
-    font-size: clamp(1.875rem, 3.5vw, 2.625rem);
-  }
-
-  /* Pasos: más aire */
   .stu-step {
-    padding-top: var(--space-l);
-    padding-bottom: var(--space-l);
-  }
-
-  .stu-step__num-mobile {
-    font-size: clamp(4rem, 10vw, 7rem);
+    padding-top: calc(var(--space-xl) * 1.25);
+    padding-bottom: calc(var(--space-xl) * 1.25);
   }
 
   .stu-step__title {
-    font-size: clamp(2.25rem, 5vw, 4.5rem);
-  }
-
-  .stu-step__body {
-    max-width: 56ch;
+    font-size: clamp(3rem, 8vw, 5.5rem);
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   DESKTOP (1280px+) — pin ScrollTrigger + asimetría editorial
+   DESKTOP (1280px+)
+   About: frase aún más grande (vía clamp, ya escala sola).
+   Proceso: más espacio, pin de numerales.
    ═══════════════════════════════════════════════════════════ */
 @media (min-width: 1280px) {
   .stu {
-    padding-top: var(--space-2xl);
-    padding-bottom: var(--space-2xl);
+    padding-top: calc(var(--space-2xl) * 1.5);
+    padding-bottom: calc(var(--space-2xl) * 1.5);
   }
 
-  /* Parte 2: sin padding-bottom — ScrollTrigger maneja el espacio */
   #studio-how {
     padding-bottom: 0;
     margin-bottom: 0;
   }
 
-  /* Servicios: asimetría editorial alternada */
-  .stu-svc {
-    padding-top: var(--space-xl);
-    padding-bottom: var(--space-m);
-    transition: opacity 0.2s ease;
-    cursor: default;
-  }
+  /* ── Proceso desktop: más espacio + pin de numerales ── */
 
-  .stu-svc[data-even="true"] .stu-svc__content {
-    padding-left: clamp(6rem, 14vw, 12rem);
-    max-width: 72ch;
-  }
-
-  .stu-svc[data-even="false"] .stu-svc__content {
-    padding-left: clamp(4.5rem, 9vw, 8rem);
-    max-width: 64ch;
-  }
-
-  .stu-svc__num {
-    font-size: clamp(4.5rem, 10vw, 8rem);
-    top: calc(var(--space-xl) * 0.35);
-  }
-
-  .stu-svc__name {
-    font-size: clamp(2rem, 3vw, 3rem);
-  }
-
-  .stu-svc__resolves {
-    max-width: 52ch;
-  }
-
-  /* Hover: dimear lista excepto fila hovered */
-  .stu-services:has(.stu-svc:hover) .stu-svc {
-    opacity: 0.4;
-  }
-
-  .stu-services:has(.stu-svc:hover) .stu-svc:hover {
-    opacity: 1;
-  }
-
-  .stu-svc:focus-visible {
-    outline: 2px solid var(--brand);
-    outline-offset: 4px;
-  }
-
-  /* Pasos: grid 2 col con pin */
   .stu-method {
     display: grid;
     grid-template-columns: 5fr 7fr;
@@ -587,37 +666,32 @@ const steps: MethodStep[] = t.method.steps;
     align-items: start;
   }
 
-  /* Columna numerales: visible en desktop */
   .stu-nums {
     display: flex;
     flex-direction: column;
-    gap: var(--space-m);
+    gap: var(--space-l);
     grid-column: 1;
     align-self: start;
     padding-bottom: var(--space-2xl);
-    padding-top: 0;
   }
 
   .stu-num-item {
-    font-size: clamp(6rem, 13vw, 11rem);
+    font-size: clamp(6rem, 11vw, 10rem);
   }
 
-  /* Numeral mobile: oculto en desktop */
   .stu-step__num-mobile {
     display: none;
   }
 
-  /* Columna pasos */
   .stu-steps {
     grid-column: 2;
     padding-bottom: var(--space-2xl);
   }
 
   .stu-step {
-    padding-top: var(--space-2xl);
-    padding-bottom: var(--space-2xl);
+    padding-top: clamp(var(--space-2xl), 14vh, 12rem);
+    padding-bottom: clamp(var(--space-2xl), 14vh, 12rem);
     border-bottom: none;
-    flex-direction: column;
     gap: 0;
   }
 
@@ -626,36 +700,26 @@ const steps: MethodStep[] = t.method.steps;
   }
 
   .stu-step__title {
-    font-size: clamp(2.5rem, 4.5vw, 5rem);
-    margin-bottom: var(--space-m);
-  }
-
-  .stu-step__body {
-    max-width: 48ch;
+    font-size: clamp(3rem, 5vw, 5.5rem);
     margin-bottom: var(--space-l);
   }
 
-  .stu-step__change {
-    padding-top: var(--space-m);
-    gap: var(--space-xs);
+  .stu-step__body {
+    max-width: 44ch;
+    margin-bottom: var(--space-xl);
   }
 
-  .stu-step__change-text {
-    font-size: clamp(0.9rem, 0.4vw + 0.8rem, 1.0625rem);
+  .stu-step__rule {
+    width: 30%;
+    margin-left: auto;
   }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   REDUCED-MOTION — todo estático y visible
-   ═══════════════════════════════════════════════════════════ */
+/* ─── reduced-motion: todo estático ─────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .stu-num-item {
-    transition: none;
-  }
-  .stu-step {
-    opacity: 1 !important;
-    transform: none !important;
-  }
+  .stu-num-item { transition: none; }
+  .stu-num-item::before { transition: none; }
+  .stu-step { opacity: 1 !important; transform: none !important; }
 }
 </style>
 
@@ -663,49 +727,137 @@ const steps: MethodStep[] = t.method.steps;
   /**
    * StudioSection — scripts de interactividad.
    *
-   * PARTE 1 — Servicios:
-   *   IntersectionObserver + stagger en las filas .stu-svc.
-   *   Progressive enhancement: sin JS → visible.
+   * PARTE 1 — About (mecanismo real de trionn.com/about):
+   *   Reveal por BLUR + OPACITY (el que usa Trionn: will-change:filter,opacity).
+   *   La frase entra desenfocada y se enfoca; anotaciones fade-up.
+   *   El video de fondo se reproduce solo (autoplay muted loop).
+   *   Progressive enhancement: sin GSAP → todo visible nítido
+   *   (el estado oculto lo aplica SOLO el JS, no el CSS).
    *
-   * PARTE 2 — Pasos del proceso:
+   * PARTE 2 — Pasos del proceso (INTACTO):
    *   DESKTOP (≥1280px): GSAP ScrollTrigger pin de columna de numerales.
    *   MOBILE/TABLET (<1280px): GSAP ScrollTrigger reveal por paso.
    *
    * prefers-reduced-motion: sin nada — todo visible estático.
    */
 
-  /* ─── PARTE 1: reveal de servicios ──────────────────────── */
+  /* ─── PARTE 1: About — reveal blur+opacity (mecanismo Trionn) ──── */
 
-  const section = document.querySelector<HTMLElement>('.stu');
-  if (section) {
-    const rows = section.querySelectorAll<HTMLElement>('.stu-svc');
+  const reducedMotionPart1 = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    rows.forEach((row, i) => {
-      row.classList.add('is-hidden');
-      row.style.transitionDelay = `${i * 0.08}s`;
-    });
+  const aboutEl = document.querySelector<HTMLElement>('#studio-what');
+  const statementEl = aboutEl?.querySelector<HTMLElement>('[data-stu-about-statement]') ?? null;
+  const annotationEls = aboutEl
+    ? Array.from(aboutEl.querySelectorAll<HTMLElement>('[data-stu-annotation]'))
+    : [];
 
-    const svcObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            rows.forEach((row) => {
-              row.classList.remove('is-hidden');
-              row.classList.add('is-visible');
-            });
-            svcObserver.disconnect();
-          }
+  if (aboutEl && statementEl && !reducedMotionPart1) {
+    try {
+      const { gsap } = await import('gsap');
+      const { SplitText } = await import('gsap/SplitText');
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      gsap.registerPlugin(SplitText, ScrollTrigger);
+
+      /* (1) Frase — ILUMINACIÓN POR SCROLL (mecanismo Trionn).
+         La frase arranca gris-tenue; cada palabra pasa a blanco a medida
+         que la sección cruza el viewport. Atado al scroll con scrub —
+         NO es una animación de una vez: el usuario controla con el scroll. */
+      const split = new SplitText(statementEl, { type: 'words', autoSplit: true });
+      gsap.set(split.words, { opacity: 0.18 });
+
+      gsap.to(split.words, {
+        opacity: 1,
+        ease: 'none',
+        stagger: 0.5, // cada palabra se ilumina un poco después de la anterior
+        scrollTrigger: {
+          trigger: aboutEl,
+          start: 'top 75%',
+          end: 'center 45%',
+          scrub: true, // atado al scroll: avanza/retrocede con la rueda
+        },
+      });
+
+      /* (2) Anotaciones de esquina — fade-up escalonado (one-shot) */
+      if (annotationEls.length) {
+        gsap.set(annotationEls, { opacity: 0, y: 18 });
+        gsap.to(annotationEls, {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: 'power3.out',
+          stagger: 0.12,
+          scrollTrigger: { trigger: aboutEl, start: 'top 45%', once: true },
         });
-      },
-      { threshold: 0.05 }
-    );
+      }
 
-    /* Observar el contenedor de la Parte 1 */
-    const part1 = section.querySelector<HTMLElement>('#studio-what');
-    if (part1) svcObserver.observe(part1);
+    } catch (err) {
+      /* Fix del catch silencioso: loguear + dejar TODO visible. */
+      console.error('[StudioSection About] motion init failed:', err);
+      statementEl.style.opacity = '1';
+      statementEl.style.filter = 'none';
+      annotationEls.forEach((el) => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+    }
   }
 
-  /* ─── PARTE 2: pin y reveals de pasos ───────────────────── */
+  /* ─── MARQUEE DIVISOR: velocidad reactiva a Lenis ─────── */
+
+  if (!reducedMotionPart1) {
+    try {
+      const track = document.querySelector<HTMLElement>('[data-stu-marquee-track]');
+      if (!track) throw new Error('no track');
+
+      const getGroupWidth = () => track.scrollWidth / 2;
+
+      let x = 0;
+      let speed = 0.5;
+      let targetSpeed = speed;
+
+      let lenisVelocity = 0;
+      const lenisEl = (window as any).__lenis;
+      if (lenisEl) {
+        lenisEl.on('scroll', (e: any) => {
+          lenisVelocity = e.velocity;
+        });
+      }
+
+      const animate = () => {
+        const velocityBoost = Math.abs(lenisVelocity) * 0.08;
+        targetSpeed = 0.5 + velocityBoost;
+        speed += (targetSpeed - speed) * 0.08;
+
+        x -= speed;
+        const groupW = getGroupWidth();
+        if (Math.abs(x) >= groupW) x += groupW;
+
+        track.style.transform = `translateX(${x}px)`;
+        raf = requestAnimationFrame(animate);
+      };
+
+      let raf = requestAnimationFrame(animate);
+
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      const { gsap } = await import('gsap');
+      gsap.registerPlugin(ScrollTrigger);
+
+      ScrollTrigger.create({
+        trigger: '[data-stu-marquee]',
+        start: 'top bottom',
+        end: 'bottom top',
+        onEnter: () => { if (!raf) raf = requestAnimationFrame(animate); },
+        onLeave: () => { cancelAnimationFrame(raf); raf = 0; },
+        onEnterBack: () => { if (!raf) raf = requestAnimationFrame(animate); },
+        onLeaveBack: () => { cancelAnimationFrame(raf); raf = 0; },
+      });
+
+    } catch (_) {
+      // Sin marquee si falla — no es crítico
+    }
+  }
+
+  /* ─── PARTE 2: pin y reveals de pasos (INTACTO) ─────────── */
 
   const isDesktop = () => window.matchMedia('(min-width: 1280px)').matches;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -737,7 +889,6 @@ const steps: MethodStep[] = t.method.steps;
             pinSpacing: false,
           });
 
-          /* Un ScrollTrigger por paso — activa el numeral correspondiente */
           steps.forEach((step, i) => {
             ScrollTrigger.create({
               trigger: step,
@@ -756,10 +907,8 @@ const steps: MethodStep[] = t.method.steps;
             });
           });
 
-          /* Activar el primer numeral al cargar */
           if (numItems[0]) numItems[0].classList.add('is-active');
 
-          /* Fade del título al hacer scroll (desktop) */
           steps.forEach((step) => {
             const title = step.querySelector<HTMLElement>('.stu-step__title');
             if (!title) return;

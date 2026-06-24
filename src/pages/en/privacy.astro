@@ -1,0 +1,186 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import FooterSection from '../../components/FooterSection.astro';
+import { getTranslations } from '../../i18n/index';
+
+const lang = 'en';
+const t = getTranslations(lang);
+---
+
+<Layout
+  title="Privacy Policy — SCUART"
+  description="Privacy policy for SCUART, a design and technology studio."
+  lang={lang}
+  canonicalURL="https://scuart.com/en/privacy"
+>
+  <Nav lang={lang} t={t} />
+
+  <main class="legal">
+    <div class="legal__container">
+      <header class="legal__header">
+        <p class="legal__kicker">SCUART · LEGAL</p>
+        <h1 class="legal__title">Privacy Policy</h1>
+        <p class="legal__date">Last updated: June 2026</p>
+      </header>
+
+      <div class="legal__body">
+        <section class="legal__section">
+          <h2>1. Who we are</h2>
+          <p>SCUART is a design and technology studio based in Bogotá, Colombia. We build websites, digital platforms and systems for businesses in the US and LATAM. You can reach us at <a href="mailto:hola@scuart.com">hola@scuart.com</a>.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>2. What information we collect</h2>
+          <p>We only collect information you voluntarily provide through our contact form:</p>
+          <ul>
+            <li>Name</li>
+            <li>Business name</li>
+            <li>Email address</li>
+            <li>Country</li>
+            <li>Project description or inquiry</li>
+          </ul>
+          <p>We do not collect payment information, sensitive data, or data from minors under 18.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>3. How we use your information</h2>
+          <p>We use the information you provide solely to:</p>
+          <ul>
+            <li>Respond to your inquiry or project request</li>
+            <li>Send you relevant information about the services you inquired about</li>
+            <li>Coordinate the start of a project if you decide to work with us</li>
+          </ul>
+          <p>We do not sell, rent, or share your information with third parties for commercial purposes.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>4. Cookies and tracking technologies</h2>
+          <p>This site uses technical cookies necessary for its operation. You can manage your cookie preferences through the banner that appears on your first visit. We do not use advertising tracking cookies.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>5. Data retention</h2>
+          <p>We retain your contact information while we have an active or potential business relationship. You can request deletion of your data at any time by writing to <a href="mailto:hola@scuart.com">hola@scuart.com</a>.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>6. Your rights</h2>
+          <p>You have the right to:</p>
+          <ul>
+            <li>Access the data we hold about you</li>
+            <li>Request correction of inaccurate data</li>
+            <li>Request deletion of your data</li>
+            <li>Object to the processing of your data</li>
+          </ul>
+          <p>To exercise any of these rights, write to us at <a href="mailto:hola@scuart.com">hola@scuart.com</a>.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>7. Security</h2>
+          <p>We take reasonable measures to protect your personal information against unauthorized access, alteration, or disclosure. However, no internet transmission is 100% secure.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>8. Changes to this policy</h2>
+          <p>We may update this policy occasionally. We will notify you of significant changes by posting the new version on this page with the update date.</p>
+        </section>
+
+        <section class="legal__section">
+          <h2>9. Contact</h2>
+          <p>For any questions about this privacy policy, write to us at <a href="mailto:hola@scuart.com">hola@scuart.com</a>.</p>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <FooterSection t={t} lang={lang} />
+</Layout>
+
+<style>
+.legal {
+  padding-top: calc(var(--space-3xl) + 4rem);
+  padding-bottom: var(--space-3xl);
+}
+
+.legal__container {
+  padding-inline: var(--margin);
+  max-width: 72ch;
+  margin-inline: auto;
+}
+
+.legal__kicker {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-42);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: var(--space-s);
+}
+
+.legal__title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  margin-bottom: var(--space-s);
+}
+
+.legal__date {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  color: var(--ink-42);
+  margin-bottom: var(--space-2xl);
+}
+
+.legal__body {
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-xl);
+}
+
+.legal__section {
+  margin-bottom: var(--space-xl);
+}
+
+.legal__section h2 {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: var(--text-body);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-62);
+  margin-bottom: var(--space-s);
+}
+
+.legal__section p,
+.legal__section li {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.legal__section ul {
+  padding-left: 1.5em;
+  margin-block: var(--space-s);
+}
+
+.legal__section li {
+  margin-bottom: 0.4em;
+}
+
+.legal__section a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--hairline);
+  transition: text-decoration-color 0.2s;
+}
+
+.legal__section a:hover {
+  text-decoration-color: var(--brand);
+}
+</style>

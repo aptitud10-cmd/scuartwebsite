@@ -1,0 +1,443 @@
+---
+/**
+ * CaseStudyLayout.astro — Layout reutilizable para páginas de caso.
+ * Patrón Locomotive: hero con nombre gigante, hairlines, ficha técnica,
+ * secciones de texto + imagen alternadas, créditos al cierre.
+ */
+
+import Layout from '../layouts/Layout.astro';
+import Nav from './Nav.astro';
+import FooterSection from './FooterSection.astro';
+import type { Translations } from '../i18n/en';
+
+interface Credit {
+  role: string;
+  name: string;
+}
+
+interface CaseSection {
+  label: string;
+  body: string;
+}
+
+export interface CaseStudyData {
+  /** Nombre del proyecto — gigante en el hero */
+  name: string;
+  /** Tagline corto — itálica debajo del nombre */
+  tagline: string;
+  /** Categorías — Geist mono, misma línea que el año */
+  categories: string[];
+  /** Año */
+  year: string;
+  /** Cliente */
+  client: string;
+  /** URL del sitio vivo (opcional) */
+  siteUrl?: string;
+  /** Imagen hero — full-bleed debajo del nombre */
+  heroImage: string;
+  heroImageAlt: string;
+  /** Secciones de contenido: Contexto, Desafío, Solución, Resultado */
+  sections: CaseSection[];
+  /** Imágenes secundarias del proyecto */
+  images: Array<{ src: string; alt: string; wide?: boolean }>;
+  /** Créditos */
+  credits: Credit[];
+  /** Proyecto siguiente (para la navegación al cierre) */
+  next?: { name: string; href: string };
+}
+
+interface Props {
+  t: Translations;
+  lang: 'es' | 'en';
+  data: CaseStudyData;
+  /** SEO */
+  title: string;
+  description: string;
+  canonicalURL?: string;
+}
+
+const { t, lang, data, title, description, canonicalURL } = Astro.props;
+---
+
+<Layout title={title} description={description} lang={lang} canonicalURL={canonicalURL}>
+  <Nav lang={lang} t={t} />
+
+  <article class="cs">
+
+    <!-- ── Hero ──────────────────────────────────────────────────── -->
+    <header class="cs-hero">
+      <div class="cs-hero__meta">
+        <span class="cs-hero__categories">{data.categories.join(' · ')}</span>
+        <span class="cs-hero__year">{data.year}</span>
+      </div>
+
+      <h1 class="cs-hero__name">{data.name}</h1>
+      <p class="cs-hero__tagline">{data.tagline}</p>
+
+      <div class="cs-hero__image-wrap">
+        <img
+          src={data.heroImage}
+          alt={data.heroImageAlt}
+          loading="eager"
+          decoding="async"
+          width="1280"
+          height="720"
+          class="cs-hero__image"
+        />
+      </div>
+    </header>
+
+    <!-- ── Ficha técnica ─────────────────────────────────────────── -->
+    <div class="cs-ficha">
+      <dl class="cs-ficha__grid">
+        <div class="cs-ficha__item">
+          <dt class="cs-ficha__label">{lang === 'es' ? 'Cliente' : 'Client'}</dt>
+          <dd class="cs-ficha__value">{data.client}</dd>
+        </div>
+        <div class="cs-ficha__item">
+          <dt class="cs-ficha__label">{lang === 'es' ? 'Servicios' : 'Services'}</dt>
+          <dd class="cs-ficha__value">{data.categories.join(', ')}</dd>
+        </div>
+        <div class="cs-ficha__item">
+          <dt class="cs-ficha__label">{lang === 'es' ? 'Año' : 'Year'}</dt>
+          <dd class="cs-ficha__value">{data.year}</dd>
+        </div>
+        {data.siteUrl && (
+          <div class="cs-ficha__item">
+            <dt class="cs-ficha__label">{lang === 'es' ? 'Sitio' : 'Site'}</dt>
+            <dd class="cs-ficha__value">
+              <a href={data.siteUrl} target="_blank" rel="noopener noreferrer" class="cs-ficha__link">
+                {data.siteUrl.replace(/^https?:\/\//, '')}
+              </a>
+            </dd>
+          </div>
+        )}
+      </dl>
+    </div>
+
+    <!-- ── Secciones de contenido ────────────────────────────────── -->
+    <div class="cs-sections">
+      {data.sections.map((s, i) => (
+        <section class="cs-block">
+          <p class="cs-block__label">{String(i + 1).padStart(2, '0')} — {s.label}</p>
+          <p class="cs-block__body">{s.body}</p>
+        </section>
+      ))}
+    </div>
+
+    <!-- ── Galería ───────────────────────────────────────────────── -->
+    {data.images.length > 0 && (
+      <div class="cs-gallery">
+        {data.images.map((img) => (
+          <div class={`cs-gallery__item${img.wide ? ' cs-gallery__item--wide' : ''}`}>
+            <img
+              src={img.src}
+              alt={img.alt}
+              loading="lazy"
+              decoding="async"
+              width="1280"
+              height="800"
+            />
+          </div>
+        ))}
+      </div>
+    )}
+
+    <!-- ── Créditos ──────────────────────────────────────────────── -->
+    <div class="cs-credits">
+      <p class="cs-credits__label">{lang === 'es' ? 'Equipo' : 'Credits'}</p>
+      <dl class="cs-credits__list">
+        {data.credits.map((c) => (
+          <div class="cs-credits__item">
+            <dt class="cs-credits__role">{c.role}</dt>
+            <dd class="cs-credits__name">{c.name}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+
+    <!-- ── Proyecto siguiente ────────────────────────────────────── -->
+    {data.next && (
+      <div class="cs-next">
+        <p class="cs-next__label">{lang === 'es' ? 'Siguiente proyecto' : 'Next project'}</p>
+        <a href={data.next.href} class="cs-next__link">
+          {data.next.name}
+          <span class="cs-next__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    )}
+
+  </article>
+
+  <FooterSection t={t} lang={lang} />
+</Layout>
+
+<style>
+/* ── Base ─────────────────────────────────────────────────────────── */
+.cs {
+  padding-top: 0;
+}
+
+/* ── Hero ────────────────────────────────────────────────────────── */
+.cs-hero {
+  padding-top: calc(var(--space-3xl) + 4rem); /* clearance del nav */
+  padding-inline: var(--margin);
+  padding-bottom: 0;
+}
+
+.cs-hero__meta {
+  display: flex;
+  gap: var(--space-m);
+  align-items: baseline;
+  margin-bottom: var(--space-s);
+}
+
+.cs-hero__categories,
+.cs-hero__year {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-62);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.cs-hero__name {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(3.5rem, 10vw, 9rem);
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0 0 var(--space-s) 0;
+}
+
+.cs-hero__tagline {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(1.25rem, 2.5vw, 2rem);
+  color: var(--ink-62);
+  margin-bottom: var(--space-xl);
+}
+
+.cs-hero__image-wrap {
+  width: calc(100% + var(--margin) * 2);
+  margin-inline: calc(var(--margin) * -1);
+}
+
+.cs-hero__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+/* ── Ficha técnica ───────────────────────────────────────────────── */
+.cs-ficha {
+  padding-inline: var(--margin);
+  padding-block: var(--space-xl);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.cs-ficha__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-m) var(--space-l);
+}
+
+.cs-ficha__label {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-42);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.35em;
+}
+
+.cs-ficha__value {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.cs-ficha__link {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--hairline);
+  transition: text-decoration-color 0.2s;
+}
+
+.cs-ficha__link:hover {
+  text-decoration-color: var(--brand);
+}
+
+/* ── Secciones de contenido ──────────────────────────────────────── */
+.cs-sections {
+  padding-inline: var(--margin);
+  padding-block: var(--space-2xl);
+  display: grid;
+  gap: var(--space-xl);
+}
+
+.cs-block__label {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-42);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-s);
+}
+
+.cs-block__body {
+  font-family: var(--font-body);
+  font-size: var(--text-subhead);
+  line-height: 1.6;
+  color: var(--ink);
+  max-width: 65ch;
+}
+
+/* ── Galería ─────────────────────────────────────────────────────── */
+.cs-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xs);
+  padding-inline: var(--margin);
+  padding-bottom: var(--space-2xl);
+}
+
+.cs-gallery__item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.cs-gallery__item--wide {
+  grid-column: 1 / -1;
+}
+
+.cs-gallery__item--wide img {
+  aspect-ratio: 16 / 9;
+}
+
+/* ── Créditos ────────────────────────────────────────────────────── */
+.cs-credits {
+  padding-inline: var(--margin);
+  padding-block: var(--space-xl);
+  border-top: 1px solid var(--hairline);
+}
+
+.cs-credits__label {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-42);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-m);
+}
+
+.cs-credits__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-s) var(--space-l);
+}
+
+.cs-credits__role {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  color: var(--ink-42);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25em;
+}
+
+.cs-credits__name {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--ink);
+}
+
+/* ── Proyecto siguiente ──────────────────────────────────────────── */
+.cs-next {
+  padding-inline: var(--margin);
+  padding-block: var(--space-2xl);
+  border-top: 1px solid var(--hairline);
+}
+
+.cs-next__label {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-42);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--space-s);
+}
+
+.cs-next__link {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.5rem, 7vw, 6rem);
+  line-height: 1.0;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  transition: color 0.2s;
+}
+
+.cs-next__link:hover {
+  color: var(--ink);
+}
+
+.cs-next__arrow {
+  display: inline-block;
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cs-next__link:hover .cs-next__arrow {
+  transform: translateX(0.3em);
+}
+
+/* ── Tablet ──────────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  .cs-ficha__grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .cs-sections {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Desktop ─────────────────────────────────────────────────────── */
+@media (min-width: 1280px) {
+  .cs-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .cs-gallery__item--wide {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ── reduced-motion ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .cs-next__arrow {
+    transition: none;
+  }
+  .cs-ficha__link {
+    transition: none;
+  }
+}
+</style>
