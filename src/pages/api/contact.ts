@@ -20,7 +20,7 @@
  * PLACEHOLDER: reemplazar FROM_EMAIL con el from definitivo al verificar dominio.
  */
 
-import type { APIRoute } from 'astro';
+import type { APIRoute } from "astro";
 
 export const prerender = false;
 
@@ -46,9 +46,9 @@ function isValidEmail(email: string): boolean {
 
 /* ── Parsear body: acepta JSON y form-data (fallback sin JS) ─── */
 async function parseBody(request: Request): Promise<Record<string, string>> {
-  const contentType = request.headers.get('content-type') ?? '';
+  const contentType = request.headers.get("content-type") ?? "";
 
-  if (contentType.includes('application/json')) {
+  if (contentType.includes("application/json")) {
     try {
       const json = await request.json();
       return json as Record<string, string>;
@@ -58,8 +58,8 @@ async function parseBody(request: Request): Promise<Record<string, string>> {
   }
 
   if (
-    contentType.includes('application/x-www-form-urlencoded') ||
-    contentType.includes('multipart/form-data')
+    contentType.includes("application/x-www-form-urlencoded") ||
+    contentType.includes("multipart/form-data")
   ) {
     try {
       const formData = await request.formData();
@@ -76,17 +76,29 @@ async function parseBody(request: Request): Promise<Record<string, string>> {
   return {};
 }
 
+/* ── Escapar HTML del input de usuario antes de interpolarlo ─────
+ * Evita inyección de markup en el email que recibe SCUART (canal de
+ * confianza). Escapa & < > " ' — el <br> de saltos se aplica DESPUÉS. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /* ── Formatear email para Resend ─────────────────────────────── */
 function buildEmailHtml(payload: ContactPayload): string {
   const fields = [
-    ['Nombre', payload.name],
-    ['Negocio / Marca', payload.business || '—'],
-    ['Email', payload.email],
-    ['País / Mercado', payload.country || '—'],
-    ['Qué necesita', payload.whatDoYouNeed || '—'],
-    ['Presupuesto', payload.budget || '—'],
-    ['Timeline', payload.timeline || '—'],
-    ['Mensaje', payload.message],
+    ["Nombre", payload.name],
+    ["Negocio / Marca", payload.business || "—"],
+    ["Email", payload.email],
+    ["País / Mercado", payload.country || "—"],
+    ["Qué necesita", payload.whatDoYouNeed || "—"],
+    ["Presupuesto", payload.budget || "—"],
+    ["Timeline", payload.timeline || "—"],
+    ["Mensaje", payload.message],
   ];
 
   const rows = fields
@@ -97,11 +109,11 @@ function buildEmailHtml(payload: ContactPayload): string {
           ${label}
         </td>
         <td style="padding:8px 12px;font-family:sans-serif;font-size:14px;color:#E8E2D6;vertical-align:top;border-top:1px solid #1A1A18">
-          ${value.replace(/\n/g, '<br>')}
+          ${escapeHtml(value).replace(/\n/g, "<br>")}
         </td>
       </tr>`
     )
-    .join('');
+    .join("");
 
   return `<!DOCTYPE html>
 <html>
@@ -138,18 +150,28 @@ export const POST: APIRoute = async ({ request }) => {
      * La API key no está configurada. El endpoint funciona pero no puede enviar.
      * Instrucciones para William: agregar RESEND_API_KEY en Vercel → Settings → Environment Variables.
      */
-    console.error('[contact] RESEND_API_KEY no configurada. Vercel → Settings → Environment Variables.');
+    console.error(
+      "[contact] RESEND_API_KEY no configurada. Vercel → Settings → Environment Variables."
+    );
     return new Response(
-      JSON.stringify({ ok: false, error: 'Email service not configured. Contact us directly at hello@scuart.com' }),
-      { status: 503, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({
+        ok: false,
+        error:
+          "Email service not configured. Contact us directly at hello@scuart.com",
+      }),
+      { status: 503, headers: { "Content-Type": "application/json" } }
     );
   }
 
   if (!contactEmail) {
-    console.error('[contact] CONTACT_EMAIL no configurada.');
+    console.error("[contact] CONTACT_EMAIL no configurada.");
     return new Response(
-      JSON.stringify({ ok: false, error: 'Email service not configured. Contact us directly at hello@scuart.com' }),
-      { status: 503, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({
+        ok: false,
+        error:
+          "Email service not configured. Contact us directly at hello@scuart.com",
+      }),
+      { status: 503, headers: { "Content-Type": "application/json" } }
     );
   }
 
@@ -161,36 +183,36 @@ export const POST: APIRoute = async ({ request }) => {
    * Los humanos lo dejan vacío. Los bots lo llenan.
    * Si viene lleno: 200 fake-success silencioso (no revelar el mecanismo al bot).
    */
-  if (body.website && body.website.trim() !== '') {
-    return new Response(
-      JSON.stringify({ ok: true }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
+  if (body.website && body.website.trim() !== "") {
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   /* ── Validación server-side ──────────────────────────────── */
-  const name = (body.name ?? '').trim();
-  const email = (body.email ?? '').trim();
-  const message = (body.message ?? '').trim();
+  const name = (body.name ?? "").trim();
+  const email = (body.email ?? "").trim();
+  const message = (body.message ?? "").trim();
 
   if (!name) {
     return new Response(
-      JSON.stringify({ ok: false, error: 'Name is required.' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ ok: false, error: "Name is required." }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
     );
   }
 
   if (!email || !isValidEmail(email)) {
     return new Response(
-      JSON.stringify({ ok: false, error: 'A valid email is required.' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ ok: false, error: "A valid email is required." }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
     );
   }
 
   if (!message) {
     return new Response(
-      JSON.stringify({ ok: false, error: 'Message is required.' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ ok: false, error: "Message is required." }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
     );
   }
 
@@ -198,19 +220,19 @@ export const POST: APIRoute = async ({ request }) => {
     name,
     email,
     message,
-    business: (body.business ?? '').trim() || undefined,
-    country: (body.country ?? '').trim() || undefined,
-    whatDoYouNeed: (body.whatDoYouNeed ?? '').trim() || undefined,
-    budget: (body.budget ?? '').trim() || undefined,
-    timeline: (body.timeline ?? '').trim() || undefined,
+    business: (body.business ?? "").trim() || undefined,
+    country: (body.country ?? "").trim() || undefined,
+    whatDoYouNeed: (body.whatDoYouNeed ?? "").trim() || undefined,
+    budget: (body.budget ?? "").trim() || undefined,
+    timeline: (body.timeline ?? "").trim() || undefined,
   };
 
   /* ── Envío vía Resend ────────────────────────────────────── */
   try {
-    const { Resend } = await import('resend');
+    const { Resend } = await import("resend");
     const resend = new Resend(apiKey);
 
-    const subject = `Nuevo proyecto — ${name}${payload.business ? ` / ${payload.business}` : ''}`;
+    const subject = `Nuevo proyecto — ${name}${payload.business ? ` / ${payload.business}` : ""}`;
 
     const result = await resend.emails.send({
       /*
@@ -220,7 +242,7 @@ export const POST: APIRoute = async ({ request }) => {
        * from: 'SCUART <hello@scuart.com>'
        * Para verificar el dominio: Resend Dashboard → Domains → Add Domain.
        */
-      from: 'SCUART <onboarding@resend.dev>',
+      from: "SCUART <onboarding@resend.dev>",
       to: contactEmail,
       replyTo: email,
       subject,
@@ -229,25 +251,34 @@ export const POST: APIRoute = async ({ request }) => {
 
     if (result.error) {
       /* Resend devolvió un error — logueamos sin PII sensible */
-      console.error('[contact] Resend error:', result.error.name, result.error.message);
+      console.error(
+        "[contact] Resend error:",
+        result.error.name,
+        result.error.message
+      );
       return new Response(
-        JSON.stringify({ ok: false, error: 'Could not send email. Please try again.' }),
-        { status: 502, headers: { 'Content-Type': 'application/json' } }
+        JSON.stringify({
+          ok: false,
+          error: "Could not send email. Please try again.",
+        }),
+        { status: 502, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    return new Response(
-      JSON.stringify({ ok: true }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    );
-
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (err) {
     /* Error inesperado — no logueamos el payload completo (PII) */
-    const errMsg = err instanceof Error ? err.message : 'Unknown error';
-    console.error('[contact] Unexpected error:', errMsg);
+    const errMsg = err instanceof Error ? err.message : "Unknown error";
+    console.error("[contact] Unexpected error:", errMsg);
     return new Response(
-      JSON.stringify({ ok: false, error: 'Server error. Please try again later.' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({
+        ok: false,
+        error: "Server error. Please try again later.",
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 };

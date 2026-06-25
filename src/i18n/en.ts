@@ -438,7 +438,7 @@ export const en: Translations = {
         href: "/en/work/menius",
       },
       {
-        name: "Healthy Choice NY",
+        name: "Healthy Choice",
         num: "003",
         category: "WEB · RESTAURANT",
         year: "2019",

@@ -108,7 +108,8 @@ const rows = projects.map((p, i) => {
     font-size: 0.8125rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--ink-42);
+    /* --ink-62 (62%) pasa WCAG AA 4.5:1 sobre --bg; --ink-42 daba 2.7:1 (fail) */
+    color: var(--ink-62);
   }
 
   .pf-list {
@@ -136,7 +137,9 @@ const rows = projects.map((p, i) => {
     font-family: var(--font-body);
     font-size: var(--text-mono);
     font-weight: 400;
-    color: var(--ink-42);
+    /* --ink-62 (4.99:1) pasa AA; --ink-42 daba 2.71:1. La jerarquía vs
+       .pf-meta__detail se mantiene por el weight (400 vs 500). */
+    color: var(--ink-62);
     letter-spacing: 0.06em;
     font-variant-numeric: tabular-nums;
   }
@@ -245,7 +248,10 @@ const rows = projects.map((p, i) => {
     }
 
     .pf-name {
-      font-size: clamp(7rem, 11.5vw, 13rem);
+      /* vw contenido (como Locomotive): nombres largos dejan aire lateral
+         en pantallas grandes en vez de tocar los bordes. Piso más alto para
+         que los nombres cortos no queden chicos. */
+      font-size: clamp(6rem, 8.5vw, 11rem);
       text-align: center;
     }
 

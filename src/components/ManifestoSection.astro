@@ -62,8 +62,11 @@ const { t } = Astro.props;
   background-color: var(--bg);
   position: relative;
   overflow: hidden;
+  /* Aire asimétrico: mucho arriba (bocanada tras el hero denso), menos abajo
+     para encadenar el statement con el portfolio ("construimos ventajas → la
+     prueba"). Simétrico aislaba la sección como un valle. */
   padding-top: var(--space-3xl);
-  padding-bottom: var(--space-3xl);
+  padding-bottom: var(--space-2xl);
   padding-left: var(--margin);
   padding-right: var(--margin);
 }
@@ -84,6 +87,7 @@ const { t } = Astro.props;
   letter-spacing: 0.14em;           /* sistema de índices: +0.14em exacto */
   line-height: 1.4;
   margin-bottom: var(--space-l);
+  text-align: center;              /* centrado grande — kicker alineado al eje */
 }
 
 /* ─── STATEMENT ─────────────────────────────────────────── */
@@ -94,6 +98,9 @@ const { t } = Astro.props;
 .manifesto-statement {
   position: relative;
   z-index: 1;
+  /* Centrado grande: el statement ocupa el ancho del contenedor (con el
+     padding del .manifesto). Cada frase-<p> se centra y quiebra natural. */
+  margin-inline: auto;
 }
 
 /* ─── LÍNEAS ─────────────────────────────────────────────── */
@@ -108,11 +115,17 @@ const { t } = Astro.props;
   font-family: var(--font-display);   /* PP Editorial New */
   font-weight: 300;                   /* light — elegante en gigante */
   font-style: normal;
-  font-size: clamp(2rem, 5.5vw, 4.5rem);
-  line-height: 1.02;
+  /* Centrado grande + escala protagonista: ~83px @1280px. Sube de 64→83px
+     para que el statement de marca NO quede más chico que los nombres del
+     portfolio (~109px) — corrige jerarquía invertida, queda por debajo a
+     propósito (el portfolio es el techo de escala del sitio). */
+  font-size: clamp(2.5rem, 6.5vw, 5.75rem);
+  line-height: 1.05;
   letter-spacing: -0.025em;
   color: var(--ink);                  /* hueso cálido sobre negro */
   margin: 0;
+  text-align: center;                 /* centrado grande */
+  text-wrap: balance;                 /* quiebre equilibrado de cada frase */
   overflow-wrap: anywhere;           /* anti-overflow mobile: "ventajas competitivas." */
   hyphens: manual;
 }
@@ -122,7 +135,7 @@ const { t } = Astro.props;
 }
 
 .manifesto-line--2 {
-  /* V5: eje central simétrico puro — sin escalonado */
+  /* Centrado grande: ambas líneas centradas en el eje, sin escalonado */
 }
 
 /* ─── ACENTO — ITÁLICA (no color) ───────────────────────────
@@ -202,44 +215,6 @@ const { t } = Astro.props;
   if (!section) { console.warn('[Manifesto] section not found'); }
   else {
 
-  /* ── SCRAMBLE ON HOVER — se activa post-reveal para no chocar con GSAP SplitText ── */
-  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%&*?';
-
-  function attachScramble(els: HTMLElement[]) {
-    if (prefersReduced) return;
-    els.forEach((el) => {
-      /* Guardar el innerText original AHORA (post-GSAP, post-DOM-mutation) */
-      const originalText = el.innerText;
-      let running = false;
-
-      el.addEventListener('mouseenter', () => {
-        if (running) return;
-        running = true;
-        const steps = 10;
-        let step = 0;
-        const timer = setInterval(() => {
-          step++;
-          const progress = step / steps;
-          const resolved = Math.floor(progress * originalText.length);
-          /* Reemplazar innerHTML temporalmente con texto scrambleado */
-          el.innerText = originalText
-            .split('')
-            .map((char, i) => {
-              if (char === ' ' || char === '\n') return char;
-              if (i < resolved) return char;
-              return CHARS[Math.floor(Math.random() * CHARS.length)];
-            })
-            .join('');
-          if (step >= steps) {
-            clearInterval(timer);
-            el.innerText = originalText;
-            running = false;
-          }
-        }, 40);
-      });
-    });
-  }
-
   /* ── REVEAL EN SCROLL ── */
   if (prefersReduced) {
     /* noop — CSS ya garantiza visibilidad */
@@ -271,7 +246,9 @@ const { t } = Astro.props;
         gsap.set(lines, { opacity: 0 });
 
         const splits = lines.map((line) =>
-          new SplitText(line, { type: 'lines', mask: 'lines', autoSplit: true })
+          /* aria: 'none' — el texto visible es legible; evita el aria-label
+             prohibido en <p> que mete SplitText por defecto (axe WCAG 4.1.2). */
+          new SplitText(line, { type: 'lines', mask: 'lines', autoSplit: true, aria: 'none' })
         );
 
         const allLines = splits.flatMap((s) => s.lines);
@@ -289,14 +266,12 @@ const { t } = Astro.props;
               ease: 'expo.out',
               stagger: 0.12,
               delay: 0.15,
-              onComplete: () => attachScramble(lines),
             });
           },
         });
       }
     } catch (err) {
       console.error('[Manifesto] GSAP error:', err);
-      attachScramble(Array.from(section.querySelectorAll<HTMLElement>('.manifesto-line')));
     }
   } else {
     /* MOBILE: IntersectionObserver + CSS fade-up */
@@ -331,8 +306,6 @@ const { t } = Astro.props;
               inner.classList.add('is-visible');
             });
             observer.disconnect();
-            /* Scramble disponible 800ms después del reveal */
-            setTimeout(() => attachScramble(lines), 800);
           }
         });
       },

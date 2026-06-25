@@ -762,7 +762,10 @@ const steps: MethodStep[] = t.method.steps;
          La frase arranca gris-tenue; cada palabra pasa a blanco a medida
          que la sección cruza el viewport. Atado al scroll con scrub —
          NO es una animación de una vez: el usuario controla con el scroll. */
-      const split = new SplitText(statementEl, { type: 'words', autoSplit: true });
+      /* aria: 'none' — evita que SplitText ponga aria-label en el <p>
+         (prohibido por ARIA 1.2 en <p> sin role; axe WCAG 4.1.2).
+         El texto visible ya es legible para lectores de pantalla. */
+      const split = new SplitText(statementEl, { type: 'words', autoSplit: true, aria: 'none' });
       gsap.set(split.words, { opacity: 0.18 });
 
       gsap.to(split.words, {
@@ -852,8 +855,9 @@ const steps: MethodStep[] = t.method.steps;
         onLeaveBack: () => { cancelAnimationFrame(raf); raf = 0; },
       });
 
-    } catch (_) {
-      // Sin marquee si falla — no es crítico
+    } catch (err) {
+      // Sin marquee si falla — no es crítico, pero logueamos para no tragar el error
+      console.error('[StudioSection marquee] init failed:', err);
     }
   }
 
@@ -954,6 +958,7 @@ const steps: MethodStep[] = t.method.steps;
                   type: 'lines',
                   mask: 'lines',
                   autoSplit: true,
+                  aria: 'none',
                 });
                 gsap.from(split.lines, {
                   yPercent: 105,
