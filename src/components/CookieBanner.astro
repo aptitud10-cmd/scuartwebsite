@@ -113,12 +113,14 @@ const c = copy[lang];
 }
 
 @media (min-width: 640px) {
+  /* Abajo-derecha: el wordmark del hero y el email de Contacto viven a la
+     izquierda — ahí el banner tapaba el CTA principal (auditoría 2026-07-21) */
   .cookie {
     flex-direction: row;
     align-items: center;
-    left: var(--space-l);
+    right: var(--space-l);
     bottom: var(--space-l);
-    right: auto;
+    left: auto;
   }
 }
 
