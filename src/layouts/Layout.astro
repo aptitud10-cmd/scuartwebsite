@@ -172,8 +172,10 @@ const resolvedOgDesc = ogDescription ?? description;
 
       if (!reducedMotion && !isMobile) {
         const lenis = new Lenis({
-          /* lerp 0.1: sutil y elegante. No flotante exagerado. */
-          lerp: 0.1,
+          /* lerp 0.08: sensación "flotante" premium tipo Locomotive — la página
+             tiene masa y sigue al usuario con un retardo suave. 0.07–0.1 es el
+             rango; 0.08 flota sin marear. (research motion 2026) */
+          lerp: 0.08,
           smoothWheel: true,
           /* syncTouch: false — el scroll touch en mobile ya es suave nativamente.
              Activarlo en iOS puede interferir con el momentum scroll nativo. */

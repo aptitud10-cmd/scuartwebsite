@@ -1,34 +1,21 @@
 ---
 /**
- * FooterSection.astro — Cierre editorial de marca — V3
- * SCUART
+ * FooterSection.astro — Cierre del sitio — Rediseño 2026-07-17
  *
- * V3: fondo barro-oscuro (continúa del contacto sin corte), Fraunces a sangre,
- * tokens terracota cálida, coordenadas Bogotá, ámbar en el "+".
+ * Patrón Locomotive confirmado (research 2026): footer COMPACTO de 3 capas,
+ * SIN wordmark gigante (es la excepción, no la norma; en un estudio de 1
+ * persona se siente vacío/pretencioso).
  *
- * CONCEPTO:
- * El footer funciona como tarjeta de presentación standalone: quien llegue
- * solo acá sabe qué hace SCUART, dónde está y cómo contactar.
- * Es la firma visual del estudio, no un bloque de contacto repetido.
+ *   Capa 1 — Descriptor del estudio (los HECHOS: independiente, NY+LATAM,
+ *            bilingüe — la logística vive acá, no en el hero) + nav + idioma.
+ *   Capa 2 — Contacto directo: email + mercados.
+ *   Capa 3 — Cierre de marca: tagline "No decoramos. Decidimos." + © + legales.
  *
- * JERARQUÍA VISUAL (≤3 niveles):
- *   N1 — Wordmark "SCUART+" en Fraunces light, a sangre (todo el ancho,
- *        sangrando fuera de ambos márgenes). El "+" en ámbar = sello del estudio.
- *        ≥40% del peso visual. Fade-up sutil al entrar al viewport.
- *   N2 — Banda nav + selector de idioma (mono hueso 55%, touch targets ≥48px).
- *        Hairline borde-oscuro la separa de N1.
- *   N3 — Créditos/mercados mono hueso 50%: año · estudio · mercados · coords · email.
+ * MOTION (restraint — el footer usa MENOS motion que el resto, como el
+ * fade-out de una canción): un solo reveal escalonado de las 3 capas al
+ * entrar + underline hover en links (CSS, cubic-bezier expo).
  *
- * COORDENADAS: 4.7110° N, 74.0721° W — consistentes con HeroSection.astro.
- *
- * MOTION:
- *   Un solo fade-up del wordmark al entrar al viewport (IntersectionObserver).
- *   prefers-reduced-motion: wordmark visible de inmediato.
- *
- * ACCESIBILIDAD:
- *   - Nav links con focus-visible claro (outline hueso).
- *   - Contraste AA: hueso 55% sobre barro-oscuro = ~6.6:1 (AA).
- *   - ámbar sobre barro-oscuro = ~7:1 (AAA).
+ * Progressive enhancement: estado oculto solo via JS.
  */
 
 import type { Translations } from '../i18n/en';
@@ -41,453 +28,212 @@ interface Props {
 
 const { t, lang } = Astro.props;
 const f = t.footer;
+
+const EMAIL = 'info@scuart.com';
 ---
 
-<footer class="site-footer" aria-label={f.ariaLabel}>
+<footer class="foot" aria-label={f.ariaLabel}>
 
-  <!--
-    BANDA DATOS/NAV — N2.
-    Desktop: asimétrica — nav (flex:1 izquierda) | lang (derecha).
-    Mobile: apilado dos filas (nav | lang), separados por gap.
-    Hairline borde-oscuro arriba = separa del contacto.
-  -->
-  <div class="footer-meta">
+  <!-- ── Capa 1: descriptor + nav + idioma ── -->
+  <div class="foot__row foot__row--top" data-foot-row>
+    <p class="foot__descriptor">{f.descriptor}</p>
 
-    <!-- Nav links del estudio — anchors funcionales -->
-    <nav class="footer-nav" aria-label="Navegación de pie de página">
-      <a href={`/${lang}#portfolio`} class="footer-nav__link">
-        {t.nav.portfolio}
-      </a>
-      <span class="footer-nav__sep" aria-hidden="true">·</span>
-      <a href={`/${lang}#studio`} class="footer-nav__link">
-        {t.nav.method}
-      </a>
-      <span class="footer-nav__sep" aria-hidden="true">·</span>
-      <a href={`/${lang}#contact`} class="footer-nav__link">
-        {t.nav.contact}
-      </a>
-    </nav>
-
-    <!-- Selector de idioma — mismo patrón que Nav.astro -->
-    <div class="footer-lang" role="navigation" aria-label="Selector de idioma">
-      <span class="footer-lang__active" aria-current="true">
-        {lang.toUpperCase()}
-      </span>
-      <span class="footer-lang__sep" aria-hidden="true">/</span>
+    <nav class="foot__nav" aria-label={f.navLabel}>
+      <a href={`/${lang}#portfolio`} class="foot__link">{t.nav.portfolio}</a>
+      <a href={`/${lang}#studio`} class="foot__link">{t.nav.method}</a>
+      <a href={`/${lang}#contact`} class="foot__link">{t.nav.contact}</a>
       <a
         href={t.nav.langHref}
-        class="footer-lang__other"
+        class="foot__link foot__link--lang"
         hreflang={t.nav.langLabel.toLowerCase()}
-        aria-label={`Cambiar idioma a ${t.nav.langLabel}`}
-      >
-        {t.nav.langLabel}
-      </a>
+        aria-label={`${f.langSwitchLabel}: ${t.nav.langLabel}`}
+      >{t.nav.langLabel}</a>
+    </nav>
+  </div>
+
+  <!-- ── Capa 2: contacto directo.
+       Orden invertido vs Contacto (mercados izq / email der) para NO
+       duplicar la estructura de la sección de arriba (fix visual-critic). ── -->
+  <div class="foot__row foot__row--contact" data-foot-row>
+    <p class="foot__markets">{f.markets}</p>
+    <a href={`mailto:${EMAIL}`} class="foot__email">{EMAIL}</a>
+  </div>
+
+  <!-- ── Capa 3: cierre de marca ── -->
+  <div class="foot__row foot__row--legal" data-foot-row>
+    <p class="foot__tagline">{f.tagline}</p>
+    <div class="foot__legal">
+      <span class="foot__copy">{f.builtBy}</span>
+      <a href={f.legal.privacyHref} class="foot__link foot__link--small">{f.legal.privacyLabel}</a>
+      <a href={f.legal.termsHref} class="foot__link foot__link--small">{f.legal.termsLabel}</a>
     </div>
-
-  </div>
-
-  <!--
-    HAIRLINE DIVISOR — separa la zona de nav de la zona del wordmark.
-    borde-oscuro (#473321) coherente con el sistema oscuro cálido.
-  -->
-  <div class="footer-divider" aria-hidden="true"></div>
-
-  <!--
-    FIRMA — N1. Protagonista.
-    Fraunces light 300, a sangre: font-size clamp(4rem, 14vw, 16rem),
-    overflow visible + negative margin para sangrar fuera de los márgenes.
-    El wordmark sale de la caja del --margin intencional = firma de estudio.
-    El "+" en ámbar = sello.
-    Contenedor .footer-brand tiene el reveal fade-up (IntersectionObserver).
-  -->
-  <div class="footer-brand" aria-hidden="false">
-    <p class="footer-wordmark" aria-label="SCUART*">
-      <span class="footer-wordmark__name">SCUART</span><span
-        class="footer-wordmark__plus"
-        aria-hidden="true"
-      >*</span>
-    </p>
-    <!-- Lema de marca — el equivalente SCUART del "Tools of Expression" de Locomotive -->
-    <p class="footer-tagline">{f.tagline}</p>
-  </div>
-
-  <!--
-    CRÉDITOS — N3.
-    Mono hueso 50%. Una fila con separadores "·".
-    Incluye coordenadas reales de Bogotá (consistentes con HeroSection.astro).
-    Tarjeta de presentación: quien llegue solo acá sabe qué hace SCUART.
-  -->
-  <div class="footer-credits">
-    <span class="footer-credits__item">{f.builtBy}</span>
-    <span class="footer-credits__dot" aria-hidden="true">·</span>
-    <a
-      href={t.contact.emailHref}
-      class="footer-credits__link"
-      aria-label="Email del estudio"
-    >hello@scuart.com</a>
-    <span class="footer-credits__dot" aria-hidden="true">·</span>
-    <a href={f.legal.privacyHref} class="footer-credits__link">{f.legal.privacyLabel}</a>
-    <span class="footer-credits__dot" aria-hidden="true">·</span>
-    <a href={f.legal.termsHref} class="footer-credits__link">{f.legal.termsLabel}</a>
   </div>
 
 </footer>
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   FOOTER — V3: barro-oscuro + Fraunces a sangre + ámbar
-   Mobile-first: 375px base. md: 768px. lg: 1280px.
-   ART_DIRECTION_V3_FINAL.md §5 (FOOTER) y §7 (detalles personalidad).
-   Continúa del contacto sin corte visual (mismo barro-oscuro).
+   FOOTER — compacto, 3 capas, sistema del portafolio.
+   Los hechos (NY/LATAM/bilingüe) viven acá — no en el hero.
    ═══════════════════════════════════════════════════════════ */
 
-.site-footer {
-  /* Plano NEGRO — continúa del contacto SIN corte (ART_DIRECTION §4: la firma) */
+.foot {
   background-color: var(--bg);
-  /* padding-left/right son los --margin normales del sitio.
-     El wordmark a sangre usa negative margin propio para romper. */
-  padding-left: var(--margin);
-  padding-right: var(--margin);
-  padding-top: var(--space-xl);
-  padding-bottom: var(--space-l);
-  position: relative;
-  overflow-x: clip;
+  padding: var(--space-xl) var(--margin) var(--space-l);
+  border-top: 1px solid var(--ink);
 }
 
-/* ─── BANDA META/NAV — N2 ────────────────────────────────── */
-
-.footer-meta {
+.foot__row {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-s);
-  margin-bottom: var(--space-l);
-}
-
-/* ─── NAV LINKS ───────────────────────────────────────────── */
-
-.footer-nav {
-  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-l);
   flex-wrap: wrap;
-  align-items: center;
-  gap: 0;
+  padding-block: clamp(1.25rem, 3vh, 2rem);
+}
+
+.foot__row + .foot__row {
+  border-top: 1px solid var(--hairline);
+}
+
+/* ── Capa 1 ── */
+.foot__descriptor {
   font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
+  font-size: var(--text-body);
   color: var(--ink-62);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  line-height: 1.4;
-}
-
-.footer-nav__link {
-  color: var(--ink-62);
-  text-decoration: none;
-  /* Touch target mínimo 48px */
-  padding: 0.5em 0;
-  transition: color 0.2s ease;
-  position: relative;
-}
-
-/* Underline lima que se dibuja en hover (V4 §4.2) */
-.footer-nav__link::after {
-  content: '';
-  position: absolute;
-  bottom: 0.15em;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background-color: var(--brand);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.footer-nav__link:hover {
-  color: var(--ink);
-}
-
-.footer-nav__link:hover::after {
-  transform: scaleX(1);
-}
-
-.footer-nav__link:focus-visible {
-  outline: 1px solid var(--brand);
-  outline-offset: 3px;
-  color: var(--ink);
-}
-
-.footer-nav__sep {
-  color: var(--ink-62);
-  opacity: 0.4;
-  padding: 0 0.6em;
-  line-height: 1.4;
-}
-
-/* ─── SELECTOR DE IDIOMA ──────────────────────────────────── */
-
-.footer-lang {
-  display: flex;
-  align-items: center;
-  gap: 0.3em;
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  line-height: 1.4;
-  opacity: 0.65;
-  transition: opacity 0.2s ease;
-}
-
-.footer-lang:hover,
-.footer-lang:focus-within {
-  opacity: 1;
-}
-
-.footer-lang__active {
-  color: var(--ink);
-  cursor: default;
-}
-
-.footer-lang__sep {
-  color: var(--ink-62);
-  opacity: 0.4;
-}
-
-.footer-lang__other {
-  color: var(--ink-62);
-  text-decoration: none;
-  transition: color 0.2s ease;
-  position: relative;
-  padding-bottom: 2px;
-}
-
-.footer-lang__other::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background-color: var(--brand);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.footer-lang__other:hover {
-  color: var(--ink);
-}
-
-.footer-lang__other:hover::after {
-  transform: scaleX(1);
-}
-
-.footer-lang__other:focus-visible {
-  outline: 1px solid var(--brand);
-  outline-offset: 3px;
-  color: var(--ink);
-}
-
-/* ─── HAIRLINE DIVISOR ───────────────────────────────────── */
-/*
- * Separa la zona de nav de la zona del wordmark.
- * borde-oscuro (#473321) — hairline del sistema oscuro cálido.
- */
-.footer-divider {
-  width: 100%;
-  height: 1px;
-  background-color: var(--hairline);
-  margin-bottom: var(--space-l);
-}
-
-/* ─── FIRMA — N1 ─────────────────────────────────────────── */
-/*
- * .footer-brand: el contenedor del reveal fade-up.
- * Empieza invisible — IntersectionObserver agrega .is-visible.
- *
- * Táctica a sangre:
- * El wordmark tiene negative horizontal margins = --margin del sitio.
- * Así desborda los márgenes del footer y sangra hasta los bordes del viewport.
- * overflow-x: clip en .site-footer contiene el desborde sin scroll horizontal.
- */
-.footer-brand {
-  /* Negative margin para sangrar el wordmark fuera del --margin del footer */
-  margin-left: calc(-1 * var(--margin));
-  margin-right: calc(-1 * var(--margin));
-  margin-bottom: var(--space-m);
-  /* Reveal: empieza invisible */
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Clase que dispara el reveal al entrar al viewport */
-.footer-brand.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.footer-wordmark {
-  font-family: var(--font-display);
-  font-weight: 300; /* Fraunces light — peso bajo = elegante en grande */
-  /*
-   * clamp a sangre:
-   * min 4rem: mobile 375px con márgenes ~20px c/u = 335px útiles.
-   *   "SCUART+" = 7 chars Fraunces 300. A 64px ~350px — entra ajustado. OK.
-   * preferred 14vw: en 375px = 52.5px (min 64px aplica). En 768px = 107px.
-   * max 16rem: en desktop 1280px. 14vw = 179px → max 16rem=256px aplica.
-   *   El wordmark a 256px con overflow y negative margin sangra correctamente.
-   */
-  font-size: clamp(5.5rem, 20vw, 16rem);
-  line-height: 0.82;
-  letter-spacing: -0.04em;
-  color: var(--ink);
-  text-transform: uppercase;
+  line-height: 1.55;
+  max-width: 38ch;
   margin: 0;
-  /* Padding horizontal para dar respiro al desborde pero mantener lectura */
-  padding-left: var(--margin);
-  padding-right: var(--margin);
-  hyphens: none;
-  -webkit-hyphens: none;
-  word-break: keep-all;
-  overflow-wrap: normal;
-  /* White-space nowrap: "SCUART+" son 7 chars que no deben partirse */
-  white-space: nowrap;
 }
 
-/* El "*" — glifo-firma del estudio. Lima bisturí — regla V5: lima solo en 4 lugares */
-.footer-wordmark__plus {
-  color: var(--brand);
-}
-
-/* ─── TAGLINE / LEMA ─────────────────────────────────────── */
-/* "No decoramos. Decidimos." — última palabra del estudio. PP Editorial New itálica. */
-.footer-tagline {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-style: italic;
-  font-size: clamp(1.125rem, 2.2vw, 1.75rem);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: var(--ink-62);
-  margin: var(--space-s) 0 0 0;
-  padding-left: var(--margin);
-  padding-right: var(--margin);
-}
-
-/* ─── CRÉDITOS — N3 ──────────────────────────────────────── */
-/*
- * Hanken Regular, hueso 50%. Una fila con separadores "·".
- * Incluye coordenadas de Bogotá (§7 detalle de personalidad).
- * flex-wrap para mobile si la línea es larga.
- */
-.footer-credits {
+.foot__nav {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4em;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  align-items: baseline;
+}
+
+/* ── Links: underline que entra por la izquierda y sale por la derecha ── */
+.foot__link {
   font-family: var(--font-body);
   font-size: var(--text-mono);
-  font-weight: 400;
-  color: var(--ink-62);
-  letter-spacing: 0.03em;
-  line-height: 1.4;
-}
-
-.footer-credits__item {
-  /* Texto plano — no interactivo */
-}
-
-/* Coordenadas: mismo estilo mono pero con tracking abierto para "ficha técnica" */
-.footer-credits__coords {
-  letter-spacing: 0.06em;
-  font-variant-numeric: tabular-nums;
-}
-
-.footer-credits__dot {
-  opacity: 0.35;
-}
-
-.footer-credits__link {
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
   color: var(--ink-62);
   text-decoration: none;
-  padding: 0.25em 0;
-  transition: color 0.2s ease;
+  padding-bottom: 2px;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+  background-size: 0% 1px;
+  transition:
+    color 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background-size 0.5s cubic-bezier(0.19, 1, 0.22, 1),
+    background-position 0s 0.5s;
 }
 
-.footer-credits__link:hover {
+.foot__link:hover,
+.foot__link:focus-visible {
   color: var(--ink);
+  background-position: 0% 100%;
+  background-size: 100% 1px;
+  transition:
+    color 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background-size 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.footer-credits__link:focus-visible {
-  outline: 1px solid var(--brand);
-  outline-offset: 2px;
+.foot__link:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.foot__link--lang {
+  color: var(--ink-42);
+}
+
+/* ── Capa 2: email + mercados ── */
+/* Nivel secundario a propósito: el CTA-email gigante ya vive en Contacto,
+   justo arriba — repetirlo en la misma escala diluye ambos (visual-critic). */
+.foot__email {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.25rem, 1.8vw, 1.75rem);
+  letter-spacing: -0.02em;
   color: var(--ink);
+  text-decoration: none;
+  padding-bottom: 0.08em;
+  background-image: linear-gradient(var(--ink), var(--ink));
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+  background-size: 0% 1.5px;
+  transition: background-size 0.5s cubic-bezier(0.19, 1, 0.22, 1), background-position 0s 0.5s;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   TABLET (768px+)
-   ═══════════════════════════════════════════════════════════ */
-@media (min-width: 768px) {
-  .site-footer {
-    padding-top: var(--space-2xl);
-    padding-bottom: var(--space-xl);
-  }
+.foot__email:hover,
+.foot__email:focus-visible {
+  background-position: 0% 100%;
+  background-size: 100% 1.5px;
+  transition: background-size 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
 
-  /* Banda meta: fila asimétrica — nav izquierda (flex:1) | lang derecha */
-  .footer-meta {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-m);
-    margin-bottom: var(--space-xl);
-  }
+.foot__email:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 4px;
+}
 
-  .footer-lang {
-    opacity: 1;
-  }
+.foot__markets {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-42);
+  margin: 0;
+}
 
-  /* Créditos: sin wrap en tablet */
-  .footer-credits {
-    flex-wrap: nowrap;
+/* ── Capa 3: tagline + legales ── */
+.foot__tagline {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: var(--text-body);
+  color: var(--ink);
+  margin: 0;
+}
+
+.foot__legal {
+  display: flex;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  align-items: baseline;
+}
+
+.foot__copy {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  letter-spacing: 0.08em;
+  color: var(--ink-42);
+}
+
+.foot__link--small {
+  font-weight: 400;
+  color: var(--ink-42);
+}
+
+@media (max-width: 640px) {
+  .foot__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-s);
   }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   DESKTOP (1280px+)
-   ═══════════════════════════════════════════════════════════ */
-@media (min-width: 1280px) {
-  .site-footer {
-    padding-top: var(--space-2xl);
-    padding-bottom: var(--space-xl);
-  }
-
-  .footer-meta {
-    margin-bottom: var(--space-2xl);
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   REDUCED-MOTION — sin transiciones, wordmark visible inmediato
-   El grano y el color se mantienen (son identidad, no motion).
-   ═══════════════════════════════════════════════════════════ */
+/* ── reduced-motion ── */
 @media (prefers-reduced-motion: reduce) {
-  .footer-brand {
-    opacity: 1;
-    transform: none;
-    transition: none;
+  [data-foot-row] {
+    opacity: 1 !important;
+    transform: none !important;
   }
-
-  .footer-nav__link,
-  .footer-lang__other,
-  .footer-credits__link,
-  .footer-lang {
-    transition: none;
-  }
-
-  .footer-nav__link::after,
-  .footer-lang__other::after {
+  .foot__link,
+  .foot__email {
     transition: none;
   }
 }
@@ -495,67 +241,42 @@ const f = t.footer;
 
 <script>
   /**
-   * Footer reveal — IntersectionObserver para el wordmark.
-   *
-   * .footer-brand (el contenedor del wordmark) empieza invisible.
-   * Al entrar al viewport (threshold 0.08 = 8% visible), agrega .is-visible
-   * que dispara la transición CSS opacity + translateY.
-   *
-   * Una sola vez: disconnect() después del primer trigger.
-   * Progressive enhancement: si JS falla, el wordmark queda invisible.
-   * Fallback para reduced-motion: visible inmediato via CSS + JS guard.
+   * Footer — motion mínimo (restraint): las 3 capas entran escalonadas
+   * una sola vez. Nada más — el footer es el fade-out del sitio.
    */
 
-  /**
-   * Footer reveal — WordMark fade-up + pulso único del asterisco.
-   *
-   * El wordmark (.footer-brand) entra con fade-up (IO, ya existía).
-   * El asterisco lima (.footer-wordmark__plus) hace un micro-pulso (escala 1→1.08→1)
-   * una sola vez al entrar — firma el cierre del sitio. [propuesta SCUART, cortable]
-   *
-   * prefers-reduced-motion: wordmark visible de inmediato, sin pulso.
-   */
-  const brand = document.querySelector<HTMLElement>('.footer-brand');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  if (brand) {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reducedMotion) {
+    try {
+      const { gsap } = await import('gsap');
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      gsap.registerPlugin(ScrollTrigger);
 
-    if (prefersReduced) {
-      brand.classList.add('is-visible');
-    } else {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              brand.classList.add('is-visible');
-              observer.disconnect();
-
-              /* Pulso del asterisco — un solo latido al entrar, 0.6s después del fade */
-              const asterisco = brand.querySelector<HTMLElement>('.footer-wordmark__plus');
-              if (asterisco) {
-                setTimeout(() => {
-                  asterisco.style.display = 'inline-block'; /* necesario para transform */
-                  asterisco.animate(
-                    [
-                      { transform: 'scale(1)', offset: 0 },
-                      { transform: 'scale(1.08)', offset: 0.4 },
-                      { transform: 'scale(1)', offset: 1 },
-                    ],
-                    {
-                      duration: 600,
-                      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
-                      fill: 'forwards',
-                    }
-                  );
-                }, 600);
-              }
-            }
-          });
-        },
-        { threshold: 0.08 }
-      );
-
-      observer.observe(brand);
+      const rows = document.querySelectorAll<HTMLElement>('[data-foot-row]');
+      if (rows.length) {
+        /* gsap.from DENTRO de onEnter — sin estado oculto persistente */
+        ScrollTrigger.create({
+          trigger: '.foot',
+          start: 'top 88%',
+          once: true,
+          onEnter: () => {
+            gsap.from(rows, {
+              opacity: 0,
+              y: 16,
+              duration: 0.7,
+              ease: 'power3.out',
+              stagger: 0.1,
+            });
+          },
+        });
+      }
+    } catch (err) {
+      console.error('[FooterSection] motion init failed:', err);
+      document.querySelectorAll<HTMLElement>('[data-foot-row]').forEach((r) => {
+        r.style.opacity = '1';
+        r.style.transform = 'none';
+      });
     }
   }
 </script>

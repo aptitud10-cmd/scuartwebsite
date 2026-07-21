@@ -1,34 +1,22 @@
 ---
 /**
- * ContactSection.astro — Sección 4: CTA / Contacto — V3
- * SCUART — "El cierre del recorrido"
+ * ContactSection.astro — Sección 4: Contacto — Rediseño 2026-07-17
  *
- * V3: fondo barro-oscuro (#241710), tipografía Fraunces + Hanken, tokens terracota cálida.
+ * Patrón sobrio premium (research 2026, Lama Lama / Locomotive):
+ * statement conversacional + EMAIL como elemento tipográfico protagonista
+ * + un CTA claro + nota de respuesta. SIN formulario largo, sin FAQ.
  *
- * CONCEPTO: Cierre de proyecto premium, NO página de contacto genérica.
- * El recorrido: hero promete → portfolio prueba → método explica → ACÁ se convierte.
+ * MOTION (research motion 2026):
+ *   - Statement: line-mask reveal (SplitText lines, yPercent 110, expo.out).
+ *   - Email: entrada y+opacity; hover con underline que crece (CSS,
+ *     cubic-bezier expo) + efecto magnético sutil (gsap.quickTo, factor 0.35,
+ *     SOLO en dispositivos con hover real).
+ *   - once:true en todos los reveals — no rebobinan.
  *
- * JERARQUÍA VISUAL (≤3 niveles):
- *   N1 — Statement de cierre (Fraunces 300, hueso, gigante, col 1-5 desktop)
- *        Peso visual ≥45% de la sección. Sticky en desktop.
- *   N2 — Formulario brief (inputs línea fina borde-oscuro, CTA terracota único)
- *        col 7-12 desktop. Split horizontal asimétrico (anti R2).
- *   N3 — Links secundarios WhatsApp/email (mono, hueso 55%, al pie)
+ * Progressive enhancement: el estado oculto lo aplica SOLO el JS.
+ * Sin JS o con reduced-motion, todo visible y estático.
  *
- * ESTRUCTURA CONSERVADA ÍNTEGRA (aprobado — NO tocar lógica):
- *   - Todos los campos: name, business, email, country, whatDoYouNeed, budget, timeline, message
- *   - Honeypot: campo 'website' oculto
- *   - Endpoint: action="/api/contact" + fetch POST /api/contact
- *   - Estados: idle → loading → success/error
- *   - Mensajes de éxito/error, bloque WhatsApp/email alternativo
- *   - UN solo CTA de envío
- *
- * Solo cambia la PIEL: colores V3, tipografía Fraunces/Hanken, layout asimétrico.
- *
- * ACCESIBILIDAD:
- *   - Labels asociados via for/id (intactos — no tocar)
- *   - Contraste AA: hueso sobre barro-oscuro ~12:1 (AAA). hueso 65% = ~8:1 (AAA).
- *   - focus-visible claro en todos los inputs y links.
+ * El endpoint /api/contact se conserva en el repo (no se usa desde aquí).
  */
 
 import type { Translations } from '../i18n/en';
@@ -39,698 +27,198 @@ interface Props {
 
 const { t } = Astro.props;
 const c = t.contact;
+
+const EMAIL = 'info@scuart.com';
 ---
 
 <section class="contact" id="contact" aria-label={c.kicker}>
+  <p class="contact__kicker">{c.kicker}</p>
 
-  <!-- Layout principal: kicker al margen izq, statement en eje central, form debajo -->
-  <div class="contact-layout">
+  <h2 class="contact__statement" data-contact-statement>{c.statement}</h2>
 
-    <!--
-      HEADER — V5: kicker anclado al margen izquierdo, statement en eje central.
-      Spec ART_DIRECTION_V5_ADN.md §Contacto:
-        - Kicker: Geist 500 uppercase, --ink-62, al borde izquierdo
-        - Statement EMPECEMOS.: PP Editorial New 300, --text-empecemos, white-space:nowrap
-      N1 visual: el statement domina. El kicker es la ficha técnica al margen.
-    -->
-    <div class="contact-statement">
-      <p class="contact-kicker">{c.kicker}</p>
-      <h2 class="contact-statement__text">{c.statement}</h2>
-      <p class="contact-statement__subcopy">{c.subcopy}</p>
-    </div>
+  <a class="contact__email" href={`mailto:${EMAIL}`} data-contact-email>{EMAIL}</a>
 
-    <!--
-      FORMULARIO — N2.
-      action="/api/contact": fallback sin JS.
-      method="POST": el endpoint acepta form-data como fallback.
-      data-contact-form: hook para el JS de estado.
-      ESTRUCTURA INTACTA — solo re-skin V3.
-    -->
-    <div class="contact-form-wrap">
-      <form
-        class="contact-form"
-        action="/api/contact"
-        method="POST"
-        data-contact-form
-        novalidate
-      >
-
-        <!--
-          HONEYPOT — anti-spam.
-          Campo 'website': oculto visualmente (no display:none).
-          aria-hidden y tabIndex=-1 para no interferir con a11y.
-        -->
-        <div class="contact-form__honeypot" aria-hidden="true">
-          <label for="contact-website">Website</label>
-          <input
-            type="text"
-            id="contact-website"
-            name="website"
-            tabindex="-1"
-            autocomplete="off"
-          />
-        </div>
-
-        <!-- ── FILA 1: Name + Business ─────────────────────── -->
-        <div class="contact-form__row contact-form__row--split">
-
-          <div class="contact-form__field">
-            <label class="contact-form__label" for="contact-name">
-              {c.labelName} <span class="contact-form__required" aria-label="requerido">*</span>
-            </label>
-            <input
-              class="contact-form__input"
-              type="text"
-              id="contact-name"
-              name="name"
-              placeholder={c.placeholderName}
-              required
-              autocomplete="name"
-            />
-          </div>
-
-          <div class="contact-form__field">
-            <label class="contact-form__label" for="contact-business">
-              {c.labelBusiness}
-            </label>
-            <input
-              class="contact-form__input"
-              type="text"
-              id="contact-business"
-              name="business"
-              placeholder={c.placeholderBusiness}
-              autocomplete="organization"
-            />
-          </div>
-
-        </div>
-
-        <!-- ── FILA 2: Email + Country ───────────────────────── -->
-        <div class="contact-form__row contact-form__row--split">
-
-          <div class="contact-form__field">
-            <label class="contact-form__label" for="contact-email">
-              {c.labelEmail} <span class="contact-form__required" aria-label="requerido">*</span>
-            </label>
-            <input
-              class="contact-form__input"
-              type="email"
-              id="contact-email"
-              name="email"
-              placeholder={c.placeholderEmail}
-              required
-              autocomplete="email"
-            />
-          </div>
-
-          <div class="contact-form__field">
-            <label class="contact-form__label" for="contact-country">
-              {c.labelCountry}
-            </label>
-            <input
-              class="contact-form__input"
-              type="text"
-              id="contact-country"
-              name="country"
-              placeholder={c.placeholderCountry}
-            />
-          </div>
-
-        </div>
-
-        <!-- ── FILA 3: What do you need (select) ─────────────── -->
-        <div class="contact-form__row">
-          <div class="contact-form__field">
-            <label class="contact-form__label" for="contact-need">
-              {c.labelWhatDoYouNeed}
-            </label>
-            <div class="contact-form__select-wrap">
-              <select
-                class="contact-form__input contact-form__select"
-                id="contact-need"
-                name="whatDoYouNeed"
-              >
-                {c.needOptions.map((opt) => (
-                  <option value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-              <span class="contact-form__select-arrow" aria-hidden="true">▾</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── FILA 4: Budget + Timeline ─────────────────────── -->
-        <div class="contact-form__row contact-form__row--split">
-
-          <div class="contact-form__field">
-            <label class="contact-form__label" for="contact-budget">
-              {c.labelBudget}
-            </label>
-            <div class="contact-form__select-wrap">
-              <select
-                class="contact-form__input contact-form__select"
-                id="contact-budget"
-                name="budget"
-              >
-                {c.budgetOptions.map((opt) => (
-                  <option value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-              <span class="contact-form__select-arrow" aria-hidden="true">▾</span>
-            </div>
-          </div>
-
-          <div class="contact-form__field">
-            <label class="contact-form__label" for="contact-timeline">
-              {c.labelTimeline}
-            </label>
-            <div class="contact-form__select-wrap">
-              <select
-                class="contact-form__input contact-form__select"
-                id="contact-timeline"
-                name="timeline"
-              >
-                {c.timelineOptions.map((opt) => (
-                  <option value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
-              <span class="contact-form__select-arrow" aria-hidden="true">▾</span>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- ── FILA 5: Message (textarea) ─────────────────────── -->
-        <div class="contact-form__row">
-          <div class="contact-form__field">
-            <label class="contact-form__label" for="contact-message">
-              {c.labelMessage} <span class="contact-form__required" aria-label="requerido">*</span>
-            </label>
-            <textarea
-              class="contact-form__input contact-form__textarea"
-              id="contact-message"
-              name="message"
-              placeholder={c.placeholderMessage}
-              rows={4}
-              required
-            ></textarea>
-          </div>
-        </div>
-
-        <!-- ── Mensaje de error inline ─────────────────────────── -->
-        <div class="contact-form__error" data-contact-error aria-live="assertive" role="alert" hidden>
-          {c.errorMessage}
-        </div>
-
-        <!-- ── Botón submit — CTA terracota único ──────────────── -->
-        <div class="contact-form__row contact-form__row--submit">
-          <button
-            class="contact-form__submit"
-            type="submit"
-            data-contact-submit
-            data-label-idle={c.submitLabel}
-            data-label-loading={c.submitLoadingLabel}
-          >
-            {c.submitLabel}
-          </button>
-        </div>
-
-      </form>
-
-      <!--
-        PANEL DE ÉXITO — oculto por defecto.
-        JS lo muestra cuando el endpoint responde 200 ok:true.
-      -->
-      <div class="contact-success" data-contact-success hidden>
-        <p class="contact-success__heading">{c.successHeading}</p>
-        <p class="contact-success__body">{c.successBody}</p>
-      </div>
-
-      <div class="contact-alt">
-        <span class="contact-alt__label">{c.alternativeLabel}</span>
-        <span class="contact-alt__sep" aria-hidden="true">—</span>
-        <a
-          class="contact-alt__link"
-          href={c.emailHref}
-        >
-          {c.emailLabel}
-        </a>
-      </div>
-
-    </div>
-    <!-- /contact-form-wrap -->
-
+  <div class="contact__foot">
+    <a class="contact__cta" href={`mailto:${EMAIL}`}>
+      {c.ctaStart} <span class="contact__arrow" aria-hidden="true">&#x2192;</span>
+    </a>
+    <p class="contact__note">{c.subcopy}</p>
   </div>
-  <!-- /contact-layout -->
 
+  <!-- Segundo eje compositivo (fix visual-critic): los mercados en vertical
+       al margen derecho — llena el ancho desktop con intención. -->
+  <p class="contact__side" aria-hidden="true">{t.footer.markets}</p>
 </section>
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   CONTACT SECTION — V3: barro-oscuro + terracota cálida
-   Mobile-first: 375px base. md: 768px. lg: 1280px.
-   ART_DIRECTION_V3_FINAL.md §5 (CONTACTO).
+   CONTACTO — sobrio, el email es el diseño.
+   Sistema del portafolio: hueso, tinta, hairlines, serif Light.
    ═══════════════════════════════════════════════════════════ */
 
-/* ─── SECCIÓN ────────────────────────────────────────────── */
-
 .contact {
-  /* Plano NEGRO (ART_DIRECTION §4 — descanso + foco: pedir el proyecto).
-     Sobre negro, blanco directo y difference coinciden → uso blanco directo
-     (más predecible, sin riesgo del statement sticky + blend, §7 nota). */
   background-color: var(--bg);
-  padding-top: var(--space-xl);
-  padding-bottom: var(--space-2xl);
-  padding-left: var(--margin);
-  padding-right: var(--margin);
-  position: relative;
-  overflow-x: clip;
+  padding: calc(var(--space-2xl) * 1.25) var(--margin) var(--space-2xl);
   scroll-margin-top: 72px;
+  position: relative;
 }
 
-/* ─── KICKER — ficha técnica anclada al borde izquierdo (V5) ─
- * Mobile: bloque normal, fluye arriba del statement (flex column).
- * Desktop: position:absolute anclado al borde izquierdo del --margin,
- * separado del flujo del statement para crear la asimetría real V5:
- * ficha al margen izquierdo, voz en el eje central.
- */
-.contact-kicker {
+/* Mercados en vertical al margen derecho — solo desktop ancho */
+.contact__side {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .contact__side {
+    display: block;
+    position: absolute;
+    top: clamp(4rem, 12vh, 8rem);
+    right: calc(var(--margin) * 0.35);
+    writing-mode: vertical-rl;
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(2.25rem, 3.5vw, 3.5rem);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--ink-18);
+    margin: 0;
+    user-select: none;
+    pointer-events: none;
+    white-space: nowrap;
+    /* no baja hasta el pie — el pie respira solo */
+    max-height: calc(100% - clamp(12rem, 30vh, 18rem));
+    overflow: hidden;
+  }
+
+  /* el pie no se mete debajo del texto vertical */
+  .contact__foot {
+    padding-right: clamp(4rem, 6vw, 7rem);
+  }
+}
+
+.contact__kicker {
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
-  color: var(--ink-62);
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  line-height: 1.4;
-  margin-bottom: var(--space-s);
+  color: var(--ink-42);
+  margin: 0 0 clamp(1.5rem, 4vh, 3rem) 0;
 }
 
-/* ─── LAYOUT PRINCIPAL (mobile: columna) ─────────────────── */
-
-.contact-layout {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xl);
-}
-
-/* ─── STATEMENT — N1 ─────────────────────────────────────── */
-
-.contact-statement {
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid var(--hairline);
-  padding-top: var(--space-m);
-}
-
-.contact-statement__text {
+.contact__statement {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: var(--text-empecemos);
-  line-height: 0.88;
-  letter-spacing: -0.04em;
+  font-size: clamp(1.75rem, 3.6vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
   color: var(--ink);
-  hyphens: none;
-  word-break: keep-all;
-  overflow-wrap: normal;
-  margin: 0 0 var(--space-m) 0;
+  max-width: 20ch;
+  margin: 0 0 clamp(2.5rem, 7vh, 4.5rem) 0;
 }
 
-.contact-statement__subcopy {
-  font-family: var(--font-body);
-  font-size: var(--text-subhead);
-  font-weight: 400;
-  color: var(--ink-62);
-  line-height: 1.55;
-  max-width: 36ch;
-  margin: 0;
-}
-
-/* ─── FORM WRAP ───────────────────────────────────────────── */
-
-.contact-form-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-l);
-}
-
-/* ─── FORM ────────────────────────────────────────────────── */
-
-.contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s);
-}
-
-/* ─── HONEYPOT — oculto visualmente ─────────────────────────
- * position:absolute + opacity:0 + pointer-events:none.
- * Visible en DOM para bots, invisible para humanos.
- */
-.contact-form__honeypot {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-  height: 0;
-  overflow: hidden;
-  z-index: -1;
-}
-
-/* ─── FILAS ───────────────────────────────────────────────── */
-
-.contact-form__row {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s);
-}
-
-.contact-form__row--submit {
-  margin-top: var(--space-s);
-}
-
-/* ─── CAMPO INDIVIDUAL ───────────────────────────────────── */
-
-.contact-form__field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2xs);
-  flex: 1;
-}
-
-/* ─── LABEL — Hanken 500 uppercase +0.14em hueso 65% ────────── */
-
-.contact-form__label {
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  color: var(--ink-62);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  line-height: 1.4;
-  cursor: pointer;
-}
-
-.contact-form__required {
-  color: var(--ink);
-  margin-left: 0.1em;
-}
-
-/* ─── INPUT EDITORIAL — línea inferior hairline borde-oscuro ─
- * Estilo editorial: sin cajas, sin border-radius, sin fondo gris.
- * Border-bottom: borde-oscuro (#473321).
- * Focus: línea pasa a terracota (transición sutil).
- * Placeholder: hueso 40%.
- * Touch target mínimo 48px via min-height.
- */
-.contact-form__input {
-  font-family: var(--font-body);
-  font-size: var(--text-body);
-  font-weight: 400;
-  color: var(--ink);
-  background-color: transparent;
-  border: none;
-  border-bottom: 1px solid var(--hairline);
-  border-radius: 0;
-  padding: var(--space-xs) 0;
-  width: 100%;
-  min-height: 48px;
-  line-height: 1.5;
-  outline: none;
-  transition: border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-.contact-form__input::placeholder {
-  color: var(--ink-42);
-  opacity: 1; /* Firefox normaliza */
-}
-
-/* Focus: la línea pasa a lima (--brand) */
-.contact-form__input:focus {
-  border-bottom-color: var(--brand);
-}
-
-.contact-form__input:focus-visible {
-  border-bottom-color: var(--brand);
-  /* Outline extra visible para teclado */
-  outline: none;
-  box-shadow: 0 2px 0 0 var(--brand);
-}
-
-/* Hover no-focus: línea sube levemente de luminosidad */
-.contact-form__input:hover:not(:focus) {
-  border-bottom-color: var(--hairline-strong);
-}
-
-/* ─── SELECT — wrapper para la flecha custom ─────────────── */
-
-.contact-form__select-wrap {
-  position: relative;
-}
-
-.contact-form__select {
-  cursor: pointer;
-  padding-right: 2em;
-}
-
-.contact-form__select option {
-  background-color: var(--bg);
-  color: var(--ink);
-}
-
-.contact-form__select-arrow {
-  position: absolute;
-  right: 0.25em;
-  top: 50%;
-  transform: translateY(-50%);
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  color: var(--ink-62);
-  pointer-events: none;
+/* ── EL EMAIL — protagonista tipográfico ── */
+.contact__email {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.5rem, 7.5vw, 6.5rem);
   line-height: 1;
-  display: flex;
-  align-items: center;
-}
-
-/* ─── TEXTAREA ────────────────────────────────────────────── */
-
-.contact-form__textarea {
-  resize: vertical;
-  min-height: 96px;
-  height: auto;
-}
-
-/* ─── ERROR INLINE ────────────────────────────────────────── */
-
-.contact-form__error {
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 400;
+  letter-spacing: -0.03em;
   color: var(--ink);
-  line-height: 1.4;
-  letter-spacing: 0.02em;
-  padding: var(--space-xs) 0;
+  text-decoration: none;
+  padding-bottom: 0.08em;
+  /* underline que crece — entra por la izquierda, sale por la derecha */
+  background-image: linear-gradient(var(--ink), var(--ink));
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+  background-size: 0% 2px;
+  transition: background-size 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+  will-change: transform;
 }
 
-/* ─── BOTÓN SUBMIT — CTA lima, único bloque sólido de color del sitio ─
- * V4 Restringido §4.2: relleno --brand, texto --on-brand (negro), hover --brand-press.
- * WCAG: --on-brand (#0e0e0c) sobre --brand (#c6f24e) = ~13:1 (AAA).
- */
-.contact-form__submit {
+.contact__email:hover,
+.contact__email:focus-visible {
+  background-position: 0% 100%;
+  background-size: 100% 2px;
+}
+
+.contact__email:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 4px;
+}
+
+/* ── Pie: CTA + nota ── */
+.contact__foot {
+  margin-top: clamp(2.5rem, 7vh, 4.5rem);
+  padding-top: clamp(1.25rem, 3vh, 2rem);
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-l);
+  flex-wrap: wrap;
+}
+
+.contact__cta {
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
-  color: var(--on-brand);          /* negro sobre lima — contraste AAA */
-  background-color: var(--brand);  /* lima: el único relleno de color del sitio */
-  border: 1px solid var(--brand);
-  border-radius: 0;
-  padding: 0.85em 1.75em;
-  min-height: 48px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  line-height: 1.4;
-  cursor: pointer;
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease,
-    opacity 0.25s ease;
-  -webkit-appearance: none;
-  appearance: none;
-  align-self: flex-start;
+  letter-spacing: 0.12em;
+  color: var(--ink);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
 }
 
-/* Hover: lima se oscurece levemente */
-.contact-form__submit:hover {
-  background-color: var(--brand-press);
-  border-color: var(--brand-press);
+.contact__arrow {
+  color: var(--brand);
+  transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.contact-form__submit:active {
-  opacity: 0.85;
+.contact__cta:hover .contact__arrow,
+.contact__cta:focus-visible .contact__arrow {
+  transform: translateX(6px);
 }
 
-.contact-form__submit:focus-visible {
+.contact__cta:focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 3px;
 }
 
-.contact-form__submit:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-/* ─── PANEL DE ÉXITO ─────────────────────────────────────── */
-
-.contact-success {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-s);
-  padding: var(--space-l) 0;
-}
-
-.contact-success__heading {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 1.02;
-  letter-spacing: -0.025em;
-  color: var(--ink);
-  margin: 0;
-}
-
-.contact-success__body {
-  font-family: var(--font-body);
-  font-size: var(--text-body);
-  font-weight: 400;
-  color: var(--ink-62);
-  line-height: 1.6;
-  max-width: 40ch;
-  margin: 0;
-}
-
-/* ─── BLOQUE ALTERNATIVO (WhatsApp / Email) — N3 ─────────── */
-
-.contact-alt {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4em;
+.contact__note {
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 400;
-  color: var(--ink-62);
-  letter-spacing: 0.03em;
-  line-height: 1.4;
-  border-top: 1px solid var(--hairline);
-  padding-top: var(--space-m);
-  margin-top: var(--space-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-42);
+  margin: 0;
 }
 
-.contact-alt__sep,
-.contact-alt__dot {
-  opacity: 0.4;
-}
-
-.contact-alt__link {
-  color: var(--ink-62);
-  text-decoration: none;
-  transition: color 0.2s ease;
-  padding: 0.2em 0;
-}
-
-.contact-alt__link:hover {
-  color: var(--ink);
-}
-
-.contact-alt__link:focus-visible {
-  outline: 1px solid var(--brand);
-  outline-offset: 2px;
-  color: var(--ink);
-}
-
-/* ═══════════════════════════════════════════════════════════
-   TABLET (768px+)
-   ═══════════════════════════════════════════════════════════ */
-@media (min-width: 768px) {
-  .contact {
-    padding-top: var(--space-2xl);
-    padding-bottom: var(--space-2xl);
+@media (max-width: 640px) {
+  .contact__email {
+    font-size: clamp(1.6rem, 9.5vw, 2.5rem);
   }
-
-  /* Filas split: 2 columnas en tablet+ */
-  .contact-form__row--split {
-    flex-direction: row;
+  .contact__foot {
+    flex-direction: column;
     align-items: flex-start;
-  }
-
-  .contact-form {
-    gap: var(--space-m);
-  }
-
-  .contact-form__row {
-    gap: var(--space-m);
-  }
-
-  .contact-form__textarea {
-    min-height: 120px;
+    gap: var(--space-s);
   }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   DESKTOP (1280px+)
-   V5: statement domina arriba (eje central), form debajo.
-   Kicker: position:absolute al borde izquierdo del --margin,
-   fuera del flujo del statement — asimetría real V5.
-   No hay split lateral — descartado #6.
-   ═══════════════════════════════════════════════════════════ */
-@media (min-width: 1280px) {
-  .contact {
-    padding-top: var(--space-2xl);
-    padding-bottom: var(--space-2xl);
-  }
-
-  /* El statement necesita position:relative para anclar el kicker absoluto */
-  .contact-statement {
-    position: relative;
-  }
-
-  /* Kicker: se desprende del flujo y se ancla al borde izquierdo */
-  .contact-kicker {
-    position: absolute;
-    left: 0;
-    top: var(--space-m); /* alineado al padding-top del statement */
-    margin-bottom: 0;
-    writing-mode: horizontal-tb;
-    max-width: 12ch;
-    line-height: 1.4;
-  }
-
-  /* Statement: padding-top extra para bajar el texto por debajo del kicker (~2.5 líneas mono) */
-  .contact-statement {
-    padding-top: calc(var(--space-m) + 2.5em); /* ~40px para que EMPECEMOS. no choque con el kicker */
-  }
-
-  .contact-statement__text {
-    font-size: var(--text-empecemos);
-  }
-
-  .contact-statement__subcopy {
-    max-width: 36ch;
-  }
-
-  .contact-form-wrap {
-    max-width: 700px;
-    gap: var(--space-m);
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   REDUCED-MOTION — sin transiciones en inputs y links
-   El grano y el color se mantienen (son identidad, no motion).
-   ═══════════════════════════════════════════════════════════ */
+/* ── reduced-motion: todo visible, sin transiciones ── */
 @media (prefers-reduced-motion: reduce) {
-  .contact-form__input,
-  .contact-form__submit,
-  .contact-alt__link {
+  .contact__statement,
+  .contact__email,
+  .contact__foot {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .contact__email,
+  .contact__arrow {
     transition: none;
   }
 }
@@ -738,197 +226,90 @@ const c = t.contact;
 
 <script>
   /**
-   * ContactSection — JS progresivo para el formulario.
-   *
-   * PROGRESSIVE ENHANCEMENT:
-   * El form tiene action/method — funciona sin JS como fallback.
-   * Este script agrega: estados loading/success/error, fetch sin recarga.
-   *
-   * FLUJO:
-   * 1. Submit → previene default → pone estado loading
-   * 2. fetch POST /api/contact con JSON body
-   * 3. Si ok:true → muestra panel success, oculta form
-   * 4. Si ok:false → muestra error inline, restaura botón
-   * 5. Si network error → muestra error inline
+   * Contacto — motion premium (valores del research 2026):
+   *   1. Statement: line-mask reveal (yPercent 110, expo.out, stagger 0.1).
+   *   2. Email + pie: entrada y+opacity escalonada.
+   *   3. Email magnético: quickTo factor 0.35, power3, solo hover:hover.
    */
 
-  /**
-   * ContactSection — Motion V4 (spec §A.6)
-   *
-   * G1 — Mask reveal del statement "LET'S / BUILD / SOMETHING." (SplitText).
-   *       yPercent 105→0, 0.9s expo.out, stagger 0.12s. ScrollTrigger top 80%.
-   *       Solo si !reducedMotion.
-   *       Mobile: IO fade-up del bloque completo.
-   *
-   * G2 — CTA lima entra último: campos del form con IO stagger sutil (0.5s, 0.05s),
-   *       el botón lima entra al final. IO, CSS. Sin GSAP (más simple).
-   *       REGLA DURA: nada se mueve mientras el usuario escribe.
-   *
-   * prefers-reduced-motion: sin motion, todo visible.
-   */
-  (async () => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isDesktop = window.matchMedia('(min-width: 769px)').matches;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canHover = window.matchMedia('(hover: hover)').matches;
 
-    if (!reducedMotion) {
-      const statementEl = document.querySelector<HTMLElement>('.contact-statement__text');
+  if (!reducedMotion) {
+    try {
+      const { gsap } = await import('gsap');
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      const { SplitText } = await import('gsap/SplitText');
+      gsap.registerPlugin(ScrollTrigger, SplitText);
 
-      if (statementEl) {
-        if (isDesktop) {
-          /* ── DESKTOP: SplitText mask reveal del statement ── */
-          try {
-            const { gsap } = await import('gsap');
-            const { SplitText } = await import('gsap/SplitText');
-            const { ScrollTrigger } = await import('gsap/ScrollTrigger');
-            gsap.registerPlugin(SplitText, ScrollTrigger);
+      const section = document.querySelector<HTMLElement>('#contact');
+      const statement = section?.querySelector<HTMLElement>('[data-contact-statement]') ?? null;
+      const email = section?.querySelector<HTMLElement>('[data-contact-email]') ?? null;
+      const foot = section?.querySelector<HTMLElement>('.contact__foot') ?? null;
 
-            const split = new SplitText(statementEl, {
+      /* (1) Statement — line-mask reveal.
+         IMPORTANTE: el split y el estado inicial se crean DENTRO de onEnter
+         (gsap.from) — nunca hay estado oculto persistente. Si el trigger no
+         dispara, el texto simplemente queda visible (robustez mobile). */
+      if (section && statement) {
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top 75%',
+          once: true,
+          onEnter: () => {
+            const split = new SplitText(statement, {
               type: 'lines',
               mask: 'lines',
               autoSplit: true,
               aria: 'none',
             });
-
-            gsap.set(split.lines, { yPercent: 105 });
-
-            ScrollTrigger.create({
-              trigger: statementEl,
-              start: 'top 80%',
-              once: true,
-              onEnter: () => {
-                gsap.to(split.lines, {
-                  yPercent: 0,
-                  duration: 0.9,
-                  ease: 'expo.out',
-                  stagger: 0.12,
-                });
-              },
+            gsap.from(split.lines, {
+              yPercent: 110,
+              duration: 1.0,
+              ease: 'expo.out',
+              stagger: 0.1,
+              force3D: true,
             });
-          } catch (_) {
-            /* Si GSAP falla: texto visible */
-          }
-        }
-        /* Mobile: el bloque de statement es visible por defecto, sin motion especial */
-      }
-
-      /* ── G2: Campos del form con stagger sutil + botón lima entra último ──
-         IO en el form-wrap. Cada fila de campos hace un fade sutil (IO + CSS).
-         El botón tiene el delay más largo — es el punto final de la frase.
-         CRÍTICO: solo en reposo antes de que el usuario interactúe. */
-      const formWrap = document.querySelector<HTMLElement>('.contact-form-wrap');
-      const formRows = document.querySelectorAll<HTMLElement>('.contact-form__row');
-      const submitBtn = document.querySelector<HTMLElement>('[data-contact-submit]');
-
-      if (formWrap && formRows.length) {
-        /* Ocultar filas hasta que entren al viewport */
-        formRows.forEach((row, i) => {
-          row.style.opacity = '0';
-          row.style.transform = 'translateY(12px)';
-          row.style.transition = `opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.05}s`;
-        });
-
-        /* El botón lima tiene delay extra — llega último */
-        if (submitBtn) {
-          const submitRow = submitBtn.closest('.contact-form__row');
-          if (submitRow) {
-            const lastDelay = formRows.length * 0.05 + 0.08;
-            (submitRow as HTMLElement).style.transition = `opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${lastDelay}s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) ${lastDelay}s`;
-          }
-        }
-
-        const io = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                formRows.forEach((row) => {
-                  row.style.opacity = '1';
-                  row.style.transform = 'translateY(0)';
-                });
-                io.disconnect();
-              }
-            });
+            /* (2) Email + pie entran después del statement */
+            if (email) {
+              gsap.set(email, { opacity: 0, y: 28 });
+              gsap.to(email, {
+                opacity: 1, y: 0, duration: 0.9, ease: 'expo.out', delay: 0.25,
+              });
+            }
+            if (foot) {
+              gsap.set(foot, { opacity: 0, y: 16 });
+              gsap.to(foot, {
+                opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', delay: 0.45,
+              });
+            }
           },
-          { threshold: 0.05 }
-        );
-
-        io.observe(formWrap);
-      }
-    }
-  })();
-
-  /* ── Formulario: lógica de envío (se conserva intacta — P5) ── */
-  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
-  const submitBtn = document.querySelector<HTMLButtonElement>('[data-contact-submit]');
-  const errorEl = document.querySelector<HTMLElement>('[data-contact-error]');
-  const successEl = document.querySelector<HTMLElement>('[data-contact-success]');
-
-  if (!form || !submitBtn) {
-    /* Sin elementos: el form funciona como action/method nativo. No hay JS que ejecutar. */
-    // eslint-disable-next-line no-empty
-  } else {
-
-    const idleLabel = submitBtn.dataset.labelIdle ?? 'SEND →';
-    const loadingLabel = submitBtn.dataset.labelLoading ?? 'SENDING…';
-
-    /* ── Funciones de estado ─────────────────────────────── */
-
-    function setLoading() {
-      submitBtn!.disabled = true;
-      submitBtn!.textContent = loadingLabel;
-      if (errorEl) errorEl.hidden = true;
-    }
-
-    function setIdle() {
-      submitBtn!.disabled = false;
-      submitBtn!.textContent = idleLabel;
-    }
-
-    function showError(message?: string) {
-      if (!errorEl) return;
-      if (message) errorEl.textContent = message;
-      errorEl.hidden = false;
-    }
-
-    function showSuccess() {
-      if (form) form.hidden = true;
-      if (successEl) successEl.hidden = false;
-    }
-
-    /* ── Submit handler ────────────────────────────────── */
-
-    form.addEventListener('submit', async (e: Event) => {
-      e.preventDefault();
-      setLoading();
-
-      /* Recopilar datos del form */
-      const formData = new FormData(form!);
-      const body: Record<string, string> = {};
-      formData.forEach((value, key) => {
-        body[key] = String(value);
-      });
-
-      try {
-        const response = await fetch('/api/contact', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
         });
-
-        const data = await response.json() as { ok: boolean; error?: string };
-
-        if (data.ok) {
-          showSuccess();
-        } else {
-          setIdle();
-          showError(data.error);
-        }
-
-      } catch (_) {
-        /* Network error o response.json() falló */
-        setIdle();
-        showError();
       }
-    });
 
-  } /* fin guard */
+      /* (3) Email magnético — solo con cursor real */
+      if (email && canHover) {
+        const xTo = gsap.quickTo(email, 'x', { duration: 0.6, ease: 'power3' });
+        const yTo = gsap.quickTo(email, 'y', { duration: 0.6, ease: 'power3' });
+
+        email.addEventListener('mousemove', (e: MouseEvent) => {
+          const r = email.getBoundingClientRect();
+          xTo((e.clientX - r.left - r.width / 2) * 0.12);
+          yTo((e.clientY - r.top - r.height / 2) * 0.35);
+        });
+        email.addEventListener('mouseleave', () => {
+          xTo(0);
+          yTo(0);
+        });
+      }
+    } catch (err) {
+      console.error('[ContactSection] motion init failed:', err);
+      document
+        .querySelectorAll<HTMLElement>('#contact [data-contact-statement], #contact [data-contact-email], #contact .contact__foot')
+        .forEach((el) => {
+          el.style.opacity = '1';
+          el.style.transform = 'none';
+        });
+    }
+  }
 </script>

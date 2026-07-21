@@ -217,40 +217,36 @@ export const es: Translations = {
     ],
     capabilitiesLabel: "CAPACIDADES",
     whatChangesLabel: "QUÉ CAMBIA",
+    /* Rediseño 2026-07-17: verbos-acción (patrón Wild, research 2026).
+       Servicios ACOTADOS a sitios web — sin la lista SaaS/AI/e-commerce. */
     steps: [
       {
-        num: "001",
-        title: "DIAGNÓSTICO",
-        body: "Entendemos el negocio, el cliente, el mercado y qué está frenando confianza, conversión o operación.",
+        num: "01",
+        title: "Escuchamos.",
+        body: "Entendemos el negocio, el cliente y el mercado — y qué está frenando la confianza o la conversión.",
         stepCapabilities: ["RESEARCH", "POSITIONING", "BRAND IDENTITY"],
         whatChanges:
           "El negocio gana claridad sobre lo que realmente debe cambiar.",
       },
       {
-        num: "002",
-        title: "DIRECCIÓN",
-        body: "Definimos posicionamiento, copy, dirección visual, estructura bilingüe EN/ES y sistema editorial antes de diseñar.",
+        num: "02",
+        title: "Definimos.",
+        body: "Posicionamiento, estructura y dirección visual, antes de diseñar nada. Cada decisión apunta al mismo lado.",
         stepCapabilities: ["BRAND IDENTITY", "COPY", "UX"],
         whatChanges: "Cada decisión a partir de acá apunta al mismo lugar.",
       },
       {
-        num: "003",
-        title: "SISTEMA",
-        body: "Construimos la solución correcta: web platform, SaaS, AI automation, e-commerce, ordering, booking, workflows o una web de alto rendimiento.",
-        stepCapabilities: [
-          "WEB PLATFORMS",
-          "SAAS + SYSTEMS",
-          "AI AUTOMATION",
-          "E-COMMERCE",
-          "WORKFLOWS",
-        ],
+        num: "03",
+        title: "Construimos.",
+        body: "Diseñamos y desarrollamos el sitio. Rápido, responsive y listo para buscadores — no solo para verse bien.",
+        stepCapabilities: ["WEB", "PERFORMANCE"],
         whatChanges:
           "El negocio obtiene algo que funciona, no solo algo que se ve bien.",
       },
       {
-        num: "004",
-        title: "LANZAMIENTO",
-        body: "Probamos responsive, performance, SEO, accesibilidad, tracking y conversión antes de publicar.",
+        num: "04",
+        title: "Lanzamos.",
+        body: "Probamos rendimiento, SEO y accesibilidad, y lo publicamos listo para funcionar, no solo para existir.",
         stepCapabilities: ["PERFORMANCE", "SEO", "QA"],
         whatChanges: "Sale en vivo listo para rendir, no solo para existir.",
       },
@@ -259,9 +255,10 @@ export const es: Translations = {
 
   /* ── Contacto — Sección 4 ───────────────────────────────── */
   contact: {
-    kicker: "EMPEZAR UN PROYECTO",
-    statement: "EMPECEMOS.",
-    subcopy: "Contanos el proyecto. Respondemos en menos de 24 horas.",
+    kicker: "CONTACTO",
+    statement: "Contanos qué estás construyendo.",
+    subcopy: "Una conversación, no una cotización. Respondemos en 24 horas.",
+    ctaStart: "Empezar un proyecto",
     labelName: "Nombre",
     labelBusiness: "Negocio o marca",
     labelEmail: "Email",
@@ -275,7 +272,7 @@ export const es: Translations = {
     placeholderEmail: "tu@ejemplo.com",
     placeholderCountry: "México, Argentina, USA…",
     placeholderMessage:
-      "Descripción breve del proyecto — cuanto más contexto, mejor.",
+      "Contanos qué tenés en mente — web, plataforma, e-commerce, automatización… y a dónde querés llegar.",
     needOptions: [
       { value: "", label: "Seleccionar" },
       { value: "website", label: "Sitio web" },
@@ -312,13 +309,34 @@ export const es: Translations = {
     whatsappHref: "https://wa.me/[WHATSAPP_NUMBER]",
     emailLabel: "Email",
     emailHref: "mailto:hello@scuart.com",
+    faqLabel: "PREGUNTAS FRECUENTES",
+    faq: [
+      {
+        q: "¿Qué tipo de proyectos toman?",
+        a: "Webs premium, plataformas SaaS y sistemas digitales a medida. Si tu negocio necesita algo que funcione de verdad, hablemos.",
+      },
+      {
+        q: "¿Cómo arranca un proyecto?",
+        a: "Con una conversación corta. Entendemos qué necesitás, definimos el alcance y te pasamos una propuesta clara.",
+      },
+      {
+        q: "¿Cómo se cotiza y se paga?",
+        a: "Por proyecto, según alcance. Hitos claros, sin tarifas ocultas.",
+      },
+      {
+        q: "¿Trabajan en remoto?",
+        a: "Sí — 100% remoto, en español e inglés, con negocios en cualquier huso horario.",
+      },
+    ],
   },
 
   /* ── Footer — cierre de marca ───────────────────────────── */
   footer: {
     navLabel: "NAVEGACIÓN",
     langSwitchLabel: "IDIOMA",
-    markets: "Bogotá · US · LATAM",
+    markets: "Nueva York · LATAM",
+    descriptor:
+      "Estudio de diseño web independiente. Nueva York + LATAM. Trabajamos en inglés y español.",
     builtBy: "© 2026 SCUART",
     tagline: "No decoramos. Decidimos.",
     ariaLabel: "SCUART — Pie de página del estudio",
