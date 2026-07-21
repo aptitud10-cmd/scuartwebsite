@@ -236,6 +236,31 @@ const rows = projects.map((p, i) => {
     .pf-row__link {
       padding-block: clamp(1.25rem, 1.8vw, 2rem);
       padding-inline: var(--margin);
+      transition: background-color 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    /* ── Gesto propio SCUART (diferenciación de Locomotive): la fila entera
+       se INVIERTE en hover — fondo tinta, nombre y ficha en hueso. Locomotive
+       solo incrusta la imagen; acá la fila reacciona como bloque. Sobre el
+       fondo tinta el lima del marco por fin respira. ── */
+    .pf-row__link:hover,
+    .pf-row__link:focus-visible {
+      background-color: var(--ink);
+    }
+
+    .pf-name,
+    .pf-meta {
+      transition: color 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .pf-row__link:hover .pf-name,
+    .pf-row__link:focus-visible .pf-name {
+      color: var(--bg);
+    }
+
+    .pf-row__link:hover .pf-meta,
+    .pf-row__link:focus-visible .pf-meta {
+      color: rgba(244, 242, 236, 0.78); /* hueso 78% — legible en el momento de foco (visual-critic) */
     }
 
     /* Ficha: absoluta, borde izquierdo del padding, alineada a la primera línea del nombre */
@@ -288,8 +313,14 @@ const rows = projects.map((p, i) => {
       margin-inline: 0.12em;
     }
 
-    /* hover: el nombre NO cambia de color (fiel a Locomotive — solo aparece
-       la imagen inline). El nombre queda hueso; el lima se reserva para el CTA. */
+    /* ── Gesto propio SCUART (diferenciación de Locomotive, auditoría
+       2026-07-21): la imagen inline lleva marco lima --brand — Locomotive la
+       muestra a sangre, sin marco. El lima solo vive DENTRO del hover (sobre
+       la foto oscura contrasta; sobre el crema del fondo moriría). ── */
+    .pf-inline {
+      border: 3px solid var(--brand);
+      box-sizing: border-box;
+    }
   }
 
   /* ── prefers-reduced-motion: todo estático y visible ────── */
