@@ -34,62 +34,9 @@ export const es: Translations = {
     langHref: "/en",
   },
 
-  /* ── Hero — B1 "Arquitecto" (aprobado 2026-06-14) ─────────── */
+  /* ── Hero — solo ariaLabel; el copy visible vive en HeroSection.astro ── */
   hero: {
-    /** Kicker: índice editorial arriba-izquierda, Geist 500 uppercase */
-    kicker: "SCUART — ESTUDIO DE DISEÑO Y TECNOLOGÍA",
-
-    /**
-     * line1: "Diseño que se ve."
-     * "ve" en Fraunces 400 itálica verde — el gesto de marca.
-     * Copy elegido por William (ART_DIRECTION.md §6 sección 1).
-     */
-    line1: [
-      { word: "Diseño", isRed: false },
-      { word: "que", isRed: false },
-      { word: "se", isRed: false },
-      { word: "ve.", isRed: false, isItalicAccent: true },
-    ],
-
-    /**
-     * line2: "Tecnología que trabaja."
-     * "trabaja" en Fraunces 400 itálica verde — firma del estudio.
-     */
-    line2: [
-      { word: "Tecnología", isRed: false },
-      { word: "que", isRed: false },
-      { word: "trabaja.", isRed: false, isItalicAccent: true },
-    ],
-
-    /** line3: vacía — el hero nuevo tiene 2 líneas, no 3 */
-    line3: [],
-
-    /**
-     * Índice de capacidades: col 10-12 desktop, lista mono debajo en mobile.
-     * Términos técnicos en inglés en ambos idiomas (coherente con el sistema).
-     */
-    capabilities: [
-      { num: "001", label: "WEB PLATFORMS" },
-      { num: "002", label: "SAAS + SYSTEMS" },
-      { num: "003", label: "AI AUTOMATION" },
-      { num: "004", label: "ORDERING · BOOKING · WORKFLOWS" },
-    ],
-
     ariaLabel: "Diseño que se ve. Tecnología que trabaja.",
-    subhead:
-      "Estudio que construye webs premium, plataformas y sistemas digitales para negocios ambiciosos en USA y LATAM.",
-    cta: "EMPEZAR UN PROYECTO",
-
-    /* Campo conservado para compatibilidad — no se renderiza en el hero */
-    index: "SCUART / ESTUDIO DE DISEÑO Y TECNOLOGÍA · BOGOTÁ · 2026",
-  },
-
-  /* ── Meta columna derecha (campo conservado, no renderizado en hero) ── */
-  meta_col: {
-    number: "N°·01",
-    label: "DECLARACIÓN",
-    coords: "GASTRO · WEB",
-    type: "DISEÑO DIGITAL",
   },
 
   /* ── Manifesto — Sección 1.5 (entre hero y portfolio) ───── */
@@ -259,75 +206,6 @@ export const es: Translations = {
     statement: "Contanos qué estás construyendo.",
     subcopy: "Una conversación, no una cotización. Respondemos en 24 horas.",
     ctaStart: "Empezar un proyecto",
-    labelName: "Nombre",
-    labelBusiness: "Negocio o marca",
-    labelEmail: "Email",
-    labelCountry: "País o mercado",
-    labelWhatDoYouNeed: "¿Qué necesitas?",
-    labelBudget: "Rango de presupuesto",
-    labelTimeline: "Tiempo ideal",
-    labelMessage: "Mensaje",
-    placeholderName: "Tu nombre",
-    placeholderBusiness: "Nombre de la empresa o marca",
-    placeholderEmail: "tu@ejemplo.com",
-    placeholderCountry: "México, Argentina, USA…",
-    placeholderMessage:
-      "Contanos qué tenés en mente — web, plataforma, e-commerce, automatización… y a dónde querés llegar.",
-    needOptions: [
-      { value: "", label: "Seleccionar" },
-      { value: "website", label: "Sitio web" },
-      { value: "saas", label: "SaaS / Plataforma web" },
-      { value: "ecommerce", label: "E-commerce" },
-      { value: "ordering", label: "Sistema de pedidos / reservas" },
-      { value: "automation", label: "IA / Automatización" },
-      { value: "branding", label: "Branding + Web" },
-      { value: "other", label: "Otro / Todavía no estoy seguro" },
-    ],
-    budgetOptions: [
-      { value: "", label: "Seleccionar rango" },
-      { value: "under5k", label: "< $5.000" },
-      { value: "5k-15k", label: "$5.000 – $15.000" },
-      { value: "15k-50k", label: "$15.000 – $50.000" },
-      { value: "over50k", label: "$50.000+" },
-      { value: "notsure", label: "No estoy seguro" },
-    ],
-    timelineOptions: [
-      { value: "", label: "Seleccionar tiempo" },
-      { value: "asap", label: "Lo antes posible" },
-      { value: "1-3mo", label: "1 – 3 meses" },
-      { value: "3-6mo", label: "3 – 6 meses" },
-      { value: "flexible", label: "Flexible" },
-    ],
-    submitLabel: "ENVIAR BRIEF →",
-    submitLoadingLabel: "ENVIANDO…",
-    successHeading: "Brief recibido.",
-    successBody: "Lo revisamos y te respondemos en menos de 24 horas.",
-    errorMessage: "Algo salió mal. Intentá de nuevo o escribinos directo.",
-    alternativeLabel: "¿Preferís un mensaje rápido?",
-    whatsappLabel: "WhatsApp",
-    /* PLACEHOLDER — William reemplaza con su número real en formato internacional */
-    whatsappHref: "https://wa.me/[WHATSAPP_NUMBER]",
-    emailLabel: "Email",
-    emailHref: "mailto:hello@scuart.com",
-    faqLabel: "PREGUNTAS FRECUENTES",
-    faq: [
-      {
-        q: "¿Qué tipo de proyectos toman?",
-        a: "Webs premium, plataformas SaaS y sistemas digitales a medida. Si tu negocio necesita algo que funcione de verdad, hablemos.",
-      },
-      {
-        q: "¿Cómo arranca un proyecto?",
-        a: "Con una conversación corta. Entendemos qué necesitás, definimos el alcance y te pasamos una propuesta clara.",
-      },
-      {
-        q: "¿Cómo se cotiza y se paga?",
-        a: "Por proyecto, según alcance. Hitos claros, sin tarifas ocultas.",
-      },
-      {
-        q: "¿Trabajan en remoto?",
-        a: "Sí — 100% remoto, en español e inglés, con negocios en cualquier huso horario.",
-      },
-    ],
   },
 
   /* ── Footer — cierre de marca ───────────────────────────── */

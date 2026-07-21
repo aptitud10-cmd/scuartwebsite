@@ -7,23 +7,9 @@
  * para que es.ts pueda implementar la misma forma sin colision de literales.
  */
 
-export interface HeroToken {
-  word: string;
-  isRed: boolean;
-  /** Si true: esta palabra se renderiza en Fraunces itálica terracota (gesto de marca V3) */
-  isItalicAccent?: boolean;
-}
-
-export interface CapabilityItem {
-  num: string;
-  label: string;
-}
-
 /**
  * CapabilityService — un ítem de la sección CAPABILITIES.
- * Se diferencia de CapabilityItem (hero) en que agrega `resolves`:
- * la línea editorial de "qué problema resuelve" esta capability.
- * num: "01"-"06" (2 dígitos, distinto al "001"-"004" del hero/método).
+ * num: "01"-"06" (2 dígitos, distinto al "001"-"004" del método).
  * name: término técnico en inglés en ambos idiomas (coherente con el sistema).
  * resolves: copy por idioma — directo, comercial, sin claims.
  */
@@ -93,47 +79,6 @@ export interface ContactTranslations {
   kicker: string;
   /** CTA mailto — "Empezar un proyecto" (rediseño sobrio 2026-07-17) */
   ctaStart: string;
-  /* Labels de campos */
-  labelName: string;
-  labelBusiness: string;
-  labelEmail: string;
-  labelCountry: string;
-  labelWhatDoYouNeed: string;
-  labelBudget: string;
-  labelTimeline: string;
-  labelMessage: string;
-  /* Placeholders */
-  placeholderName: string;
-  placeholderBusiness: string;
-  placeholderEmail: string;
-  placeholderCountry: string;
-  placeholderMessage: string;
-  /* Opciones del select "What do you need" */
-  needOptions: { value: string; label: string }[];
-  /* Opciones del select de presupuesto */
-  budgetOptions: { value: string; label: string }[];
-  /* Opciones del select de timeline */
-  timelineOptions: { value: string; label: string }[];
-  /* Botón de envío */
-  submitLabel: string;
-  submitLoadingLabel: string;
-  /* Mensajes de estado */
-  successHeading: string;
-  successBody: string;
-  errorMessage: string;
-  /* Bloque secundario WhatsApp/email */
-  alternativeLabel: string;
-  whatsappLabel: string;
-  emailLabel: string;
-  /** Número de WhatsApp — placeholder hasta que William lo confirme */
-  whatsappHref: string;
-  /** Email de contacto público */
-  emailHref: string;
-  /** Label del bloque FAQ — "FAQ" / "PREGUNTAS FRECUENTES" */
-  faqLabel: string;
-  /** FAQ tipo Trionn: absorbe las dudas (presupuesto, alcance) que antes
-   *  intentaban capturar los selects del form. */
-  faq: { q: string; a: string }[];
 }
 
 export interface FooterTranslations {
@@ -198,22 +143,10 @@ export interface Translations {
     /** Frase editorial fusionada de la Parte 1 (About estilo Trionn) — un solo string largo por idioma. */
     aboutStatement: string;
   };
+  /** Hero — el componente actual solo consume ariaLabel; el copy visible
+   *  vive hardcodeado en HeroSection.astro (wordmark). */
   hero: {
-    kicker: string;
-    line1: HeroToken[];
-    line2: HeroToken[];
-    line3: HeroToken[];
-    capabilities: CapabilityItem[];
     ariaLabel: string;
-    subhead: string;
-    cta: string;
-    index: string;
-  };
-  meta_col: {
-    number: string;
-    label: string;
-    coords: string;
-    type: string;
   };
   /** Sección 1.5 — Manifesto (entre hero y portfolio) */
   manifesto: ManifestoTranslations;
@@ -300,61 +233,9 @@ export const en: Translations = {
     langHref: "/es",
   },
 
-  /* ── Hero — B1 "Arquitecto" (aprobado 2026-06-14) ─────────── */
+  /* ── Hero — solo ariaLabel; el copy visible vive en HeroSection.astro ── */
   hero: {
-    /** Kicker: índice editorial arriba-izquierda, Geist 500 uppercase */
-    kicker: "SCUART — DESIGN + TECHNOLOGY STUDIO",
-
-    /**
-     * line1: "Design you notice."
-     * "notice" en Fraunces 400 itálica verde — el gesto de marca.
-     * Copy elegido por William (ART_DIRECTION.md §6 sección 1).
-     */
-    line1: [
-      { word: "Design", isRed: false },
-      { word: "you", isRed: false },
-      { word: "notice.", isRed: false, isItalicAccent: true },
-    ],
-
-    /**
-     * line2: "Technology that works."
-     * "works" en Fraunces 400 itálica verde — firma del estudio.
-     */
-    line2: [
-      { word: "Technology", isRed: false },
-      { word: "that", isRed: false },
-      { word: "works.", isRed: false, isItalicAccent: true },
-    ],
-
-    /** line3: vacía — el hero nuevo tiene 2 líneas, no 3 */
-    line3: [],
-
-    /**
-     * Índice de capacidades: col 10-12 desktop, lista mono debajo en mobile.
-     * Términos técnicos en inglés en ambos idiomas (coherente con el sistema).
-     */
-    capabilities: [
-      { num: "001", label: "WEB PLATFORMS" },
-      { num: "002", label: "SAAS + SYSTEMS" },
-      { num: "003", label: "AI AUTOMATION" },
-      { num: "004", label: "ORDERING · BOOKING · WORKFLOWS" },
-    ],
-
     ariaLabel: "Design you notice. Technology that works.",
-    subhead:
-      "A studio building premium websites, platforms and digital systems for ambitious businesses across the US and LATAM.",
-    cta: "START A PROJECT",
-
-    /* Campo conservado para compatibilidad — no se renderiza en el hero */
-    index: "SCUART / DESIGN + TECHNOLOGY STUDIO · BOGOTÁ · 2026",
-  },
-
-  /* ── Meta columna derecha (campo conservado, no renderizado en hero) ── */
-  meta_col: {
-    number: "N°·01",
-    label: "STATEMENT",
-    coords: "GASTRO · WEB",
-    type: "DIGITAL DESIGN",
   },
 
   /* ── Manifesto — Sección 1.5 (entre hero y portfolio) ───── */
@@ -539,75 +420,6 @@ export const en: Translations = {
     statement: "Tell us what you're building.",
     subcopy: "A conversation, not a quote. We reply within 24 hours.",
     ctaStart: "Start a project",
-    labelName: "Name",
-    labelBusiness: "Business or brand",
-    labelEmail: "Email",
-    labelCountry: "Country / Market",
-    labelWhatDoYouNeed: "What do you need?",
-    labelBudget: "Budget range",
-    labelTimeline: "Timeline",
-    labelMessage: "Message",
-    placeholderName: "Your name",
-    placeholderBusiness: "Company or brand name",
-    placeholderEmail: "you@example.com",
-    placeholderCountry: "US, Mexico, Argentina…",
-    placeholderMessage:
-      "Tell us what you have in mind — website, platform, e-commerce, automation… and where you want to take it.",
-    needOptions: [
-      { value: "", label: "Select one" },
-      { value: "website", label: "Website" },
-      { value: "saas", label: "SaaS / Web platform" },
-      { value: "ecommerce", label: "E-commerce" },
-      { value: "ordering", label: "Ordering / Booking system" },
-      { value: "automation", label: "AI / Automation" },
-      { value: "branding", label: "Branding + Web" },
-      { value: "other", label: "Other / Not sure yet" },
-    ],
-    budgetOptions: [
-      { value: "", label: "Select range" },
-      { value: "under5k", label: "< $5,000" },
-      { value: "5k-15k", label: "$5,000 – $15,000" },
-      { value: "15k-50k", label: "$15,000 – $50,000" },
-      { value: "over50k", label: "$50,000+" },
-      { value: "notsure", label: "Not sure" },
-    ],
-    timelineOptions: [
-      { value: "", label: "Select timeline" },
-      { value: "asap", label: "ASAP" },
-      { value: "1-3mo", label: "1 – 3 months" },
-      { value: "3-6mo", label: "3 – 6 months" },
-      { value: "flexible", label: "Flexible" },
-    ],
-    submitLabel: "SEND PROJECT BRIEF →",
-    submitLoadingLabel: "SENDING…",
-    successHeading: "Brief received.",
-    successBody: "We'll review it and get back to you within 24 hours.",
-    errorMessage: "Something went wrong. Try again or write us directly.",
-    alternativeLabel: "Prefer a quick message?",
-    whatsappLabel: "WhatsApp",
-    /* PLACEHOLDER — William reemplaza con su número real en formato internacional */
-    whatsappHref: "https://wa.me/[WHATSAPP_NUMBER]",
-    emailLabel: "Email",
-    emailHref: "mailto:hello@scuart.com",
-    faqLabel: "FAQ",
-    faq: [
-      {
-        q: "What kind of projects do you take on?",
-        a: "Premium websites, SaaS platforms and custom digital systems. If your business needs something that actually performs, let's talk.",
-      },
-      {
-        q: "How does a project start?",
-        a: "With a short conversation. We understand what you need, define the scope and send you a clear proposal.",
-      },
-      {
-        q: "How are projects priced and paid?",
-        a: "Per project, based on scope. Clear milestones, no hidden fees.",
-      },
-      {
-        q: "Do you work remotely?",
-        a: "Yes — fully remote, in English and Spanish, with businesses in any time zone.",
-      },
-    ],
   },
 
   /* ── Footer — cierre de marca ───────────────────────────── */
