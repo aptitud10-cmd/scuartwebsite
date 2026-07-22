@@ -11,19 +11,22 @@ interface Props {
 
 const { lang } = Astro.props;
 
+/* Copy conversacional, no legalés (tendencia 2026: lenguaje humano, no jurídico).
+   Voz SCUART — directa, sin humo. Aceptar/Rechazar con igual peso (equal
+   prominence, requisito legal 2026: ninguno puede verse más "correcto"). */
 const copy = {
   es: {
-    text: 'Usamos cookies técnicas necesarias para el funcionamiento del sitio.',
-    accept: 'Aceptar',
-    decline: 'Solo esenciales',
-    privacyLabel: 'Política de privacidad',
+    text: 'Solo cookies técnicas, las justas para que el sitio funcione. Nada de rastreo.',
+    accept: 'De acuerdo',
+    decline: 'Solo las esenciales',
+    privacyLabel: 'Privacidad',
     privacyHref: '/es/privacidad',
   },
   en: {
-    text: 'We use technical cookies necessary for the site to function.',
-    accept: 'Accept',
+    text: 'Only technical cookies — just enough to make the site work. No tracking.',
+    accept: 'Got it',
     decline: 'Essential only',
-    privacyLabel: 'Privacy policy',
+    privacyLabel: 'Privacy',
     privacyHref: '/en/privacy',
   },
 };
@@ -43,25 +46,52 @@ const c = copy[lang];
 </div>
 
 <style>
+/* Bloque COMPACTO abajo-izquierda — NO una barra full-width estirada (lo más
+   genérico) ni una card cuadrada con sombra (2018). Chico, tipográfico, con un
+   borde-acento lima a la izquierda que lo ata a la marca. Evidencia 2026: el
+   banner debe integrarse al lenguaje del sitio y ser minimalista real, con copy
+   conversacional y acciones de igual peso. */
 .cookie {
   position: fixed;
   bottom: max(var(--space-m), env(safe-area-inset-bottom));
   left: var(--space-m);
   right: var(--space-m);
   z-index: 1000;
-  background-color: var(--ink);
+  max-width: 30rem;
+  background-color: color-mix(in srgb, var(--ink) 90%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-left: 2px solid var(--brand);
   color: var(--bg);
-  border-radius: 4px;
   padding: var(--space-s) var(--space-m);
   display: flex;
   flex-direction: column;
   gap: var(--space-s);
-  max-width: 480px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
 
 .cookie[hidden] {
   display: none;
+}
+
+/* En la sección Contacto el banner se desvanece y deja de recibir clics, para
+   no competir con el email (CTA principal). Reaparece al salir de Contacto. */
+.cookie[data-dimmed] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(0.5rem);
+}
+
+.cookie {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie {
+    transition: opacity 0.2s ease;
+  }
+  .cookie[data-dimmed] {
+    transform: none;
+  }
 }
 
 .cookie__text {
@@ -80,8 +110,10 @@ const c = copy[lang];
 
 .cookie__actions {
   display: flex;
-  gap: var(--space-xs);
+  align-items: center;
+  gap: var(--space-m);
   justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .cookie__btn {
@@ -90,38 +122,39 @@ const c = copy[lang];
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 0.5em 1em;
   border: none;
-  border-radius: 2px;
+  background: none;
   cursor: pointer;
-  transition: opacity 0.2s;
+  padding: 0.35em 0;
+  transition: opacity 0.2s, color 0.2s;
 }
 
-.cookie__btn:hover {
-  opacity: 0.8;
-}
-
-.cookie__btn--decline {
-  background-color: transparent;
-  color: rgba(244, 242, 236, 0.6);
-  border: 1px solid rgba(244, 242, 236, 0.2);
-}
-
+/* IGUAL PESO (equal prominence, requisito legal 2026): ambos botones son texto
+   del mismo tamaño/peso — ninguno se ve más "correcto" que el otro. Se
+   diferencian solo por un subrayado de acento que aparece al hover. */
+.cookie__btn--decline,
 .cookie__btn--accept {
-  background-color: var(--brand);
-  color: var(--on-brand);
+  color: var(--bg);
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1px;
+  transition: background-size 0.3s ease;
 }
-
-@media (min-width: 640px) {
-  /* Abajo-derecha: el wordmark del hero y el email de Contacto viven a la
-     izquierda — ahí el banner tapaba el CTA principal (auditoría 2026-07-21) */
-  .cookie {
-    flex-direction: row;
-    align-items: center;
-    right: var(--space-l);
-    bottom: var(--space-l);
-    left: auto;
-  }
+.cookie__btn--decline:hover,
+.cookie__btn--decline:focus-visible,
+.cookie__btn--accept:hover,
+.cookie__btn--accept:focus-visible {
+  background-size: 100% 1px;
+}
+/* El acento lima marca cuál es el primario SIN darle más tamaño ni relleno. */
+.cookie__btn--accept {
+  background-image: linear-gradient(var(--brand), var(--brand));
+  background-size: 100% 1px;
+}
+.cookie__btn--accept:hover,
+.cookie__btn--accept:focus-visible {
+  background-size: 100% 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -142,15 +175,33 @@ const c = copy[lang];
     setTimeout(() => {
       banner.removeAttribute('hidden');
     }, 1200);
+
+    /* AUTO-OCULTAR al llegar a Contacto (auditoría 2026-07-21): el banner es
+       position:fixed y flotaba encima de TODAS las secciones. El email de
+       Contacto (info@scuart.com) es el CTA principal y ocupa casi el ancho —
+       cualquier esquina inferior lo tapa. En vez de jugar a mover el banner de
+       esquina, se OCULTA en cuanto Contacto entra en viewport: ahí el usuario ya
+       vio el sitio y el consentimiento no debe competir con la conversión. Al
+       salir de Contacto reaparece (si aún no decidió). No persiste la decisión:
+       solo se esconde temporalmente, no cuenta como "aceptar". */
+    const contact = document.querySelector('#contact, .contact');
+    if (contact && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (localStorage.getItem(COOKIE_KEY)) return; // ya decidió: no tocar
+          if (entry.isIntersecting) banner.setAttribute('data-dimmed', '');
+          else banner.removeAttribute('data-dimmed');
+        },
+        { threshold: 0.15 },
+      );
+      io.observe(contact);
+    }
   }
 
-  acceptBtn?.addEventListener('click', () => {
-    localStorage.setItem(COOKIE_KEY, 'accepted');
+  const dismiss = (value: string) => {
+    localStorage.setItem(COOKIE_KEY, value);
     banner?.setAttribute('hidden', '');
-  });
-
-  declineBtn?.addEventListener('click', () => {
-    localStorage.setItem(COOKIE_KEY, 'essential');
-    banner?.setAttribute('hidden', '');
-  });
+  };
+  acceptBtn?.addEventListener('click', () => dismiss('accepted'));
+  declineBtn?.addEventListener('click', () => dismiss('essential'));
 </script>
