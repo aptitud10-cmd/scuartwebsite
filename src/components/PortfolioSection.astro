@@ -236,32 +236,10 @@ const rows = projects.map((p, i) => {
     .pf-row__link {
       padding-block: clamp(1.25rem, 1.8vw, 2rem);
       padding-inline: var(--margin);
-      transition: background-color 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
-    /* ── Gesto propio SCUART (diferenciación de Locomotive): la fila entera
-       se INVIERTE en hover — fondo tinta, nombre y ficha en hueso. Locomotive
-       solo incrusta la imagen; acá la fila reacciona como bloque. Sobre el
-       fondo tinta el lima del marco por fin respira. ── */
-    .pf-row__link:hover,
-    .pf-row__link:focus-visible {
-      background-color: var(--ink);
-    }
-
-    .pf-name,
-    .pf-meta {
-      transition: color 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    }
-
-    .pf-row__link:hover .pf-name,
-    .pf-row__link:focus-visible .pf-name {
-      color: var(--bg);
-    }
-
-    .pf-row__link:hover .pf-meta,
-    .pf-row__link:focus-visible .pf-meta {
-      color: rgba(244, 242, 236, 0.78); /* hueso 78% — legible en el momento de foco (visual-critic) */
-    }
+    /* Hover: solo aparece la imagen incrustada en el nombre (Locomotive limpio).
+       La fila NO se pinta de negro — se quitó la inversión (decisión William). */
 
     /* Ficha: absoluta, borde izquierdo del padding, alineada a la primera línea del nombre */
     .pf-meta {
