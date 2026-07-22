@@ -110,3 +110,5 @@ temp/
 
 # Playwright
 test-results/
+demo-*.html
+playwright/tests/*-temp.spec.ts
