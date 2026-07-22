@@ -24,11 +24,10 @@ const COPY = {
     whatWeDoLabel: 'QUÉ HACEMOS',
     statement:
       'Hacemos que tu marca se sienta memorable, con webs que transmiten confianza, no solo diseño — diseñadas con criterio, no por tendencia.',
-    valuesLead: 'WE DESIGN FOR LONGEVITY',
-    valuesList: 'CLARITY FIRST, CRAFT ALWAYS, BUILT TO SCALE',
+    valuesLead: 'DISEÑAMOS PARA QUE DURE',
+    valuesList: 'CLARIDAD PRIMERO, OFICIO SIEMPRE, HECHO PARA ESCALAR',
     mission:
-      'Our mission is to make technology feel human by designing digital products that are intuitive, purposeful, and meaningful to people.',
-    more: 'MORE ABOUT US',
+      'Nuestra misión es hacer que la tecnología se sienta humana, diseñando productos digitales intuitivos, con propósito y significado para las personas.',
   },
   en: {
     whatWeDoLabel: 'WHAT WE DO',
@@ -38,7 +37,6 @@ const COPY = {
     valuesList: 'CLARITY FIRST, CRAFT ALWAYS, BUILT TO SCALE',
     mission:
       'Our mission is to make technology feel human by designing digital products that are intuitive, purposeful, and meaningful to people.',
-    more: 'MORE ABOUT US',
   },
 } as const;
 
@@ -78,10 +76,6 @@ const c = COPY[lang as 'es' | 'en'];
     <p class="stu-about__mission" data-stu-annotation>
       {c.mission}
     </p>
-
-    <a class="stu-about__more" href="#services" data-stu-annotation>
-      {c.more} <span aria-hidden="true">&#x2192;</span>
-    </a>
   </div>
 </div>
 
@@ -96,9 +90,8 @@ const c = COPY[lang as 'es' | 'en'];
   margin-right: calc(-1 * var(--margin));
   padding: 0; /* el contenido se posiciona dentro de __inner */
 
-  min-height: 100svh; /* la sección ocupa el viewport, como Trionn */
   display: flex;
-  align-items: flex-end; /* el contenido se ancla abajo */
+  align-items: stretch;
   overflow: hidden;
 }
 
@@ -118,7 +111,9 @@ const c = COPY[lang as 'es' | 'en'];
   position: relative;
   z-index: 1;
   width: 100%;
-  padding: var(--space-2xl) var(--margin);
+  /* Padding lateral con piso: las notas de esquina se cortaban contra los
+     bordes cuando --margin era chico. max() garantiza aire mínimo. */
+  padding: var(--space-2xl) max(var(--margin), 2.5rem);
   /* mix-blend-difference: el truco de Trionn. El texto blanco se
      invierte contra el video → legible sobre claro y oscuro. */
   mix-blend-mode: difference;
@@ -144,8 +139,7 @@ const c = COPY[lang as 'es' | 'en'];
 
 /* ── Anotaciones de esquina ── */
 .stu-about__values-lead,
-.stu-about__values-list,
-.stu-about__more {
+.stu-about__values-list {
   font-family: var(--font-body);
   font-size: var(--text-mono);
   text-transform: uppercase;
@@ -168,20 +162,6 @@ const c = COPY[lang as 'es' | 'en'];
   max-width: 34ch;
 }
 
-.stu-about__more {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.5em;
-  color: #ffffff;
-  text-decoration: none;
-  transition: opacity 0.3s ease;
-}
-
-.stu-about__more:hover,
-.stu-about__more:focus-visible {
-  opacity: 0.6; /* en blend-difference el color hover no sirve — uso opacity */
-}
-
 /* ── MOBILE (<768px): anotaciones en flujo, apiladas bajo la frase ── */
 @media (max-width: 767px) {
   .stu-about {
@@ -202,20 +182,18 @@ const c = COPY[lang as 'es' | 'en'];
   }
 }
 
-/* ── TABLET/DESKTOP (≥768px): anotaciones ancladas en esquinas ──
-   Layout tomado del HTML real de Trionn: frase arriba-izq,
-   valores abajo-izq, misión + link abajo-der. */
+/* ── TABLET/DESKTOP (≥768px): frase centrada arriba, anotaciones en esquinas.
+   Sin el link "MORE ABOUT US" → 2 filas (frase / notas), sin fila 3 vacía.
+   Altura ajustada al contenido + respiro, en vez de 100svh (dejaba mucho
+   negro abajo). El statement gigante ya da presencia sin forzar viewport. */
 @media (min-width: 768px) {
   .stu-about__inner {
-    min-height: 100svh;
     display: grid;
-    /* 2 columnas; la frase ocupa la fila de arriba (centrada vertical),
-       valores e (misión+link) ocupan la fila de abajo, en esquinas. */
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr auto;
     column-gap: var(--space-l);
     row-gap: var(--space-2xl);
-    padding-top: calc(var(--space-2xl) + 2rem);
+    padding-top: var(--space-3xl);
     padding-bottom: var(--space-2xl);
   }
   .stu-about__statement {
@@ -229,25 +207,12 @@ const c = COPY[lang as 'es' | 'en'];
     grid-row: 2;
     align-self: end;
   }
-  /* columna derecha (fila 2): misión y link apilados, alineados a la derecha.
-     Para que no se solapen, los apilo con un flex en una sola celda. */
   .stu-about__mission {
     grid-column: 2;
     grid-row: 2;
     justify-self: end;
     align-self: end;
     text-align: right;
-  }
-  .stu-about__more {
-    grid-column: 2;
-    grid-row: 3; /* fila propia debajo de la misión */
-    justify-self: end;
-    align-self: start;
-    margin-top: var(--space-m);
-  }
-  /* añade la fila 3 solo para el link */
-  .stu-about__inner {
-    grid-template-rows: 1fr auto auto;
   }
 }
 
