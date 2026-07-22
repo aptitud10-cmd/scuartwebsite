@@ -249,7 +249,9 @@ const c = COPY[lang as 'es' | 'en'];
          La frase arranca gris-tenue; cada palabra pasa a blanco a medida
          que la sección cruza el viewport. Atado al scroll con scrub —
          NO es una animación de una vez: el usuario controla con el scroll. */
-      const split = new SplitText(statementEl, { type: 'words', autoSplit: true });
+      /* aria:'none' — el texto visible ya es legible; sin esto SplitText mete
+         un aria-label prohibido en el <p> (axe aria-prohibited-attr, QA 2026-07-22). */
+      const split = new SplitText(statementEl, { type: 'words', autoSplit: true, aria: 'none' });
       gsap.set(split.words, { opacity: 0.18 });
 
       gsap.to(split.words, {

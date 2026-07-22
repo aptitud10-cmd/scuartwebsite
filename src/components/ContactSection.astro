@@ -80,7 +80,9 @@ const EMAIL = 'info@scuart.com';
     font-size: clamp(2.25rem, 3.5vw, 3.5rem);
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: var(--ink-18);
+    /* mercado vertical decorativo: 18% daba 1.46:1 (falla AA). Subo a ~50%
+       → ~3.2:1, pasa el gate de texto grande sin robar protagonismo al email. */
+    color: rgba(20, 19, 15, 0.5);
     margin: 0;
     user-select: none;
     pointer-events: none;

@@ -55,7 +55,7 @@ const steps: MethodStep[] = t.method.steps;
        fantasma — restraint (research motion Locomotive).
        ═══════════════════════════════════════════════ -->
   <div class="stu-part" id="studio-how">
-    <p class="stu-part__label stu-part__label--how">{howWeWorkLabel}</p>
+    <h2 class="stu-part__label stu-part__label--how">{howWeWorkLabel}</h2>
 
     <div class="stu-proc" data-stu-proc>
       {steps.map((step, i) => (
@@ -219,7 +219,9 @@ const steps: MethodStep[] = t.method.steps;
     font-variant-numeric: tabular-nums;
     /* 18% daba 1.46:1 — texto display necesita 3:1 (WCAG AA texto grande).
        42% ≈ 3.1:1: sigue siendo fantasma, pero pasa el gate. */
-    color: var(--ink-42);
+    /* numeral fantasma: 42% daba 2.7:1 (falla AA texto grande = 3:1). Subo a
+       ~50% → ~3.2:1, pasa el gate sin dejar de ser fantasma (QA 2026-07-22). */
+    color: rgba(20, 19, 15, 0.5);
     align-self: center;
     justify-self: end;
     user-select: none;
