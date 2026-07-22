@@ -53,6 +53,18 @@ export const es: Translations = {
       "Manifiesto — No hacemos webs. Construimos ventajas competitivas.",
   },
 
+  /* ── Statement dark — scroll-reveal por palabra (portfolio → servicios) ── */
+  statement: {
+    kicker: "SCUART — ESTUDIO",
+    body: "Diseño y tecnología que trabajan juntos, no por separado.",
+    noteLeft: "ESTUDIO INDEPENDIENTE · NUEVA YORK · LATAM",
+    noteRight: "Un solo equipo, de la idea al deploy.",
+    ariaLabel: "Diseño y tecnología que trabajan juntos, no por separado.",
+  },
+
+  /* ── Servicios — kicker (los 6 items viven en capabilities.items) ── */
+  servicesKicker: "SERVICIOS",
+
   /* ── Studio — Sección fusionada (capabilities + method) ── */
   studio: {
     kicker: "ESTUDIO",
@@ -70,21 +82,44 @@ export const es: Translations = {
     items: [
       {
         num: "01",
-        name: "DISEÑO+MARCA",
-        statement: "Hacemos que tu marca se sienta memorable.",
-        resolves: "",
+        name: "WEB PLATFORMS",
+        statement: "",
+        resolves:
+          "Sitios que cargan rápido, posicionan en búsqueda y convierten visitantes en clientes.",
       },
       {
         num: "02",
-        name: "WEB/PRODUCTO",
-        statement: "Webs que transmiten confianza, no solo diseño.",
-        resolves: "",
+        name: "SAAS + SYSTEMS",
+        statement: "",
+        resolves:
+          "Productos completos — login, pagos, paneles, APIs. De cero a producción.",
       },
       {
         num: "03",
-        name: "MÉTODO",
-        statement: "Diseño con criterio, no por tendencia.",
-        resolves: "",
+        name: "AI AUTOMATION",
+        statement: "",
+        resolves:
+          "Automatizamos lo repetitivo para que el equipo se enfoque en lo que importa.",
+      },
+      {
+        num: "04",
+        name: "E-COMMERCE",
+        statement: "",
+        resolves:
+          "Tiendas hechas para vender — checkout rápido, inventario, listas para crecer.",
+      },
+      {
+        num: "05",
+        name: "ORDERING · BOOKING · WORKFLOWS",
+        statement: "",
+        resolves: "Pedidos, reservas y operación sin el desorden manual.",
+      },
+      {
+        num: "06",
+        name: "BRAND IDENTITY",
+        statement: "",
+        resolves:
+          "Un sistema visual coherente en todo — no armado por accidente.",
       },
     ],
   },

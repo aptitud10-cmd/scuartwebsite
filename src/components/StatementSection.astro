@@ -1,0 +1,326 @@
+---
+/**
+ * StatementSection.astro — Sección "About" dark, COPIA EXACTA del commit e1823ae.
+ *
+ * Extraída literalmente del bloque `stu-about` de StudioSection.astro (e1823ae):
+ * markup, CSS y JS idénticos. Copy exacto del original (hardcodeado por idioma,
+ * tal como estaba en i18n del commit viejo). Mecanismo Trionn: full-bleed dark,
+ * frase gigante en mix-blend-difference que se ilumina palabra por palabra con
+ * el scroll (scrub), + anotaciones ancladas en las esquinas.
+ */
+
+import type { Translations } from '../i18n/en';
+
+interface Props {
+  t: Translations;
+}
+
+const { t } = Astro.props;
+const lang = t === undefined ? 'en' : (t.nav.langLabel === 'EN' ? 'es' : 'en');
+
+/* Copy EXACTO del commit e1823ae (aboutStatement / whatWeDoLabel de i18n viejo) */
+const COPY = {
+  es: {
+    whatWeDoLabel: 'QUÉ HACEMOS',
+    statement:
+      'Hacemos que tu marca se sienta memorable, con webs que transmiten confianza, no solo diseño — diseñadas con criterio, no por tendencia.',
+    valuesLead: 'WE DESIGN FOR LONGEVITY',
+    valuesList: 'CLARITY FIRST, CRAFT ALWAYS, BUILT TO SCALE',
+    mission:
+      'Our mission is to make technology feel human by designing digital products that are intuitive, purposeful, and meaningful to people.',
+    more: 'MORE ABOUT US',
+  },
+  en: {
+    whatWeDoLabel: 'WHAT WE DO',
+    statement:
+      'We make your brand feel unforgettable, with websites that earn trust, not just attention — designed with intent, not trend.',
+    valuesLead: 'WE DESIGN FOR LONGEVITY',
+    valuesList: 'CLARITY FIRST, CRAFT ALWAYS, BUILT TO SCALE',
+    mission:
+      'Our mission is to make technology feel human by designing digital products that are intuitive, purposeful, and meaningful to people.',
+    more: 'MORE ABOUT US',
+  },
+} as const;
+
+const c = COPY[lang as 'es' | 'en'];
+---
+
+<div class="stu-part stu-about" id="studio-what" aria-label={c.whatWeDoLabel}>
+
+  <!-- Video de fondo — fallback negro mientras no exista el archivo -->
+  <video
+    class="stu-about__video"
+    autoplay
+    loop
+    muted
+    playsinline
+    preload="metadata"
+    aria-hidden="true"
+    poster="/studio-bg-poster.jpg"
+  >
+    <source src="/studio-bg.webm" type="video/webm" />
+    <source src="/studio-bg.mp4" type="video/mp4" />
+  </video>
+
+  <div class="stu-about__inner">
+
+    <!-- Frase fusionada gigante en mix-blend-difference -->
+    <p class="stu-about__statement" data-stu-about-statement>
+      {c.statement}
+    </p>
+
+    <!-- Anotaciones de esquina -->
+    <div class="stu-about__values" data-stu-annotation>
+      <p class="stu-about__values-lead">{c.valuesLead}</p>
+      <p class="stu-about__values-list">{c.valuesList}</p>
+    </div>
+
+    <p class="stu-about__mission" data-stu-annotation>
+      {c.mission}
+    </p>
+
+    <a class="stu-about__more" href="#services" data-stu-annotation>
+      {c.more} <span aria-hidden="true">&#x2192;</span>
+    </a>
+  </div>
+</div>
+
+<style>
+.stu-about {
+  position: relative;
+  isolation: isolate;
+  background-color: #0a0a0a; /* fallback negro hasta que exista el video */
+
+  /* Full-bleed */
+  margin-left: calc(-1 * var(--margin));
+  margin-right: calc(-1 * var(--margin));
+  padding: 0; /* el contenido se posiciona dentro de __inner */
+
+  min-height: 100svh; /* la sección ocupa el viewport, como Trionn */
+  display: flex;
+  align-items: flex-end; /* el contenido se ancla abajo */
+  overflow: hidden;
+}
+
+/* Video de fondo — cubre toda la sección */
+.stu-about__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Contenedor del texto — sobre el video, en blend-difference */
+.stu-about__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: var(--space-2xl) var(--margin);
+  /* mix-blend-difference: el truco de Trionn. El texto blanco se
+     invierte contra el video → legible sobre claro y oscuro. */
+  mix-blend-mode: difference;
+}
+
+/* ── Frase gigante — réplica de trionn.com/about ──
+   Sans-serif bold, CENTRADA y ancha (clases reales de Trionn:
+   text-center mx-auto max-w-342 text-[#d8d8d8]).
+   Trionn usa Neue Haas; acá uso Geist (la sans del sitio) en bold.
+   IMPORTANTE: sin opacity en CSS base — lo aplica el JS, así sin
+   JS o si GSAP falla, todo se ve. */
+.stu-about__statement {
+  font-family: var(--font-body); /* Geist sans — como la sans de Trionn */
+  font-weight: 700;
+  font-size: clamp(2.25rem, 5.2vw, 5.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: #d8d8d8; /* gris claro base — exacto de Trionn */
+  text-align: center;
+  max-width: 21em; /* ancho generoso → ~3 líneas anchas, no columna angosta */
+  margin: 0 auto var(--space-2xl) auto; /* mx-auto: centrada en la página */
+}
+
+/* ── Anotaciones de esquina ── */
+.stu-about__values-lead,
+.stu-about__values-list,
+.stu-about__more {
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  margin: 0;
+  color: #ffffff;
+}
+
+.stu-about__values-list {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.stu-about__mission {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  max-width: 34ch;
+}
+
+.stu-about__more {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  color: #ffffff;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.stu-about__more:hover,
+.stu-about__more:focus-visible {
+  opacity: 0.6; /* en blend-difference el color hover no sirve — uso opacity */
+}
+
+/* ── MOBILE (<768px): anotaciones en flujo, apiladas bajo la frase ── */
+@media (max-width: 767px) {
+  .stu-about {
+    align-items: flex-start;
+  }
+  .stu-about__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-l);
+    padding-top: calc(var(--space-2xl) + 3rem); /* deja respiro bajo el nav */
+  }
+  .stu-about__statement {
+    max-width: 100%;
+    margin-bottom: var(--space-m);
+  }
+  .stu-about__mission {
+    max-width: 100%;
+  }
+}
+
+/* ── TABLET/DESKTOP (≥768px): anotaciones ancladas en esquinas ──
+   Layout tomado del HTML real de Trionn: frase arriba-izq,
+   valores abajo-izq, misión + link abajo-der. */
+@media (min-width: 768px) {
+  .stu-about__inner {
+    min-height: 100svh;
+    display: grid;
+    /* 2 columnas; la frase ocupa la fila de arriba (centrada vertical),
+       valores e (misión+link) ocupan la fila de abajo, en esquinas. */
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr auto;
+    column-gap: var(--space-l);
+    row-gap: var(--space-2xl);
+    padding-top: calc(var(--space-2xl) + 2rem);
+    padding-bottom: var(--space-2xl);
+  }
+  .stu-about__statement {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    align-self: center;
+    margin-bottom: 0;
+  }
+  .stu-about__values {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+  }
+  /* columna derecha (fila 2): misión y link apilados, alineados a la derecha.
+     Para que no se solapen, los apilo con un flex en una sola celda. */
+  .stu-about__mission {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    align-self: end;
+    text-align: right;
+  }
+  .stu-about__more {
+    grid-column: 2;
+    grid-row: 3; /* fila propia debajo de la misión */
+    justify-self: end;
+    align-self: start;
+    margin-top: var(--space-m);
+  }
+  /* añade la fila 3 solo para el link */
+  .stu-about__inner {
+    grid-template-rows: 1fr auto auto;
+  }
+}
+
+/* ── reduced-motion: frase y anotaciones visibles desde el inicio ── */
+@media (prefers-reduced-motion: reduce) {
+  .stu-about__statement,
+  .stu-about [data-stu-annotation] {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}
+</style>
+
+<script>
+  /* ─── About — reveal blur+opacity (mecanismo Trionn) — COPIA EXACTA e1823ae ── */
+
+  const reducedMotionPart1 = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const aboutEl = document.querySelector<HTMLElement>('#studio-what');
+  const statementEl = aboutEl?.querySelector<HTMLElement>('[data-stu-about-statement]') ?? null;
+  const annotationEls = aboutEl
+    ? Array.from(aboutEl.querySelectorAll<HTMLElement>('[data-stu-annotation]'))
+    : [];
+
+  if (aboutEl && statementEl && !reducedMotionPart1) {
+    try {
+      const { gsap } = await import('gsap');
+      const { SplitText } = await import('gsap/SplitText');
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      gsap.registerPlugin(SplitText, ScrollTrigger);
+
+      /* (1) Frase — ILUMINACIÓN POR SCROLL (mecanismo Trionn).
+         La frase arranca gris-tenue; cada palabra pasa a blanco a medida
+         que la sección cruza el viewport. Atado al scroll con scrub —
+         NO es una animación de una vez: el usuario controla con el scroll. */
+      const split = new SplitText(statementEl, { type: 'words', autoSplit: true });
+      gsap.set(split.words, { opacity: 0.18 });
+
+      gsap.to(split.words, {
+        opacity: 1,
+        ease: 'none',
+        stagger: 0.5, // cada palabra se ilumina un poco después de la anterior
+        scrollTrigger: {
+          trigger: aboutEl,
+          start: 'top 75%',
+          end: 'center 45%',
+          scrub: true, // atado al scroll: avanza/retrocede con la rueda
+        },
+      });
+
+      /* (2) Anotaciones de esquina — fade-up escalonado (one-shot) */
+      if (annotationEls.length) {
+        gsap.set(annotationEls, { opacity: 0, y: 18 });
+        gsap.to(annotationEls, {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: 'power3.out',
+          stagger: 0.12,
+          scrollTrigger: { trigger: aboutEl, start: 'top 45%', once: true },
+        });
+      }
+
+    } catch (err) {
+      /* Fix del catch silencioso: loguear + dejar TODO visible. */
+      console.error('[StatementSection About] motion init failed:', err);
+      statementEl.style.opacity = '1';
+      statementEl.style.filter = 'none';
+      annotationEls.forEach((el) => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+    }
+  }
+</script>

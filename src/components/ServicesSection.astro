@@ -1,0 +1,193 @@
+---
+/**
+ * ServicesSection.astro — Los 6 servicios de SCUART con su línea de beneficio.
+ * Reemplaza el marquee pobre de 3 palabras (crítica del visual-critic).
+ *
+ * Fondo crema. Va entre la sección dark (statement) y el Método.
+ * Flujo: Portfolio (qué hice) → Statement dark → SERVICIOS → Método (cómo trabajo).
+ *
+ * COMPOSICIÓN (visual-composition):
+ *   N1 — nombre del servicio (display, contraste fuerte).
+ *   N2 — línea de beneficio "resolves" (cuerpo, subordinada).
+ *   N3 — numeral 01–06 al margen izquierdo (mono, ficha técnica).
+ *   Filas con hairlines + numeral al margen = asimetría (anti R2), NO cards
+ *   uniformes (anti R4). Sin numerales gigantes (evita la muletilla del sitio).
+ *
+ * MOTION: entrada escalonada por fila (y + fade, power3.out, once). Mismo
+ * lenguaje del Método. reduced-motion → visible estático.
+ */
+
+import type { Translations, CapabilityService } from '../i18n/en';
+
+interface Props {
+  t: Translations;
+}
+
+const { t } = Astro.props;
+const kicker = t.servicesKicker;
+const items: CapabilityService[] = t.capabilities.items;
+---
+
+<section class="svc" id="services" aria-label={kicker}>
+  <p class="svc__kicker">{kicker}</p>
+
+  <ol class="svc__list" data-svc-list>
+    {items.map((item) => (
+      <li class="svc__row" data-svc-row>
+        <span class="svc__num" aria-hidden="true">{item.num}</span>
+        <h3 class="svc__name">{item.name}</h3>
+        <p class="svc__resolves">{item.resolves}</p>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  /* ═══════════════════════════════════════════════════════════
+     SERVICIOS — 6 filas compactas, fondo crema.
+     Numeral al margen + nombre display + línea de beneficio.
+     Sistema del Método pero más denso, sin numerales gigantes.
+     ═══════════════════════════════════════════════════════════ */
+  .svc {
+    background-color: var(--bg);
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+    padding-left: var(--margin);
+    padding-right: var(--margin);
+  }
+
+  .svc__kicker {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-62);
+    margin: 0 0 var(--space-xl) 0;
+    padding-bottom: var(--space-s);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .svc__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── FILA ───
+     Mobile: apilada (numeral+nombre en una línea, resolves debajo). */
+  .svc__row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "num name"
+      ".   resolves";
+    column-gap: var(--space-m);
+    row-gap: var(--space-2xs);
+    align-items: baseline;
+    border-bottom: 1px solid var(--hairline);
+    padding-block: clamp(1.5rem, 3.5vh, 2.5rem);
+  }
+
+  .svc__num {
+    grid-area: num;
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    color: var(--ink-62);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .svc__name {
+    grid-area: name;
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(1.5rem, 3.5vw, 2.75rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .svc__resolves {
+    grid-area: resolves;
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    color: var(--ink-mid);
+    margin: 0;
+    max-width: 52ch;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     DESKTOP (768px+): 3 columnas — numeral | nombre | resolves.
+     El beneficio a la derecha del nombre, alineados a la baseline.
+     ═══════════════════════════════════════════════════════════ */
+  @media (min-width: 768px) {
+    .svc__row {
+      grid-template-columns: 3rem minmax(0, 0.9fr) minmax(0, 1.1fr);
+      grid-template-areas: "num name resolves";
+      column-gap: var(--space-l);
+      align-items: baseline;
+    }
+
+    .svc__resolves {
+      padding-top: 0.35em; /* óptica: baja el cuerpo para casar con la x-height del nombre */
+    }
+  }
+
+  /* ─── Entrada escalonada — estado oculto lo aplica SOLO el JS ─── */
+  .svc-animate .svc__row {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc-animate .svc__row {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const list = document.querySelector<HTMLElement>('[data-svc-list]');
+
+  if (list && !prefersReduced) {
+    (async () => {
+      try {
+        const { gsap } = await import('gsap');
+        const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+        gsap.registerPlugin(ScrollTrigger);
+
+        const rows = gsap.utils.toArray<HTMLElement>('[data-svc-row]');
+        list.closest('.svc')?.classList.add('svc-animate');
+
+        ScrollTrigger.create({
+          trigger: list,
+          start: 'top 80%',
+          once: true,
+          onEnter: () => {
+            gsap.to(rows, {
+              opacity: 1,
+              y: 0,
+              duration: 0.7,
+              ease: 'power3.out',
+              stagger: 0.08,
+            });
+          },
+        });
+      } catch (err) {
+        console.error('[ServicesSection] motion init failed:', err);
+        document.querySelectorAll<HTMLElement>('[data-svc-row]').forEach((r) => {
+          r.style.opacity = '1';
+          r.style.transform = 'none';
+        });
+      }
+    })();
+  }
+</script>

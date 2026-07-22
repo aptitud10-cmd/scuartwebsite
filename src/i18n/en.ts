@@ -150,6 +150,21 @@ export interface Translations {
   };
   /** Sección 1.5 — Manifesto (entre hero y portfolio) */
   manifesto: ManifestoTranslations;
+  /** Sección dark — statement con scroll-reveal por palabra (entre portfolio y servicios) */
+  statement: {
+    /** Kicker mono arriba-izquierda */
+    kicker: string;
+    /** Statement grande — cada palabra se aclara con el scroll */
+    body: string;
+    /** Nota inferior izquierda — mono uppercase */
+    noteLeft: string;
+    /** Nota inferior derecha — cuerpo */
+    noteRight: string;
+    /** Aria-label de la sección */
+    ariaLabel: string;
+  };
+  /** Kicker de la sección Servicios (los 6 items viven en capabilities) */
+  servicesKicker: string;
   /**
    * Sección CAPABILITIES — entre portfolio y método.
    * Expande las 6 capabilities con su "qué resuelve".
@@ -252,6 +267,18 @@ export const en: Translations = {
     ariaLabel:
       "Manifesto — We don't build websites. We build competitive advantages.",
   },
+
+  /* ── Statement dark — scroll-reveal por palabra (portfolio → servicios) ── */
+  statement: {
+    kicker: "SCUART — STUDIO",
+    body: "Design and technology that work together, not apart.",
+    noteLeft: "INDEPENDENT STUDIO · NEW YORK · LATAM",
+    noteRight: "One team, from idea to deploy.",
+    ariaLabel: "Design and technology that work together, not apart.",
+  },
+
+  /* ── Servicios — kicker (los 6 items viven en capabilities.items) ── */
+  servicesKicker: "SERVICES",
 
   /* ── Studio — Sección fusionada (capabilities + method) ── */
   studio: {

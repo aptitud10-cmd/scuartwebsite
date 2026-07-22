@@ -29,14 +29,13 @@
  *   prefers-reduced-motion: todo estático y visible.
  */
 
-import type { Translations, CapabilityService, MethodStep } from '../i18n/en';
+import type { Translations, MethodStep } from '../i18n/en';
 
 const { t } = Astro.props as { t: Translations };
 
 const kicker: string = t.studio.kicker;
 const howWeWorkLabel: string = t.studio.howWeWorkLabel;
 
-const items: CapabilityService[] = t.capabilities.items;
 const steps: MethodStep[] = t.method.steps;
 ---
 
@@ -46,25 +45,6 @@ const steps: MethodStep[] = t.method.steps;
   aria-label={kicker}
 >
 
-  <!-- ═══════════════════════════════════════════════
-       MARQUEE DIVISOR — nombres de servicio corriendo infinito.
-       Velocidad reactiva a Lenis (frena/acelera con el scroll).
-       aria-hidden: contenido decorativo, no semántico.
-       ═══════════════════════════════════════════════ -->
-  <div class="stu-marquee" aria-hidden="true" data-stu-marquee>
-    <div class="stu-marquee__track" data-stu-marquee-track>
-      {[0, 1].map(() => (
-        <span class="stu-marquee__group">
-          {items.map((item) => (
-            <>
-              <span class="stu-marquee__item">{item.name}</span>
-              <span class="stu-marquee__dot">·</span>
-            </>
-          ))}
-        </span>
-      ))}
-    </div>
-  </div>
 
   <!-- ═══════════════════════════════════════════════
        PARTE 2 — CÓMO TRABAJAMOS (4 verbos-acción)
@@ -148,52 +128,6 @@ const steps: MethodStep[] = t.method.steps;
   border-bottom: 1px solid var(--hairline);
 }
 
-
-/* ═══════════════════════════════════════════════════════════
-   MARQUEE DIVISOR — entre Parte 1 y Parte 2
-   Velocidad reactiva a Lenis via JS (--marquee-speed custom prop).
-   ═══════════════════════════════════════════════════════════ */
-
-.stu-marquee {
-  overflow: hidden;
-  border-top: 1px solid var(--hairline);
-  border-bottom: 1px solid var(--hairline);
-  padding: var(--space-s) 0;
-  margin-bottom: calc(var(--space-2xl) * 1.5);
-  position: relative;
-}
-
-.stu-marquee__track {
-  display: flex;
-  width: max-content;
-  will-change: transform;
-}
-
-.stu-marquee__group {
-  display: flex;
-  align-items: center;
-  gap: var(--space-l);
-  padding-right: var(--space-l);
-  flex-shrink: 0;
-}
-
-.stu-marquee__item {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(1.5rem, 4vw, 3.5rem);
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  white-space: nowrap;
-  line-height: 1;
-}
-
-.stu-marquee__dot {
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  color: var(--ink-62); /* --ink-42 daba 2.7:1 — AA pide 4.5:1 (QA 2026-07-21) */
-  font-weight: 500;
-  flex-shrink: 0;
-}
 
 /* ═══════════════════════════════════════════════════════════
    PARTE 2 — PROCESO (verbos-acción, mobile first)
@@ -328,64 +262,6 @@ const steps: MethodStep[] = t.method.steps;
    *
    * prefers-reduced-motion: sin nada — todo visible estático.
    */
-
-  const reducedMotionPart1 = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ─── MARQUEE DIVISOR: velocidad reactiva a Lenis ─────── */
-
-  if (!reducedMotionPart1) {
-    try {
-      const track = document.querySelector<HTMLElement>('[data-stu-marquee-track]');
-      if (!track) throw new Error('no track');
-
-      const getGroupWidth = () => track.scrollWidth / 2;
-
-      let x = 0;
-      let speed = 0.5;
-      let targetSpeed = speed;
-
-      let lenisVelocity = 0;
-      const lenisEl = (window as any).__lenis;
-      if (lenisEl) {
-        lenisEl.on('scroll', (e: any) => {
-          lenisVelocity = e.velocity;
-        });
-      }
-
-      const animate = () => {
-        const velocityBoost = Math.abs(lenisVelocity) * 0.08;
-        targetSpeed = 0.5 + velocityBoost;
-        speed += (targetSpeed - speed) * 0.08;
-
-        x -= speed;
-        const groupW = getGroupWidth();
-        if (Math.abs(x) >= groupW) x += groupW;
-
-        track.style.transform = `translateX(${x}px)`;
-        raf = requestAnimationFrame(animate);
-      };
-
-      let raf = requestAnimationFrame(animate);
-
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
-      const { gsap } = await import('gsap');
-      gsap.registerPlugin(ScrollTrigger);
-
-      ScrollTrigger.create({
-        trigger: '[data-stu-marquee]',
-        start: 'top bottom',
-        end: 'bottom top',
-        onEnter: () => { if (!raf) raf = requestAnimationFrame(animate); },
-        onLeave: () => { cancelAnimationFrame(raf); raf = 0; },
-        onEnterBack: () => { if (!raf) raf = requestAnimationFrame(animate); },
-        onLeaveBack: () => { cancelAnimationFrame(raf); raf = 0; },
-      });
-
-    } catch (err) {
-      // Sin marquee si falla — no es crítico, pero logueamos para no tragar el error
-      console.error('[StudioSection marquee] init failed:', err);
-    }
-  }
 
   /* ─── PARTE 2: proceso — motion premium (research 2026) ───
      Cada paso entra escalonado (y + blur, power3.out) y el verbo
