@@ -57,7 +57,7 @@ export const es: Translations = {
   statement: {
     kicker: "SCUART — ESTUDIO",
     body: "Diseño y tecnología que trabajan juntos, no por separado.",
-    noteLeft: "ESTUDIO INDEPENDIENTE · NUEVA YORK · LATAM",
+    noteLeft: "ESTUDIO INDEPENDIENTE · BILINGÜE · LATAM + USA",
     noteRight: "Un solo equipo, de la idea al deploy.",
     ariaLabel: "Diseño y tecnología que trabajan juntos, no por separado.",
   },
@@ -247,9 +247,9 @@ export const es: Translations = {
   footer: {
     navLabel: "NAVEGACIÓN",
     langSwitchLabel: "IDIOMA",
-    markets: "Nueva York · LATAM",
+    markets: "Bilingüe · LATAM + USA",
     descriptor:
-      "Estudio de diseño web independiente. Nueva York + LATAM. Trabajamos en inglés y español.",
+      "Estudio de diseño web independiente y bilingüe. Trabajamos con negocios en LATAM y USA, en español e inglés.",
     builtBy: "© 2026 SCUART",
     tagline: "No decoramos. Decidimos.",
     ariaLabel: "SCUART — Pie de página del estudio",

@@ -272,7 +272,7 @@ export const en: Translations = {
   statement: {
     kicker: "SCUART — STUDIO",
     body: "Design and technology that work together, not apart.",
-    noteLeft: "INDEPENDENT STUDIO · NEW YORK · LATAM",
+    noteLeft: "INDEPENDENT STUDIO · BILINGUAL · LATAM + USA",
     noteRight: "One team, from idea to deploy.",
     ariaLabel: "Design and technology that work together, not apart.",
   },
@@ -453,9 +453,9 @@ export const en: Translations = {
   footer: {
     navLabel: "NAVIGATION",
     langSwitchLabel: "LANGUAGE",
-    markets: "New York · LATAM",
+    markets: "Bilingual · LATAM + USA",
     descriptor:
-      "Independent web design studio. New York + LATAM. We work in English and Spanish.",
+      "Independent, bilingual web design studio. We work with businesses across LATAM and the US, in English and Spanish.",
     builtBy: "© 2026 SCUART",
     tagline: "We don't decorate. We decide.",
     ariaLabel: "SCUART — Studio footer",
