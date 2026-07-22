@@ -15,7 +15,7 @@
  * FROM DE RESEND:
  * 'SCUART <onboarding@resend.dev>' es el from de prueba de Resend.
  * William DEBE reemplazarlo con un from de su dominio verificado en Resend:
- * ej. 'SCUART <hello@scuart.com>' una vez que verifique el dominio en Resend.
+ * ej. 'SCUART <info@scuart.com>' una vez que verifique el dominio en Resend.
  *
  * PLACEHOLDER: reemplazar FROM_EMAIL con el from definitivo al verificar dominio.
  */
@@ -157,7 +157,7 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         ok: false,
         error:
-          "Email service not configured. Contact us directly at hello@scuart.com",
+          "Email service not configured. Contact us directly at info@scuart.com",
       }),
       { status: 503, headers: { "Content-Type": "application/json" } }
     );
@@ -169,7 +169,7 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         ok: false,
         error:
-          "Email service not configured. Contact us directly at hello@scuart.com",
+          "Email service not configured. Contact us directly at info@scuart.com",
       }),
       { status: 503, headers: { "Content-Type": "application/json" } }
     );
@@ -239,7 +239,7 @@ export const POST: APIRoute = async ({ request }) => {
        * PLACEHOLDER FROM:
        * 'onboarding@resend.dev' funciona sin verificar dominio (solo para testing).
        * William DEBE reemplazar esto con su dominio verificado en Resend:
-       * from: 'SCUART <hello@scuart.com>'
+       * from: 'SCUART <info@scuart.com>'
        * Para verificar el dominio: Resend Dashboard → Domains → Add Domain.
        */
       from: "SCUART <onboarding@resend.dev>",

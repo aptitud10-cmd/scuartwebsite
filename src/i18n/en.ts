@@ -29,17 +29,9 @@ export interface PortfolioProject {
   name: string;
   /** Número de orden editorial, ej "001" */
   num: string;
-  /**
-   * Categoría del proyecto.
-   * PLACEHOLDER — William completa con el tipo real de cada proyecto.
-   * NO inventar: web, SaaS, branding, etc. Dejar marcado.
-   */
+  /** Categoría del proyecto — real, confirmada por William (2026-07-22). */
   category: string;
-  /**
-   * Año del proyecto.
-   * PLACEHOLDER — William completa con el año real.
-   * NO inventar. Dejar marcado.
-   */
+  /** Año del proyecto — real, confirmado por William (2026-07-22). */
   year: string;
   /** Ruta de imagen desde /public — ej "/images/portfolio-jamon-casero.webp" */
   image: string;
@@ -188,7 +180,7 @@ export interface Translations {
      * El enlace es elemento visual; href="#" con preventDefault en JS.
      */
     viewCase: string;
-    /** Los 4 proyectos reales. Nombres definitivos; category/year son placeholders. */
+    /** Los 4 proyectos reales. Nombres, categoría y año confirmados por William. */
     projects: PortfolioProject[];
   };
   method: {
@@ -289,32 +281,54 @@ export const en: Translations = {
       "We make your brand feel unforgettable, with websites that earn trust, not just attention — designed with intent, not trend.",
   },
 
-  /* ── Capabilities — datos conservados (reutilizados por StudioSection) ──
-     NOTA: tras el rediseño "About" (2026-06-24), las 3 `statement` se fusionaron
-     en `studio.aboutStatement`. Acá `statement` quedó SIN USO (deuda documentada).
-     `name` SÍ se sigue usando: alimenta el marquee divisor. No borrar items. */
+  /* ── Servicios — los 6 reales, sincronizados con es.ts (fix auditoría
+     2026-07-22: en.ts tenía solo 3 items distintos → la sección Servicios en
+     inglés mostraba algo diferente al español). `resolves` en inglés nativo. */
   capabilities: {
-    kicker: "CAPABILITIES",
+    kicker: "SERVICES",
     ariaLabel:
-      "Capabilities — what SCUART builds and what problems each one solves.",
+      "Services — what SCUART builds and what problem each one solves.",
     items: [
       {
         num: "01",
-        name: "DESIGN+BRAND",
-        statement: "We make your brand feel unforgettable.",
-        resolves: "",
+        name: "WEB PLATFORMS",
+        statement: "",
+        resolves:
+          "Sites that load fast, rank on search and turn visitors into clients.",
       },
       {
         num: "02",
-        name: "WEB/PRODUCT",
-        statement: "Websites that earn trust, not just attention.",
-        resolves: "",
+        name: "SAAS + SYSTEMS",
+        statement: "",
+        resolves:
+          "Full products — login, payments, dashboards, APIs. From zero to production.",
       },
       {
         num: "03",
-        name: "METHOD",
-        statement: "Design with intent, not trend.",
-        resolves: "",
+        name: "AI AUTOMATION",
+        statement: "",
+        resolves:
+          "We automate the repetitive so the team focuses on what matters.",
+      },
+      {
+        num: "04",
+        name: "E-COMMERCE",
+        statement: "",
+        resolves:
+          "Stores built to sell — fast checkout, inventory, ready to grow.",
+      },
+      {
+        num: "05",
+        name: "ORDERING · BOOKING · WORKFLOWS",
+        statement: "",
+        resolves: "Orders, bookings and operations without the manual mess.",
+      },
+      {
+        num: "06",
+        name: "BRAND IDENTITY",
+        statement: "",
+        resolves:
+          "A visual system that stays consistent everywhere — not assembled by accident.",
       },
     ],
   },
@@ -434,7 +448,7 @@ export const en: Translations = {
   /* ── Footer — cierre editorial de marca ─────────────────── */
   /*
    * C1/P4 — ANTI-INVENCIÓN:
-   * Email: hello@scuart.com — extraído del contacto (emailHref).
+   * Email: info@scuart.com — extraído del contacto (emailHref).
    * WhatsApp: placeholder wa.me/[WHATSAPP_NUMBER] — igual que el contacto.
    * Mercados: US · LATAM — de la identidad del estudio (hero index).
    * Bogotá: ciudad del estudio (de project_scuart.md). Sin dirección exacta.

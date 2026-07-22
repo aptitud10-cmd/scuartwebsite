@@ -46,13 +46,17 @@ const { t } = Astro.props;
 const lang = t.nav.langHref === '/es' ? 'en' : 'es';
 
 /*
- * Wordmark abajo-izquierda — RÉPLICA LITERAL del copy de Locomotive
- * ("Locomotive® / Digital-first Design Agency"), cambiando solo el nombre.
- * Dos líneas, MISMA serif, casi el mismo tamaño grande, redonda (no itálica),
- * Title Case en la segunda línea. Igual en ambos idiomas (término de marca).
+ * Wordmark abajo-izquierda — dos líneas, serif display.
+ * Descriptor propio (2026-07-22): antes era réplica literal de Locomotive
+ * ("Digital-first Design Agency") — texto de otra marca y encima "Agency",
+ * cuando SCUART se define como ESTUDIO en todo el resto del sitio.
+ * Ahora: estudio de diseño y tecnología, bilingüe. Localizado ES/EN.
  */
 const wordmarkName = 'SCUART';
-const wordmarkDescriptor = 'Digital-first Design Agency';
+const wordmarkDescriptor =
+  lang === 'es'
+    ? 'Estudio de diseño y tecnología'
+    : 'Design & technology studio';
 
 /* CTA superior derecha — "Let's talk" / "Hablemos" */
 const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
