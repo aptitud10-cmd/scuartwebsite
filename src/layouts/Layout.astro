@@ -89,6 +89,16 @@ const resolvedOgDesc = ogDescription ?? description;
       no están en el critical path de render del hero B1.
     -->
 
+    <!-- PP Editorial New pinta TODO el texto display (hero, nombres, statements).
+         Sin preload, el swap tardío causa reflow/CLS y retrasa el LCP (QA 2026-07-21). -->
+    <link
+      rel="preload"
+      href="/fonts/ppeditorialnew-light.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
     <!-- Favicon placeholder -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 

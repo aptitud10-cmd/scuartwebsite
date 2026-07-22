@@ -190,7 +190,7 @@ const steps: MethodStep[] = t.method.steps;
 .stu-marquee__dot {
   font-family: var(--font-body);
   font-size: var(--text-mono);
-  color: var(--ink-42);
+  color: var(--ink-62); /* --ink-42 daba 2.7:1 — AA pide 4.5:1 (QA 2026-07-21) */
   font-weight: 500;
   flex-shrink: 0;
 }
@@ -225,7 +225,7 @@ const steps: MethodStep[] = t.method.steps;
   font-size: var(--text-mono);
   font-weight: 400;
   letter-spacing: 0.1em;
-  color: var(--ink-42);
+  color: var(--ink-62); /* 42% daba 2.7:1 sobre crema — WCAG AA pide 4.5:1 (QA 2026-07-21) */
   font-variant-numeric: tabular-nums;
 }
 
@@ -283,7 +283,9 @@ const steps: MethodStep[] = t.method.steps;
     line-height: 0.75;
     letter-spacing: -0.05em;
     font-variant-numeric: tabular-nums;
-    color: var(--ink-18);
+    /* 18% daba 1.46:1 — texto display necesita 3:1 (WCAG AA texto grande).
+       42% ≈ 3.1:1: sigue siendo fantasma, pero pasa el gate. */
+    color: var(--ink-42);
     align-self: center;
     justify-self: end;
     user-select: none;

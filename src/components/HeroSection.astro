@@ -233,6 +233,10 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
     radial-gradient(70% 60% at 70% 70%, #ff3a24 0%, rgba(214,31,22,0) 65%),
     linear-gradient(130deg, #b3140d 0%, #e7251c 50%, #b3140d 100%);
   will-change: transform;
+  /* Estado base = primer frame de hero-drift: sin esto, en CPU lenta el
+     elemento pinta sin transform y salta al arrancar la animación (CLS
+     0.63 en tablet, QA 2026-07-21). */
+  transform: scale(1.1) translate3d(-6%, -4%, 0);
   /* dos animaciones: el bloque entero deriva, y los brillos pulsan */
   animation:
     hero-drift 9s ease-in-out infinite alternate,
