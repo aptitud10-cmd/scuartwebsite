@@ -1,121 +1,85 @@
 ---
 /**
- * StudioSection.astro — Sección "Estudio / Studio"
- * Fusión de CapabilitiesSection + MethodSection (William 2026-06-18).
+ * StudioSection.astro — "Cómo trabajamos" (proceso, 4 pasos). REDISEÑO 2026-07-26.
  *
- * ESTRUCTURA:
- *   Parte 1 — QUÉ HACEMOS / WHAT WE DO
- *     Tres declaraciones PP Editorial New centradas, mask-reveal por scroll.
- *     Numeral anclado al margen izquierdo (absoluto en tablet+, estático en mobile).
- *     Barra lima scaleX 0→1 post-reveal.
+ * PROBLEMA: era una lista vertical de 4 pasos con numerales fantasma — mismo
+ * molde que Servicios ("larguero"). William pidió movimiento/wow, y que NO se
+ * viera igual a Servicios (que ahora usa pin+highlight vertical).
  *
- *   MARQUEE DIVISOR — nombres de servicio corriendo infinito.
- *     Velocidad reactiva a Lenis velocity (frena/acelera con el scroll).
+ * SOLUCIÓN (DESIGN_RESEARCH_SERVICIOS_PROCESO_2026-07, mecánica #2):
+ * HORIZONTAL SCROLL DENTRO DE VERTICAL. Al llegar a la sección, se pinea y el
+ * scroll vertical del usuario se traduce en desplazamiento LATERAL de un track
+ * con los 4 pasos (Escuchamos → Definimos → Construimos → Lanzamos). El cambio
+ * de EJE respecto a Servicios (que baja) comunica "módulo distinto, secuencia".
+ * Una línea de progreso lima marca el avance. Patrón activo en agencias 2026.
  *
- *   Parte 2 — CÓMO TRABAJAMOS / HOW WE WORK
- *     4 pasos del proceso (de method.steps).
- *     Numerales 001-004 + título + body + "qué cambia".
- *     whatChanges: PP Editorial New itálica + hairline corto derecha.
- *     Pin GSAP de columna de numerales en desktop ≥1280px (conservado).
+ * ⚠️ DESKTOP-ONLY (≥1024px). Regla de William + advertencia del research:
+ * el horizontal-scroll es de los patrones más delicados en mobile (falta de
+ * affordance) y el pin puede chocar con el body-scroll-container de iOS. TODO
+ * el motion horizontal se registra SOLO en ScrollTrigger.matchMedia('(min-width:1024px)').
+ * Mobile/tablet (<1024px) = pasos APILADOS con reveal por paso, como ya estaba.
  *
- * TOKENS V4 BLANCO ACTIVOS (NO modificar):
- *   --bg, --ink, --ink-62, --ink-18, --brand, --hairline,
- *   --font-display, --font-body, --text-mono, --text-body.
- *
- * RESPONSIVE:
- *   Mobile (375px): numeral estático arriba-izquierda, declaración centrada.
- *   Tablet (768px): numeral absoluto al margen, más aire.
- *   Desktop (1280px): declaración más grande + proceso con pin.
- *   prefers-reduced-motion: todo estático y visible.
+ * COMPOSICIÓN: cada paso = numeral display gigante + verbo + body + "qué cambia".
  */
 
 import type { Translations, MethodStep } from '../i18n/en';
 
 const { t } = Astro.props as { t: Translations };
 
-const kicker: string = t.studio.kicker;
 const howWeWorkLabel: string = t.studio.howWeWorkLabel;
-
+const whatChangesLabel: string = t.method.whatChangesLabel;
 const steps: MethodStep[] = t.method.steps;
 ---
 
-<section
-  class="stu"
-  id="studio"
-  aria-label={kicker}
->
-
-
-  <!-- ═══════════════════════════════════════════════
-       PARTE 2 — CÓMO TRABAJAMOS (4 verbos-acción)
-       Rediseño 2026-07-17 (aprobado por William sobre demo):
-       verbo serif gigante protagonista + número discreto + descripción.
-       Motion: line-mask reveal del verbo (SplitText, expo.out) +
-       entrada escalonada del paso (y + blur). Sin pin, sin numerales
-       fantasma — restraint (research motion Locomotive).
-       ═══════════════════════════════════════════════ -->
-  <div class="stu-part" id="studio-how">
-    <h2 class="stu-part__label stu-part__label--how">{howWeWorkLabel}</h2>
-
-    <div class="stu-proc" data-stu-proc>
-      {steps.map((step, i) => (
-        <div
-          class="stu-proc__step"
-          data-step-index={i}
-          role="article"
-          aria-label={`${step.num} ${step.title}`}
-        >
-          <span class="stu-proc__num" aria-hidden="true">{step.num}</span>
-          <div class="stu-proc__body-wrap">
-            <h3 class="stu-proc__verb" data-proc-verb>{step.title}</h3>
-            <p class="stu-proc__desc">{step.body}</p>
-          </div>
-          <!-- Numeral fantasma al margen derecho — llena el ancho desktop
-               con intención (fix visual-critic: asimetría decidida, no vacío) -->
-          <span class="stu-proc__ghost" aria-hidden="true">{step.num}</span>
-        </div>
-      ))}
-    </div>
+<section class="stu" id="studio" aria-label={howWeWorkLabel} data-stu>
+  <div class="stu-head">
+    <h2 class="stu-part__label--how">{howWeWorkLabel}</h2>
   </div>
 
+  <!-- Pista horizontal (desktop) / columna apilada (mobile) -->
+  <div class="stu-track-wrap" data-stu-wrap>
+    <div class="stu-track" data-stu-track>
+      {steps.map((step, i) => (
+        <article
+          class="stu-step"
+          data-stu-step
+          data-index={i}
+          aria-label={`${step.num} ${step.title}`}
+        >
+          <span class="stu-step__num" aria-hidden="true">{step.num}</span>
+          <div class="stu-step__body">
+            <h3 class="stu-step__verb" data-step-verb>{step.title}</h3>
+            <p class="stu-step__desc">{step.body}</p>
+            <p class="stu-step__change">
+              <span class="stu-step__change-label">{whatChangesLabel}</span>
+              {step.whatChanges}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <!-- Línea de progreso (solo desktop, la anima el JS) -->
+    <div class="stu-progress" aria-hidden="true" data-stu-progress>
+      <span class="stu-progress__fill" data-stu-progress-fill></span>
+    </div>
+  </div>
 </section>
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   STUDIO SECTION — Art direction V5.
-   Parte 1: numeral al margen + declaración serif centrada + mask-reveal.
-   Parte 2: proceso con pin de numerales en desktop.
-   Mobile-first: 375px → 768px → 1280px.
+   STUDIO / CÓMO TRABAJAMOS — fondo crema.
+   BASE (mobile/tablet <1024px): pasos apilados con reveal.
+   DESKTOP (≥1024px): horizontal scroll (track lateral) + progreso.
    ═══════════════════════════════════════════════════════════ */
-
 .stu {
   background-color: var(--bg);
-  isolation: isolate;
-  padding-top: var(--space-xl);
-  padding-bottom: var(--space-2xl);
-  padding-left: var(--margin);
-  padding-right: var(--margin);
-  position: relative;
+  padding: var(--space-2xl) var(--margin);
   overflow-x: clip;
   scroll-margin-top: 72px;
 }
 
-/* ─── PARTES ─────────────────────────────────────────────── */
-
-.stu-part {
-  margin-bottom: calc(var(--space-2xl) * 1.5);
-}
-
-.stu-part:last-child {
-  margin-bottom: 0;
-}
-
-.stu-part__label {
-  display: none;
-}
-
 .stu-part__label--how {
-  display: block;
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
@@ -128,207 +92,256 @@ const steps: MethodStep[] = t.method.steps;
   border-bottom: 1px solid var(--hairline);
 }
 
-
-/* ═══════════════════════════════════════════════════════════
-   PARTE 2 — PROCESO (verbos-acción, mobile first)
-   Verbo serif protagonista + número discreto + descripción.
-   Hairlines entre pasos. Sin numerales fantasma, sin pin.
-   IMPORTANTE: sin opacity:0 en CSS base — el estado oculto lo
-   aplica solo el JS (progressive enhancement).
-   ═══════════════════════════════════════════════════════════ */
-
-.stu-proc {
+/* ─── TRACK: en mobile es columna; en desktop es fila horizontal ─── */
+.stu-track {
   display: flex;
   flex-direction: column;
+  gap: 0;
 }
 
-.stu-proc__step {
+.stu-step {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-2xs);
   border-top: 1px solid var(--hairline);
   padding-block: clamp(2rem, 5vh, 3.5rem);
 }
+.stu-step:last-child { border-bottom: 1px solid var(--hairline); }
 
-.stu-proc__step:last-child {
-  border-bottom: 1px solid var(--hairline);
-}
-
-.stu-proc__num {
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 400;
-  letter-spacing: 0.1em;
-  color: var(--ink-62); /* 42% daba 2.7:1 sobre crema — WCAG AA pide 4.5:1 (QA 2026-07-21) */
+.stu-step__num {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(3rem, 12vw, 5rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  color: var(--ink-62);
   font-variant-numeric: tabular-nums;
 }
 
-.stu-proc__verb {
+.stu-step__verb {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(2.25rem, 5.5vw, 4.5rem);
+  font-size: clamp(2rem, 5vw, 3.25rem);
   line-height: 1.0;
   letter-spacing: -0.025em;
   color: var(--ink);
-  margin: 0 0 clamp(0.75rem, 1.5vh, 1.25rem) 0;
+  margin: clamp(0.5rem, 1.5vh, 1rem) 0 clamp(0.6rem, 1.5vh, 1rem) 0;
 }
 
-.stu-proc__desc {
+.stu-step__desc {
   font-family: var(--font-body);
   font-size: var(--text-body);
-  font-weight: 400;
   color: var(--ink-62);
   line-height: 1.55;
   max-width: 44ch;
-  margin: 0;
+  margin: 0 0 clamp(1rem, 2vh, 1.5rem) 0;
 }
 
-/* Numeral fantasma — solo tablet/desktop. Llena el margen derecho
-   con la marca de agua tipográfica del paso (--ink-18, gigante). */
-.stu-proc__ghost {
-  display: none;
+.stu-step__change {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-style: italic;
+  color: var(--ink);
+  line-height: 1.5;
+  max-width: 40ch;
+  margin: 0;
+  padding-top: clamp(0.75rem, 1.5vh, 1.25rem);
+  border-top: 1px solid var(--hairline);
 }
+.stu-step__change-label {
+  display: block;
+  font-style: normal;
+  font-size: var(--text-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-62);
+  margin-bottom: 0.4em;
+}
+
+.stu-progress { display: none; }
+
+/* ─── reveal base (mobile) — lo aplica el JS ─── */
+.stu-animate-base .stu-step { opacity: 0; transform: translateY(24px); }
 
 /* ═══════════════════════════════════════════════════════════
-   TABLET/DESKTOP (768px+): número en columna propia, alineado
-   a la primera línea del verbo — asimetría editorial.
+   DESKTOP ≥1024px — HORIZONTAL SCROLL.
+   El wrap se pinea; el track se desliza en X con el scroll vertical.
+   Cada paso ocupa ~una pantalla; línea de progreso lima abajo.
    ═══════════════════════════════════════════════════════════ */
-@media (min-width: 768px) {
-  .stu {
-    padding-top: var(--space-2xl);
-    padding-bottom: calc(var(--space-2xl) * 1.5);
+@media (min-width: 1024px) {
+  .stu { padding-bottom: 0; overflow: hidden; }
+
+  .stu-head { padding-bottom: var(--space-l); }
+
+  .stu-track-wrap {
+    position: relative;
   }
 
-  .stu-proc__step {
-    grid-template-columns: 4rem 1fr auto;
-    gap: clamp(1rem, 3vw, 3rem);
-    align-items: baseline;
+  .stu-track {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0;
+    /* el ancho real lo da la suma de los pasos; el JS calcula el desplazamiento */
+    width: max-content;
+    align-items: stretch;
   }
 
-  .stu-proc__num {
-    padding-top: 0.4em;
+  .stu-step {
+    /* cada paso ocupa una franja ancha de la pantalla */
+    width: clamp(30rem, 46vw, 44rem);
+    min-height: 82vh;
+    border-top: none;
+    border-left: 1px solid var(--hairline);
+    padding: clamp(3rem, 6vh, 5rem) clamp(2.5rem, 5vw, 5rem);
+    display: grid;
+    grid-template-rows: auto 1fr;
+    align-content: start;
+    gap: clamp(1.5rem, 4vh, 3rem);
+  }
+  .stu-step:last-child { border-bottom: none; }
+  .stu-step:first-child { border-left: none; padding-left: 0; }
+
+  .stu-step__num {
+    font-size: clamp(8rem, 15vw, 15rem);
+    line-height: 0.72;
+    color: rgba(20, 19, 15, 0.14);
+    /* el numeral gigante como marca de agua del paso */
+    align-self: start;
   }
 
-  .stu-proc__ghost {
+  .stu-step__verb {
+    font-size: clamp(2.5rem, 3.4vw, 4rem);
+    margin-top: 0;
+  }
+
+  .stu-step__body { align-self: start; }
+
+  /* Línea de progreso — fija abajo del viewport pineado */
+  .stu-progress {
     display: block;
-    font-family: var(--font-display);
-    font-weight: 300;
-    font-size: clamp(8rem, 16vw, 15rem);
-    line-height: 0.75;
-    letter-spacing: -0.05em;
-    font-variant-numeric: tabular-nums;
-    /* 18% daba 1.46:1 — texto display necesita 3:1 (WCAG AA texto grande).
-       42% ≈ 3.1:1: sigue siendo fantasma, pero pasa el gate. */
-    /* numeral fantasma: 42% daba 2.7:1 (falla AA texto grande = 3:1). Subo a
-       ~50% → ~3.2:1, pasa el gate sin dejar de ser fantasma (QA 2026-07-22). */
-    color: rgba(20, 19, 15, 0.5);
-    align-self: center;
-    justify-self: end;
-    user-select: none;
-    pointer-events: none;
+    position: absolute;
+    left: 0;
+    bottom: clamp(2rem, 5vh, 4rem);
+    width: 100%;
+    height: 2px;
+    background: var(--hairline);
   }
+  .stu-progress__fill {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: var(--brand);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  /* en desktop el reveal-base no aplica (manda el pin horizontal) */
+  .stu-animate-base .stu-step { opacity: 1; transform: none; }
 }
 
-@media (min-width: 1280px) {
-  .stu {
-    padding-top: calc(var(--space-2xl) * 1.5);
-    padding-bottom: calc(var(--space-2xl) * 1.5);
-  }
-
-  #studio-how {
-    padding-bottom: 0;
-    margin-bottom: 0;
-  }
-}
-
-/* ─── reduced-motion: todo estático ─────────────────────── */
+/* ─── reduced-motion: todo estático y visible ─── */
 @media (prefers-reduced-motion: reduce) {
-  .stu-proc__step { opacity: 1 !important; transform: none !important; filter: none !important; }
+  .stu-animate-base .stu-step { opacity: 1 !important; transform: none !important; }
+  .stu-progress__fill { transform: scaleX(1) !important; }
+  @media (min-width: 1024px) {
+    /* sin horizontal scroll: los pasos vuelven a columna legible */
+    .stu-track { flex-direction: column; width: auto; }
+    .stu-step { width: auto; min-height: 0; border-left: none; border-top: 1px solid var(--hairline); padding-inline: 0; }
+    .stu-step:first-child { padding-left: 0; }
+  }
 }
 </style>
 
 <script>
   /**
-   * StudioSection — scripts de interactividad.
-   *
-   * PARTE 1 — About (mecanismo real de trionn.com/about):
-   *   Reveal por BLUR + OPACITY (el que usa Trionn: will-change:filter,opacity).
-   *   La frase entra desenfocada y se enfoca; anotaciones fade-up.
-   *   El video de fondo se reproduce solo (autoplay muted loop).
-   *   Progressive enhancement: sin GSAP → todo visible nítido
-   *   (el estado oculto lo aplica SOLO el JS, no el CSS).
-   *
-   * PARTE 2 — Pasos del proceso (INTACTO):
-   *   DESKTOP (≥1280px): GSAP ScrollTrigger pin de columna de numerales.
-   *   MOBILE/TABLET (<1280px): GSAP ScrollTrigger reveal por paso.
-   *
-   * prefers-reduced-motion: sin nada — todo visible estático.
+   * Cómo trabajamos — dos vías por ancho (ScrollTrigger.matchMedia):
+   *   ≥1024px: horizontal scroll — pin del wrap, track se desliza en X con el
+   *     scroll vertical, línea de progreso lima se llena. Cambio de eje respecto
+   *     a Servicios (vertical) → "módulo distinto".
+   *   <1024px: reveal por paso (apilado). Igual que antes. NO toca el scroll de iOS.
    */
 
-  /* ─── PARTE 2: proceso — motion premium (research 2026) ───
-     Cada paso entra escalonado (y + blur, power3.out) y el verbo
-     hace line-mask reveal (SplitText, yPercent 110, expo.out).
-     once:true — los reveals de entrada no rebobinan. */
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const section = document.querySelector<HTMLElement>('[data-stu]');
+  const wrap = document.querySelector<HTMLElement>('[data-stu-wrap]');
+  const track = document.querySelector<HTMLElement>('[data-stu-track]');
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (section && wrap && track && !prefersReduced) {
+    (async () => {
+      try {
+        const { gsap } = await import('gsap');
+        const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+        const { SplitText } = await import('gsap/SplitText');
+        gsap.registerPlugin(ScrollTrigger, SplitText);
 
-  if (!reducedMotion) {
-    try {
-      const { gsap } = await import('gsap');
-      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
-      const { SplitText } = await import('gsap/SplitText');
-      gsap.registerPlugin(ScrollTrigger, SplitText);
+        const steps = gsap.utils.toArray<HTMLElement>('[data-stu-step]');
+        const fill = section.querySelector<HTMLElement>('[data-stu-progress-fill]');
 
-      const procSteps = document.querySelectorAll<HTMLElement>('.stu-proc__step');
+        ScrollTrigger.matchMedia({
+          /* ─────────── DESKTOP ≥1024px: horizontal scroll ─────────── */
+          '(min-width: 1024px)': () => {
+            /* distancia a desplazar en X = ancho del track menos un viewport */
+            const getDistance = () => track.scrollWidth - window.innerWidth;
 
-      procSteps.forEach((step, i) => {
-        /* Entrada del paso: y + blur sutil, escalonada por índice.
-           gsap.from DENTRO de onEnter — sin estado oculto persistente:
-           si el trigger no dispara, el paso queda visible (robustez). */
-        ScrollTrigger.create({
-          trigger: step,
-          start: 'top 82%',
-          once: true,
-          onEnter: () => {
-            gsap.from(step, {
-              opacity: 0,
-              y: 24,
-              filter: 'blur(4px)',
-              duration: 0.7,
-              ease: 'power3.out',
-              delay: i * 0.06,
-              onComplete: () => { step.style.filter = ''; },
+            const tween = gsap.to(track, {
+              x: () => -getDistance(),
+              ease: 'none',
+              scrollTrigger: {
+                trigger: wrap,
+                start: 'top top',
+                end: () => '+=' + getDistance(),
+                pin: true,
+                scrub: 0.8,
+                invalidateOnRefresh: true,
+                onUpdate: (self) => {
+                  if (fill) gsap.set(fill, { scaleX: self.progress });
+                },
+              },
             });
 
-            /* Verbo: line-mask reveal — la línea sube desde su máscara */
-            const verb = step.querySelector<HTMLElement>('[data-proc-verb]');
-            if (verb) {
-              const split = new SplitText(verb, {
-                type: 'lines',
-                mask: 'lines',
-                autoSplit: true,
-                aria: 'none',
+            /* Cada verbo hace line-mask reveal al entrar en X (batch por paso) */
+            steps.forEach((step) => {
+              const verb = step.querySelector<HTMLElement>('[data-step-verb]');
+              if (!verb) return;
+              const split = new SplitText(verb, { type: 'lines', mask: 'lines', autoSplit: true, aria: 'none' });
+              gsap.set(split.lines, { yPercent: 0 });
+              ScrollTrigger.create({
+                trigger: step,
+                containerAnimation: tween,
+                start: 'left 70%',
+                once: true,
+                onEnter: () => {
+                  gsap.from(split.lines, { yPercent: 115, duration: 0.9, ease: 'expo.out', stagger: 0.08 });
+                },
               });
-              gsap.from(split.lines, {
-                yPercent: 110,
-                duration: 1.0,
-                ease: 'expo.out',
-                stagger: 0.1,
-                force3D: true,
-              });
-            }
+            });
+
+            return () => { tween.scrollTrigger?.kill(); tween.kill(); gsap.set(track, { x: 0 }); };
+          },
+
+          /* ─────────── MOBILE/TABLET <1024px: reveal apilado ─────────── */
+          '(max-width: 1023px)': () => {
+            section.classList.add('stu-animate-base');
+            const triggers = steps.map((step, i) =>
+              ScrollTrigger.create({
+                trigger: step,
+                start: 'top 82%',
+                once: true,
+                onEnter: () => {
+                  gsap.to(step, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', delay: i * 0.05 });
+                },
+              }),
+            );
+            return () => { triggers.forEach((t) => t.kill()); };
           },
         });
-      });
-
-    } catch (err) {
-      /* Si GSAP falla → pasos visibles (el estado oculto lo puso este JS) */
-      console.error('[StudioSection proceso] motion init failed:', err);
-      document.querySelectorAll<HTMLElement>('.stu-proc__step').forEach((s) => {
-        s.style.opacity = '1';
-        s.style.transform = 'none';
-        s.style.filter = 'none';
-      });
-    }
+      } catch (err) {
+        console.error('[StudioSection] motion init failed:', err);
+        document.querySelectorAll<HTMLElement>('[data-stu-step]').forEach((s) => {
+          s.style.opacity = '1';
+          s.style.transform = 'none';
+        });
+      }
+    })();
   }
 </script>

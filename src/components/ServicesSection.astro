@@ -1,20 +1,26 @@
 ---
 /**
- * ServicesSection.astro — Los 6 servicios de SCUART con su línea de beneficio.
- * Reemplaza el marquee pobre de 3 palabras (crítica del visual-critic).
+ * ServicesSection.astro — Los 6 servicios de SCUART. REDISEÑO 2026-07-26 (v2).
  *
- * Fondo crema. Va entre la sección dark (statement) y el Método.
- * Flujo: Portfolio (qué hice) → Statement dark → SERVICIOS → Método (cómo trabajo).
+ * PROBLEMA: "larguero de texto sin movimiento ni wow". Rechazado: agrandar
+ * tipografía; numerales gigantes estáticos en zig-zag.
+ *
+ * SOLUCIÓN (DESIGN_RESEARCH_SERVICIOS_PROCESO_2026-07, mecánica #3 + #1):
+ * PIN + HIGHLIGHT SECUENCIAL — patrón canónico de agencias premiadas 2026.
+ * La lista se clava en pantalla; al scrollear, UN servicio se resalta por vez
+ * (se agranda + acento lima + los otros se atenúan). El usuario controla el
+ * avance con su propio scroll → deja de ser "6 textos que se leen de golpe".
+ * Un numeral gigante muta en vivo (01→06) sincronizado con el servicio activo.
+ *
+ * ⚠️ DESKTOP-ONLY (≥1024px). Regla de William + advertencia del research:
+ * el pin puede romper el body-scroll-container de iOS. TODO el motion nuevo se
+ * registra SOLO dentro de ScrollTrigger.matchMedia('(min-width:1024px)').
+ * Mobile/tablet (<1024px) = layout apilado simple con reveal por fila, IDÉNTICO
+ * a lo que ya funcionaba. NO se toca.
  *
  * COMPOSICIÓN (visual-composition):
- *   N1 — nombre del servicio (display, contraste fuerte).
- *   N2 — línea de beneficio "resolves" (cuerpo, subordinada).
- *   N3 — numeral 01–06 al margen izquierdo (mono, ficha técnica).
- *   Filas con hairlines + numeral al margen = asimetría (anti R2), NO cards
- *   uniformes (anti R4). Sin numerales gigantes (evita la muletilla del sitio).
- *
- * MOTION: entrada escalonada por fila (y + fade, power3.out, once). Mismo
- * lenguaje del Método. reduced-motion → visible estático.
+ *   N1 — servicio activo (grande, lima). N2 — numeral gigante que muta.
+ *   N3 — servicios inactivos (atenuados) + beneficio + kicker.
  */
 
 import type { Translations, CapabilityService } from '../i18n/en';
@@ -26,34 +32,63 @@ interface Props {
 const { t } = Astro.props;
 const kicker = t.servicesKicker;
 const items: CapabilityService[] = t.capabilities.items;
+
+/* Diagramas isométricos por servicio (generados, aprobados por William 2026-07-27).
+   Orden alineado a capabilities.items: 01 WEB · 02 SAAS · 03 AI · 04 ECOMMERCE ·
+   05 ORDERING · 06 BRAND. Cada uno SUGIERE su servicio (no abstracto). */
+const svcImages = [
+  '/images/servicios/web-platforms.webp',
+  '/images/servicios/saas.webp',
+  '/images/servicios/ai.webp',
+  '/images/servicios/ecommerce.webp',
+  '/images/servicios/ordering.webp',
+  '/images/servicios/brand.webp',
+];
 ---
 
-<section class="svc" id="services" aria-label={kicker}>
+<section class="svc" id="services" aria-label={kicker} data-svc>
   <p class="svc__kicker">{kicker}</p>
 
-  <ol class="svc__list" data-svc-list>
-    {items.map((item) => (
-      <li class="svc__row" data-svc-row>
-        <span class="svc__num" aria-hidden="true">{item.num}</span>
-        <h2 class="svc__name">{item.name}</h2>
-        <p class="svc__resolves">{item.resolves}</p>
-      </li>
-    ))}
-  </ol>
+  <div class="svc__stage" data-svc-stage>
+    <!-- Panel visual: el diagrama del servicio activo (solo desktop, lo cruza el JS).
+         Se apilan las 6 imágenes; el JS muestra solo la del servicio en foco. -->
+    <div class="svc__visual" aria-hidden="true" data-svc-visual>
+      {items.map((item, i) => (
+        <img
+          class="svc__img"
+          src={svcImages[i]}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          data-svc-img
+          data-index={i}
+        />
+      ))}
+      <span class="svc__bignum" data-svc-bignum>01</span>
+    </div>
+
+    <ol class="svc__list" data-svc-list>
+      {items.map((item, i) => (
+        <li class="svc__row" data-svc-row data-index={i}>
+          <span class="svc__num" aria-hidden="true">{item.num}</span>
+          <h2 class="svc__name">{item.name}</h2>
+          <p class="svc__resolves">{item.resolves}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
 </section>
 
 <style>
   /* ═══════════════════════════════════════════════════════════
-     SERVICIOS — 6 filas compactas, fondo crema.
-     Numeral al margen + nombre display + línea de beneficio.
-     Sistema del Método pero más denso, sin numerales gigantes.
+     SERVICIOS — fondo crema.
+     BASE (mobile/tablet <1024px): lista apilada simple con reveal.
+     DESKTOP (≥1024px): pin + highlight secuencial + numeral que muta.
      ═══════════════════════════════════════════════════════════ */
   .svc {
     background-color: var(--bg);
-    padding-top: var(--space-2xl);
-    padding-bottom: var(--space-2xl);
-    padding-left: var(--margin);
-    padding-right: var(--margin);
+    padding: var(--space-2xl) var(--margin);
+    overflow-x: clip;
   }
 
   .svc__kicker {
@@ -68,6 +103,13 @@ const items: CapabilityService[] = t.capabilities.items;
     border-bottom: 1px solid var(--hairline);
   }
 
+  .svc__stage { position: relative; }
+
+  /* ── Panel visual (mobile): oculto. En mobile mandan las filas de texto;
+     meter 6 diagramas grandes apilados haría un mega-larguero. Solo desktop. ── */
+  .svc__visual { display: none; }
+  .svc__bignum { display: none; }
+
   .svc__list {
     list-style: none;
     margin: 0;
@@ -76,8 +118,7 @@ const items: CapabilityService[] = t.capabilities.items;
     flex-direction: column;
   }
 
-  /* ─── FILA ───
-     Mobile: apilada (numeral+nombre en una línea, resolves debajo). */
+  /* ─── FILA base (mobile/tablet) ─── */
   .svc__row {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -105,8 +146,8 @@ const items: CapabilityService[] = t.capabilities.items;
     grid-area: name;
     font-family: var(--font-display);
     font-weight: 300;
-    font-size: clamp(1.5rem, 3.5vw, 2.75rem);
-    line-height: 1.05;
+    font-size: clamp(1.9rem, 5vw, 2.75rem);
+    line-height: 1.02;
     letter-spacing: -0.02em;
     color: var(--ink);
     margin: 0;
@@ -122,42 +163,172 @@ const items: CapabilityService[] = t.capabilities.items;
     max-width: 52ch;
   }
 
-  /* ═══════════════════════════════════════════════════════════
-     DESKTOP (768px+): 3 columnas — numeral | nombre | resolves.
-     El beneficio a la derecha del nombre, alineados a la baseline.
-     ═══════════════════════════════════════════════════════════ */
-  @media (min-width: 768px) {
-    .svc__row {
-      grid-template-columns: 3rem minmax(0, 0.9fr) minmax(0, 1.1fr);
-      grid-template-areas: "num name resolves";
-      column-gap: var(--space-l);
-      align-items: baseline;
-    }
-
-    .svc__resolves {
-      padding-top: 0.35em; /* óptica: baja el cuerpo para casar con la x-height del nombre */
-    }
-  }
-
-  /* ─── Entrada escalonada — estado oculto lo aplica SOLO el JS ─── */
-  .svc-animate .svc__row {
+  /* ─── reveal base (mobile/tablet) — lo aplica el JS ─── */
+  .svc-animate-base .svc__row {
     opacity: 0;
     transform: translateY(20px);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .svc-animate .svc__row {
-      opacity: 1;
-      transform: none;
+  /* ═══════════════════════════════════════════════════════════
+     DESKTOP ≥1024px — PIN + HIGHLIGHT SECUENCIAL.
+     La escena ocupa el alto del viewport; el numeral gigante vive
+     a la izquierda, la lista a la derecha. El servicio activo se
+     agranda y toma color; los demás se atenúan. Lo orquesta el JS.
+     ═══════════════════════════════════════════════════════════ */
+  @media (min-width: 1024px) {
+    .svc { padding-block: 0; } /* el pin maneja el alto; sin doble padding */
+
+    .svc__kicker {
+      /* el kicker se saca del flujo pineado: va arriba de la escena */
+      margin-bottom: var(--space-xl);
+      padding-top: var(--space-2xl);
     }
+
+    .svc__stage {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      align-items: center;
+      gap: clamp(2rem, 6vw, 6rem);
+      min-height: 100vh;
+    }
+
+    /* ── Panel visual — columna izquierda. El diagrama del servicio activo. ── */
+    .svc__visual {
+      display: block;
+      grid-column: 1;
+      position: relative;
+      align-self: center;
+      justify-self: stretch;
+      aspect-ratio: 4 / 5;
+      max-height: 78vh;
+    }
+
+    /* Las 6 imágenes apiladas; solo la activa es visible (crossfade). */
+    .svc__img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transform: scale(0.985);
+      transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.19,1,0.22,1);
+      pointer-events: none;
+    }
+    .svc__img[data-active] {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Numeral que muta — acento chico arriba-izquierda del panel, no protagonista */
+    .svc__bignum {
+      display: block;
+      position: absolute;
+      top: -0.1em;
+      left: 0;
+      z-index: 2;
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: clamp(3.5rem, 5vw, 5rem);
+      line-height: 0.8;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      user-select: none;
+    }
+    .svc__bignum::after {
+      content: '';
+      position: absolute;
+      left: 0.06em;
+      bottom: 0.08em;
+      width: 0.5em;
+      height: 0.07em;
+      background: var(--brand);
+    }
+
+    .svc__list {
+      grid-column: 2;
+      gap: 0;
+    }
+
+    /* Filas desktop: sin hairlines, sin grid de 2 áreas — cada una es un
+       bloque que se resalta/atenúa. */
+    .svc__row {
+      display: block;
+      border-bottom: none;
+      padding-block: clamp(0.6rem, 1.4vh, 1.1rem);
+      opacity: 0.28; /* estado inactivo por defecto */
+      transition: opacity 0.5s ease;
+    }
+
+    .svc__row .svc__num {
+      display: inline-block;
+      margin-right: 1em;
+      vertical-align: middle;
+      opacity: 0; /* el numeral chico se oculta en desktop; manda el gigante */
+    }
+
+    .svc__row .svc__name {
+      display: inline-block;
+      vertical-align: middle;
+      font-size: clamp(1.75rem, 3vw, 3.25rem);
+      transition: color 0.4s ease, transform 0.5s cubic-bezier(0.19,1,0.22,1);
+      transform-origin: left center;
+    }
+
+    .svc__row .svc__resolves {
+      max-width: 46ch;
+      margin-top: 0.5rem;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.5s ease, opacity 0.4s ease, margin-top 0.4s ease;
+    }
+
+    /* SERVICIO ACTIVO — resaltado */
+    .svc__row[data-active] {
+      opacity: 1;
+    }
+    .svc__row[data-active] .svc__name {
+      color: var(--ink);
+      transform: scale(1.04);
+    }
+    .svc__row[data-active] .svc__resolves {
+      max-height: 6rem;
+      opacity: 1;
+      margin-top: 0.75rem;
+    }
+
+    /* En desktop NO se usa el reveal-base (lo maneja el pin) */
+    .svc-animate-base .svc__row { opacity: 0.28; transform: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .svc-animate-base .svc__row { opacity: 1; transform: none; }
+    /* Con reduced-motion en desktop: mostrar todo, sin atenuar ni pin */
+    .svc__row { opacity: 1 !important; }
+    .svc__row .svc__resolves { max-height: none !important; opacity: 1 !important; }
+    .svc__row .svc__num { opacity: 0.62 !important; }
   }
 </style>
 
 <script>
+  /**
+   * Servicios — dos vías, seleccionadas por ancho:
+   *   <1024px (BASE): reveal por fila con IntersectionObserver-like (GSAP
+   *     ScrollTrigger simple). Igual que la versión que ya funcionaba en mobile.
+   *   ≥1024px (DESKTOP): pin + highlight secuencial + numeral que muta.
+   *
+   * Todo el motion se registra dentro de ScrollTrigger.matchMedia — así el
+   * bloque desktop JAMÁS corre en mobile (no toca el body-scroll de iOS) y GSAP
+   * limpia/recrea automáticamente al cruzar el breakpoint (resize).
+   */
+
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const section = document.querySelector<HTMLElement>('[data-svc]');
   const list = document.querySelector<HTMLElement>('[data-svc-list]');
 
-  if (list && !prefersReduced) {
+  if (section && list && !prefersReduced) {
     (async () => {
       try {
         const { gsap } = await import('gsap');
@@ -165,20 +336,76 @@ const items: CapabilityService[] = t.capabilities.items;
         gsap.registerPlugin(ScrollTrigger);
 
         const rows = gsap.utils.toArray<HTMLElement>('[data-svc-row]');
-        list.closest('.svc')?.classList.add('svc-animate');
+        const bignum = section.querySelector<HTMLElement>('[data-svc-bignum]');
+        const imgs = gsap.utils.toArray<HTMLElement>('[data-svc-img]');
 
-        ScrollTrigger.create({
-          trigger: list,
-          start: 'top 80%',
-          once: true,
-          onEnter: () => {
-            gsap.to(rows, {
-              opacity: 1,
-              y: 0,
-              duration: 0.7,
-              ease: 'power3.out',
-              stagger: 0.08,
+        ScrollTrigger.matchMedia({
+          /* ─────────── DESKTOP ≥1024px: pin + highlight ─────────── */
+          '(min-width: 1024px)': () => {
+            const stage = section.querySelector<HTMLElement>('[data-svc-stage]');
+            if (!stage) return;
+
+            const setActive = (idx: number) => {
+              rows.forEach((r, i) => {
+                if (i === idx) r.setAttribute('data-active', '');
+                else r.removeAttribute('data-active');
+              });
+              /* Diagrama del servicio activo (crossfade por CSS) */
+              imgs.forEach((im, i) => {
+                if (i === idx) im.setAttribute('data-active', '');
+                else im.removeAttribute('data-active');
+              });
+              if (bignum) {
+                const n = String(idx + 1).padStart(2, '0');
+                if (bignum.textContent !== n) {
+                  /* micro-transición del numeral al mutar */
+                  gsap.fromTo(
+                    bignum,
+                    { yPercent: 8, opacity: 0.4 },
+                    { yPercent: 0, opacity: 1, duration: 0.45, ease: 'expo.out', overwrite: true },
+                  );
+                  bignum.textContent = n;
+                }
+              }
+            };
+            setActive(0);
+
+            /* Pin de la escena; el scroll dentro del tramo cambia el activo.
+               El tramo = alto por servicio; snap para que cada paso “encaje”. */
+            const st = ScrollTrigger.create({
+              trigger: stage,
+              start: 'center center',
+              end: () => '+=' + window.innerHeight * (rows.length * 0.85),
+              pin: true,
+              scrub: 0.6,
+              snap: {
+                snapTo: 1 / (rows.length - 1),
+                duration: 0.25,
+                ease: 'power1.inOut',
+              },
+              onUpdate: (self) => {
+                const idx = Math.round(self.progress * (rows.length - 1));
+                setActive(idx);
+              },
             });
+
+            return () => { st.kill(); rows.forEach((r) => r.removeAttribute('data-active')); };
+          },
+
+          /* ─────────── MOBILE/TABLET <1024px: reveal simple ─────────── */
+          '(max-width: 1023px)': () => {
+            section.classList.add('svc-animate-base');
+            const trig = ScrollTrigger.create({
+              trigger: list,
+              start: 'top 80%',
+              once: true,
+              onEnter: () => {
+                gsap.to(rows, {
+                  opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.08,
+                });
+              },
+            });
+            return () => { trig.kill(); };
           },
         });
       } catch (err) {

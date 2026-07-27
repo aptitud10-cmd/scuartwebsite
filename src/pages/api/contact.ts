@@ -236,13 +236,12 @@ export const POST: APIRoute = async ({ request }) => {
 
     const result = await resend.emails.send({
       /*
-       * PLACEHOLDER FROM:
-       * 'onboarding@resend.dev' funciona sin verificar dominio (solo para testing).
-       * William DEBE reemplazar esto con su dominio verificado en Resend:
-       * from: 'SCUART <info@scuart.com>'
-       * Para verificar el dominio: Resend Dashboard → Domains → Add Domain.
+       * FROM: requiere dominio scuart.com verificado en Resend (Dashboard →
+       * Domains → Add Domain, agregar los registros DNS que Resend indique).
+       * Hasta que el dominio esté verificado, Resend rechaza el envío con este
+       * from — si en las pruebas iniciales falla, verificá el dominio primero.
        */
-      from: "SCUART <onboarding@resend.dev>",
+      from: "SCUART <info@scuart.com>",
       to: contactEmail,
       replyTo: email,
       subject,

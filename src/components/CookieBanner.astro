@@ -54,8 +54,13 @@ const c = copy[lang];
 .cookie {
   position: fixed;
   bottom: max(var(--space-m), env(safe-area-inset-bottom));
-  left: var(--space-m);
+  /* Anclado a la DERECHA: el wordmark del hero vive abajo-IZQUIERDA — si el
+     banner arranca a la izquierda se monta sobre "SCUART" en la primera visita
+     (los ~1.2s que tarda en aparecer, el usuario aún mira el hero). La derecha
+     del hero está libre, así nunca se pisan en ningún viewport. En mobile el
+     max-width no alcanza y ocupa casi todo el ancho igual (left+right definidos). */
   right: var(--space-m);
+  left: auto;
   z-index: 1000;
   max-width: 30rem;
   background-color: color-mix(in srgb, var(--ink) 90%, transparent);
@@ -71,6 +76,17 @@ const c = copy[lang];
 
 .cookie[hidden] {
   display: none;
+}
+
+/* Mobile: el banner ocupa el ancho abajo (left+right), como antes. En viewport
+   chico el hero es más alto y el wordmark escala, así que el banner al pie no
+   lo tapa; y a 30rem descolgado a la derecha se vería raro. */
+@media (max-width: 520px) {
+  .cookie {
+    left: var(--space-m);
+    right: var(--space-m);
+    max-width: none;
+  }
 }
 
 /* En la sección Contacto el banner se desvanece y deja de recibir clics, para

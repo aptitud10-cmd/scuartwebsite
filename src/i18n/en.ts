@@ -71,6 +71,22 @@ export interface ContactTranslations {
   kicker: string;
   /** CTA mailto — "Empezar un proyecto" (rediseño sobrio 2026-07-17) */
   ctaStart: string;
+  /* ── Formulario corto (4 campos) — reconectado a /api/contact ── */
+  formName: string;
+  formEmail: string;
+  formNeed: string;
+  /** Opciones del select "qué necesitás" — value + label */
+  formNeedOptions: { value: string; label: string }[];
+  formMessage: string;
+  formSubmit: string;
+  formSubmitting: string;
+  formSuccess: string;
+  formError: string;
+  /** Alternativa: email + WhatsApp */
+  altLabel: string;
+  whatsappLabel: string;
+  /** URL wa.me con el número real de SCUART */
+  whatsappHref: string;
 }
 
 export interface FooterTranslations {
@@ -461,6 +477,25 @@ export const en: Translations = {
     statement: "Tell us what you're building.",
     subcopy: "A conversation, not a quote. We reply within 24 hours.",
     ctaStart: "Start a project",
+    formName: "Your name",
+    formEmail: "Your email",
+    formNeed: "What do you need?",
+    formNeedOptions: [
+      { value: "", label: "What do you need?" },
+      { value: "web", label: "A website" },
+      { value: "saas", label: "A platform / SaaS" },
+      { value: "ecommerce", label: "An online store" },
+      { value: "branding", label: "Brand identity" },
+      { value: "otro", label: "Something else / not sure" },
+    ],
+    formMessage: "Tell us a bit about the project",
+    formSubmit: "Send",
+    formSubmitting: "Sending…",
+    formSuccess: "Got it! We'll get back to you within 24 hours.",
+    formError: "Something went wrong. Email us directly at info@scuart.com.",
+    altLabel: "Or reach us directly",
+    whatsappLabel: "WhatsApp",
+    whatsappHref: "https://wa.me/13478489720",
   },
 
   /* ── Footer — cierre de marca ───────────────────────────── */

@@ -1,22 +1,34 @@
 ---
 /**
- * ContactSection.astro — Sección 4: Contacto — Rediseño 2026-07-17
+ * ContactSection.astro — Sección 4: Contacto — Rediseño 2026-07-25
  *
- * Patrón sobrio premium (research 2026, Lama Lama / Locomotive):
- * statement conversacional + EMAIL como elemento tipográfico protagonista
- * + un CTA claro + nota de respuesta. SIN formulario largo, sin FAQ.
+ * PATRÓN (research DESIGN_RESEARCH_CONTACTO_CASOS_2026-07):
+ * Email directo + WhatsApp, SIN formulario. Es lo que hacen las agencias
+ * boutique top (Dogstudio, Koto, Basic Agency, Locomotive): contacto
+ * persona-a-persona, cero fricción, cero pipeline de CRM. Coherente con
+ * "SCUART = estudio chico, hablás directo con William".
+ *
+ * JERARQUÍA (visual-composition):
+ *   N1 — EMAIL gigante (serif Light, protagonista tipográfico).
+ *   N2 — WhatsApp (canal directo, estilo sistema, solo el ícono da color).
+ *   N3 — kicker, statement, botón copiar-email, nota de respuesta, mercados.
  *
  * MOTION (research motion 2026):
  *   - Statement: line-mask reveal (SplitText lines, yPercent 110, expo.out).
- *   - Email: entrada y+opacity; hover con underline que crece (CSS,
- *     cubic-bezier expo) + efecto magnético sutil (gsap.quickTo, factor 0.35,
- *     SOLO en dispositivos con hover real).
- *   - once:true en todos los reveals — no rebobinan.
+ *   - Email: entrada y+opacity; hover con underline que crece (CSS) +
+ *     efecto magnético sutil (gsap.quickTo, SOLO con hover real).
+ *   - Canales (WhatsApp + copiar): entrada escalonada después del email.
+ *   - once:true — no rebobinan.
  *
- * Progressive enhancement: el estado oculto lo aplica SOLO el JS.
- * Sin JS o con reduced-motion, todo visible y estático.
+ * COPIAR EMAIL (patrón Koto): un click copia info@scuart.com sin abrir el
+ * cliente de correo — mejor UX mobile. Fallback a mailto en el email grande.
  *
- * El endpoint /api/contact se conserva en el repo (no se usa desde aquí).
+ * Progressive enhancement: el estado oculto lo aplica SOLO el JS. Sin JS o
+ * con reduced-motion, todo visible y estático. El botón copiar degrada a
+ * "seleccionar el email a mano" si la Clipboard API no está disponible.
+ *
+ * El endpoint /api/contact se conserva en el repo (no se usa desde aquí —
+ * queda listo por si se decide sumar un form corto en el futuro).
  */
 
 import type { Translations } from '../i18n/en';
@@ -29,6 +41,14 @@ const { t } = Astro.props;
 const c = t.contact;
 
 const EMAIL = 'info@scuart.com';
+const WHATSAPP_HREF = c.whatsappHref;
+/* Número legible para mostrar junto al botón (formateado a mano, no derivado
+   del href para no depender de parseo). */
+const WHATSAPP_DISPLAY = '+1 347 848 9720';
+/* nav.langLabel es "EN" en la página ES y "ES" en la página EN → detecta idioma */
+const isES = t.nav.langLabel === 'EN';
+const copyLabel = isES ? 'Copiar' : 'Copy';
+const copiedLabel = isES ? '¡Copiado!' : 'Copied!';
 ---
 
 <section class="contact" id="contact" aria-label={c.kicker}>
@@ -36,17 +56,53 @@ const EMAIL = 'info@scuart.com';
 
   <h2 class="contact__statement" data-contact-statement>{c.statement}</h2>
 
-  <a class="contact__email" href={`mailto:${EMAIL}`} data-contact-email>{EMAIL}</a>
+  <!-- N1 — EL EMAIL, protagonista tipográfico -->
+  <div class="contact__email-row" data-contact-email>
+    <a class="contact__email" href={`mailto:${EMAIL}`}>{EMAIL}</a>
+    <button
+      type="button"
+      class="contact__copy"
+      data-copy-email
+      data-email={EMAIL}
+      data-label-copy={copyLabel}
+      data-label-copied={copiedLabel}
+      aria-label={`${copyLabel} ${EMAIL}`}
+    >
+      <span class="contact__copy-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4.5" y="4.5" width="8" height="8" rx="1.2"></rect>
+          <path d="M9.5 4.5V3a1 1 0 0 0-1-1H2.5a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1H3.5"></path>
+        </svg>
+      </span>
+      <span class="contact__copy-text" data-copy-text>{copyLabel}</span>
+    </button>
+  </div>
+
+  <!-- N2 — Canal directo: WhatsApp -->
+  <div class="contact__channels" data-contact-channels>
+    <p class="contact__alt">{c.altLabel}</p>
+    <a
+      class="contact__wa"
+      href={WHATSAPP_HREF}
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <span class="contact__wa-icon" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .104 5.359.101 11.947c0 2.096.549 4.14 1.595 5.945L0 24l6.335-1.652a11.96 11.96 0 0 0 5.71 1.454h.006c6.585 0 11.946-5.359 11.949-11.947a11.9 11.9 0 0 0-3.48-8.406"></path>
+        </svg>
+      </span>
+      <span class="contact__wa-text">{c.whatsappLabel}</span>
+      <span class="contact__wa-num">{WHATSAPP_DISPLAY}</span>
+      <span class="contact__wa-arrow" aria-hidden="true">&#x2192;</span>
+    </a>
+  </div>
 
   <div class="contact__foot">
-    <a class="contact__cta" href={`mailto:${EMAIL}`}>
-      {c.ctaStart} <span class="contact__arrow" aria-hidden="true">&#x2192;</span>
-    </a>
     <p class="contact__note">{c.subcopy}</p>
   </div>
 
-  <!-- Segundo eje compositivo (fix visual-critic): los mercados en vertical
-       al margen derecho — llena el ancho desktop con intención. -->
+  <!-- Segundo eje compositivo: los mercados en vertical al margen derecho -->
   <p class="contact__side" aria-hidden="true">{t.footer.markets}</p>
 </section>
 
@@ -80,20 +136,18 @@ const EMAIL = 'info@scuart.com';
     font-size: clamp(2.25rem, 3.5vw, 3.5rem);
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    /* mercado vertical decorativo: 18% daba 1.46:1 (falla AA). Subo a ~50%
-       → ~3.2:1, pasa el gate de texto grande sin robar protagonismo al email. */
     color: rgba(20, 19, 15, 0.5);
     margin: 0;
     user-select: none;
     pointer-events: none;
     white-space: nowrap;
-    /* no baja hasta el pie — el pie respira solo */
     max-height: calc(100% - clamp(12rem, 30vh, 18rem));
     overflow: hidden;
   }
 
-  /* el pie no se mete debajo del texto vertical */
-  .contact__foot {
+  /* el pie y los canales no se meten debajo del texto vertical */
+  .contact__foot,
+  .contact__channels {
     padding-right: clamp(4rem, 6vw, 7rem);
   }
 }
@@ -104,7 +158,7 @@ const EMAIL = 'info@scuart.com';
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: var(--ink-62); /* --ink-42 daba 2.7:1 — AA pide 4.5:1 (QA 2026-07-21) */
+  color: var(--ink-62);
   margin: 0 0 clamp(1.5rem, 4vh, 3rem) 0;
 }
 
@@ -119,7 +173,14 @@ const EMAIL = 'info@scuart.com';
   margin: 0 0 clamp(2.5rem, 7vh, 4.5rem) 0;
 }
 
-/* ── EL EMAIL — protagonista tipográfico ── */
+/* ── N1 — EL EMAIL + botón copiar ── */
+.contact__email-row {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+
 .contact__email {
   display: inline-block;
   font-family: var(--font-display);
@@ -150,44 +211,122 @@ const EMAIL = 'info@scuart.com';
   outline-offset: 4px;
 }
 
-/* ── Pie: CTA + nota ── */
-.contact__foot {
-  margin-top: clamp(2.5rem, 7vh, 4.5rem);
-  padding-top: clamp(1.25rem, 3vh, 2rem);
-  border-top: 1px solid var(--hairline);
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-l);
-  flex-wrap: wrap;
+/* Botón copiar — micro-detalle UX (patrón Koto), subordinado al email */
+.contact__copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-62);
+  background: none;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 0.5em 0.95em;
+  cursor: pointer;
+  transition: color 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  align-self: center;
 }
 
-.contact__cta {
+.contact__copy:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.contact__copy:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+.contact__copy[data-copied='true'] {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.contact__copy-icon {
+  display: inline-flex;
+  color: var(--brand);
+}
+
+/* ── N2 — Canal directo: WhatsApp ── */
+.contact__channels {
+  margin-top: clamp(2.5rem, 7vh, 4.5rem);
+}
+
+.contact__alt {
   font-family: var(--font-body);
   font-size: var(--text-mono);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--ink);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.5em;
+  color: var(--ink-62);
+  margin: 0 0 clamp(0.9rem, 2vh, 1.4rem) 0;
 }
 
-.contact__arrow {
+.contact__wa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 0.7em 1.3em;
+  transition: border-color 0.35s ease, background-color 0.35s ease, transform 0.35s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.contact__wa:hover,
+.contact__wa:focus-visible {
+  border-color: var(--ink);
+  background-color: rgba(20, 19, 15, 0.03);
+  transform: translateY(-2px);
+}
+
+.contact__wa:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+}
+
+/* el ícono de WhatsApp es el único color propio de la sección junto al acento */
+.contact__wa-icon {
+  display: inline-flex;
+  color: #25d366;
+}
+
+.contact__wa-text {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--text-mono);
+}
+
+.contact__wa-num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+.contact__wa-arrow {
   color: var(--brand);
   transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-.contact__cta:hover .contact__arrow,
-.contact__cta:focus-visible .contact__arrow {
-  transform: translateX(6px);
+.contact__wa:hover .contact__wa-arrow,
+.contact__wa:focus-visible .contact__wa-arrow {
+  transform: translateX(5px);
 }
 
-.contact__cta:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 3px;
+/* ── Pie: nota de respuesta ── */
+.contact__foot {
+  margin-top: clamp(2.5rem, 7vh, 4.5rem);
+  padding-top: clamp(1.25rem, 3vh, 2rem);
+  border-top: 1px solid var(--hairline);
 }
 
 .contact__note {
@@ -196,7 +335,7 @@ const EMAIL = 'info@scuart.com';
   font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: var(--ink-62); /* --ink-42 daba 2.7:1 — AA pide 4.5:1 (QA 2026-07-21) */
+  color: var(--ink-62);
   margin: 0;
 }
 
@@ -204,23 +343,32 @@ const EMAIL = 'info@scuart.com';
   .contact__email {
     font-size: clamp(1.6rem, 9.5vw, 2.5rem);
   }
-  .contact__foot {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-s);
+  .contact__email-row {
+    gap: 1rem;
+  }
+  .contact__wa {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .contact__wa-num {
+    margin-left: auto;
   }
 }
 
 /* ── reduced-motion: todo visible, sin transiciones ── */
 @media (prefers-reduced-motion: reduce) {
   .contact__statement,
-  .contact__email,
+  .contact__email-row,
+  .contact__channels,
   .contact__foot {
     opacity: 1 !important;
     transform: none !important;
   }
   .contact__email,
-  .contact__arrow {
+  .contact__wa,
+  .contact__wa-arrow,
+  .contact__copy {
     transition: none;
   }
 }
@@ -228,12 +376,48 @@ const EMAIL = 'info@scuart.com';
 
 <script>
   /**
-   * Contacto — motion premium (valores del research 2026):
+   * Contacto — motion premium + copiar-email.
    *   1. Statement: line-mask reveal (yPercent 110, expo.out, stagger 0.1).
-   *   2. Email + pie: entrada y+opacity escalonada.
-   *   3. Email magnético: quickTo factor 0.35, power3, solo hover:hover.
+   *   2. Email + canales + pie: entrada y+opacity escalonada.
+   *   3. Email magnético: quickTo, solo hover:hover.
+   *   4. Copiar email: Clipboard API con feedback visual + fallback.
    */
 
+  /* ── (4) Copiar email — independiente del motion, corre siempre ── */
+  const copyBtn = document.querySelector<HTMLButtonElement>('[data-copy-email]');
+  if (copyBtn) {
+    const textEl = copyBtn.querySelector<HTMLElement>('[data-copy-text]');
+    const email = copyBtn.dataset.email ?? '';
+    const labelCopy = copyBtn.dataset.labelCopy ?? 'Copy';
+    const labelCopied = copyBtn.dataset.labelCopied ?? 'Copied!';
+    let resetTimer: number | undefined;
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(email);
+      } catch {
+        /* Fallback sin Clipboard API: selección del texto del email a mano */
+        const emailLink = document.querySelector<HTMLElement>('.contact__email');
+        if (emailLink) {
+          const range = document.createRange();
+          range.selectNodeContents(emailLink);
+          const sel = window.getSelection();
+          sel?.removeAllRanges();
+          sel?.addRange(range);
+        }
+      }
+      /* Feedback visual — vuelve al estado normal a los 2s */
+      if (textEl) textEl.textContent = labelCopied;
+      copyBtn.dataset.copied = 'true';
+      window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => {
+        if (textEl) textEl.textContent = labelCopy;
+        copyBtn.removeAttribute('data-copied');
+      }, 2000);
+    });
+  }
+
+  /* ── Motion ── */
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canHover = window.matchMedia('(hover: hover)').matches;
 
@@ -246,13 +430,14 @@ const EMAIL = 'info@scuart.com';
 
       const section = document.querySelector<HTMLElement>('#contact');
       const statement = section?.querySelector<HTMLElement>('[data-contact-statement]') ?? null;
-      const email = section?.querySelector<HTMLElement>('[data-contact-email]') ?? null;
+      const emailRow = section?.querySelector<HTMLElement>('[data-contact-email]') ?? null;
+      const emailLink = section?.querySelector<HTMLElement>('.contact__email') ?? null;
+      const channels = section?.querySelector<HTMLElement>('[data-contact-channels]') ?? null;
       const foot = section?.querySelector<HTMLElement>('.contact__foot') ?? null;
 
-      /* (1) Statement — line-mask reveal.
-         IMPORTANTE: el split y el estado inicial se crean DENTRO de onEnter
-         (gsap.from) — nunca hay estado oculto persistente. Si el trigger no
-         dispara, el texto simplemente queda visible (robustez mobile). */
+      /* (1) Statement — line-mask reveal. El split y el estado inicial se crean
+         DENTRO de onEnter — nunca hay estado oculto persistente. Si el trigger
+         no dispara, el texto queda visible (robustez mobile). */
       if (section && statement) {
         ScrollTrigger.create({
           trigger: section,
@@ -272,17 +457,23 @@ const EMAIL = 'info@scuart.com';
               stagger: 0.1,
               force3D: true,
             });
-            /* (2) Email + pie entran después del statement */
-            if (email) {
-              gsap.set(email, { opacity: 0, y: 28 });
-              gsap.to(email, {
+            /* (2) Email → canales → pie entran escalonados */
+            if (emailRow) {
+              gsap.set(emailRow, { opacity: 0, y: 28 });
+              gsap.to(emailRow, {
                 opacity: 1, y: 0, duration: 0.9, ease: 'expo.out', delay: 0.25,
+              });
+            }
+            if (channels) {
+              gsap.set(channels, { opacity: 0, y: 20 });
+              gsap.to(channels, {
+                opacity: 1, y: 0, duration: 0.8, ease: 'expo.out', delay: 0.45,
               });
             }
             if (foot) {
               gsap.set(foot, { opacity: 0, y: 16 });
               gsap.to(foot, {
-                opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', delay: 0.45,
+                opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', delay: 0.6,
               });
             }
           },
@@ -290,16 +481,16 @@ const EMAIL = 'info@scuart.com';
       }
 
       /* (3) Email magnético — solo con cursor real */
-      if (email && canHover) {
-        const xTo = gsap.quickTo(email, 'x', { duration: 0.6, ease: 'power3' });
-        const yTo = gsap.quickTo(email, 'y', { duration: 0.6, ease: 'power3' });
+      if (emailLink && canHover) {
+        const xTo = gsap.quickTo(emailLink, 'x', { duration: 0.6, ease: 'power3' });
+        const yTo = gsap.quickTo(emailLink, 'y', { duration: 0.6, ease: 'power3' });
 
-        email.addEventListener('mousemove', (e: MouseEvent) => {
-          const r = email.getBoundingClientRect();
+        emailLink.addEventListener('mousemove', (e: MouseEvent) => {
+          const r = emailLink.getBoundingClientRect();
           xTo((e.clientX - r.left - r.width / 2) * 0.12);
           yTo((e.clientY - r.top - r.height / 2) * 0.35);
         });
-        email.addEventListener('mouseleave', () => {
+        emailLink.addEventListener('mouseleave', () => {
           xTo(0);
           yTo(0);
         });
@@ -307,7 +498,7 @@ const EMAIL = 'info@scuart.com';
     } catch (err) {
       console.error('[ContactSection] motion init failed:', err);
       document
-        .querySelectorAll<HTMLElement>('#contact [data-contact-statement], #contact [data-contact-email], #contact .contact__foot')
+        .querySelectorAll<HTMLElement>('#contact [data-contact-statement], #contact [data-contact-email], #contact [data-contact-channels], #contact .contact__foot')
         .forEach((el) => {
           el.style.opacity = '1';
           el.style.transform = 'none';
