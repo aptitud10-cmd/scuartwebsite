@@ -336,4 +336,64 @@ const rows = projects.map((p, i) => {
     );
     rows.forEach((row) => io.observe(row));
   }
+
+  /* ─────────────────────────────────────────────────────────────
+     SCRAMBLE en hover del nombre — gesto Locomotive ("letter shuffle").
+     Al pasar el mouse sobre un proyecto, sus letras barajan por un instante
+     y "aterrizan" en el nombre. Sutil, editorial — NO estilo hacker:
+       · charset solo letras (sin #$%&) → se lee como marca, no como terminal
+       · corto (~0.6s) y con speed alto → shuffle rápido, no lento/dramático
+       · SOLO desktop con hover real (mobile no tiene hover; el nombre ahí
+         convive con la imagen en reposo). reduced-motion → no corre.
+     ScrambleTextPlugin es parte de GSAP (gratis desde 2025, ya instalado). ── */
+  const canHover = window.matchMedia('(min-width: 1024px) and (hover: hover)').matches;
+
+  if (!prefersReduced && canHover) {
+    (async () => {
+      try {
+        const { gsap } = await import('gsap');
+        const { ScrambleTextPlugin } = await import('gsap/ScrambleTextPlugin');
+        gsap.registerPlugin(ScrambleTextPlugin);
+
+        const links = document.querySelectorAll<HTMLElement>('.pf-row__link');
+
+        links.forEach((link) => {
+          const words = Array.from(link.querySelectorAll<HTMLElement>('.pf-word'));
+          if (!words.length) return;
+
+          /* Texto original de cada palabra — para restaurar exacto (incluye
+             el espacio inicial del segundo .pf-word: " Gold" etc.). */
+          const originals = words.map((w) => w.textContent ?? '');
+          let playing = false;
+
+          link.addEventListener('mouseenter', () => {
+            if (playing) return;
+            playing = true;
+            let done = 0;
+            words.forEach((word, i) => {
+              const text = originals[i];
+              gsap.to(word, {
+                duration: 0.55,
+                ease: 'none',
+                scrambleText: {
+                  text,
+                  chars: 'upperAndLowerCase', // solo letras, sin símbolos
+                  speed: 0.8,
+                  tweenLength: false,
+                },
+                onComplete: () => {
+                  word.textContent = text; // garantiza el nombre exacto al cerrar
+                  done += 1;
+                  if (done === words.length) playing = false;
+                },
+              });
+            });
+          });
+        });
+      } catch (err) {
+        /* Si el plugin no carga, no pasa nada: los nombres se ven normales. */
+        console.error('[PortfolioSection] scramble init failed:', err);
+      }
+    })();
+  }
 </script>
