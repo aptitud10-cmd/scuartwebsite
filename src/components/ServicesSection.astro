@@ -392,20 +392,40 @@ const svcImages = [
             return () => { st.kill(); rows.forEach((r) => r.removeAttribute('data-active')); };
           },
 
-          /* ─────────── MOBILE/TABLET <1024px: reveal simple ─────────── */
+          /* ─────────── MOBILE/TABLET <1024px: reveal simple ───────────
+             OJO: en mobile el scroller es document.body (directiva iOS
+             body-scroll-container), NO window. ScrollTrigger observa el
+             scroll del root por defecto, así que su trigger 'top 80%' NO
+             dispara de forma fiable acá → las filas quedaban en opacity:0
+             PARA SIEMPRE (pantalla en blanco). Por eso el reveal mobile usa
+             IntersectionObserver nativo (observa el viewport real, ajeno a
+             qué elemento scrollea) + un timeout de seguridad que garantiza
+             que el contenido NUNCA quede invisible aunque todo falle. */
           '(max-width: 1023px)': () => {
             section.classList.add('svc-animate-base');
-            const trig = ScrollTrigger.create({
-              trigger: list,
-              start: 'top 80%',
-              once: true,
-              onEnter: () => {
-                gsap.to(rows, {
-                  opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.08,
-                });
-              },
-            });
-            return () => { trig.kill(); };
+
+            const reveal = () => {
+              gsap.to(rows, {
+                opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.08,
+                overwrite: true,
+              });
+            };
+
+            /* Red de seguridad dura: pase lo que pase, a los 1.2s el
+               contenido se muestra. Si el observer ya reveló, este to()
+               es un no-op (mismos valores). */
+            const safety = window.setTimeout(reveal, 1200);
+
+            const io = new IntersectionObserver((entries, obs) => {
+              if (entries.some((e) => e.isIntersecting)) {
+                window.clearTimeout(safety);
+                reveal();
+                obs.disconnect();
+              }
+            }, { rootMargin: '0px 0px -20% 0px' });
+            io.observe(list);
+
+            return () => { window.clearTimeout(safety); io.disconnect(); };
           },
         });
       } catch (err) {
