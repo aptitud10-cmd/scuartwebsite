@@ -90,6 +90,13 @@ const c = COPY[lang as 'es' | 'en'];
   margin-right: calc(-1 * var(--margin));
   padding: 0; /* el contenido se posiciona dentro de __inner */
 
+  /* Pantalla completa (decisión de William). svh = small viewport height:
+     no se pelea con la barra dinámica de Safari en mobile. Antes esto era
+     100svh y se bajó por "mucho negro abajo" — ahora el __inner reparte el
+     alto (grilla 1fr/auto en desktop, flex centrado en mobile) así que la
+     altura completa se LLENA en vez de dejar hueco muerto. */
+  min-height: 100svh;
+
   display: flex;
   align-items: stretch;
   overflow: hidden;
@@ -186,10 +193,11 @@ const c = COPY[lang as 'es' | 'en'];
   }
 }
 
-/* ── TABLET/DESKTOP (≥768px): frase centrada arriba, anotaciones en esquinas.
-   Sin el link "MORE ABOUT US" → 2 filas (frase / notas), sin fila 3 vacía.
-   Altura ajustada al contenido + respiro, en vez de 100svh (dejaba mucho
-   negro abajo). El statement gigante ya da presencia sin forzar viewport. */
+/* ── TABLET/DESKTOP (≥768px): frase centrada, anotaciones en esquinas.
+   La sección es 100svh (William). La grilla reparte ese alto: fila 1 (1fr)
+   con el statement centrado verticalmente, fila 2 (auto) con las notas
+   ancladas abajo. Así el viewport completo se LLENA con jerarquía —el
+   statement domina el centro, las notas cierran abajo— sin negro muerto. */
 @media (min-width: 768px) {
   .stu-about__inner {
     display: grid;
