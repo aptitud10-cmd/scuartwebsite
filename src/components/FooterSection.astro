@@ -59,9 +59,15 @@ const EMAIL = 'info@scuart.com';
     <a href={`mailto:${EMAIL}`} class="foot__email">{EMAIL}</a>
   </div>
 
-  <!-- ── Capa 3: cierre de marca ── -->
-  <div class="foot__row foot__row--legal" data-foot-row>
+  <!-- ── Capa 3: REMATE de marca — el tagline es la mejor línea de copy del
+       sitio; va a escala display como cierre, no enterrado en los legales
+       (fix auditoría 2026-07-27: antes competía en 14px con el copyright). ── -->
+  <div class="foot__row foot__row--sign" data-foot-row>
     <p class="foot__tagline">{f.tagline}</p>
+  </div>
+
+  <!-- ── Capa 4: legales (pie administrativo, nivel más bajo) ── -->
+  <div class="foot__row foot__row--legal" data-foot-row>
     <div class="foot__legal">
       <span class="foot__copy">{f.builtBy}</span>
       <a href={f.legal.privacyHref} class="foot__link foot__link--small">{f.legal.privacyLabel}</a>
@@ -190,20 +196,31 @@ const EMAIL = 'info@scuart.com';
   margin: 0;
 }
 
-/* ── Capa 3: tagline + legales ── */
+/* ── Capa 3: REMATE de marca — el tagline a escala display ──
+   Es la línea que mejor define a SCUART; ahora cierra el sitio con peso,
+   no como nota al pie. Serif light gigante (misma voz que el hero y el
+   statement dark) con la palabra clave en itálica lima. */
+.foot__row--sign {
+  padding-block: clamp(2rem, 6vh, 4rem);
+}
+
 .foot__tagline {
   font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 400;
-  font-size: var(--text-body);
+  font-weight: 300;
+  font-size: clamp(2.25rem, 6vw, 5rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
   color: var(--ink);
   margin: 0;
+  max-width: 18ch;
+  text-wrap: balance;
 }
 
 .foot__legal {
   display: flex;
   gap: clamp(0.75rem, 2vw, 1.5rem);
   align-items: baseline;
+  flex-wrap: wrap;
 }
 
 .foot__copy {
