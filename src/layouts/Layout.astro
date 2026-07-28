@@ -15,6 +15,9 @@ interface Props {
   description?: string;
   ogTitle?: string;
   ogDescription?: string;
+  /** ruta absoluta o relativa a una imagen OG propia de la página (ej. hero de un
+   *  caso). Si se omite, cae al og.png genérico del estudio. */
+  ogImage?: string;
   lang?: Lang;
   canonicalURL?: string;
   alternates?: {
@@ -29,30 +32,67 @@ const {
   description = 'A bilingual studio building premium websites, platforms and digital systems for ambitious businesses across the US and LATAM.',
   ogTitle,
   ogDescription,
+  ogImage,
   lang = 'en',
   canonicalURL,
   alternates,
 } = Astro.props;
 
+/* og:image por página: si la página pasa ogImage, se usa esa (absolutizada);
+   si no, el og.png genérico del estudio. Mejora el preview al compartir un caso. */
+const resolvedOgImage = ogImage
+  ? (ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`)
+  : `${SITE_URL}/og.png`;
+
 /*
- * JSON-LD Organization. El sitio no emitía ningún structured data, así que
- * los buscadores (y los motores generativos) no tenían una descripción
- * declarada del estudio: nombre, idiomas, área de servicio ni perfiles.
- * Va en el layout para cubrir las 15 páginas, no solo las dos home.
+ * JSON-LD @graph: Organization (ProfessionalService con base en Bogotá) + WebSite.
+ * Enriquecido en la pasada SEO 2026-07-28: se agregó address (Bogotá), teléfono
+ * (WhatsApp), email y el nodo WebSite. Le da a Google/motores generativos una
+ * entidad completa del estudio — nombre, idiomas, ubicación, área de servicio.
+ * Va en el layout para cubrir las 15 páginas.
  */
 const orgSchema = {
   '@context': 'https://schema.org',
-  '@type': 'Organization',
-  '@id': `${SITE_URL}/#organization`,
-  name: 'SCUART',
-  url: SITE_URL,
-  description,
-  image: `${SITE_URL}/og.png`,
-  logo: `${SITE_URL}/og.png`,
-  knowsLanguage: ['en', 'es'],
-  areaServed: [
-    { '@type': 'Country', name: 'United States' },
-    { '@type': 'Place', name: 'Latin America' },
+  '@graph': [
+    {
+      '@type': 'ProfessionalService',
+      '@id': `${SITE_URL}/#organization`,
+      name: 'SCUART',
+      url: SITE_URL,
+      description,
+      image: `${SITE_URL}/og.png`,
+      logo: `${SITE_URL}/favicon.svg`,
+      email: 'info@scuart.com',
+      telephone: '+13478489720',
+      knowsLanguage: ['en', 'es'],
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Bogotá',
+        addressCountry: 'CO',
+      },
+      areaServed: [
+        { '@type': 'Country', name: 'United States' },
+        { '@type': 'Country', name: 'Colombia' },
+        { '@type': 'Place', name: 'Latin America' },
+      ],
+      knowsAbout: [
+        'Web design',
+        'Web development',
+        'SaaS development',
+        'E-commerce',
+        'Booking systems',
+        'Brand identity',
+      ],
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: 'SCUART',
+      description,
+      inLanguage: ['en', 'es'],
+      publisher: { '@id': `${SITE_URL}/#organization` },
+    },
   ],
 };
 
@@ -74,16 +114,16 @@ const resolvedOgDesc = ogDescription ?? description;
     {canonicalURL && <meta property="og:url" content={canonicalURL} />}
     <meta property="og:locale" content={lang === 'es' ? 'es_419' : 'en_US'} />
     <meta property="og:site_name" content="SCUART" />
-    <meta property="og:image" content="https://scuart.com/og.png" />
+    <meta property="og:image" content={resolvedOgImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="SCUART — Design + Technology studio for ambitious businesses" />
+    <meta property="og:image:alt" content={resolvedOgTitle} />
 
     <!-- Twitter / X Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={resolvedOgTitle} />
     <meta name="twitter:description" content={resolvedOgDesc} />
-    <meta name="twitter:image" content="https://scuart.com/og.png" />
+    <meta name="twitter:image" content={resolvedOgImage} />
 
     <!-- Browser theme — V3: hueso como color de tema (el hero arranca claro) -->
     <meta name="theme-color" content="#F0E9DC" />

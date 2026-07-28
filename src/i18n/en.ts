@@ -375,7 +375,7 @@ export const en: Translations = {
         category: "WEB · GASTRO BRAND",
         year: "2025",
         image: "/images/portfolio-jamon-casero-trim.webp",
-        alt: "JAMÓN CASERO — proyecto SCUART",
+        alt: "Jamón Casero website — editorial site for an artisanal charcuterie brand by SCUART",
         href: "/en/work/jamon-casero",
       },
       {
@@ -384,7 +384,7 @@ export const en: Translations = {
         category: "SAAS · OWN PRODUCT",
         year: "2025",
         image: "/images/portfolio-menius-real-trim.webp",
-        alt: "MENIUS — proyecto SCUART",
+        alt: "Menius — digital menu and online ordering SaaS for restaurants by SCUART",
         href: "/en/work/menius",
       },
       {
@@ -395,7 +395,7 @@ export const en: Translations = {
         /* thumbnail real: hero del sitio de Etnia en browser-mockup macOS
            (generado 2026-07-28 con el mismo chrome que Jamón/Menius) */
         image: "/images/portfolio-etnia-braids-trim.webp",
-        alt: "ETNIA BRAIDS — proyecto SCUART",
+        alt: "Etnia Braids — custom booking website for a braiding salon in New York by SCUART",
         href: "/en/work/etnia-braids",
       },
     ],

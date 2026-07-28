@@ -21,6 +21,21 @@ import Layout from '../layouts/Layout.astro';
 import Nav from './Nav.astro';
 import FooterSection from './FooterSection.astro';
 import type { Translations } from '../i18n/en';
+import { SITE_URL } from '../i18n/index';
+import sharp from 'sharp';
+import path from 'node:path';
+
+/* Dimensiones reales de cada imagen leídas en BUILD (evita CLS: el navegador
+   reserva el espacio con width/height correctos). Se resuelve contra /public. */
+async function imgDims(src: string): Promise<{ w: number; h: number }> {
+  try {
+    const file = path.join(process.cwd(), 'public', src);
+    const m = await sharp(file).metadata();
+    return { w: m.width ?? 1600, h: m.height ?? 1000 };
+  } catch {
+    return { w: 1600, h: 1000 }; // fallback razonable si falla la lectura
+  }
+}
 
 interface Credit {
   role: string;
@@ -84,16 +99,59 @@ const copy = {
 
 /** host limpio para la barra de URL del mockup (sin protocolo, sin path) */
 const siteHost = data.siteUrl ? data.siteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
+
+/* JSON-LD CreativeWork: es el schema natural de una página de portfolio (un trabajo
+   realizado). Le dice a Google/motores generativos que esto es una obra creada por
+   SCUART, para quién, cuándo. Complementa el Organization global del Layout. */
+const workSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: data.name,
+  headline: title,
+  description: data.tagline,
+  image: `${SITE_URL}${data.heroImage}`,
+  url: canonicalURL,
+  inLanguage: lang,
+  dateCreated: data.year,
+  creator: { '@type': 'Organization', '@id': `${SITE_URL}/#organization`, name: 'SCUART' },
+  ...(data.siteUrl ? { sameAs: data.siteUrl } : {}),
+  about: data.categories.join(', '),
+};
+
+/* BreadcrumbList: declara la jerarquía Home → Trabajo → {caso} para la SERP.
+   El índice de trabajo vive en el ancla #portfolio del home (no hay /work dedicado). */
+const workLabel = lang === 'es' ? 'Trabajo' : 'Work';
+const homeUrl = `${SITE_URL}/${lang}`;
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'SCUART', item: homeUrl },
+    { '@type': 'ListItem', position: 2, name: workLabel, item: `${homeUrl}#portfolio` },
+    { '@type': 'ListItem', position: 3, name: data.name, item: canonicalURL },
+  ],
+};
+
+/* Dimensiones reales (build-time) del hero y de cada bloque, para width/height → sin CLS */
+const heroDims = await imgDims(data.heroImage);
+const blockDims = await Promise.all(
+  data.blocks.map((b) => (b.image ? imgDims(b.image) : Promise.resolve({ w: 1600, h: 1000 }))),
+);
 ---
 
 <Layout
   title={title}
   description={description}
+  ogImage={data.heroImage}
   lang={lang}
   canonicalURL={canonicalURL}
   alternates={alternates}
 >
   <Nav lang={lang} t={t} />
+
+  <!-- JSON-LD: CreativeWork del caso + BreadcrumbList -->
+  <script type="application/ld+json" set:html={JSON.stringify(workSchema)} is:inline />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} is:inline />
 
   <article class="cs">
 
@@ -129,11 +187,11 @@ const siteHost = data.siteUrl ? data.siteUrl.replace(/^https?:\/\//, '').replace
             <span class="cs-frame__dot"></span>
             <span class="cs-frame__url">{siteHost}</span>
           </div>
-          <img src={data.heroImage} alt={data.heroImageAlt} loading="eager" decoding="async" />
+          <img src={data.heroImage} alt={data.heroImageAlt} width={heroDims.w} height={heroDims.h} loading="eager" decoding="async" />
         </figure>
       ) : (
         <figure class="cs-shot" data-cs-tilt>
-          <img src={data.heroImage} alt={data.heroImageAlt} loading="eager" decoding="async" />
+          <img src={data.heroImage} alt={data.heroImageAlt} width={heroDims.w} height={heroDims.h} loading="eager" decoding="async" />
         </figure>
       )}
     </div>
@@ -161,11 +219,11 @@ const siteHost = data.siteUrl ? data.siteUrl.replace(/^https?:\/\//, '').replace
                   <span class="cs-frame__dot"></span>
                   <span class="cs-frame__url">{siteHost}</span>
                 </div>
-                <img src={block.image} alt={block.imageAlt ?? ''} loading="lazy" decoding="async" />
+                <img src={block.image} alt={block.imageAlt ?? ''} width={blockDims[i].w} height={blockDims[i].h} loading="lazy" decoding="async" />
               </figure>
             ) : (
               <figure class="cs-shot" data-cs-tilt>
-                <img src={block.image} alt={block.imageAlt ?? ''} loading="lazy" decoding="async" />
+                <img src={block.image} alt={block.imageAlt ?? ''} width={blockDims[i].w} height={blockDims[i].h} loading="lazy" decoding="async" />
               </figure>
             )}
           </div>
