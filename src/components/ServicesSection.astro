@@ -389,7 +389,65 @@ const svcImages = [
               },
             });
 
-            return () => { st.kill(); rows.forEach((r) => r.removeAttribute('data-active')); };
+            /* ── CLICK-TO-FOCUS ──────────────────────────────────────────
+               Click en un servicio → salta a SU diagrama, sin romper el pin.
+               Patrón oficial GSAP (foro): el click NO llama setActive directo
+               (el onUpdate lo pisaría al primer scroll). En su lugar MUEVE el
+               scroll físico a la posición del tramo pineado que corresponde a
+               ese índice — y el onUpdate del propio st activa el servicio. Así
+               click y scroll son una sola fuente de verdad (la posición).
+               st.scroll() conoce su rango y funciona con o sin Lenis, sin
+               pelearse con el smooth-scroll.
+               Técnica: animamos un proxy {v: posActual} → {v: target} y en
+               cada tick llamamos st.scroll(v). overwrite:auto evita jitter si
+               el usuario ya venía scrolleando. */
+            const seekTo = (idx: number) => {
+              /* Progreso objetivo = fracción exacta del servicio idx.
+                 target en píxeles dentro del tramo pineado. Añadimos medio
+                 píxel de sesgo hacia el interior para que el redondeo del
+                 scroll no caiga en el borde entre dos bandas de snap (bug:
+                 click en 4 aterrizaba en 3). */
+              const progress = idx / (rows.length - 1);
+              const range = st.end - st.start;
+              const bias = idx === rows.length - 1 ? -1 : 1; // último: sesgar hacia adentro
+              const target = st.start + range * progress + bias;
+
+              const proxy = { v: st.scroll() };
+              gsap.to(proxy, {
+                v: target,
+                duration: 0.6,
+                ease: 'power2.inOut',
+                overwrite: 'auto',
+                onUpdate: () => st.scroll(proxy.v),
+                onComplete: () => {
+                  /* Garantía dura: al terminar el seek, forzamos el estado
+                     visual correcto por si el snap reposicionó por 1px. El
+                     onUpdate del st ya lo hace normalmente, pero esto lo blinda
+                     contra el off-by-one del redondeo/snap. */
+                  setActive(idx);
+                },
+              });
+            };
+
+            const onRowClick = (e: Event) => {
+              const row = (e.currentTarget as HTMLElement);
+              const idx = Number(row.getAttribute('data-index'));
+              if (Number.isNaN(idx)) return;
+              seekTo(idx);
+            };
+            rows.forEach((r) => {
+              r.style.cursor = 'pointer';
+              r.addEventListener('click', onRowClick);
+            });
+
+            return () => {
+              st.kill();
+              rows.forEach((r) => {
+                r.removeAttribute('data-active');
+                r.style.cursor = '';
+                r.removeEventListener('click', onRowClick);
+              });
+            };
           },
 
           /* ─────────── MOBILE/TABLET <1024px: reveal simple ───────────
