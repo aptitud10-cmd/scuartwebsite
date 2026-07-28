@@ -89,12 +89,27 @@ const c = copy[lang];
   }
 }
 
-/* En la sección Contacto el banner se desvanece y deja de recibir clics, para
-   no competir con el email (CTA principal). Reaparece al salir de Contacto. */
+/* En la sección Contacto el banner se desvanece por completo y deja de recibir
+   clics, para no competir con el email (CTA principal). */
 .cookie[data-dimmed] {
   opacity: 0;
   pointer-events: none;
   transform: translateY(0.5rem);
+}
+
+/* Al scrollear el banner se ATENÚA pero SIGUE CLICKEABLE (2026-07-28): el usuario
+   ya vio que existe, pero debe poder aceptar/rechazar en cualquier momento sin
+   volver arriba. Se hace discreto (semi-transparente + un pelín más chico), no
+   desaparece. Al hover/focus vuelve a opacidad plena. */
+.cookie[data-faded]:not([data-dimmed]) {
+  opacity: 0.55;
+  transform: scale(0.97);
+  transform-origin: bottom right;
+}
+.cookie[data-faded]:not([data-dimmed]):hover,
+.cookie[data-faded]:not([data-dimmed]):focus-within {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .cookie {
@@ -192,21 +207,43 @@ const c = copy[lang];
       banner.removeAttribute('hidden');
     }, 1200);
 
-    /* AUTO-OCULTAR al llegar a Contacto (auditoría 2026-07-21): el banner es
-       position:fixed y flotaba encima de TODAS las secciones. El email de
-       Contacto (info@scuart.com) es el CTA principal y ocupa casi el ancho —
-       cualquier esquina inferior lo tapa. En vez de jugar a mover el banner de
-       esquina, se OCULTA en cuanto Contacto entra en viewport: ahí el usuario ya
-       vio el sitio y el consentimiento no debe competir con la conversión. Al
-       salir de Contacto reaparece (si aún no decidió). No persiste la decisión:
-       solo se esconde temporalmente, no cuenta como "aceptar". */
+    /* ATENUAR POR SCROLL (universal, 2026-07-28): el banner es position:fixed y
+       flotaba tapando contenido. Antes se atenuaba solo al llegar a #contact —
+       pero las páginas de caso NO tienen #contact, así que ahí nunca se atenuaba
+       y tapaba el hero (bug reportado por William). Solución robusta: se atenúa
+       en cuanto el usuario scrollea más allá de la primera pantalla — funciona
+       igual en TODAS las páginas (home, casos, legales). No persiste la decisión:
+       solo se hace discreto, no cuenta como "aceptar".
+       iOS: el scroll puede vivir en document.body, no en window (ver CLAUDE.md
+       body-scroll-container) → leo el mayor de los dos. */
+    const readScrollY = () =>
+      Math.max(window.scrollY || 0, document.body.scrollTop || 0, document.documentElement.scrollTop || 0);
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        if (!localStorage.getItem(COOKIE_KEY)) {
+          // umbral: media pantalla — pasado eso el usuario ya vio el banner. Se
+          // ATENÚA (data-faded, sigue clickeable), no se esconde.
+          if (readScrollY() > window.innerHeight * 0.5) banner.setAttribute('data-faded', '');
+          else banner.removeAttribute('data-faded');
+        }
+        ticking = false;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    document.body.addEventListener('scroll', onScroll, { passive: true });
+
+    /* Extra en el home: al llegar a Contacto (el CTA principal) el banner se
+       mantiene atenuado aunque el usuario suba — no debe competir con la conversión. */
     const contact = document.querySelector('#contact, .contact');
     if (contact && 'IntersectionObserver' in window) {
       const io = new IntersectionObserver(
         ([entry]) => {
-          if (localStorage.getItem(COOKIE_KEY)) return; // ya decidió: no tocar
+          if (localStorage.getItem(COOKIE_KEY)) return;
           if (entry.isIntersecting) banner.setAttribute('data-dimmed', '');
-          else banner.removeAttribute('data-dimmed');
         },
         { threshold: 0.15 },
       );

@@ -1,0 +1,13 @@
+{
+  "name": "SCUART",
+  "short_name": "SCUART",
+  "description": "Estudio de diseño y desarrollo web bilingüe — LATAM + USA. Bogotá.",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512" }
+  ],
+  "theme_color": "#c6f24e",
+  "background_color": "#14130f",
+  "display": "standalone",
+  "start_url": "/"
+}

@@ -71,7 +71,10 @@ export interface ContactTranslations {
   kicker: string;
   /** CTA mailto — "Empezar un proyecto" (rediseño sobrio 2026-07-17) */
   ctaStart: string;
-  /* ── Formulario corto (4 campos) — reconectado a /api/contact ── */
+  /* ── Keys de formulario — NO SE USAN. El sitio es contacto-directo (email +
+     WhatsApp), sin formulario (decisión William 2026-07-28: las agencias top-tier
+     usan solo email, no forms). Se conservan por si se reactiva el form; el
+     endpoint /api/contact sigue en el repo pero no se ejerce desde la UI. ── */
   formName: string;
   formEmail: string;
   formNeed: string;
