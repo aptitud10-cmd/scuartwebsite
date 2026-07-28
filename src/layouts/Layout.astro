@@ -45,11 +45,12 @@ const resolvedOgImage = ogImage
   : `${SITE_URL}/og.png`;
 
 /*
- * JSON-LD @graph: Organization (ProfessionalService con base en Bogotá) + WebSite.
- * Enriquecido en la pasada SEO 2026-07-28: se agregó address (Bogotá), teléfono
- * (WhatsApp), email y el nodo WebSite. Le da a Google/motores generativos una
- * entidad completa del estudio — nombre, idiomas, ubicación, área de servicio.
- * Va en el layout para cubrir las 15 páginas.
+ * JSON-LD @graph: Organization (ProfessionalService con base en New York) + WebSite.
+ * Base geo NY primario (William 2026-07-28): vive en Queens, mercado principal USA.
+ * La dirección web es solo ciudad/estado (New York, NY, US) — NUNCA el domicilio
+ * real; ese solo existe en el panel privado de Google Business Profile y oculto
+ * al público (Service Area Business). Colombia queda como segundo mercado en
+ * areaServed. Teléfono +1 347 (NY) ya coherente. Cubre las 15 páginas.
  */
 const orgSchema = {
   '@context': 'https://schema.org',
@@ -67,8 +68,9 @@ const orgSchema = {
       knowsLanguage: ['en', 'es'],
       address: {
         '@type': 'PostalAddress',
-        addressLocality: 'Bogotá',
-        addressCountry: 'CO',
+        addressLocality: 'New York',
+        addressRegion: 'NY',
+        addressCountry: 'US',
       },
       areaServed: [
         { '@type': 'Country', name: 'United States' },
