@@ -47,6 +47,15 @@ const { t } = Astro.props;
     </p>
   </div>
 
+  <!--
+    Ancla inferior — tercer punto de peso que completa el 100vh (evita el
+    "vacío" de dos líneas centradas en pantalla completa). Reutiliza el label
+    del portfolio (la sección que sigue): el ancla ES el puente hacia el
+    trabajo. aria-hidden: es señalética visual, no contenido navegable
+    (el portfolio ya tiene su propio encabezado).
+  -->
+  <p class="manifesto-anchor" aria-hidden="true">{t.portfolio.sectionLabel} <span class="manifesto-anchor__arrow">↓</span></p>
+
 </section>
 
 <style>
@@ -62,11 +71,24 @@ const { t } = Astro.props;
   background-color: var(--bg);
   position: relative;
   overflow: hidden;
-  /* Aire asimétrico: mucho arriba (bocanada tras el hero denso), menos abajo
-     para encadenar el statement con el portfolio ("construimos ventajas → la
-     prueba"). Simétrico aislaba la sección como un valle. */
-  padding-top: var(--space-3xl);
-  padding-bottom: var(--space-2xl);
+
+  /* Pantalla completa (decisión William 2026-07-28). Antes ocupaba solo el
+     alto del contenido (~624px en 900) y se leía "corta". El statement de
+     marca merece el viewport entero.
+     svh = small viewport height: no se pelea con la barra dinámica de Safari.
+     La grilla de 3 filas reparte ese alto en tercios (kicker arriba /
+     statement al centro / ancla abajo) para que el 100vh se LLENE con
+     jerarquía en vez de dejar crema muerto — el error de centrar 2 líneas
+     solas en pantalla completa. */
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  box-sizing: border-box;
+
+  /* Aire vertical proporcional al viewport (vh) en vez de tokens fijos: en
+     pantallas altas el kicker/ancla no se pegan a los bordes. */
+  padding-top: clamp(2rem, 8vh, 6rem);
+  padding-bottom: clamp(1.5rem, 6vh, 4.5rem);
   padding-left: var(--margin);
   padding-right: var(--margin);
 }
@@ -79,6 +101,8 @@ const { t } = Astro.props;
 .manifesto-kicker {
   position: relative;
   z-index: 1;
+  grid-row: 1;                     /* fila superior del 100vh */
+  align-self: start;
   font-family: var(--font-body);   /* Geist Sans */
   font-size: var(--text-mono);     /* clamp(0.6875rem, 0.3vw + 0.6rem, 0.8125rem) = 11-13px */
   font-weight: 500;
@@ -86,7 +110,7 @@ const { t } = Astro.props;
   text-transform: uppercase;
   letter-spacing: 0.14em;           /* sistema de índices: +0.14em exacto */
   line-height: 1.4;
-  margin-bottom: var(--space-l);
+  margin-bottom: 0;                 /* el grid reparte el alto, no el margin */
   text-align: center;              /* centrado grande — kicker alineado al eje */
 }
 
@@ -98,9 +122,48 @@ const { t } = Astro.props;
 .manifesto-statement {
   position: relative;
   z-index: 1;
+  grid-row: 2;                     /* fila central del 100vh — protagonista */
+  align-self: center;
   /* Centrado grande: el statement ocupa el ancho del contenedor (con el
      padding del .manifesto). Cada frase-<p> se centra y quiebra natural. */
   margin-inline: auto;
+}
+
+/* ─── ANCLA INFERIOR ─────────────────────────────────────────
+ * Tercer punto de peso que cierra el 100vh. Mismo lenguaje del kicker
+ * (Geist 500 uppercase +0.14em) para que lean como par arriba/abajo.
+ * La flecha ↓ señala el portfolio que sigue.
+ */
+.manifesto-anchor {
+  position: relative;
+  z-index: 1;
+  grid-row: 3;                     /* fila inferior del 100vh */
+  align-self: end;
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-62);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  margin: 0;
+  text-align: center;
+}
+
+.manifesto-anchor__arrow {
+  display: inline-block;
+  margin-left: 0.4em;
+  /* rebote sutil y lento — invita a bajar sin gritar */
+  animation: manifesto-anchor-bob 2.4s ease-in-out infinite;
+}
+
+@keyframes manifesto-anchor-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(0.25em); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .manifesto-anchor__arrow { animation: none; }
 }
 
 /* ─── LÍNEAS ─────────────────────────────────────────────── */
@@ -227,17 +290,20 @@ const { t } = Astro.props;
       gsap.registerPlugin(SplitText, ScrollTrigger);
 
       const kicker = section.querySelector<HTMLElement>('.manifesto-kicker');
+      const anchor = section.querySelector<HTMLElement>('.manifesto-anchor');
       const statementEl = section.querySelector<HTMLElement>('.manifesto-statement');
       const lines = Array.from(section.querySelectorAll<HTMLElement>('.manifesto-line'));
 
-      if (kicker) {
-        gsap.set(kicker, { opacity: 0 });
+      /* Kicker y ancla comparten el mismo fade suave — leen como par arriba/abajo */
+      const chrome = [kicker, anchor].filter(Boolean) as HTMLElement[];
+      if (chrome.length) {
+        gsap.set(chrome, { opacity: 0 });
         ScrollTrigger.create({
           trigger: section,
           start: 'top 80%',
           once: true,
           onEnter: () => {
-            gsap.to(kicker, { opacity: 1, duration: 0.4, ease: 'power2.out' });
+            gsap.to(chrome, { opacity: 1, duration: 0.4, ease: 'power2.out', stagger: 0.1 });
           },
         });
       }
