@@ -1,8 +1,20 @@
 ---
 /**
- * CaseStudyLayout.astro — Layout reutilizable para páginas de caso.
- * Patrón Locomotive: hero con nombre gigante, hairlines, ficha técnica,
- * secciones de texto + imagen alternadas, créditos al cierre.
+ * CaseStudyLayout.astro — Página de caso premium (rediseño 2026-07-28 v2).
+ *
+ * Tratamiento de imágenes VERIFICADO capturando Locomotive/Cuberto en vivo +
+ * research DESIGN_RESEARCH_MOCKUP_PRESENTACION:
+ *   - Las imágenes NO van full-bleed crudas. Van en CONTENEDOR con fondo de
+ *     color + padding generoso + border-radius + sombra suave. "Flotan", respiran.
+ *   - NUNCA se muestra el navbar del navegador del cliente (screenshot recortado
+ *     o browser-mockup minimal propio que reemplaza el chrome).
+ *   - browser-mockup: barra estilizada propia (dots neutros, no el semáforo de
+ *     macOS) para vistas de sitio; se activa con block.frame.
+ *   - Composición asimétrica: texto + imagen en columnas, tamaños que alternan.
+ *
+ * Anti-patrón evitado (rechazado por William): screenshot crudo a todo el ancho,
+ * cortado, con el navbar del navegador, sin contenedor. Eso NO es full-bleed
+ * premium — es una captura estirada.
  */
 
 import Layout from '../layouts/Layout.astro';
@@ -15,34 +27,37 @@ interface Credit {
   name: string;
 }
 
-interface CaseSection {
+interface CaseBlock {
   label: string;
   body: string;
+  image?: string;
+  imageAlt?: string;
+  /** proporción del contenedor de la imagen */
+  ratio?: 'wide' | 'tall' | 'default';
+  /** color de fondo del contenedor de la imagen (CSS color o var) */
+  bg?: string;
+  /** true = envolver la imagen en un browser-mockup minimal (para vistas de sitio) */
+  frame?: boolean;
+  /** variante del mockup/fondo: 'dark' para apps oscuras */
+  theme?: 'light' | 'dark';
 }
 
 export interface CaseStudyData {
-  /** Nombre del proyecto — gigante en el hero */
   name: string;
-  /** Tagline corto — itálica debajo del nombre */
   tagline: string;
-  /** Categorías — Geist mono, misma línea que el año */
   categories: string[];
-  /** Año */
   year: string;
-  /** Cliente */
   client: string;
-  /** URL del sitio vivo (opcional) */
   siteUrl?: string;
-  /** Imagen hero — full-bleed debajo del nombre */
   heroImage: string;
   heroImageAlt: string;
-  /** Secciones de contenido: Contexto, Desafío, Solución, Resultado */
-  sections: CaseSection[];
-  /** Imágenes secundarias del proyecto */
-  images: Array<{ src: string; alt: string; wide?: boolean }>;
-  /** Créditos */
+  /** color de fondo del contenedor de la imagen hero */
+  heroBg?: string;
+  /** browser-mockup en el hero */
+  heroFrame?: boolean;
+  heroTheme?: 'light' | 'dark';
+  blocks: CaseBlock[];
   credits: Credit[];
-  /** Proyecto siguiente (para la navegación al cierre) */
   next?: { name: string; href: string };
 }
 
@@ -50,12 +65,9 @@ interface Props {
   t: Translations;
   lang: 'es' | 'en';
   data: CaseStudyData;
-  /** SEO */
   title: string;
   description: string;
   canonicalURL?: string;
-  /** hreflang: los case studies cambian de slug entre idiomas
-      ('work/menius' vs 'trabajo/menius'), asi que llegan armados. */
   alternates?: {
     en: string;
     es: string;
@@ -64,6 +76,14 @@ interface Props {
 }
 
 const { t, lang, data, title, description, canonicalURL, alternates } = Astro.props;
+
+const copy = {
+  es: { index: 'CASO', visit: 'VISITAR SITIO', next: 'SIGUIENTE', role: 'ROL', client: 'CLIENTE', year: 'AÑO' },
+  en: { index: 'CASE', visit: 'VISIT SITE', next: 'NEXT', role: 'ROLE', client: 'CLIENT', year: 'YEAR' },
+}[lang];
+
+/** host limpio para la barra de URL del mockup (sin protocolo, sin path) */
+const siteHost = data.siteUrl ? data.siteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '') : '';
 ---
 
 <Layout
@@ -77,107 +97,112 @@ const { t, lang, data, title, description, canonicalURL, alternates } = Astro.pr
 
   <article class="cs">
 
-    <!-- ── Hero ──────────────────────────────────────────────────── -->
+    <!-- ── HERO tipográfico ──────────────────────────────────────── -->
     <header class="cs-hero">
-      <div class="cs-hero__meta">
-        <span class="cs-hero__categories">{data.categories.join(' · ')}</span>
-        <span class="cs-hero__year">{data.year}</span>
-      </div>
-
+      <p class="cs-hero__kicker">
+        <span>{copy.index}</span>
+        <span>{data.categories.join(' · ')}</span>
+        <span>{data.year}</span>
+      </p>
       <h1 class="cs-hero__name">{data.name}</h1>
       <p class="cs-hero__tagline">{data.tagline}</p>
-
-      <div class="cs-hero__image-wrap">
-        <img
-          src={data.heroImage}
-          alt={data.heroImageAlt}
-          loading="eager"
-          decoding="async"
-          width="1280"
-          height="720"
-          class="cs-hero__image"
-        />
-      </div>
+      {data.siteUrl && (
+        <a class="cs-hero__visit" href={data.siteUrl} target="_blank" rel="noopener noreferrer">
+          {copy.visit} <span aria-hidden="true">↗</span>
+        </a>
+      )}
     </header>
 
-    <!-- ── Ficha técnica ─────────────────────────────────────────── -->
-    <div class="cs-ficha">
-      <dl class="cs-ficha__grid">
-        <div class="cs-ficha__item">
-          <dt class="cs-ficha__label">{lang === 'es' ? 'Cliente' : 'Client'}</dt>
-          <dd class="cs-ficha__value">{data.client}</dd>
+    <!-- ── Vista hero del proyecto — en contenedor con fondo + halo + tilt ── -->
+    <div
+      class="cs-canvas"
+      data-cs-reveal
+      style={`--canvas-bg: ${data.heroBg ?? 'var(--ink)'}; --canvas-img: url('${data.heroImage}')`}
+    >
+      <!-- halo: la propia imagen blureada detrás (hereda el color real del screenshot) -->
+      <span class="cs-halo" aria-hidden="true"></span>
+      {data.heroFrame ? (
+        <figure class={`cs-frame cs-frame--${data.heroTheme ?? 'light'}`} data-cs-tilt>
+          <div class="cs-frame__bar" aria-hidden="true">
+            <span class="cs-frame__dot"></span>
+            <span class="cs-frame__dot"></span>
+            <span class="cs-frame__dot"></span>
+            <span class="cs-frame__url">{siteHost}</span>
+          </div>
+          <img src={data.heroImage} alt={data.heroImageAlt} loading="eager" decoding="async" />
+        </figure>
+      ) : (
+        <figure class="cs-shot" data-cs-tilt>
+          <img src={data.heroImage} alt={data.heroImageAlt} loading="eager" decoding="async" />
+        </figure>
+      )}
+    </div>
+
+    <!-- ── Bloques texto + imagen ───────────────────────────────── -->
+    {data.blocks.map((block, i) => (
+      <section class="cs-block">
+        <div class="cs-block__text" data-cs-reveal>
+          <span class="cs-block__num">{String(i + 1).padStart(2, '0')}</span>
+          <h2 class="cs-block__label">{block.label}</h2>
+          <p class="cs-block__body">{block.body}</p>
         </div>
-        <div class="cs-ficha__item">
-          <dt class="cs-ficha__label">{lang === 'es' ? 'Servicios' : 'Services'}</dt>
-          <dd class="cs-ficha__value">{data.categories.join(', ')}</dd>
-        </div>
-        <div class="cs-ficha__item">
-          <dt class="cs-ficha__label">{lang === 'es' ? 'Año' : 'Year'}</dt>
-          <dd class="cs-ficha__value">{data.year}</dd>
-        </div>
-        {data.siteUrl && (
-          <div class="cs-ficha__item">
-            <dt class="cs-ficha__label">{lang === 'es' ? 'Sitio' : 'Site'}</dt>
-            <dd class="cs-ficha__value">
-              <a href={data.siteUrl} target="_blank" rel="noopener noreferrer" class="cs-ficha__link">
-                {data.siteUrl.replace(/^https?:\/\//, '')}
-              </a>
-            </dd>
+        {block.image && (
+          <div
+            class={`cs-canvas cs-canvas--${block.ratio ?? 'default'}`}
+            data-cs-reveal
+            style={`--canvas-bg: ${block.bg ?? 'var(--ink)'}; --canvas-img: url('${block.image}')`}
+          >
+            <span class="cs-halo" aria-hidden="true"></span>
+            {block.frame ? (
+              <figure class={`cs-frame cs-frame--${block.theme ?? 'light'}`} data-cs-tilt>
+                <div class="cs-frame__bar" aria-hidden="true">
+                  <span class="cs-frame__dot"></span>
+                  <span class="cs-frame__dot"></span>
+                  <span class="cs-frame__dot"></span>
+                  <span class="cs-frame__url">{siteHost}</span>
+                </div>
+                <img src={block.image} alt={block.imageAlt ?? ''} loading="lazy" decoding="async" />
+              </figure>
+            ) : (
+              <figure class="cs-shot" data-cs-tilt>
+                <img src={block.image} alt={block.imageAlt ?? ''} loading="lazy" decoding="async" />
+              </figure>
+            )}
           </div>
         )}
-      </dl>
-    </div>
+      </section>
+    ))}
 
-    <!-- ── Secciones de contenido ────────────────────────────────── -->
-    <div class="cs-sections">
-      {data.sections.map((s, i) => (
-        <section class="cs-block">
-          <p class="cs-block__label">{String(i + 1).padStart(2, '0')} — {s.label}</p>
-          <p class="cs-block__body">{s.body}</p>
-        </section>
-      ))}
-    </div>
-
-    <!-- ── Galería ───────────────────────────────────────────────── -->
-    {data.images.length > 0 && (
-      <div class="cs-gallery">
-        {data.images.map((img) => (
-          <div class={`cs-gallery__item${img.wide ? ' cs-gallery__item--wide' : ''}`}>
-            <img
-              src={img.src}
-              alt={img.alt}
-              loading="lazy"
-              decoding="async"
-              width="1280"
-              height="800"
-            />
-          </div>
-        ))}
+    <!-- ── Ficha de créditos ─────────────────────────────────────── -->
+    <section class="cs-credits" data-cs-reveal>
+      <div class="cs-credits__col">
+        <p class="cs-credits__head">{copy.client}</p>
+        <p class="cs-credits__val">{data.client}</p>
       </div>
-    )}
-
-    <!-- ── Créditos ──────────────────────────────────────────────── -->
-    <div class="cs-credits">
-      <p class="cs-credits__label">{lang === 'es' ? 'Equipo' : 'Credits'}</p>
-      <dl class="cs-credits__list">
+      <div class="cs-credits__col">
+        <p class="cs-credits__head">{copy.role}</p>
         {data.credits.map((c) => (
-          <div class="cs-credits__item">
-            <dt class="cs-credits__role">{c.role}</dt>
-            <dd class="cs-credits__name">{c.name}</dd>
-          </div>
+          <p class="cs-credits__val">{c.role} — {c.name}</p>
         ))}
-      </dl>
-    </div>
-
-    <!-- ── Proyecto siguiente ────────────────────────────────────── -->
-    {data.next && (
-      <div class="cs-next">
-        <p class="cs-next__label">{lang === 'es' ? 'Siguiente proyecto' : 'Next project'}</p>
-        <a href={data.next.href} class="cs-next__link">
-          {data.next.name}
-          <span class="cs-next__arrow" aria-hidden="true">→</span>
-        </a>
       </div>
+      <div class="cs-credits__col">
+        <p class="cs-credits__head">{copy.year}</p>
+        <p class="cs-credits__val">{data.year}</p>
+        {data.siteUrl && (
+          <a class="cs-credits__link" href={data.siteUrl} target="_blank" rel="noopener noreferrer">
+            {copy.visit} <span aria-hidden="true">↗</span>
+          </a>
+        )}
+      </div>
+    </section>
+
+    <!-- ── Next project ──────────────────────────────────────────── -->
+    {data.next && (
+      <a class="cs-next" href={data.next.href}>
+        <span class="cs-next__label">{copy.next}</span>
+        <span class="cs-next__name">{data.next.name}</span>
+        <span class="cs-next__arrow" aria-hidden="true">→</span>
+      </a>
     )}
 
   </article>
@@ -186,271 +211,424 @@ const { t, lang, data, title, description, canonicalURL, alternates } = Astro.pr
 </Layout>
 
 <style>
-/* ── Base ─────────────────────────────────────────────────────────── */
-.cs {
-  padding-top: 0;
-}
-
-/* ── Hero ────────────────────────────────────────────────────────── */
-.cs-hero {
-  padding-top: calc(var(--space-3xl) + 4rem); /* clearance del nav */
-  padding-inline: var(--margin);
-  padding-bottom: 0;
-}
-
-.cs-hero__meta {
-  display: flex;
-  gap: var(--space-m);
-  align-items: baseline;
-  margin-bottom: var(--space-s);
-}
-
-.cs-hero__categories,
-.cs-hero__year {
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  color: var(--ink-62);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-}
-
-.cs-hero__name {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(3.5rem, 10vw, 9rem);
-  line-height: 1.0;
-  letter-spacing: -0.03em;
-  color: var(--ink);
-  margin: 0 0 var(--space-s) 0;
-}
-
-.cs-hero__tagline {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-style: italic;
-  font-size: clamp(1.25rem, 2.5vw, 2rem);
-  color: var(--ink-62);
-  margin-bottom: var(--space-xl);
-}
-
-.cs-hero__image-wrap {
-  width: calc(100% + var(--margin) * 2);
-  margin-inline: calc(var(--margin) * -1);
-}
-
-.cs-hero__image {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-}
-
-/* ── Ficha técnica ───────────────────────────────────────────────── */
-.cs-ficha {
-  padding-inline: var(--margin);
-  padding-block: var(--space-xl);
-  border-bottom: 1px solid var(--hairline);
-}
-
-.cs-ficha__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-m) var(--space-l);
-}
-
-.cs-ficha__label {
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  color: var(--ink-62); /* --ink-42 daba 2.7:1 — AA pide 4.5:1 (QA 2026-07-21) */
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-bottom: 0.35em;
-}
-
-.cs-ficha__value {
-  font-family: var(--font-body);
-  font-size: var(--text-body);
-  font-weight: 400;
-  color: var(--ink);
-}
-
-.cs-ficha__link {
-  color: var(--ink);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--hairline);
-  transition: text-decoration-color 0.2s;
-}
-
-.cs-ficha__link:hover {
-  text-decoration-color: var(--brand);
-}
-
-/* ── Secciones de contenido ──────────────────────────────────────── */
-.cs-sections {
-  padding-inline: var(--margin);
-  padding-block: var(--space-2xl);
-  display: grid;
-  gap: var(--space-xl);
-}
-
-.cs-block__label {
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  color: var(--ink-62); /* --ink-42 daba 2.7:1 — AA pide 4.5:1 (QA 2026-07-21) */
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-bottom: var(--space-s);
-}
-
-.cs-block__body {
-  font-family: var(--font-body);
-  font-size: var(--text-subhead);
-  line-height: 1.6;
-  color: var(--ink);
-  max-width: 65ch;
-}
-
-/* ── Galería ─────────────────────────────────────────────────────── */
-.cs-gallery {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-xs);
-  padding-inline: var(--margin);
-  padding-bottom: var(--space-2xl);
-}
-
-.cs-gallery__item img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-}
-
-.cs-gallery__item--wide {
-  grid-column: 1 / -1;
-}
-
-.cs-gallery__item--wide img {
-  aspect-ratio: 16 / 9;
-}
-
-/* ── Créditos ────────────────────────────────────────────────────── */
-.cs-credits {
-  padding-inline: var(--margin);
-  padding-block: var(--space-xl);
-  border-top: 1px solid var(--hairline);
-}
-
-.cs-credits__label {
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  color: var(--ink-62); /* --ink-42 daba 2.7:1 — AA pide 4.5:1 (QA 2026-07-21) */
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-bottom: var(--space-m);
-}
-
-.cs-credits__list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--space-s) var(--space-l);
-}
-
-.cs-credits__role {
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  color: var(--ink-62); /* --ink-42 daba 2.7:1 — AA pide 4.5:1 (QA 2026-07-21) */
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.25em;
-}
-
-.cs-credits__name {
-  font-family: var(--font-body);
-  font-size: var(--text-body);
-  color: var(--ink);
-}
-
-/* ── Proyecto siguiente ──────────────────────────────────────────── */
-.cs-next {
-  padding-inline: var(--margin);
-  padding-block: var(--space-2xl);
-  border-top: 1px solid var(--hairline);
-}
-
-.cs-next__label {
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  color: var(--ink-62); /* --ink-42 daba 2.7:1 — AA pide 4.5:1 (QA 2026-07-21) */
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin-bottom: var(--space-s);
-}
-
-.cs-next__link {
-  font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(2.5rem, 7vw, 6rem);
-  line-height: 1.0;
-  letter-spacing: -0.025em;
-  color: var(--ink);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3em;
-  transition: color 0.2s;
-}
-
-.cs-next__link:hover {
-  color: var(--ink);
-}
-
-.cs-next__arrow {
-  display: inline-block;
-  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.cs-next__link:hover .cs-next__arrow {
-  transform: translateX(0.3em);
-}
-
-/* ── Tablet ──────────────────────────────────────────────────────── */
-@media (min-width: 768px) {
-  .cs-ficha__grid {
-    grid-template-columns: repeat(4, 1fr);
+  /* Registrar --rx/--ry como ángulos numéricos → GSAP quickTo los interpola
+     suavemente y el navegador conoce su valor inicial (0). Sin @property,
+     un custom prop sin valor inicial no anima de forma fiable. */
+  @property --rx {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 0;
+  }
+  @property --ry {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 0;
   }
 
-  .cs-sections {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* ── Desktop ─────────────────────────────────────────────────────── */
-@media (min-width: 1280px) {
-  .cs-gallery {
-    grid-template-columns: repeat(3, 1fr);
+  .cs {
+    background-color: var(--bg);
+    color: var(--ink);
   }
 
-  .cs-gallery__item--wide {
-    grid-column: 1 / -1;
+  /* ── HERO tipográfico ─────────────────────────────────────── */
+  .cs-hero {
+    padding: clamp(7rem, 18vh, 12rem) var(--margin) clamp(3rem, 6vh, 5rem);
+    max-width: 1600px;
+    margin-inline: auto;
   }
-}
+  .cs-hero__kicker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em 1.5em;
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-62);
+    margin: 0 0 var(--space-l);
+  }
+  .cs-hero__name {
+    font-family: var(--font-display);
+    font-weight: 200;
+    font-size: clamp(3.5rem, 12vw, 10rem);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .cs-hero__tagline {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(1.25rem, 3vw, 2rem);
+    line-height: 1.25;
+    color: var(--ink-mid, var(--ink-62));
+    margin: var(--space-m) 0 0;
+    max-width: 26ch;
+  }
+  .cs-hero__visit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: var(--space-l);
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 0.3em;
+    transition: gap 0.3s ease, opacity 0.3s ease;
+  }
+  .cs-hero__visit:hover { gap: 0.9em; opacity: 0.7; }
 
-/* ── reduced-motion ─────────────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
+  /* ── CANVAS: el lienzo de color que abraza la imagen ──────────
+   * v3 (2026-07-28, research DESIGN_RESEARCH_HALO_HOVER3D):
+   *   - SIN min-height en vh: el canvas ABRAZA su contenido (el mockup/shot
+   *     define la altura). Esto elimina el "cuadro negro alargado" que aparecía
+   *     en pantallas 29"/ultrawide, donde el vh estiraba el fondo muerto.
+   *   - max-width: topa el ancho del bloque en pantallas anchas → el contenido
+   *     no queda chico perdido en un mar de color.
+   *   - position: relative + overflow visible → el halo puede sangrar afuera. */
+  .cs-canvas {
+    --canvas-bg: var(--ink);
+    position: relative;
+    background: var(--canvas-bg);
+    display: grid;
+    place-items: center;
+    padding: clamp(2rem, 5vw, 5.5rem);
+    max-width: 1400px;
+    margin: 0 auto clamp(3rem, 7vh, 6rem);
+    margin-inline: max(var(--margin), calc((100% - 1400px) / 2));
+    border-radius: clamp(12px, 1.5vw, 20px);
+    /* overflow visible para el halo; el border-radius se preserva porque el
+       halo va detrás (z-index) y el contenido tiene su propio radius */
+    overflow: visible;
+    isolation: isolate;
+  }
+
+  /* ── HALO: la propia imagen del proyecto, blureada, detrás del contenido.
+   * Hereda el color/luz real de cada screenshot → cada caso tiene un halo con
+   * su propia paleta, no un glow genérico. Técnica verificada (Smashing/CodyHouse
+   * "ambient glow"). Sangra fuera del canvas para un resplandor suave. ── */
+  .cs-halo {
+    position: absolute;
+    inset: 8%;
+    z-index: 0;
+    background-image: var(--canvas-img);
+    background-size: cover;
+    background-position: center;
+    filter: blur(60px) saturate(1.2);
+    opacity: 0.5;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /* ── SHOT: imagen suelta (foto de producto) — border-radius + sombra ── */
+  .cs-shot {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    max-width: 100%;
+    line-height: 0;
+    /* base del tilt 3D: el JS escribe --rx/--ry; sin JS queda plano */
+    transform: perspective(1300px) rotateX(calc(var(--rx, 0) * 1deg)) rotateY(calc(var(--ry, 0) * 1deg));
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cs-shot img {
+    display: block;
+    max-width: 100%;
+    max-height: 68vh;
+    width: auto;
+    height: auto;
+    border-radius: clamp(6px, 0.8vw, 12px);
+    /* hairline oscuro + sombra: define el contorno de la imagen contra el canvas
+       hueso claro. Las imágenes oscuras sueltas van sobre --bg (decisión William
+       2026-07-28) → una imagen oscura sobre hueso flota nítida. */
+    box-shadow:
+      0 0 0 1px rgba(20, 19, 17, 0.08),
+      0 30px 60px -25px rgba(0, 0, 0, 0.35);
+  }
+
+  /* ── FRAME: browser-mockup minimal (vistas de sitio) ──────────
+   * Reemplaza el navbar del navegador del cliente por un chrome propio.
+   * dots NEUTROS (no el semáforo de macOS) — research Geist/Vercel. */
+  .cs-frame {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    width: 100%;
+    max-width: 1000px;
+    border-radius: clamp(10px, 1.2vw, 16px);
+    overflow: hidden;
+    box-shadow: 0 30px 70px -25px rgba(0, 0, 0, 0.5);
+    line-height: 0;
+    /* base del tilt 3D */
+    transform: perspective(1300px) rotateX(calc(var(--rx, 0) * 1deg)) rotateY(calc(var(--ry, 0) * 1deg));
+    transform-style: preserve-3d;
+    will-change: transform;
+    transition: transform 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .cs-frame__bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: clamp(34px, 3vw, 42px);
+    padding: 0 clamp(12px, 1.2vw, 18px);
+  }
+  .cs-frame__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .cs-frame__url {
+    margin-left: 0.75rem;
+    flex: 1;
+    max-width: 320px;
+    height: 22px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding-inline: 12px;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .cs-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* variante light */
+  .cs-frame--light { background: #ffffff; }
+  .cs-frame--light .cs-frame__bar { background: #f0efe9; }
+  .cs-frame--light .cs-frame__dot { background: rgba(20, 19, 17, 0.18); }
+  .cs-frame--light .cs-frame__url { background: #ffffff; color: var(--ink-62); }
+  /* variante dark (apps oscuras como Menius) */
+  .cs-frame--dark { background: #0e0e0e; }
+  .cs-frame--dark .cs-frame__bar { background: #1a1a1a; }
+  .cs-frame--dark .cs-frame__dot { background: rgba(255, 255, 255, 0.22); }
+  .cs-frame--dark .cs-frame__url { background: #0e0e0e; color: rgba(255, 255, 255, 0.55); }
+
+  /* ── BLOQUES texto ────────────────────────────────────────── */
+  .cs-block__text {
+    max-width: 1600px;
+    margin-inline: auto;
+    padding-inline: var(--margin);
+    display: grid;
+    gap: var(--space-s);
+    margin-bottom: clamp(2rem, 5vh, 4rem);
+  }
+  .cs-block__num {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    color: var(--ink-62);
+    font-variant-numeric: tabular-nums;
+  }
+  .cs-block__label {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .cs-block__body {
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 1.4vw, 1.1875rem);
+    line-height: 1.6;
+    color: var(--ink-mid, var(--ink-62));
+    margin: 0;
+    max-width: 60ch;
+  }
+
+  /* ── CRÉDITOS ─────────────────────────────────────────────── */
+  .cs-credits {
+    max-width: 1600px;
+    margin: clamp(2rem, 5vh, 4rem) auto 0;
+    padding: clamp(3rem, 6vh, 5rem) var(--margin);
+    border-top: 1px solid var(--hairline);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+  }
+  .cs-credits__head {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-62);
+    margin: 0 0 var(--space-s);
+  }
+  .cs-credits__val {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0 0 0.35em;
+  }
+  .cs-credits__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-top: var(--space-s);
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 0.25em;
+  }
+
+  /* ── NEXT ─────────────────────────────────────────────────── */
+  .cs-next {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    max-width: 1600px;
+    margin-inline: auto;
+    padding: clamp(4rem, 12vh, 9rem) var(--margin);
+    text-decoration: none;
+    color: var(--ink);
+    border-top: 1px solid var(--hairline);
+  }
+  .cs-next__label {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-62);
+    flex-shrink: 0;
+  }
+  .cs-next__name {
+    font-family: var(--font-display);
+    font-weight: 200;
+    font-size: clamp(2.5rem, 8vw, 6rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    transition: opacity 0.3s ease;
+  }
   .cs-next__arrow {
-    transition: none;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4rem);
+    margin-left: auto;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .cs-ficha__link {
-    transition: none;
+  .cs-next:hover .cs-next__name { opacity: 0.6; }
+  .cs-next:hover .cs-next__arrow { transform: translateX(0.4em); }
+
+  /* ── DESKTOP: bloques texto+imagen en 2 columnas para imagen vertical ── */
+  @media (min-width: 900px) {
+    .cs-credits {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-l);
+    }
+    /* bloque con imagen tall: texto a la izquierda, canvas a la derecha */
+    .cs-block:has(.cs-canvas--tall) {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      max-width: 1600px;
+      margin-inline: auto;
+      gap: clamp(2rem, 5vw, 5rem);
+      padding-inline: var(--margin);
+    }
+    .cs-block:has(.cs-canvas--tall) .cs-block__text {
+      max-width: none;
+      margin: 0;
+      padding-inline: 0;
+    }
+    .cs-block:has(.cs-canvas--tall) .cs-canvas--tall {
+      margin: 0;
+    }
   }
-}
+
+  /* ── Reveal ───────────────────────────────────────────────── */
+  [data-cs-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  [data-cs-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-cs-reveal] { opacity: 1; transform: none; }
+  }
 </style>
+
+<script>
+  const els = document.querySelectorAll('[data-cs-reveal]');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) {
+    els.forEach((el) => el.classList.add('is-visible'));
+  } else {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -12% 0px' }
+    );
+    els.forEach((el) => io.observe(el));
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     TILT 3D en hover — tridimensionalidad sutil al pasar el cursor.
+     Molde del research DESIGN_RESEARCH_HALO_HOVER3D: perspective 1300, max 7°
+     (no 15° "gadget"), con GSAP (ya instalado — sin dependencia nueva).
+     Solo desktop con hover real; reduced-motion → no corre. ── */
+  const canHover = window.matchMedia('(min-width: 1024px) and (hover: hover)').matches;
+  if (!prefersReduced && canHover) {
+    (async () => {
+      try {
+        const { gsap } = await import('gsap');
+        const tilts = document.querySelectorAll<HTMLElement>('[data-cs-tilt]');
+        const MAX = 7; // grados máximos de rotación
+
+        tilts.forEach((el) => {
+          /* quickTo anima los números --rx/--ry; la unidad deg la aplica el CSS
+             con calc(var(--rx) * 1deg). */
+          const setRX = gsap.quickTo(el, '--rx', { duration: 0.4, ease: 'power2.out' });
+          const setRY = gsap.quickTo(el, '--ry', { duration: 0.4, ease: 'power2.out' });
+
+          el.addEventListener('pointermove', (e) => {
+            const r = el.getBoundingClientRect();
+            const px = (e.clientX - r.left) / r.width - 0.5;  // -0.5..0.5
+            const py = (e.clientY - r.top) / r.height - 0.5;
+            setRX(-py * MAX);
+            setRY(px * MAX);
+          });
+          el.addEventListener('pointerleave', () => {
+            setRX(0);
+            setRY(0);
+          });
+        });
+      } catch (err) {
+        console.error('[CaseStudyLayout] tilt init failed:', err);
+      }
+    })();
+  }
+</script>

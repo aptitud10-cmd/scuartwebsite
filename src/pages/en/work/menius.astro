@@ -9,50 +9,56 @@ const alternates = getAlternatesFor('work/menius', 'trabajo/menius');
 
 const data: CaseStudyData = {
   name: 'Menius',
-  tagline: 'Digital menu SaaS for restaurants. SCUART\'s own product.',
-  categories: ['SaaS', 'Product', 'Platform'],
+  tagline: 'Digital menu and ordering SaaS for restaurants. SCUART\'s own product, from zero to production.',
+  categories: ['SAAS', 'OWN PRODUCT'],
   year: '2025',
   client: 'SCUART (own product)',
   siteUrl: 'https://menius.app',
-  heroImage: '/images/portfolio-menius-real.webp',
-  heroImageAlt: 'Menius — restaurant SaaS platform designed and built by SCUART',
-  sections: [
+  // site view cropped (no client navbar) → dark browser-mockup
+  heroImage: '/images/casos/menius-hero-crop.webp',
+  heroImageAlt: 'Menius — product landing: online orders with no commission',
+  // warm arena canvas: the dark screenshot contrasts and stays legible.
+  heroBg: 'var(--canvas-arena)',
+  heroFrame: true,
+  heroTheme: 'dark',
+  blocks: [
     {
-      label: 'Context',
-      body: 'Small and mid-sized restaurants needed an affordable digital menu solution — no transaction fees, no dependency on third-party platforms. The pandemic accelerated QR adoption, but existing solutions were either expensive or generic.',
+      label: 'The problem',
+      body: 'Restaurants lose up to 30% of every order to delivery-app commissions. They needed their own channel — digital menu, online orders, and payments straight to their account — without depending on third-party platforms or paying per transaction.',
+      image: '/images/casos/menius-precios-crop.webp',
+      imageAlt: 'Menius — plans and pricing with no commission',
+      ratio: 'wide',
+      bg: 'var(--canvas-arena)',
+      frame: true,
+      theme: 'dark',
     },
     {
-      label: 'Challenge',
-      body: 'Build a complete SaaS — from multi-tenant architecture to the admin experience — that would work for restaurants with varying levels of technical capability. The product had to be simple enough for an owner to configure alone, and robust enough to scale.',
+      label: 'The product',
+      // phone mockup (dark device) → arena canvas so it floats crisply
+      image: '/images/casos/menius-mockup.webp',
+      body: 'We designed and built Menius from scratch: multi-tenant architecture, mobile-first public menu with QR, real-time orders, Stripe payments (0% commission), and an AI assistant that builds the menu from a photo. Each restaurant gets its own subdomain and admin panel.',
+      imageAlt: 'Menius — the digital menu app running on a phone',
+      ratio: 'tall',
+      bg: 'var(--canvas-arena)',
     },
     {
-      label: 'Solution',
-      body: 'We designed and built Menius from scratch: Supabase multi-tenant architecture with RLS, Next.js admin dashboard, mobile-optimized public menu, and real-time update system. Each restaurant gets their own subdomain and can customize colors, typography, and content without touching code.',
-    },
-    {
-      label: 'Result',
-      body: 'Menius is SCUART\'s own product: a system built so a restaurant can put together and publish its digital menu without friction. It validates the studio\'s model — we build digital systems that generate long-term value, not just websites.',
-    },
-  ],
-  images: [
-    {
-      src: '/images/portfolio-menius-real-trim.webp',
-      alt: 'Menius — admin dashboard',
-      wide: true,
-    },
-    {
-      src: '/images/portfolio-menius-real.webp',
-      alt: 'Menius — mobile digital menu view',
+      label: 'The result',
+      body: 'Menius validates the studio\'s model: we don\'t just build websites, we build digital systems that create long-term value. It\'s SCUART\'s technical proof — a complete SaaS, in production, with real payments and active clients.',
+      // mobile screenshot (dark) → arena canvas so it floats crisply
+      image: '/images/casos/menius-mobile.webp',
+      imageAlt: 'Menius — mobile version of the landing',
+      ratio: 'tall',
+      bg: 'var(--canvas-arena)',
     },
   ],
   credits: [
-    { role: 'Product Direction', name: 'William Cuartas' },
-    { role: 'UX/UI Design', name: 'William Cuartas' },
-    { role: 'Architecture & Development', name: 'William Cuartas' },
+    { role: 'Product direction', name: 'William Cuartas' },
+    { role: 'UX/UI design', name: 'William Cuartas' },
+    { role: 'Architecture & development', name: 'William Cuartas' },
   ],
   next: {
-    name: 'Healthy Choice NY',
-    href: '/en/work/healthy-choice',
+    name: 'Etnia Braids',
+    href: '/en/work/etnia-braids',
   },
 };
 ---
@@ -62,8 +68,7 @@ const data: CaseStudyData = {
   lang={lang}
   data={data}
   title="Menius — SCUART"
-  description="Digital menu SaaS for restaurants. Designed and built by SCUART."
+  description="Digital menu SaaS for restaurants. Designed and built by SCUART, from zero to production."
   canonicalURL="https://scuart.com/en/work/menius"
-
   alternates={alternates}
 />

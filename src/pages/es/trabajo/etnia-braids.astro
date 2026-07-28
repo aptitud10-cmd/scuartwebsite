@@ -1,0 +1,80 @@
+---
+import CaseStudyLayout from '../../../components/CaseStudyLayout.astro';
+import { getTranslations, getAlternatesFor } from '../../../i18n/index';
+import type { CaseStudyData } from '../../../components/CaseStudyLayout.astro';
+
+const lang = 'es';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('work/etnia-braids', 'trabajo/etnia-braids');
+
+const data: CaseStudyData = {
+  name: 'Etnia Braids',
+  tagline: 'Sitio a medida con sistema de reservas y pagos para un salón de trenzas en Nueva York.',
+  categories: ['WEB A MEDIDA', 'RESERVAS'],
+  year: '2025',
+  client: 'Etnia Braids',
+  siteUrl: 'https://etniabraids.com',
+  // vista del sitio recortada (sin navbar del cliente) → browser-mockup dark
+  heroImage: '/images/casos/etnia-hero-crop.webp',
+  heroImageAlt: 'Etnia Braids — landing editorial del sitio, el arte de las trenzas',
+  // canvas arena cálida en todos los bloques (William 2026-07-28)
+  heroBg: 'var(--canvas-arena)',
+  heroFrame: true,
+  heroTheme: 'dark',
+  blocks: [
+    {
+      // narrativa 2026-07-28: 'El reto' mostraba la foto de trenzas mientras el
+      // texto hablaba de reservas (incoherencia grave). Ahora 'El oficio' — la foto
+      // SÍ ilustra el oficio artesanal. El oficio → El sistema → La reserva.
+      label: 'El oficio',
+      body: 'Etnia Braids es un salón especializado en el arte de las trenzas, en Corona, Queens. El sitio parte de ahí: una estética editorial premium que trata el trabajo como lo que es — oficio, no un servicio más. La fotografía lleva el peso de la marca; la voz es "nosotras", el foco es el resultado en el cabello.',
+      // foto del trabajo (galería) — sin chrome → canvas arena resalta los cobrizos
+      image: '/images/casos/etnia-detalle.webp',
+      imageAlt: 'Etnia Braids — detalle del trabajo de trenzas',
+      ratio: 'tall',
+      bg: 'var(--canvas-arena)',
+    },
+    {
+      label: 'El sistema',
+      body: 'El salón necesitaba más que una web bonita: un sistema de reservas real. Diseñamos un flujo propio — elegir servicio, día y hora — con depósito cobrado por Stripe. Cada servicio tiene su duración y precio, y la cita queda confirmada y en agenda automáticamente. No es una plantilla genérica: es un sistema hecho a la medida del negocio.',
+      // vista del flujo de reserva (paso servicio) → browser-mockup dark sobre arena
+      image: '/images/casos/etnia-servicios.webp',
+      imageAlt: 'Etnia Braids — catálogo de servicios con precios',
+      ratio: 'wide',
+      bg: 'var(--canvas-arena)',
+      frame: true,
+      theme: 'dark',
+    },
+    {
+      label: 'La reserva',
+      body: 'El trabajo se cobra por adelantado con depósito, así que la agenda se gestiona sola — sin llamadas, sin WhatsApp manual, sin huecos en el calendario. Lo que justifica el ticket alto no es solo el diseño: es la infraestructura de reservas y pagos que corre por detrás.',
+      // vista del flujo de reserva (paso horario) → browser-mockup dark sobre arena
+      image: '/images/casos/etnia-reserva.webp',
+      imageAlt: 'Etnia Braids — flujo de reserva con selección de horario',
+      ratio: 'wide',
+      bg: 'var(--canvas-arena)',
+      frame: true,
+      theme: 'dark',
+    },
+  ],
+  credits: [
+    { role: 'Dirección creativa', name: 'William Cuartas' },
+    { role: 'Diseño UX/UI', name: 'William Cuartas' },
+    { role: 'Desarrollo & reservas', name: 'William Cuartas' },
+  ],
+  next: {
+    name: 'Jamón Casero',
+    href: '/es/trabajo/jamon-casero',
+  },
+};
+---
+
+<CaseStudyLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Etnia Braids — SCUART"
+  description="Sitio a medida con sistema de reservas y pagos para un salón de trenzas en Nueva York. Diseño y desarrollo por SCUART."
+  canonicalURL="https://scuart.com/es/trabajo/etnia-braids"
+  alternates={alternates}
+/>

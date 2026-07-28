@@ -1,0 +1,80 @@
+---
+import CaseStudyLayout from '../../../components/CaseStudyLayout.astro';
+import { getTranslations, getAlternatesFor } from '../../../i18n/index';
+import type { CaseStudyData } from '../../../components/CaseStudyLayout.astro';
+
+const lang = 'en';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('work/etnia-braids', 'trabajo/etnia-braids');
+
+const data: CaseStudyData = {
+  name: 'Etnia Braids',
+  tagline: 'Custom website with a booking and payments system for a braiding salon in New York.',
+  categories: ['CUSTOM WEB', 'BOOKINGS'],
+  year: '2025',
+  client: 'Etnia Braids',
+  siteUrl: 'https://etniabraids.com',
+  // site view cropped (no client navbar) → dark browser-mockup
+  heroImage: '/images/casos/etnia-hero-crop.webp',
+  heroImageAlt: 'Etnia Braids — editorial site landing, the art of braids',
+  // warm arena canvas across all blocks (William 2026-07-28)
+  heroBg: 'var(--canvas-arena)',
+  heroFrame: true,
+  heroTheme: 'dark',
+  blocks: [
+    {
+      // 2026-07-28 narrative: 'The challenge' showed the braids photo while the
+      // copy talked about bookings (major mismatch). Now 'The craft' — the photo
+      // actually illustrates the craft. The craft → The system → The booking.
+      label: 'The craft',
+      body: 'Etnia Braids is a salon specialized in the art of braids, in Corona, Queens. The site starts there: a premium editorial aesthetic that treats the work as what it is — craft, not just another service. Photography carries the brand; the voice is "we", the focus is the result in the hair.',
+      // work photo (gallery) — no chrome → arena canvas lifts the copper tones
+      image: '/images/casos/etnia-detalle.webp',
+      imageAlt: 'Etnia Braids — detail of the braiding work',
+      ratio: 'tall',
+      bg: 'var(--canvas-arena)',
+    },
+    {
+      label: 'The system',
+      body: 'The salon needed more than a pretty website: a real booking system. We built a custom flow — pick a service, day and time — with the deposit charged through Stripe. Each service has its own duration and price, and the appointment is confirmed and scheduled automatically. Not a generic template: a system built to fit the business.',
+      // booking-flow view (service step) → dark browser-mockup on arena
+      image: '/images/casos/etnia-servicios.webp',
+      imageAlt: 'Etnia Braids — services catalog with pricing',
+      ratio: 'wide',
+      bg: 'var(--canvas-arena)',
+      frame: true,
+      theme: 'dark',
+    },
+    {
+      label: 'The booking',
+      body: 'Work is charged upfront with a deposit, so the calendar manages itself — no calls, no manual WhatsApp, no gaps in the schedule. What justifies the higher ticket isn\'t just the design: it\'s the booking and payments infrastructure running behind it.',
+      // booking-flow view (time step) → dark browser-mockup on arena
+      image: '/images/casos/etnia-reserva.webp',
+      imageAlt: 'Etnia Braids — booking flow with time selection',
+      ratio: 'wide',
+      bg: 'var(--canvas-arena)',
+      frame: true,
+      theme: 'dark',
+    },
+  ],
+  credits: [
+    { role: 'Creative direction', name: 'William Cuartas' },
+    { role: 'UX/UI design', name: 'William Cuartas' },
+    { role: 'Development & bookings', name: 'William Cuartas' },
+  ],
+  next: {
+    name: 'Jamón Casero',
+    href: '/en/work/jamon-casero',
+  },
+};
+---
+
+<CaseStudyLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Etnia Braids — SCUART"
+  description="Custom website with a booking and payments system for a braiding salon in New York. Design and development by SCUART."
+  canonicalURL="https://scuart.com/en/work/etnia-braids"
+  alternates={alternates}
+/>

@@ -9,44 +9,55 @@ const alternates = getAlternatesFor('work/jamon-casero', 'trabajo/jamon-casero')
 
 const data: CaseStudyData = {
   name: 'Jamón Casero',
-  tagline: 'Identidad digital para una marca gastronómica colombiana con historia.',
-  categories: ['Web', 'Marca', 'Gastro'],
-  year: '2017',
+  tagline: 'Identidad digital para una marca de charcutería artesanal con más de 55 años de historia en Bogotá.',
+  categories: ['WEB', 'MARCA GASTRO'],
+  // marca fundada en 1970, sitio remodelado por SCUART en 2025
+  year: '2025',
   client: 'Jamón Casero',
-  heroImage: '/images/portfolio-jamon-casero.webp',
-  heroImageAlt: 'Jamón Casero — sitio web diseñado por SCUART',
-  sections: [
+  siteUrl: 'https://jamoncasero.com.co',
+  // vista del sitio recortada (sin navbar del cliente) → browser-mockup dark
+  heroImage: '/images/casos/jamon-hero-crop.webp',
+  heroImageAlt: 'Jamón Casero — landing del sitio: el pernil sobre madera',
+  // canvas arena cálida en todos los bloques (William 2026-07-28)
+  heroBg: 'var(--canvas-arena)',
+  heroFrame: true,
+  heroTheme: 'dark',
+  blocks: [
     {
-      label: 'Contexto',
-      body: 'Jamón Casero es una marca colombiana de charcutería artesanal con más de 20 años de historia. Su reputación vivía en el voz a voz; su presencia digital era inexistente. El reto era trasladar esa confianza al mundo digital sin perder la calidez del producto.',
+      // narrativa 2026-07-28: labels que cada imagen ILUSTRA (no 'El reto' con el
+      // sitio ya terminado). El sitio → El oficio → En tu bolsillo.
+      label: 'El sitio',
+      body: 'Una marca con más de 55 años de tradición, pero sin presencia digital. Diseñamos su identidad online: fotografía de producto en primer plano, tipografía con carácter y una paleta cálida que evoca el proceso artesanal. El sitio le habla al consumidor final y al distribuidor a la vez, con pedidos por WhatsApp integrados.',
+      // vista del sitio (bloque de producto con precio) → browser-mockup dark sobre arena
+      image: '/images/casos/jamon-producto.webp',
+      imageAlt: 'Jamón Casero — bloque de producto del sitio con precio',
+      ratio: 'wide',
+      bg: 'var(--canvas-arena)',
+      frame: true,
+      theme: 'dark',
     },
     {
-      label: 'Desafío',
-      body: 'Crear una presencia web que compitiera con marcas internacionales en términos de diseño, pero que siguiera sintiéndose artesanal, local y auténtica. La marca necesitaba hablarle tanto al consumidor final como a distribuidores y restaurantes.',
+      label: 'El oficio',
+      body: 'La marca se sostiene en una receta de familia transmitida por generaciones. El sitio prioriza esa historia por encima del catálogo: primero se construye la confianza en el oficio, después se pide el pedido. La identidad editorial hace del proceso artesanal el argumento de venta.',
+      // detalle editorial (el libro de recetas) — sin chrome → canvas arena
+      image: '/images/casos/jamon-detalle.webp',
+      imageAlt: 'Jamón Casero — el libro de recetas familiar',
+      ratio: 'wide',
+      bg: 'var(--canvas-arena)',
     },
     {
-      label: 'Solución',
-      body: 'Diseñamos una identidad visual completa con tipografía editorial, fotografía de producto en primer plano y una paleta cálida que evocaba el proceso artesanal. El sitio web priorizó la historia del producto sobre el catálogo, construyendo primero la confianza.',
-    },
-    {
-      label: 'Resultado',
-      body: 'El sitio se convirtió en el principal punto de contacto para distribuidores nuevos. La identidad digital que salió del proyecto sirvió además de base para los materiales de punto de venta y empaque de la marca.',
-    },
-  ],
-  images: [
-    {
-      src: '/images/portfolio-jamon-casero-trim.webp',
-      alt: 'Jamón Casero — vista del sitio web',
-      wide: true,
-    },
-    {
-      src: '/images/portfolio-jamon-casero.webp',
-      alt: 'Jamón Casero — detalle del diseño',
+      label: 'En tu bolsillo',
+      body: 'La experiencia se diseñó mobile-first: la mayoría de los pedidos entran desde el teléfono. El sitio se convirtió en el principal punto de contacto para distribuidores nuevos, y la identidad digital sirvió de base para el material de punto de venta y el empaque de la marca.',
+      // vista mobile del sitio (oscura) → canvas arena para que flote nítida
+      image: '/images/casos/jamon-mobile.webp',
+      imageAlt: 'Jamón Casero — versión mobile del sitio',
+      ratio: 'tall',
+      bg: 'var(--canvas-arena)',
     },
   ],
   credits: [
-    { role: 'Dirección Creativa', name: 'William Cuartas' },
-    { role: 'Diseño Web', name: 'William Cuartas' },
+    { role: 'Dirección creativa', name: 'William Cuartas' },
+    { role: 'Diseño web', name: 'William Cuartas' },
     { role: 'Desarrollo', name: 'William Cuartas' },
   ],
   next: {
@@ -63,6 +74,5 @@ const data: CaseStudyData = {
   title="Jamón Casero — SCUART"
   description="Identidad digital y sitio web para Jamón Casero, marca colombiana de charcutería artesanal."
   canonicalURL="https://scuart.com/es/trabajo/jamon-casero"
-
   alternates={alternates}
 />

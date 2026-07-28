@@ -342,17 +342,21 @@ const { t } = Astro.props;
           gsap.fromTo(
             allChars,
             {
-              yPercent: () => gsap.utils.random(80, 130),
-              rotation: () => gsap.utils.random(-5, 5),
+              /* Movimiento CONTENIDO (William 2026-07-28: "muy exagerado, bajale
+                 al movimiento"). Antes: yPercent 80-130 + rotation ±5 = mucho
+                 salto. Ahora: recorrido corto y casi sin rotación → sube suave,
+                 mantiene el carácter (random por letra) sin dramatismo. */
+              yPercent: () => gsap.utils.random(30, 55),
+              rotation: () => gsap.utils.random(-2, 2),
               opacity: 0,
             },
             {
               yPercent: 0,
               rotation: 0,     /* termina exacto: sin rotación residual */
               opacity: 1,
-              duration: () => gsap.utils.random(0.55, 0.72),
-              ease: 'expo.out',
-              stagger: { amount: 0.4, from: 'random' },
+              duration: () => gsap.utils.random(0.45, 0.6),
+              ease: 'power3.out',
+              stagger: { amount: 0.3, from: 'random' },
               /* limpia los transforms inline al terminar → glifos perfectamente
                  alineados en reposo (sin scale/rotate residual que los torcía) */
               clearProps: 'transform',
@@ -362,8 +366,9 @@ const { t } = Astro.props;
 
         /* Estado de reposo antes del reveal: letras ocultas abajo. Así, aunque
            la sección ya esté en pantalla al cargar (es 100vh), el texto NO se
-           anima hasta que el trigger lo dispara. */
-        gsap.set(allChars, { yPercent: 110, opacity: 0 });
+           anima hasta que el trigger lo dispara. yPercent moderado, coherente
+           con el recorrido contenido del reveal. */
+        gsap.set(allChars, { yPercent: 60, opacity: 0 });
 
         const revealST = ScrollTrigger.create({
           trigger: statementEl,

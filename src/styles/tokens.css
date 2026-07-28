@@ -28,6 +28,9 @@
      Para volver a negro: --bg #0e0e0c, --ink #f2efe9, transparencias rgba(242,239,233,..) */
   --bg: #f4f2ec; /* hueso claro — fondo del cuerpo. NUNCA #fff puro */
   --surface: #ece9e1; /* elevación sutilísima */
+  --canvas-arena: #dcd6c8; /* arena cálida — lienzo de screenshots en páginas de caso.
+                              Más profundo que --surface para que la pieza flote sobre --bg
+                              y el screenshot oscuro resalte (elegido William 2026-07-28). */
   --ink: #14130f; /* tinta casi-negra cálida — texto y titulares. NUNCA #000 */
   --ink-mid: rgba(20, 19, 15, 0.62); /* tinta 62% — subcopy */
   --ink-62: rgba(20, 19, 15, 0.62); /* kickers, labels */

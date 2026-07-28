@@ -57,12 +57,11 @@ const rows = projects.map((p, i) => {
   <ol class="pf-list">
     {rows.map((row) => (
       <li class="pf-row" style={`transition-delay: ${row.delay}`}>
-        {/* Índice tipográfico estilo Locomotive — NO son links: las páginas de
-            caso se retiraron (2026-07-28) porque el material de imagen disponible
-            —screenshots de los sitios— no da para casos de nivel. El portfolio es
-            un museo de nombres + hover de imagen; la prueba real vive en los
-            sitios vivos, no en páginas de caso forzadas. Ver research de casos. */}
-        <div class="pf-row__link">
+        {/* Índice tipográfico estilo Locomotive. Cada fila enlaza a su página
+            de caso dedicada (rehechas 2026-07-28 con screenshots reales del
+            trabajo + molde full-bleed premium). Los 3 casos son premium: Jamón,
+            Menius, Etnia. Ver LISTA_SCREENSHOTS_PORTFOLIO / CaseStudyLayout. */}
+        <a class="pf-row__link" href={row.href} aria-label={row.name}>
           <!-- Ficha técnica anclada al borde izquierdo — V5 (numeral · category · year) -->
           <p class="pf-meta" aria-hidden="true">
             <span class="pf-meta__num">{row.num}·</span>
@@ -90,7 +89,7 @@ const rows = projects.map((p, i) => {
               height="800"
             />
           </div>
-        </div>
+        </a>
       </li>
     ))}
   </ol>

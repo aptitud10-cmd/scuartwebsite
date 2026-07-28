@@ -9,44 +9,55 @@ const alternates = getAlternatesFor('work/jamon-casero', 'trabajo/jamon-casero')
 
 const data: CaseStudyData = {
   name: 'Jamón Casero',
-  tagline: 'Digital identity for a Colombian artisan charcuterie brand with decades of history.',
-  categories: ['Web', 'Brand', 'Food & Beverage'],
-  year: '2017',
+  tagline: 'Digital identity for an artisanal charcuterie brand with over 55 years of history in Bogotá.',
+  categories: ['WEB', 'GASTRO BRAND'],
+  // brand founded in 1970, site rebuilt by SCUART in 2025
+  year: '2025',
   client: 'Jamón Casero',
-  heroImage: '/images/portfolio-jamon-casero.webp',
-  heroImageAlt: 'Jamón Casero — website designed by SCUART',
-  sections: [
+  siteUrl: 'https://jamoncasero.com.co',
+  // site view cropped (no client navbar) → dark browser-mockup
+  heroImage: '/images/casos/jamon-hero-crop.webp',
+  heroImageAlt: 'Jamón Casero — site landing: the roast on wood',
+  // warm arena canvas across all blocks (William 2026-07-28)
+  heroBg: 'var(--canvas-arena)',
+  heroFrame: true,
+  heroTheme: 'dark',
+  blocks: [
     {
-      label: 'Context',
-      body: 'Jamón Casero is a Colombian artisan charcuterie brand with over 20 years of history. Their reputation lived in word-of-mouth; their digital presence was nonexistent. The challenge was to translate that trust into the digital world without losing the warmth of the product.',
+      // 2026-07-28 narrative: labels each image actually ILLUSTRATES.
+      // The site → The craft → In your pocket.
+      label: 'The site',
+      body: 'A brand with over 55 years of tradition, but no digital presence. We designed its online identity: product photography front and center, characterful typography, and a warm palette that evokes the artisanal process. The site speaks to both the end customer and the distributor, with WhatsApp ordering built in.',
+      // site view (product block with pricing) → dark browser-mockup on arena
+      image: '/images/casos/jamon-producto.webp',
+      imageAlt: 'Jamón Casero — product block from the site with pricing',
+      ratio: 'wide',
+      bg: 'var(--canvas-arena)',
+      frame: true,
+      theme: 'dark',
     },
     {
-      label: 'Challenge',
-      body: 'Build a web presence that could compete with international brands in terms of design, while still feeling artisanal, local, and authentic. The brand needed to speak to both end consumers and distributors and restaurants.',
+      label: 'The craft',
+      body: 'The brand rests on a family recipe passed down through generations. The site puts that story ahead of the catalog: build trust in the craft first, then take the order. The editorial identity turns the artisanal process into the selling point.',
+      // editorial detail (the recipe book) — no chrome → arena canvas
+      image: '/images/casos/jamon-detalle.webp',
+      imageAlt: 'Jamón Casero — the family recipe book',
+      ratio: 'wide',
+      bg: 'var(--canvas-arena)',
     },
     {
-      label: 'Solution',
-      body: 'We designed a complete visual identity with editorial typography, close-up product photography, and a warm palette that evoked the artisanal process. The website prioritized the product story over the catalog, building trust first.',
-    },
-    {
-      label: 'Result',
-      body: 'The website became the primary contact point for new distributors. The digital identity that came out of the project also served as the foundation for the brand\'s point-of-sale materials and packaging.',
-    },
-  ],
-  images: [
-    {
-      src: '/images/portfolio-jamon-casero-trim.webp',
-      alt: 'Jamón Casero — website view',
-      wide: true,
-    },
-    {
-      src: '/images/portfolio-jamon-casero.webp',
-      alt: 'Jamón Casero — design detail',
+      label: 'In your pocket',
+      body: 'The experience was designed mobile-first: most orders come in from the phone. The site became the main point of contact for new distributors, and the digital identity served as the base for the brand\'s point-of-sale and packaging materials.',
+      // mobile view of the site (dark) → arena canvas so it floats crisply
+      image: '/images/casos/jamon-mobile.webp',
+      imageAlt: 'Jamón Casero — mobile version of the site',
+      ratio: 'tall',
+      bg: 'var(--canvas-arena)',
     },
   ],
   credits: [
-    { role: 'Creative Direction', name: 'William Cuartas' },
-    { role: 'Web Design', name: 'William Cuartas' },
+    { role: 'Creative direction', name: 'William Cuartas' },
+    { role: 'Web design', name: 'William Cuartas' },
     { role: 'Development', name: 'William Cuartas' },
   ],
   next: {
@@ -61,8 +72,7 @@ const data: CaseStudyData = {
   lang={lang}
   data={data}
   title="Jamón Casero — SCUART"
-  description="Digital identity and website for Jamón Casero, Colombian artisan charcuterie brand."
+  description="Digital identity and website for Jamón Casero, a Colombian artisanal charcuterie brand."
   canonicalURL="https://scuart.com/en/work/jamon-casero"
-
   alternates={alternates}
 />

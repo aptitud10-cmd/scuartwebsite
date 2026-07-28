@@ -140,12 +140,17 @@ export const es: Translations = {
      * no navega a ningún lado. Ver PortfolioSection.astro para el manejo JS.
      */
     viewCase: "VER CASO ↓",
+    /* Portfolio 2026-07-28: 3 casos PREMIUM con página dedicada + link al sitio
+       vivo (decisión William). Se sacaron Healthy Choice y Arriba Gold: material
+       viejo que bajaba el promedio. Un estudio que arranca vende más con 3 casos
+       impecables que con 5 desparejos. Las imágenes -trim son PLACEHOLDER hasta
+       que lleguen los screenshots reales (ver LISTA_SCREENSHOTS_PORTFOLIO). */
     projects: [
       {
         name: "Jamón Casero",
         num: "001",
         category: "WEB · MARCA GASTRO",
-        year: "2017",
+        year: "2025",
         image: "/images/portfolio-jamon-casero-trim.webp",
         alt: "JAMÓN CASERO — proyecto SCUART",
         href: "/es/trabajo/jamon-casero",
@@ -160,22 +165,15 @@ export const es: Translations = {
         href: "/es/trabajo/menius",
       },
       {
-        name: "Healthy Choice",
+        name: "Etnia Braids",
         num: "003",
-        category: "WEB · RESTAURANTE",
-        year: "2019",
-        image: "/images/portfolio-healthy-choice-real-trim.webp",
-        alt: "HEALTHY CHOICE NY — proyecto SCUART",
-        href: "/es/trabajo/healthy-choice",
-      },
-      {
-        name: "Arriba Gold",
-        num: "004",
-        category: "E-COMMERCE",
-        year: "2021",
-        image: "/images/portfolio-arriba-gold-real-trim.webp",
-        alt: "ARRIBA GOLD — proyecto SCUART",
-        href: "/es/trabajo/arriba-gold",
+        category: "WEB A MEDIDA · RESERVAS",
+        year: "2025",
+        /* thumbnail real: hero del sitio de Etnia en browser-mockup macOS
+           (generado 2026-07-28 con el mismo chrome que Jamón/Menius) */
+        image: "/images/portfolio-etnia-braids-trim.webp",
+        alt: "ETNIA BRAIDS — proyecto SCUART",
+        href: "/es/trabajo/etnia-braids",
       },
     ],
   },
