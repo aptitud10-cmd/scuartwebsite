@@ -176,12 +176,13 @@ const svcImages = [
      agranda y toma color; los demás se atenúan. Lo orquesta el JS.
      ═══════════════════════════════════════════════════════════ */
   @media (min-width: 1024px) {
-    .svc { padding-block: 0; } /* el pin maneja el alto; sin doble padding */
+    /* Sin pin: la sección tiene su propio padding vertical (antes 0 porque el
+       pin manejaba el alto). */
+    .svc { padding-block: var(--space-2xl); }
 
     .svc__kicker {
-      /* el kicker se saca del flujo pineado: va arriba de la escena */
       margin-bottom: var(--space-xl);
-      padding-top: var(--space-2xl);
+      padding-top: 0;
     }
 
     .svc__stage {
@@ -189,7 +190,10 @@ const svcImages = [
       grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
       align-items: center;
       gap: clamp(2rem, 6vw, 6rem);
-      min-height: 100vh;
+      /* Sin pin: el alto lo da el contenido (el panel de imagen es alto de por
+         sí). min-height moderado para que respire, NO 100vh forzado que
+         obligaba a scrollear la sección entera. */
+      min-height: 80vh;
     }
 
     /* ── Panel visual — columna izquierda. El diagrama del servicio activo. ── */
@@ -256,8 +260,12 @@ const svcImages = [
     .svc__row {
       display: block;
       border-bottom: none;
-      padding-block: clamp(0.6rem, 1.4vh, 1.1rem);
-      opacity: 0.28; /* estado inactivo por defecto */
+      /* menos padding → la lista llena mejor su columna (menos aire muerto) */
+      padding-block: clamp(0.45rem, 1vh, 0.9rem);
+      /* inactivo MÁS apagado → contraste dramático activo/inactivo (patrón
+         Monolog: la lista gris, solo el activo pleno). Antes 0.28 apenas se
+         distinguía. */
+      opacity: 0.22; /* estado inactivo por defecto */
       transition: opacity 0.5s ease;
     }
 
@@ -271,9 +279,11 @@ const svcImages = [
     .svc__row .svc__name {
       display: inline-block;
       vertical-align: middle;
-      font-size: clamp(1.75rem, 3vw, 3.25rem);
-      transition: color 0.4s ease, transform 0.5s cubic-bezier(0.19,1,0.22,1);
-      transform-origin: left center;
+      /* más grande → presencia tipográfica tipo Monolog (la lista es el
+         protagonista, no un larguero tímido) */
+      font-size: clamp(2.25rem, 4vw, 4rem);
+      line-height: 1.06;
+      transition: color 0.4s ease;
     }
 
     .svc__row .svc__resolves {
@@ -290,8 +300,9 @@ const svcImages = [
       opacity: 1;
     }
     .svc__row[data-active] .svc__name {
+      /* activo: color pleno. Sin scale — el contraste opacidad/color ya lo
+         destaca; el scale se veía nervioso al saltar entre servicios. */
       color: var(--ink);
-      transform: scale(1.04);
     }
     .svc__row[data-active] .svc__resolves {
       max-height: 6rem;
@@ -340,11 +351,12 @@ const svcImages = [
         const imgs = gsap.utils.toArray<HTMLElement>('[data-svc-img]');
 
         ScrollTrigger.matchMedia({
-          /* ─────────── DESKTOP ≥1024px: pin + highlight ─────────── */
+          /* ─────────── DESKTOP ≥1024px: HOVER-to-preview (gesto Monolog) ──
+             SIN pin (decisión William 2026-07-28: el pin trababa el scroll
+             hasta pasar los 6 servicios). La sección se scrollea normal; los
+             servicios se exploran con el CURSOR: al pasar el mouse sobre un
+             nombre, su diagrama aparece al instante. Como Monolog. */
           '(min-width: 1024px)': () => {
-            const stage = section.querySelector<HTMLElement>('[data-svc-stage]');
-            if (!stage) return;
-
             const setActive = (idx: number) => {
               rows.forEach((r, i) => {
                 if (i === idx) r.setAttribute('data-active', '');
@@ -368,84 +380,27 @@ const svcImages = [
                 }
               }
             };
+            /* Primer servicio activo por defecto (antes de tocar nada) */
             setActive(0);
 
-            /* Pin de la escena; el scroll dentro del tramo cambia el activo.
-               El tramo = alto por servicio; snap para que cada paso “encaje”. */
-            const st = ScrollTrigger.create({
-              trigger: stage,
-              start: 'center center',
-              end: () => '+=' + window.innerHeight * (rows.length * 0.85),
-              pin: true,
-              scrub: 0.6,
-              snap: {
-                snapTo: 1 / (rows.length - 1),
-                duration: 0.25,
-                ease: 'power1.inOut',
-              },
-              onUpdate: (self) => {
-                const idx = Math.round(self.progress * (rows.length - 1));
-                setActive(idx);
-              },
-            });
-
-            /* ── CLICK-TO-FOCUS ──────────────────────────────────────────
-               Click en un servicio → salta a SU diagrama, sin romper el pin.
-               Patrón oficial GSAP (foro): el click NO llama setActive directo
-               (el onUpdate lo pisaría al primer scroll). En su lugar MUEVE el
-               scroll físico a la posición del tramo pineado que corresponde a
-               ese índice — y el onUpdate del propio st activa el servicio. Así
-               click y scroll son una sola fuente de verdad (la posición).
-               st.scroll() conoce su rango y funciona con o sin Lenis, sin
-               pelearse con el smooth-scroll.
-               Técnica: animamos un proxy {v: posActual} → {v: target} y en
-               cada tick llamamos st.scroll(v). overwrite:auto evita jitter si
-               el usuario ya venía scrolleando. */
-            const seekTo = (idx: number) => {
-              /* Progreso objetivo = fracción exacta del servicio idx.
-                 target en píxeles dentro del tramo pineado. Añadimos medio
-                 píxel de sesgo hacia el interior para que el redondeo del
-                 scroll no caiga en el borde entre dos bandas de snap (bug:
-                 click en 4 aterrizaba en 3). */
-              const progress = idx / (rows.length - 1);
-              const range = st.end - st.start;
-              const bias = idx === rows.length - 1 ? -1 : 1; // último: sesgar hacia adentro
-              const target = st.start + range * progress + bias;
-
-              const proxy = { v: st.scroll() };
-              gsap.to(proxy, {
-                v: target,
-                duration: 0.6,
-                ease: 'power2.inOut',
-                overwrite: 'auto',
-                onUpdate: () => st.scroll(proxy.v),
-                onComplete: () => {
-                  /* Garantía dura: al terminar el seek, forzamos el estado
-                     visual correcto por si el snap reposicionó por 1px. El
-                     onUpdate del st ya lo hace normalmente, pero esto lo blinda
-                     contra el off-by-one del redondeo/snap. */
-                  setActive(idx);
-                },
-              });
-            };
-
-            const onRowClick = (e: Event) => {
-              const row = (e.currentTarget as HTMLElement);
+            /* Hover sobre un servicio → su diagrama al instante. */
+            const onRowEnter = (e: Event) => {
+              const row = e.currentTarget as HTMLElement;
               const idx = Number(row.getAttribute('data-index'));
               if (Number.isNaN(idx)) return;
-              seekTo(idx);
+              setActive(idx);
             };
+
             rows.forEach((r) => {
-              r.style.cursor = 'pointer';
-              r.addEventListener('click', onRowClick);
+              r.style.cursor = 'default';
+              r.addEventListener('mouseenter', onRowEnter);
             });
 
             return () => {
-              st.kill();
               rows.forEach((r) => {
                 r.removeAttribute('data-active');
                 r.style.cursor = '';
-                r.removeEventListener('click', onRowClick);
+                r.removeEventListener('mouseenter', onRowEnter);
               });
             };
           },
