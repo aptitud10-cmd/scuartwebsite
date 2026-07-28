@@ -1,10 +1,11 @@
 ---
 import CaseStudyLayout from '../../../components/CaseStudyLayout.astro';
-import { getTranslations } from '../../../i18n/index';
+import { getTranslations, getAlternatesFor } from '../../../i18n/index';
 import type { CaseStudyData } from '../../../components/CaseStudyLayout.astro';
 
 const lang = 'en';
 const t = getTranslations(lang);
+const alternates = getAlternatesFor('work/menius', 'trabajo/menius');
 
 const data: CaseStudyData = {
   name: 'Menius',
@@ -63,4 +64,6 @@ const data: CaseStudyData = {
   title="Menius — SCUART"
   description="Digital menu SaaS for restaurants. Designed and built by SCUART."
   canonicalURL="https://scuart.com/en/work/menius"
+
+  alternates={alternates}
 />

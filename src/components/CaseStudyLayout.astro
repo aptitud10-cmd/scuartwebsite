@@ -54,12 +54,25 @@ interface Props {
   title: string;
   description: string;
   canonicalURL?: string;
+  /** hreflang: los case studies cambian de slug entre idiomas
+      ('work/menius' vs 'trabajo/menius'), asi que llegan armados. */
+  alternates?: {
+    en: string;
+    es: string;
+    xDefault: string;
+  };
 }
 
-const { t, lang, data, title, description, canonicalURL } = Astro.props;
+const { t, lang, data, title, description, canonicalURL, alternates } = Astro.props;
 ---
 
-<Layout title={title} description={description} lang={lang} canonicalURL={canonicalURL}>
+<Layout
+  title={title}
+  description={description}
+  lang={lang}
+  canonicalURL={canonicalURL}
+  alternates={alternates}
+>
   <Nav lang={lang} t={t} />
 
   <article class="cs">

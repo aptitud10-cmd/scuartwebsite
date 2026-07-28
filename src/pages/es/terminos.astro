@@ -2,10 +2,11 @@
 import Layout from '../../layouts/Layout.astro';
 import Nav from '../../components/Nav.astro';
 import FooterSection from '../../components/FooterSection.astro';
-import { getTranslations } from '../../i18n/index';
+import { getTranslations, getAlternatesFor } from '../../i18n/index';
 
 const lang = 'es';
 const t = getTranslations(lang);
+const alternates = getAlternatesFor('terms', 'terminos');
 ---
 
 <Layout
@@ -13,6 +14,7 @@ const t = getTranslations(lang);
   description="Términos y condiciones de los servicios de SCUART, estudio de diseño y tecnología."
   lang={lang}
   canonicalURL="https://scuart.com/es/terminos"
+  alternates={alternates}
 >
   <Nav lang={lang} t={t} />
 

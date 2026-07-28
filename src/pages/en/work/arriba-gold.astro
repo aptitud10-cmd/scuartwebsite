@@ -1,10 +1,11 @@
 ---
 import CaseStudyLayout from '../../../components/CaseStudyLayout.astro';
-import { getTranslations } from '../../../i18n/index';
+import { getTranslations, getAlternatesFor } from '../../../i18n/index';
 import type { CaseStudyData } from '../../../components/CaseStudyLayout.astro';
 
 const lang = 'en';
 const t = getTranslations(lang);
+const alternates = getAlternatesFor('work/arriba-gold', 'trabajo/arriba-gold');
 
 const data: CaseStudyData = {
   name: 'Arriba Gold',
@@ -62,4 +63,6 @@ const data: CaseStudyData = {
   title="Arriba Gold — SCUART"
   description="E-commerce for a Colombian artisan jewelry brand. Design and development by SCUART."
   canonicalURL="https://scuart.com/en/work/arriba-gold"
+
+  alternates={alternates}
 />

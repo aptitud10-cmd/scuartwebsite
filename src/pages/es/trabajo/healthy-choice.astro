@@ -1,10 +1,11 @@
 ---
 import CaseStudyLayout from '../../../components/CaseStudyLayout.astro';
-import { getTranslations } from '../../../i18n/index';
+import { getTranslations, getAlternatesFor } from '../../../i18n/index';
 import type { CaseStudyData } from '../../../components/CaseStudyLayout.astro';
 
 const lang = 'es';
 const t = getTranslations(lang);
+const alternates = getAlternatesFor('work/healthy-choice', 'trabajo/healthy-choice');
 
 const data: CaseStudyData = {
   name: 'Healthy Choice NY',
@@ -62,4 +63,6 @@ const data: CaseStudyData = {
   title="Healthy Choice NY — SCUART"
   description="Sitio web para restaurante de comida saludable en Nueva York. Diseño y desarrollo por SCUART."
   canonicalURL="https://scuart.com/es/trabajo/healthy-choice"
+
+  alternates={alternates}
 />

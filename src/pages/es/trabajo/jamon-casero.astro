@@ -1,10 +1,11 @@
 ---
 import CaseStudyLayout from '../../../components/CaseStudyLayout.astro';
-import { getTranslations } from '../../../i18n/index';
+import { getTranslations, getAlternatesFor } from '../../../i18n/index';
 import type { CaseStudyData } from '../../../components/CaseStudyLayout.astro';
 
 const lang = 'es';
 const t = getTranslations(lang);
+const alternates = getAlternatesFor('work/jamon-casero', 'trabajo/jamon-casero');
 
 const data: CaseStudyData = {
   name: 'Jamón Casero',
@@ -62,4 +63,6 @@ const data: CaseStudyData = {
   title="Jamón Casero — SCUART"
   description="Identidad digital y sitio web para Jamón Casero, marca colombiana de charcutería artesanal."
   canonicalURL="https://scuart.com/es/trabajo/jamon-casero"
+
+  alternates={alternates}
 />

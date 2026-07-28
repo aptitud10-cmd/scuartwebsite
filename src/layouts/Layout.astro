@@ -8,7 +8,7 @@
 
 import '../styles/global.css';
 import CookieBanner from '../components/CookieBanner.astro';
-import type { Lang } from '../i18n/index';
+import { SITE_URL, type Lang } from '../i18n/index';
 
 interface Props {
   title?: string;
@@ -33,6 +33,28 @@ const {
   canonicalURL,
   alternates,
 } = Astro.props;
+
+/*
+ * JSON-LD Organization. El sitio no emitía ningún structured data, así que
+ * los buscadores (y los motores generativos) no tenían una descripción
+ * declarada del estudio: nombre, idiomas, área de servicio ni perfiles.
+ * Va en el layout para cubrir las 15 páginas, no solo las dos home.
+ */
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${SITE_URL}/#organization`,
+  name: 'SCUART',
+  url: SITE_URL,
+  description,
+  image: `${SITE_URL}/og.png`,
+  logo: `${SITE_URL}/og.png`,
+  knowsLanguage: ['en', 'es'],
+  areaServed: [
+    { '@type': 'Country', name: 'United States' },
+    { '@type': 'Place', name: 'Latin America' },
+  ],
+};
 
 const resolvedOgTitle = ogTitle ?? title;
 const resolvedOgDesc = ogDescription ?? description;
@@ -79,6 +101,14 @@ const resolvedOgDesc = ogDescription ?? description;
         <link rel="alternate" hreflang="x-default" href={alternates.xDefault} />
       </>
     )}
+
+    <!-- SEO: structured data (Organization) -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(orgSchema)}
+      is:inline
+    />
+
 
     <!--
       Fuentes activas: Fraunces Variable (display) + Geist Sans (cuerpo/UI).
