@@ -18,9 +18,9 @@
  *
  * VIDEO — placeholder hasta que William lo cree/consiga:
  *   <video> apunta a /video/hero.mp4 (+ .webm opcional). MIENTRAS no exista,
- *   el atributo poster="/images/hero-portrait.jpg" muestra la imagen actual,
- *   así el hero se ve completo HOY. Cuando William ponga el archivo en
- *   /public/video/hero.mp4, arranca solo — CERO cambios de código.
+ *   se ve la capa .hero-fallback (base cyan/roja animada) por debajo del <video>
+ *   transparente, así el hero se ve completo HOY. Cuando William ponga el archivo
+ *   en /public/video/hero.mp4, arranca solo — CERO cambios de código.
  *   autoplay muted loop playsinline = autoplay permitido en todos los browsers.
  *
  * --font-display: "Fraunces Variable", serif
@@ -110,7 +110,7 @@ const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
     -->
     <nav class="hero-nav__center" aria-label="Secciones">
       <a href={`/${lang}#portfolio`} class="hero-nav__link" data-comma>{t.nav.portfolio}</a>
-      <a href={`/${lang}#studio`} class="hero-nav__link" data-comma>{t.nav.method}</a>
+      <a href={`/${lang}#services`} class="hero-nav__link" data-comma>{t.nav.method}</a>
       <a href={`/${lang}#contact`} class="hero-nav__link">{t.nav.contact}</a>
     </nav>
 

@@ -39,6 +39,14 @@ export default defineConfig({
   output: 'static',
   adapter: vercel(),
 
+  /*
+   * trailingSlash: 'never' — alinea canonical + hreflang (emitidos SIN slash por
+   * getAlternatesFor) con el sitemap (@astrojs/sitemap emitía CON slash por
+   * default). Sin esto, Google veía /work/menius y /work/menius/ como distintas.
+   * Fijado en auditoría pre-launch 2026-07-28.
+   */
+  trailingSlash: 'never',
+
   /**
    * i18n nativo Astro v5.
    * defaultLocale: 'en' — el idioma base es ingles.

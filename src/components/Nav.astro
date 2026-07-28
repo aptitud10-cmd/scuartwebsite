@@ -36,7 +36,7 @@ const { lang, t } = Astro.props;
   <div class="nav-global__right">
     <ul class="nav-global__links" role="list">
       <li><a href={`/${lang}#portfolio`} class="nav-global__link">{t.nav.portfolio}</a></li>
-      <li><a href={`/${lang}#studio`} class="nav-global__link">{t.nav.method}</a></li>
+      <li><a href={`/${lang}#services`} class="nav-global__link">{t.nav.method}</a></li>
       <li><a href={`/${lang}#contact`} class="nav-global__link">{t.nav.contact}</a></li>
     </ul>
 
@@ -170,7 +170,7 @@ const { lang, t } = Astro.props;
   }
 
   .nav-global__link:focus-visible {
-    outline: 2px solid var(--brand);
+    outline: 2px solid var(--ink);
     outline-offset: 3px;
   }
 
@@ -211,7 +211,7 @@ const { lang, t } = Astro.props;
   }
 
   .nav-global__lang-other:focus-visible {
-    outline: 2px solid var(--brand);
+    outline: 2px solid var(--ink);
     outline-offset: 3px;
   }
 
