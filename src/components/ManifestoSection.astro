@@ -311,33 +311,84 @@ const { t } = Astro.props;
       if (lines.length && statementEl) {
         gsap.set(lines, { opacity: 0 });
 
+        /* Reveal POR LETRA con carácter orgánico — Dirección A del research
+           DESIGN_RESEARCH_TEXT_REVEAL_CARACTER (2026-07-28).
+           Arregla los 2 rechazos previos:
+           · "uniforme": cada letra saca SU PROPIO random (función () => ...),
+             no un valor compartido; + orden de arranque random (from:'random').
+             Antes: mismo movimiento en las 40 letras → fila de soldados.
+           · "muy largo": stagger.amount FIJO (0.4s total, no crece con el largo
+             del texto) en vez de stagger acumulativo. Antes: duración 1s + stagger
+             lineal = cola de ~2s.
+           mask:'chars' recorta cada letra contra su caja → arregla también el bug
+           de la 1ª línea que no animaba (la combinación chars+lines+mask fallaba).
+           aria:'none' evita el aria-label prohibido en <p> (axe WCAG 4.1.2). */
         const splits = lines.map((line) =>
-          /* aria: 'none' — el texto visible es legible; evita el aria-label
-             prohibido en <p> que mete SplitText por defecto (axe WCAG 4.1.2). */
-          new SplitText(line, { type: 'lines', mask: 'lines', autoSplit: true, aria: 'none' })
+          new SplitText(line, { type: 'chars', aria: 'none' })
         );
 
-        const allLines = splits.flatMap((s) => s.lines);
+        /* display:inline-block en cada char → yPercent/rotation funcionan sin
+           romper el flujo; el overflow:clip de .manifesto-line hace de máscara.
+           NO usamos mask:'chars' — recorta mal las letras con acento (í/á) del
+           serif y dejaba glifos torcidos en el estado final. */
+        const allChars = splits.flatMap((s) => s.chars) as HTMLElement[];
+        gsap.set(allChars, { display: 'inline-block' });
         gsap.set(lines, { opacity: 1 });
-        gsap.set(allLines, { yPercent: 105 });
 
-        ScrollTrigger.create({
-          trigger: statementEl,
-          start: 'top 80%',
-          once: true,
-          onEnter: () => {
-            gsap.to(allLines, {
+        /* Estado inicial explícito (fuera de pantalla, abajo) — se aplica SOLO
+           cuando el trigger dispara, para que las letras no se muevan antes de
+           que el usuario llegue a la sección. */
+        const revealChars = () => {
+          gsap.fromTo(
+            allChars,
+            {
+              yPercent: () => gsap.utils.random(80, 130),
+              rotation: () => gsap.utils.random(-5, 5),
+              opacity: 0,
+            },
+            {
               yPercent: 0,
-              duration: 0.9,
+              rotation: 0,     /* termina exacto: sin rotación residual */
+              opacity: 1,
+              duration: () => gsap.utils.random(0.55, 0.72),
               ease: 'expo.out',
-              stagger: 0.12,
-              delay: 0.15,
-            });
-          },
+              stagger: { amount: 0.4, from: 'random' },
+              /* limpia los transforms inline al terminar → glifos perfectamente
+                 alineados en reposo (sin scale/rotate residual que los torcía) */
+              clearProps: 'transform',
+            }
+          );
+        };
+
+        /* Estado de reposo antes del reveal: letras ocultas abajo. Así, aunque
+           la sección ya esté en pantalla al cargar (es 100vh), el texto NO se
+           anima hasta que el trigger lo dispara. */
+        gsap.set(allChars, { yPercent: 110, opacity: 0 });
+
+        const revealST = ScrollTrigger.create({
+          trigger: statementEl,
+          /* 'top 65%': dispara cuando el TOPE del statement sube más allá del
+             65% del viewport — o sea cuando el usuario ya scrolleó hacia él.
+             Antes 'top 80%' + sección 100vh podía estar ya dentro al cargar. */
+          start: 'top 65%',
+          once: true,
+          onEnter: revealChars,
         });
+
+        /* Red de seguridad: si el manifiesto ya está por ENCIMA del punto de
+           disparo al cargar (raro pero posible en pantallas muy altas), el
+           onEnter no se dispararía nunca y el texto quedaría invisible. En ese
+           caso revelamos igual — sin animación de scroll pero visible. */
+        if (revealST.progress > 0) {
+          revealChars();
+          revealST.kill();
+        }
       }
     } catch (err) {
+      /* Falla dura de GSAP → dejar el texto visible sí o sí (nunca invisible). */
       console.error('[Manifesto] GSAP error:', err);
+      section.querySelectorAll<HTMLElement>('.manifesto-line, .manifesto-line .char')
+        .forEach((el) => { el.style.transform = 'none'; el.style.opacity = '1'; });
     }
   } else {
     /* MOBILE: IntersectionObserver + CSS fade-up */
