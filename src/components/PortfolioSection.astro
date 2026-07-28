@@ -343,13 +343,22 @@ const rows = projects.map((p, i) => {
   }
 
   /* ─────────────────────────────────────────────────────────────
-     SCRAMBLE en hover del nombre — gesto Locomotive ("letter shuffle").
-     Al pasar el mouse sobre un proyecto, sus letras barajan por un instante
-     y "aterrizan" en el nombre. Sutil, editorial — NO estilo hacker:
-       · charset solo letras (sin #$%&) → se lee como marca, no como terminal
-       · corto (~0.6s) y con speed alto → shuffle rápido, no lento/dramático
-       · SOLO desktop con hover real (mobile no tiene hover; el nombre ahí
-         convive con la imagen en reposo). reduced-motion → no corre.
+     SCRAMBLE al entrar en viewport — gesto Locomotive ("letter shuffle").
+     Cada nombre se "arma" con un shuffle breve UNA sola vez cuando aparece
+     al scrollear — como el intro de Locomotive, NO en cada hover.
+
+     Corrección 2026-07-28 (research DESIGN_RESEARCH_SCRAMBLE_LOCOMOTIVE):
+     la versión anterior se sentía "terminal/hacker" por 3 razones, todas
+     arregladas acá:
+       · charset 'upperCase' (antes 'upperAndLowerCase') → letras del propio
+         alfabeto, no mezcla caótica que lee como código
+       · trigger UNA vez al entrar en viewport (antes: cada mouseenter, que
+         se agota rápido y se siente "efecto de plugin")
+       · barrido progresivo izquierda→derecha (stagger entre palabras + el
+         plugin revela left-to-right) → intencional/tipográfico, no glitch
+       · corto (~0.45s) y sutil, no dramático
+     SOLO desktop con hover real (en mobile el nombre convive con la imagen en
+     reposo, sin momento de "entrada" tipográfico). reduced-motion → no corre.
      ScrambleTextPlugin es parte de GSAP (gratis desde 2025, ya instalado). ── */
   const canHover = window.matchMedia('(min-width: 1024px) and (hover: hover)').matches;
 
@@ -362,39 +371,43 @@ const rows = projects.map((p, i) => {
 
         const links = document.querySelectorAll<HTMLElement>('.pf-row__link');
 
-        links.forEach((link) => {
+        const runScramble = (link: HTMLElement) => {
           const words = Array.from(link.querySelectorAll<HTMLElement>('.pf-word'));
           if (!words.length) return;
-
-          /* Texto original de cada palabra — para restaurar exacto (incluye
-             el espacio inicial del segundo .pf-word: " Gold" etc.). */
-          const originals = words.map((w) => w.textContent ?? '');
-          let playing = false;
-
-          link.addEventListener('mouseenter', () => {
-            if (playing) return;
-            playing = true;
-            let done = 0;
-            words.forEach((word, i) => {
-              const text = originals[i];
-              gsap.to(word, {
-                duration: 0.55,
-                ease: 'none',
-                scrambleText: {
-                  text,
-                  chars: 'upperAndLowerCase', // solo letras, sin símbolos
-                  speed: 0.8,
-                  tweenLength: false,
-                },
-                onComplete: () => {
-                  word.textContent = text; // garantiza el nombre exacto al cerrar
-                  done += 1;
-                  if (done === words.length) playing = false;
-                },
-              });
+          words.forEach((word, i) => {
+            const text = word.textContent ?? '';
+            gsap.to(word, {
+              duration: 0.45,
+              ease: 'none',
+              /* stagger implícito: cada palabra arranca un poco después que la
+                 anterior → barrido izquierda→derecha entre palabras */
+              delay: i * 0.08,
+              scrambleText: {
+                text,
+                chars: 'upperCase', // solo mayúsculas del propio alfabeto — NO símbolos
+                speed: 0.4,          // refresco moderado, no parpadeo de terminal
+                tweenLength: false,
+              },
+              onComplete: () => {
+                word.textContent = text; // garantiza el nombre exacto al cerrar
+              },
             });
           });
-        });
+        };
+
+        /* Dispara una vez por fila cuando entra en viewport */
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                runScramble(entry.target as HTMLElement);
+                io.unobserve(entry.target);
+              }
+            }
+          },
+          { threshold: 0.6 }
+        );
+        links.forEach((link) => io.observe(link));
       } catch (err) {
         /* Si el plugin no carga, no pasa nada: los nombres se ven normales. */
         console.error('[PortfolioSection] scramble init failed:', err);
