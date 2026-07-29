@@ -112,3 +112,24 @@ temp/
 test-results/
 demo-*.html
 playwright/tests/*-temp.spec.ts
+
+# ── Basura de trabajo / no va a producción (2026-07-29) ──────────────
+# Sitio viejo (React/Vite) conservado en disco pero fuera del repo.
+_old/
+# Art direction, diagnósticos y scripts de screenshots del rediseño.
+redesign/
+# Scripts de captura temporales. generate-og-png.mjs SÍ se conserva (genera og.png).
+scripts/*-shots.mjs
+scripts/shot.mjs
+scripts/shot-scroll.mjs
+scripts/audit-sections.mjs
+# Docs internos de research/estrategia (no son parte del sitio).
+*_RESEARCH_*.md
+AUDITORIA_*.md
+DISCOVERY_*.md
+LISTA_SCREENSHOTS_*.md
+screenshots-portfolio/
+# Documento interno de precios — NUNCA en el repo público.
+SCUART-Pricing-*.pdf
+# Scripts temporales de captura en la raíz.
+shot-*-temp.mjs
