@@ -7,6 +7,9 @@ dist/
 build/
 *.dist
 
+# Astro cache / tipos generados (se regeneran en cada build)
+.astro/
+
 # Environment variables
 .env
 .env.local
