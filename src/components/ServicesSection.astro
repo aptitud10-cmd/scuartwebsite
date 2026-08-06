@@ -233,6 +233,19 @@ const items: CapabilityService[] = t.capabilities.items;
     .svc__kicker {
       margin-bottom: var(--space-l);
     }
+
+    /* Área táctil del servicio enlazable (auditoría Fase 5): el <a> envuelve
+       solo el texto del nombre (29px de alto). El pseudo-elemento extiende
+       la zona sensible a la fila completa —incluyendo la descripción, que
+       es donde el dedo cae naturalmente— sin cambiar nada visual. */
+    .svc__link {
+      position: relative;
+    }
+    .svc__link::after {
+      content: '';
+      position: absolute;
+      inset: -10px -8px;
+    }
   }
 
   /* ═══════════════════════════════════════════════════════════

@@ -353,6 +353,17 @@ const copiedLabel = isES ? '¡Copiado!' : 'Copied!';
    vale 34px en mobile desde la escala propia de tokens.css; el clamp que
    había (35.6px@375) era el parche que compensaba los 40px del token roto. */
 @media (max-width: 767px) {
+  /* Áreas táctiles (auditoría Fase 5, 2026-08-06): "Copiar" medía 30px de
+     alto y el email 37px — por debajo de los 44px de guía. Son los dos
+     controles principales de la sección de contacto en un teléfono. */
+  .contact__copy,
+  .contact__email,
+  .contact__wa {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
   .contact__email-row {
     gap: 1rem;
   }

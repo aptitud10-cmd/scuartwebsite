@@ -343,6 +343,26 @@ const blockDims = await Promise.all(
   }
   .cs-hero__visit:hover { gap: 0.9em; opacity: 0.7; }
 
+  /* Área táctil en mobile (auditoría Fase 5, 2026-08-06): el enlace medía
+     21px de alto. No se puede estirar con min-height porque el border-bottom
+     es parte del diseño (subrayado pegado al texto) y se separaría. Un
+     pseudo-elemento amplía la zona sensible al toque sin mover un pixel de
+     lo que se ve. */
+  @media (max-width: 767px) {
+    /* .cs-credits__link es el SEGUNDO "VISITAR SITIO" de la página (ficha de
+       créditos al pie) — mismo tratamiento. */
+    .cs-hero__visit,
+    .cs-credits__link {
+      position: relative;
+    }
+    .cs-hero__visit::after,
+    .cs-credits__link::after {
+      content: '';
+      position: absolute;
+      inset: -12px -8px;
+    }
+  }
+
   /* ── CANVAS: el lienzo de color que abraza la imagen ──────────
    * v3 (2026-07-28, research DESIGN_RESEARCH_HALO_HOVER3D):
    *   - SIN min-height en vh: el canvas ABRAZA su contenido (el mockup/shot

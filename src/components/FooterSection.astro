@@ -258,12 +258,28 @@ const EMAIL = 'info@scuart.com';
   }
 
   /* Los links del pie son destinos táctiles: 44px de alto mínimo. Estaban
-     como <a> inline sin padding, igual que el toggle de idioma del nav. */
-  .foot__nav a,
-  .foot__link--small {
+     como <a> inline sin padding, igual que el toggle de idioma del nav.
+     Selector por elemento (.foot a) y no por clase: la auditoría Fase 5
+     mostró que apuntar a .foot__nav a dejaba fuera el email y los legales,
+     que usan clases propias. Se excluyen los enlaces dentro de prosa
+     (WCAG exime los links inline en texto corrido). */
+  .foot a:not(p a):not(.foot__email) {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
+  }
+
+  /* .foot__email va aparte: su subrayado es un background-image animado
+     pegado al borde inferior de la caja (background-position 100% 100%).
+     Con min-height la caja crece y el subrayado se despega del texto. El
+     pseudo-elemento amplía la zona táctil sin tocar la geometría. */
+  .foot__email {
+    position: relative;
+  }
+  .foot__email::after {
+    content: '';
+    position: absolute;
+    inset: -10px -8px;
   }
 
   /* El nav del pie en columna: en fila, con 44px de alto cada link, los

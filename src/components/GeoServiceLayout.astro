@@ -444,6 +444,21 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   }
   .geo-cta:hover { gap: 0.9em; opacity: 0.7; }
 
+  /* Área táctil en mobile (auditoría Fase 5, 2026-08-06): los CTAs medían
+     21px de alto. Mismo patrón que .cs-hero__visit — pseudo-elemento en vez
+     de min-height, porque el border-bottom es el subrayado del diseño y
+     estirar la caja lo despegaría del texto. */
+  @media (max-width: 767px) {
+    .geo-cta {
+      position: relative;
+    }
+    .geo-cta::after {
+      content: '';
+      position: absolute;
+      inset: -12px -8px;
+    }
+  }
+
   /* ── BLOQUES ──────────────────────────────────────────────── */
   .geo-block {
     max-width: 1600px;
@@ -746,6 +761,11 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
     display: inline-flex;
     align-items: center;
     gap: 0.5em;
+    /* 44px de alto táctil: es el botón que dispara el análisis, el control
+       más importante de la página (auditoría Fase 5, 2026-08-06 — medía 38px
+       porque el padding en em sobre --text-mono de 11px no alcanza). */
+    min-height: 44px;
+    justify-content: center;
     transition: gap 0.3s ease, opacity 0.3s ease;
   }
   .geo-checker__btn:hover { gap: 0.9em; opacity: 0.85; }

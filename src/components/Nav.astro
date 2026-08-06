@@ -350,6 +350,18 @@ const { lang, t } = Astro.props;
     }
   }
 
+  /* Área táctil del wordmark en mobile (auditoría Fase 5, 2026-08-06): el
+     <a> del logo medía 17px de alto — es el enlace a la home y el elemento
+     que más se toca por error al querer volver. El nav tiene 64-80px de
+     alto, así que estirar el enlace a 44px no cambia nada visualmente. */
+  @media (max-width: 767px) {
+    .nav-global__logo {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+
   /* ═══════════════════════════════════════════════════════════════
      HAMBURGUESA + PANEL MOBILE (≤767px) — 2026-08-06
      ═══════════════════════════════════════════════════════════════ */
@@ -618,6 +630,16 @@ const { lang, t } = Astro.props;
     border-bottom: 1px solid var(--brand);
     align-self: flex-start;
     padding-bottom: 2px;
+    /* Área táctil (auditoría Fase 5, 2026-08-06): medía 29px. No se usa
+       min-height porque el border-bottom lima es el subrayado del diseño y
+       se despegaría del texto; el pseudo-elemento amplía la zona sensible
+       sin mover nada visual. */
+    position: relative;
+  }
+  .nav-panel__mail::after {
+    content: '';
+    position: absolute;
+    inset: -10px -8px;
   }
   .nav-panel__mail:focus-visible,
   .nav-panel__wa:focus-visible {
