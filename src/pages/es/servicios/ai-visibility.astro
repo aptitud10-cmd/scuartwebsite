@@ -1,0 +1,199 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'es';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/ai-visibility', 'servicios/ai-visibility');
+
+/* Copy neutro LATAM, sin voseo (convención es.ts).
+   Precios base en USD (decisión William 2026-08-04: COP limitaba al resto de
+   LATAM + España); el hint de moneda local lo pone el layout client-side.
+   Stats con fuente real (research 2026-08-04): AI search 30% de interacciones
+   (desde <10% en 2023); adopción >70% Gen Z/Millennials. */
+const data: GeoServiceData = {
+  kicker: 'SERVICIO N°02 — AI VISIBILITY · GEO',
+  heading: 'Aparece en las respuestas de ChatGPT, no solo en Google.',
+  tagline:
+    'Tus clientes ya no buscan — preguntan. Si la IA no te menciona, ese cliente nunca llega a tu puerta.',
+  cta: 'Chequear mi sitio gratis',
+  shift: {
+    label: 'El comportamiento ya cambió',
+    body: 'No es una predicción: es medible. Una de cada tres interacciones de búsqueda ya pasa por un motor de IA, y en las generaciones que hoy deciden dónde gastar, la adopción supera el 70%. El que espera "a ver si esto crece" está regalando esos clientes.',
+    stats: [
+      { num: '30%', note: 'de las interacciones de búsqueda ya pasan por IA en 2026 — era menos del 10% en 2023' },
+      { num: '+70%', note: 'de Gen Z y Millennials usan búsqueda con IA — las generaciones que deciden compras hoy' },
+      { num: '4+', note: 'motores responden por tu categoría ahora mismo: ChatGPT, Gemini, Perplexity, Claude' },
+    ],
+    sourceNote: 'Cifras de estudios del mercado de búsqueda con IA, 2026 (AI Search Trends — ALM Corp; Reporter Outreach; Sedestral). Pedinos las fuentes completas.',
+  },
+  whatIs: {
+    label: '¿Qué es GEO?',
+    body: 'GEO (Generative Engine Optimization) es hacer que tu negocio aparezca en las respuestas de la inteligencia artificial. Cuando alguien pregunta "¿cuál es el mejor salón en Queens?" o "¿qué agencia me recomiendas en Bogotá?", ChatGPT, Perplexity y Gemini responden con nombres concretos. GEO es el trabajo de que uno de esos nombres sea el tuyo. Es al 2026 lo que el SEO fue al 2010: los que entraron temprano se quedaron con la categoría.',
+  },
+  whyNot: {
+    label: '¿Por qué tu negocio no aparece?',
+    items: [
+      {
+        title: 'La IA lee información vieja.',
+        body: 'Horarios desactualizados, direcciones que ya no son, precios de hace dos años — la IA repite lo que encuentra en sus fuentes, aunque esté mal. Peor que no aparecer es aparecer con datos errados.',
+      },
+      {
+        title: 'Tu sitio no responde preguntas.',
+        body: 'Los motores generativos citan páginas que contestan directo lo que la gente pregunta: qué cuesta, dónde queda, qué incluye. Un sitio bonito pero que no responde nada no les sirve como fuente.',
+      },
+      {
+        title: 'Nadie más te menciona.',
+        body: 'Los modelos de IA confían en las menciones de terceros: directorios, prensa, reseñas, listas de "los mejores de". Sin ecos externos, para la IA tu negocio no existe — por bueno que sea.',
+      },
+    ],
+  },
+  engines: {
+    label: 'Los motores que auditamos',
+    body: 'Cada motor responde distinto y lee fuentes distintas. Por eso la auditoría no es "preguntarle a ChatGPT": es la misma batería de preguntas reales de cliente, corrida en paralelo en los cuatro motores principales, con sus fuentes rastreadas.',
+    primary: ['ChatGPT', 'Perplexity', 'Gemini', 'Claude'],
+    secondary: 'En el monitoreo mensual se suman Google AI Overviews y Copilot cuando aplican a tu mercado.',
+  },
+  how: {
+    label: '¿Cómo funciona?',
+    tiers: [
+      {
+        num: '01',
+        name: 'Diagnóstico',
+        priceUSD: 249,
+        priceSuffix: 'pago único',
+        body: 'La foto completa de tu presencia en IA: dónde apareces, quién se está llevando a tus clientes y qué información errada circula sobre tu negocio.',
+        includesLabel: 'Incluye',
+        includes: [
+          '25+ preguntas reales de cliente corridas en ChatGPT, Perplexity, Gemini y Claude',
+          'En tu idioma y el de tu mercado (español e inglés si aplica)',
+          'Mapa de competidores: quiénes aparecen en tu categoría y por qué',
+          'Fuentes que la IA cita para tu rubro — o sea, dónde hay que estar',
+          'Información errada detectada (horarios, precios, ubicación)',
+          'Plan de arreglo priorizado: qué mover primero y qué esperar de cada cambio',
+          'Reporte diseñado, en cristiano, entregado en 7 días',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Arreglo',
+        priceUSD: 900,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por proyecto',
+        body: 'Ejecutamos el plan del diagnóstico: convertimos tu presencia digital en algo que la IA pueda leer, citar y recomendar.',
+        includesLabel: 'Incluye',
+        includes: [
+          'Arquitectura answer-first: tus páginas responden las preguntas que tu cliente hace',
+          'Reescritura de las páginas clave (servicios, precios, ubicación, FAQ)',
+          'Corrección de tu información en las fuentes que la IA lee (Google Business, directorios, mapas)',
+          'Datos estructurados donde aportan (negocio, servicios, FAQ)',
+          'Plan de menciones de terceros: dónde y cómo conseguir los ecos que la IA escucha',
+          'Si tu sitio necesita rediseño, se cotiza aparte — con el diagnóstico como base',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Mantenimiento',
+        priceUSD: 149,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por mes',
+        body: 'La visibilidad en IA no es un logro, es una posición — y se defiende trabajando, no mirando. Cada mes hacemos algo por tu presencia, y te mostramos el resultado.',
+        includesLabel: 'Cada mes incluye',
+        includes: [
+          'Una página o FAQ nueva respondiendo lo que tus clientes preguntan ese mes',
+          'Tu Google Business al día: horarios, fotos, servicios, novedades',
+          'Gestión de reseñas — fuente directa de lo que la IA dice de ti',
+          'Una mención nueva de terceros perseguida (directorios, listas, prensa local)',
+          'Re-auditoría completa en los 4 motores: qué ganaste, qué perdiste, quién se movió',
+        ],
+      },
+    ],
+  },
+  checker: {
+    label: '¿Cómo está tu sitio hoy?',
+    body: 'Pega la dirección de tu sitio y lo analizamos al instante: si los motores de IA pueden leerte, si tenés schema, si tu contenido responde preguntas. Sin registro, sin email, sin espera.',
+    placeholder: 'tusitio.com',
+    inputLabel: 'Dirección de tu sitio web',
+    button: 'Analizar mi sitio',
+    note: 'El análisis es técnico y automático. Lo que la IA responde hoy sobre tu negocio lo revisamos juntos — escribinos con el resultado.',
+    waMessage: 'Hola SCUART, analicé mi sitio con el chequeo GEO:',
+    loadingLabel: 'Analizando…',
+    prioLabel: 'Lo que movería la aguja primero',
+    waCta: 'Hablemos de cómo arreglarlo',
+    errorLabel: 'Algo falló. Probá de nuevo o escribinos.',
+  },
+  forWhom: {
+    label: '¿Es para tu negocio?',
+    yesLabel: 'Funciona muy bien si',
+    yes: [
+      'Te buscan por categoría: "mejor dentista en...", "agencia de...", "salón de..."',
+      'Vives de clientes nuevos, no solo de recompra',
+      'Tu competencia ya aparece en las respuestas y tú no',
+      'Vendes servicios con ticket que justifica la inversión',
+    ],
+    noLabel: 'No es prioridad si',
+    no: [
+      'Todo tu negocio llega por referidos y no necesitas ser encontrado',
+      'Tu marca ya domina la categoría en todos los motores',
+      'No tienes presencia digital ni planes de tenerla — primero hay que construir la base',
+    ],
+  },
+  evidence: {
+    label: 'La prueba',
+    body: 'Estamos corriendo esta misma auditoría sobre SCUART. El antes y el después se publican aquí — con capturas reales, no promesas.',
+  },
+  faq: {
+    label: 'Preguntas directas',
+    items: [
+      {
+        q: '¿Cuánto cuesta el servicio GEO?',
+        a: 'El diagnóstico cuesta $249 USD (pago único, y se abona al arreglo si continúas), el arreglo desde $900 USD según el tamaño de tu presencia digital, y el mantenimiento mensual desde $149 USD. Facturamos en dólares y aceptamos pagos internacionales; en Colombia también en pesos.',
+      },
+      {
+        q: '¿Cuánto tarda en verse el resultado?',
+        a: 'El diagnóstico toma una semana. Los cambios de visibilidad en IA suelen notarse entre 4 y 12 semanas después del arreglo, según el punto de partida y la competencia de tu categoría.',
+      },
+      {
+        q: '¿Funciona para cualquier negocio?',
+        a: 'Funciona mejor para negocios que la gente busca por categoría: servicios locales, profesionales, marcas con nicho claro. En el diagnóstico te decimos con honestidad si vale la pena para el tuyo.',
+      },
+      {
+        q: '¿En qué países trabajan?',
+        a: 'En toda Latinoamérica, Estados Unidos y España. El trabajo es remoto y el equipo es bilingüe — auditamos y optimizamos en español y en inglés, según el mercado de tu negocio.',
+      },
+      {
+        q: '¿Qué necesitan de mí?',
+        a: 'El nombre de tu negocio, tu zona y tus competidores conocidos. El resto lo hacemos nosotros.',
+      },
+      {
+        q: '¿Esto reemplaza el SEO?',
+        a: 'No — lo complementa. Google sigue existiendo; GEO cubre el frente nuevo: las respuestas generadas por IA, donde los resultados clásicos no aparecen. Lo que haces bien para GEO suele mejorar también tu SEO.',
+      },
+      {
+        q: '¿Cómo miden los resultados?',
+        a: 'Con una batería fija de preguntas reales corrida cada mes en los mismos motores, en conversaciones nuevas y sin historial. Las respuestas de la IA varían por sesión, así que medimos tendencia sobre una muestra representativa — y te lo decimos así, sin prometer "posición #1".',
+      },
+      {
+        q: '¿Sirve si mi negocio no tiene sitio web?',
+        a: 'Se puede empezar por perfiles y directorios (Google Business, reseñas), pero el techo es bajo: la IA necesita una fuente propia que leer. Si no tienes sitio, lo honesto es construir esa base primero — y también lo hacemos.',
+      },
+    ],
+  },
+  closing: {
+    statement: '¿Qué dice la IA de tu negocio? Averigüémoslo.',
+    emailLabel: 'Escribir a info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="AI Visibility (GEO) — Aparece en ChatGPT | SCUART"
+  description="Servicio GEO en español para LATAM, USA y España: auditamos qué dicen ChatGPT, Perplexity y Gemini de tu negocio y hacemos que te recomienden. Diagnóstico $249 USD."
+  canonicalURL={`${SITE_URL}/es/servicios/ai-visibility`}
+  alternates={alternates}
+/>

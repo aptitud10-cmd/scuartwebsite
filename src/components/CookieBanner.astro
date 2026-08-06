@@ -46,82 +46,118 @@ const c = copy[lang];
 </div>
 
 <style>
-/* Bloque COMPACTO abajo-izquierda — NO una barra full-width estirada (lo más
-   genérico) ni una card cuadrada con sombra (2018). Chico, tipográfico, con un
-   borde-acento lima a la izquierda que lo ata a la marca. Evidencia 2026: el
-   banner debe integrarse al lenguaje del sitio y ser minimalista real, con copy
-   conversacional y acciones de igual peso. */
+/* BARRA AL PIE, DELGADA (William 2026-08-04) — reemplaza el bloque flotante
+   abajo-derecha. El bloque anterior se ancló a la derecha "porque el wordmark
+   del hero vive abajo-izquierda"; ese hero (réplica Locomotive) ya no se
+   renderiza. El hero actual es tipográfico y su titular ocupa TODO el ancho:
+   la derecha dejó de estar libre y el banner se montaba sobre "VENDER MÁS.".
+   Solución: franja de ancho completo pegada al borde inferior, baja, con texto
+   y acciones en UNA fila. No flota sobre la composición — se lee como pie del
+   sitio (patrón Stripe/Linear/Vercel). El acento lima pasa de borde-izquierdo a
+   borde-superior, que es el canto visible de una barra. */
 .cookie {
   position: fixed;
-  bottom: max(var(--space-m), env(safe-area-inset-bottom));
-  /* Anclado a la DERECHA: el wordmark del hero vive abajo-IZQUIERDA — si el
-     banner arranca a la izquierda se monta sobre "SCUART" en la primera visita
-     (los ~1.2s que tarda en aparecer, el usuario aún mira el hero). La derecha
-     del hero está libre, así nunca se pisan en ningún viewport. En mobile el
-     max-width no alcanza y ocupa casi todo el ancho igual (left+right definidos). */
-  right: var(--space-m);
-  left: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
-  max-width: 30rem;
-  background-color: color-mix(in srgb, var(--ink) 90%, transparent);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
-  border-left: 2px solid var(--brand);
-  color: var(--bg);
-  padding: var(--space-s) var(--space-m);
+  /* CLARA, no negra (William 2026-08-04): el bloque oscuro pesaba sobre el
+     crema del sitio y se leía como cartel pegado. Ahora es el MISMO fondo del
+     cuerpo con blur — la barra pertenece a la página en vez de aterrizar sobre
+     ella. La jerarquía la da un hairline de tinta arriba (no un filo lima de
+     2px, que gritaba); el lima queda reservado al botón primario. */
+  /* OPACO, no translúcido: con 88% + blur el párrafo del hero se leía A TRAVÉS
+     de la barra y chocaba con el copy de cookies (verificado 2026-08-04). El
+     blur no alcanza contra texto de alto contraste. --surface es el crema un
+     paso más profundo que --bg: separa la barra del cuerpo sin ser otro color. */
+  background-color: var(--surface, #ece9e1);
+  border-top: 1px solid var(--ink-18);
+  color: var(--ink);
+  /* safe-area en el padding, NO en bottom: la barra debe tocar el borde real de
+     la pantalla; el inset solo empuja el CONTENIDO hacia arriba (iOS home bar). */
+  padding: 0.9rem var(--space-m);
+  padding-bottom: max(0.9rem, calc(env(safe-area-inset-bottom) + 0.4rem));
   display: flex;
-  flex-direction: column;
-  gap: var(--space-s);
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-l, 2rem);
 }
 
 .cookie[hidden] {
   display: none;
 }
 
-/* Mobile: el banner ocupa el ancho abajo (left+right), como antes. En viewport
-   chico el hero es más alto y el wordmark escala, así que el banner al pie no
-   lo tapa; y a 30rem descolgado a la derecha se vería raro. */
-@media (max-width: 520px) {
+/* Mobile: la fila única no entra (texto + 2 botones en 375px queda apretado).
+   Vuelve a dos filas DENTRO de la barra full-width: texto arriba, acciones
+   abajo-derecha. Sigue siendo una franja al pie, no un bloque flotante.
+   Breakpoint unificado a 767px (antes 620px) — ver tokens.css §escala mobile. */
+@media (max-width: 767px) {
   .cookie {
-    left: var(--space-m);
-    right: var(--space-m);
-    max-width: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 0.7rem var(--space-s);
+    padding-bottom: max(0.7rem, calc(env(safe-area-inset-bottom) + 0.35rem));
+  }
+  .cookie__text {
+    font-size: 0.6875rem;
+    line-height: 1.4;
+  }
+  .cookie__actions {
+    gap: var(--space-s);
+  }
+  .cookie__btn {
+    font-size: 0.625rem;
+    /* En la barra compacta el target de 48px estira demasiado la franja.
+       44px sigue cumpliendo WCAG 2.5.8 (target mínimo 24px) y AAA táctil. */
+    min-height: 44px;
   }
 }
 
-/* En la sección Contacto el banner se desvanece por completo y deja de recibir
-   clics, para no competir con el email (CTA principal). */
-.cookie[data-dimmed] {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(0.5rem);
+/* En Contacto el banner NO debe competir con el CTA principal, pero tampoco
+   puede volverse inalcanzable: bajo GDPR el usuario que aún no eligió tiene que
+   poder aceptar o rechazar en cualquier momento (2026-08-04). Antes esto era
+   opacity:0 + pointer-events:none → el control desaparecía de verdad. Ahora se
+   atenúa fuerte y SIGUE clickeable; al hover/focus vuelve a opacidad plena. */
+/* Igual que data-faded: la atenuación necesita hover para revertirse, y en
+   touch no hay hover. En mobile el banner queda opaco (2026-08-05). */
+@media (hover: hover) and (pointer: fine) {
+  .cookie[data-dimmed] {
+    opacity: 0.25;
+  }
+  .cookie[data-dimmed]:hover,
+  .cookie[data-dimmed]:focus-within {
+    opacity: 1;
+  }
 }
 
 /* Al scrollear el banner se ATENÚA pero SIGUE CLICKEABLE (2026-07-28): el usuario
    ya vio que existe, pero debe poder aceptar/rechazar en cualquier momento sin
-   volver arriba. Se hace discreto (semi-transparente + un pelín más chico), no
-   desaparece. Al hover/focus vuelve a opacidad plena. */
-.cookie[data-faded]:not([data-dimmed]) {
-  opacity: 0.55;
-  transform: scale(0.97);
-  transform-origin: bottom right;
+   volver arriba. En barra full-width el scale(0.97) anterior se leía como glitch
+   (la franja se despegaba de los bordes) → atenuación SOLO por opacidad. */
+/* La atenuación por scroll es SOLO para punteros con hover (desktop): ahí el
+   usuario puede devolverle opacidad plena pasando el mouse. En touch no hay
+   hover, así que el banner quedaba a 0.6 PARA SIEMPRE — el contenido de atrás
+   se filtraba y se leía como "se ve pero no se ve" (William, iPhone
+   2026-08-05). En mobile se mantiene opaco y legible. */
+@media (hover: hover) and (pointer: fine) {
+  .cookie[data-faded]:not([data-dimmed]) {
+    opacity: 0.6;
+  }
 }
 .cookie[data-faded]:not([data-dimmed]):hover,
 .cookie[data-faded]:not([data-dimmed]):focus-within {
   opacity: 1;
-  transform: scale(1);
 }
 
 .cookie {
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity 0.4s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .cookie {
     transition: opacity 0.2s ease;
-  }
-  .cookie[data-dimmed] {
-    transform: none;
   }
 }
 
@@ -129,14 +165,18 @@ const c = copy[lang];
   font-family: var(--font-body);
   font-size: var(--text-mono);
   line-height: 1.5;
-  color: rgba(244, 242, 236, 0.8);
+  color: var(--ink-mid);
+  /* La barra es discreta pero el texto no debe volverse ilegible al estirarse
+     en desktop: limitamos la medida y dejamos que las acciones tomen su ancho. */
+  max-width: 52ch;
 }
 
 .cookie__link {
-  color: var(--bg);
+  color: var(--ink);
   /* underline explícito: el link no debe distinguirse solo por color (WCAG 1.4.1) */
   text-decoration: underline;
   text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
 }
 
 .cookie__actions {
@@ -156,7 +196,14 @@ const c = copy[lang];
   border: none;
   background: none;
   cursor: pointer;
-  padding: 0.35em 0;
+  /* Touch target ≥48px (directiva mobile): el área clickeable era ~18px de alto
+     (padding 0.35em 0). Se sube a min-height 48 + padding lateral, SIN cambiar
+     el font-size (para no romper el equal-prominence legal Aceptar/Rechazar).
+     El underline de acento se mantiene al fondo del área (background-position). */
+  min-height: 48px;
+  padding: 0 0.5em;
+  display: inline-flex;
+  align-items: center;
   transition: opacity 0.2s, color 0.2s;
 }
 
@@ -165,10 +212,10 @@ const c = copy[lang];
    diferencian solo por un subrayado de acento que aparece al hover. */
 .cookie__btn--decline,
 .cookie__btn--accept {
-  color: var(--bg);
+  color: var(--ink);
   background-image: linear-gradient(currentColor, currentColor);
   background-repeat: no-repeat;
-  background-position: 0 100%;
+  background-position: 0 calc(100% - 12px);
   background-size: 0% 1px;
   transition: background-size 0.3s ease;
 }
@@ -178,14 +225,23 @@ const c = copy[lang];
 .cookie__btn--accept:focus-visible {
   background-size: 100% 1px;
 }
-/* El acento lima marca cuál es el primario SIN darle más tamaño ni relleno. */
+/* El acento lima marca cuál es el primario SIN darle más tamaño ni relleno.
+   Sobre fondo CLARO el lima puro no contrasta como texto (falla WCAG), así que
+   se usa solo como SUBRAYADO: el texto queda en tinta y el lima lo señala. */
 .cookie__btn--accept {
   background-image: linear-gradient(var(--brand), var(--brand));
-  background-size: 100% 1px;
+  background-size: 100% 2px;
 }
 .cookie__btn--accept:hover,
 .cookie__btn--accept:focus-visible {
-  background-size: 100% 2px;
+  background-size: 100% 3px;
+}
+
+/* Foco visible sobre fondo claro: el lima es invisible acá (1.16:1) — se usa
+   tinta, igual que el resto del sitio. */
+.cookie__btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -251,9 +307,28 @@ const c = copy[lang];
     }
   }
 
+  /* La barra es position:fixed y por lo tanto NO ocupa espacio en el flujo: el
+     hero (100vh) la ignoraba y su banda inferior — CTA + capacidades — quedaba
+     DEBAJO del banner (verificado 2026-08-04). Publicamos la altura real de la
+     barra como --cookiebar-h en :root; el hero la resta de su alto para que su
+     contenido nunca caiga tapado. Al aceptar/rechazar vuelve a 0px. */
+  const publishHeight = () => {
+    const h = banner && !banner.hasAttribute('hidden') ? banner.offsetHeight : 0;
+    document.documentElement.style.setProperty('--cookiebar-h', `${h}px`);
+  };
+
+  if (banner) {
+    /* se recalcula al aparecer, al cambiar de tamaño y al reflowear el texto */
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(publishHeight).observe(banner);
+    }
+    window.addEventListener('resize', publishHeight, { passive: true });
+  }
+
   const dismiss = (value: string) => {
     localStorage.setItem(COOKIE_KEY, value);
     banner?.setAttribute('hidden', '');
+    publishHeight();
   };
   acceptBtn?.addEventListener('click', () => dismiss('accepted'));
   declineBtn?.addEventListener('click', () => dismiss('essential'));

@@ -54,15 +54,80 @@ const { lang, t } = Astro.props;
         {t.nav.langLabel}
       </a>
     </div>
+
+    <!-- Botón hamburguesa — SOLO mobile (≤767px). Hasta 2026-08-06 el nav
+         mobile no tenía navegación: los links estaban display:none y no se
+         reemplazaban por nada, así que el único recorrido posible era scroll.
+         Es un <button> real (no un div con onclick): teclado y lectores de
+         pantalla lo reconocen sin ARIA extra. -->
+    <button
+      class="nav-burger"
+      type="button"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+      aria-controls="nav-panel"
+      data-burger
+    >
+      <span class="nav-burger__box" aria-hidden="true">
+        <span class="nav-burger__line"></span>
+        <span class="nav-burger__line"></span>
+      </span>
+    </button>
   </div>
 </nav>
+
+<!--
+  Panel de navegación mobile. Fuera del <nav> a propósito: el nav es
+  position:fixed con isolation:isolate (blindado del mix-blend del Statement),
+  y anidar acá adentro un panel a pantalla completa lo dejaría atrapado en ese
+  stacking context, por debajo de secciones posteriores.
+
+  inert cuando está cerrado: saca TODO el subárbol del orden de tabulación y
+  del árbol de accesibilidad de una sola vez — más robusto que tabindex="-1"
+  link por link, que es lo que se rompe en cuanto alguien agrega un link nuevo.
+-->
+<div class="nav-panel" id="nav-panel" data-panel inert>
+  <nav class="nav-panel__inner" aria-label="Menú">
+    <ul class="nav-panel__list" role="list">
+      <li>
+        <a href={`/${lang}#portfolio`} class="nav-panel__link" data-panel-link>
+          <span class="nav-panel__word">{t.nav.portfolio}</span>
+          <span class="nav-panel__num" aria-hidden="true">01</span>
+        </a>
+      </li>
+      <li>
+        <a href={`/${lang}#services`} class="nav-panel__link" data-panel-link>
+          <span class="nav-panel__word">{t.nav.method}</span>
+          <span class="nav-panel__num" aria-hidden="true">02</span>
+        </a>
+      </li>
+      <li>
+        <a href={`/${lang}#contact`} class="nav-panel__link" data-panel-link>
+          <span class="nav-panel__word">{t.nav.contact}</span>
+          <span class="nav-panel__num" aria-hidden="true">03</span>
+        </a>
+      </li>
+    </ul>
+
+    <!-- Pie del panel. El research marca que un menú sin contacto/ubicación
+         se siente incompleto: es donde el visitante que ya decidió busca cómo
+         escribirte, sin volver a scrollear la home. -->
+    <div class="nav-panel__foot">
+      <a href="mailto:info@scuart.com" class="nav-panel__mail">info@scuart.com</a>
+      <a href="https://wa.me/13478489720" class="nav-panel__wa" rel="noopener">
+        WHATSAPP <span aria-hidden="true">→</span>
+      </a>
+      <span class="nav-panel__meta">EST. 2025 · NYC + LATAM</span>
+    </div>
+  </nav>
+</div>
 
 <style>
   /*
    * Nav global reducida — aparece sticky SOLO tras salir del hero.
    * Estado inicial: oculta (translateY -100%, opacity 0, pointer-events none).
    * Al activarse (JS): transición suave a visible.
-   * B1 "Arquitecto": fondo yeso --bg, tinta --ink, hairline inferior.
+   * Fondo crema --bg, tinta --ink, hairline inferior.
    */
   .nav-global {
     /*
@@ -75,6 +140,12 @@ const { lang, t } = Astro.props;
     left: 0;
     right: 0;
     z-index: 100;
+    /* isolation: isolate — el nav es su PROPIO stacking context, blindado.
+       Sin esto, el mix-blend-mode:difference del StatementSection (sección dark)
+       al scrollear por detrás del nav se MEZCLABA con él → el texto blanco de
+       la frase sangraba encima de los links del nav (bug 2026-08-04). Aislar el
+       nav corta esa mezcla: el blend de abajo ya no lo alcanza. */
+    isolation: isolate;
     height: clamp(64px, 9vh, 80px);
     display: flex;
     align-items: center;
@@ -100,6 +171,53 @@ const { lang, t } = Astro.props;
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+  }
+
+  /* ── MODO OSCURO — cuando el nav flota sobre una sección dark (Statement).
+     Antes el nav crema quedaba "pegado encima" del fondo negro como un error de
+     capas (visual-critic 2026-08-02). Ahora se integra: fondo transparente,
+     texto crema, acento lima. La transición de color hace que se sienta parte
+     de la sección, no una barra flotando. ── */
+  .nav-global--on-dark {
+    /* Fondo negro casi-opaco (NO transparent): el nav solo entra en modo dark
+       SOBRE el Statement, cuyo fondo ya es #0a0a0a → un negro a 0.92 se ve igual
+       que "integrado/transparente" pero SÍ tapa el texto de la frase que pasa
+       por detrás. Transparent puro dejaba que el mix-blend-difference del
+       Statement sangrara el texto blanco encima de los links del nav
+       (bug 2026-08-04: "diseñadas con criterio, no por tendencia" atravesaba
+       TRABAJO/SERVICIOS/CONTACTO). El negro opaco corta ese sangrado sin romper
+       la integración visual con la sección. */
+    background-color: rgba(10, 10, 10, 0.92);
+    border-bottom-color: rgba(244, 242, 236, 0.12);
+  }
+  .nav-global--on-dark .nav-global__logo,
+  .nav-global--on-dark .nav-global__link,
+  .nav-global--on-dark .nav-global__lang-active {
+    color: var(--bg); /* crema sobre oscuro */
+  }
+  .nav-global--on-dark .nav-global__reg {
+    color: var(--brand); /* ® en lima sobre oscuro (aquí el lima SÍ contrasta) */
+  }
+  .nav-global--on-dark .nav-global__lang-sep,
+  .nav-global--on-dark .nav-global__lang-other {
+    color: rgba(244, 242, 236, 0.55);
+  }
+  .nav-global--on-dark .nav-global__lang-other:hover {
+    color: var(--bg);
+  }
+  /* transición suave de color al cruzar el borde de la sección */
+  .nav-global,
+  .nav-global__logo,
+  .nav-global__link,
+  .nav-global__lang-active,
+  .nav-global__lang-sep,
+  .nav-global__lang-other {
+    transition:
+      opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      color 0.35s ease,
+      background-color 0.35s ease,
+      border-color 0.35s ease;
   }
 
   /* ── Wordmark ──────────────────────────────────────────────────── */
@@ -204,6 +322,16 @@ const { lang, t } = Astro.props;
     color: var(--mid);
     text-decoration: none;
     transition: color 0.2s ease;
+    /* Área táctil (auditoría 2026-08-06): era un <a> inline sin padding, con
+       texto de 11-13px — la caja clickeable medía ~20×14px, muy por debajo
+       de los 44px de guía. Es el ÚNICO control interactivo del nav mobile
+       junto a la hamburguesa. El padding negativo en margin evita que el
+       área ampliada corra visualmente el texto. */
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 0.5em;
+    margin-inline: -0.5em;
   }
 
   .nav-global__lang-other:hover {
@@ -220,6 +348,354 @@ const { lang, t } = Astro.props;
     .nav-global__links {
       display: flex;
     }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     HAMBURGUESA + PANEL MOBILE (≤767px) — 2026-08-06
+     ═══════════════════════════════════════════════════════════════ */
+
+  /* ── Botón ──────────────────────────────────────────────────────
+     48×48 real (guía táctil), pero las líneas miden 22px: el área
+     clickeable es grande y el glifo chico. El resto del nav mobile
+     (el toggle ES|EN) queda por debajo de 44px — eso se corrige aparte. */
+  .nav-burger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    /* compensa el padding del nav para que el borde óptico del botón
+       coincida con el margen del contenido, no quede metido hacia adentro */
+    margin-right: -12px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-burger:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .nav-burger__box {
+    position: relative;
+    display: block;
+    width: 22px;
+    height: 12px;
+  }
+  .nav-burger__line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background-color: currentColor;
+    /* transform-origin al centro: al cruzarse en X las dos líneas rotan
+       sobre el mismo punto y la aspa queda simétrica */
+    transform-origin: 50% 50%;
+    transition:
+      transform 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+      top 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .nav-burger__line:nth-child(1) { top: 0; }
+  .nav-burger__line:nth-child(2) { top: 10.5px; }
+
+  /* Estado abierto: las dos líneas van al centro y rotan ±45° = aspa */
+  .nav-burger[aria-expanded='true'] .nav-burger__line:nth-child(1) {
+    top: 5.25px;
+    transform: rotate(45deg);
+  }
+  .nav-burger[aria-expanded='true'] .nav-burger__line:nth-child(2) {
+    top: 5.25px;
+    transform: rotate(-45deg);
+  }
+
+  /* Modo dark (nav sobre el Statement): la hamburguesa hereda crema.
+     currentColor en las líneas hace que baste con cambiar el color del
+     botón — no hay que repetir la regla por cada línea. */
+  :global(.nav-global--on-dark) .nav-burger {
+    color: var(--bg);
+  }
+
+  /* ── Nav en tinta mientras el panel está abierto ──────────────────
+     El panel es tinta a pantalla completa, pero la barra del nav quedaba
+     crema encima: se leía como dos capas pegadas, no como un modo. Con la
+     barra en tinta el conjunto es UNA superficie oscura y la X flota sobre
+     ella. Misma transición de color que ya usa el modo --on-dark. */
+  :global(.nav-global[data-panel-open]) {
+    background-color: var(--ink);
+    border-bottom-color: transparent;
+  }
+  :global(.nav-global[data-panel-open]) .nav-burger {
+    color: var(--bg);
+  }
+  /* Logo y selector de idioma también invierten — si no, quedan tinta sobre
+     tinta (invisibles). Mismos colores que el modo --on-dark. */
+  :global(.nav-global[data-panel-open]) .nav-global__logo,
+  :global(.nav-global[data-panel-open]) .nav-global__lang-active {
+    color: var(--bg);
+  }
+  :global(.nav-global[data-panel-open]) .nav-global__reg {
+    color: var(--brand);
+  }
+  :global(.nav-global[data-panel-open]) .nav-global__lang-sep,
+  :global(.nav-global[data-panel-open]) .nav-global__lang-other {
+    color: rgba(244, 242, 236, 0.55);
+  }
+
+  /* ── Panel ──────────────────────────────────────────────────────
+     Ocupa la pantalla completa por debajo del nav. Fondo TINTA (no crema):
+     el sitio es claro de punta a punta, así que invertir es lo que hace
+     evidente que estás en un modo distinto — y evita que el panel se
+     confunda con la sección que quedó detrás. */
+  .nav-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 99; /* debajo del nav (100): el botón X queda siempre clickeable */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    /* Tinta a 0.97 + blur: el research marca el overlay negro PLANO como
+       anti-patrón. Casi opaco (la legibilidad manda) pero deja intuir el
+       contenido detrás — el panel se lee como una capa de vidrio sobre el
+       sitio, no como una pantalla nueva. El fallback sólido va primero por
+       si backdrop-filter no está soportado. */
+    background-color: var(--ink);
+    background-color: rgba(20, 19, 15, 0.97);
+    backdrop-filter: blur(20px) saturate(1.1);
+    -webkit-backdrop-filter: blur(20px) saturate(1.1);
+    /* deja libre la franja del nav para que el wordmark y la X se vean */
+    padding-top: calc(clamp(64px, 9vh, 80px) + var(--space-xl));
+    padding-right: var(--margin);
+    /* --cookiebar-h: alto real de la barra de cookies (publicado por
+       CookieBanner.astro vía ResizeObserver; 0px cuando no está). La barra
+       es position:fixed y no ocupa flujo — sin descontarla, el pie del panel
+       (info@scuart.com) queda TAPADO por el banner en la primera visita. */
+    padding-bottom: calc(
+      max(var(--space-xl), calc(env(safe-area-inset-bottom) + var(--space-l))) +
+        var(--cookiebar-h, 0px)
+    );
+    padding-left: var(--margin);
+    /* ── CLIP-PATH REVEAL — cortina que baja ──────────────────────────
+       Research 2026-08-06: el patrón actual en menús de agencia NO es fade
+       ni slide lateral (drawer tipo Shopify = anti-patrón), es un clip-path
+       que revela el panel como una cortina. El easing cubic-bezier(0.83,0,
+       0.17,1) es el que aparece repetido en las implementaciones: arranque
+       lento, tramo central muy rápido, frenada suave — se siente material,
+       no como una capa que aparece.
+       Cerrado: el inset recorta el panel entero desde abajo (100% del alto).
+       Abierto: inset 0 = panel completo. */
+    clip-path: inset(0 0 100% 0);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      clip-path 0.62s cubic-bezier(0.83, 0, 0.17, 1),
+      visibility 0s linear 0.62s;
+  }
+  .nav-panel[data-open] {
+    clip-path: inset(0 0 0 0);
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+      clip-path 0.62s cubic-bezier(0.83, 0, 0.17, 1),
+      visibility 0s;
+  }
+
+  /* Tablet y desktop: el panel no existe. Los links viven en la barra. */
+  @media (min-width: 768px) {
+    .nav-burger { display: none; }
+    .nav-panel { display: none; }
+  }
+
+  .nav-panel__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .nav-panel__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    /* sin gap: el ritmo lo dan las hairlines de cada fila (patrón editorial,
+       igual que .pf-list del portfolio y .svc__list de servicios) */
+    gap: 0;
+  }
+
+  /* ── Link — ocupa el ANCHO COMPLETO ────────────────────────────────
+     Research 2026-08-06 (menús mobile de agencias premium): el error que
+     hace ver un menú "chico y genérico" es la columna angosta con texto
+     mediano. El patrón actual es tipografía fluida clamp() que llena el
+     viewport de borde a borde, alineada a la izquierda, con numeración
+     mono al costado. 42px@375 llena los 327px útiles con las palabras más
+     largas ("Servicios", "Contacto"); el clamp deja crecer hasta 767px. */
+  .nav-panel__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: var(--space-s);
+    font-family: var(--font-display);
+    font-weight: var(--display-weight-light);
+    font-size: clamp(2.625rem, 11vw, 4.5rem); /* 42px@375 → 72px@767 */
+    /* 0.95: el research marca 0.9-1.05 para nav primaria. Apretado, editorial. */
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--bg);
+    text-decoration: none;
+    /* hairline entre filas — el ritmo del sitio, no un gap suelto */
+    border-bottom: 1px solid rgba(244, 242, 236, 0.14);
+    padding-block: 0.42em;
+    /* área táctil holgada: a 42px de tipografía la caja ya supera los 44px,
+       pero el min-height lo garantiza si la escala baja */
+    min-height: 56px;
+  }
+  .nav-panel__list li:first-child .nav-panel__link {
+    border-top: 1px solid rgba(244, 242, 236, 0.14);
+  }
+  .nav-panel__link:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: -2px;
+  }
+
+  /* El NOMBRE arranca pegado al margen izquierdo — mismo eje que el
+     manifiesto, el portfolio y los servicios en mobile. El research marca el
+     centrado (y por extensión el alineado a la derecha) como señal de
+     2018-2020; la izquierda es lo que hace que el menú se lea como índice
+     editorial y no como lista decorativa. */
+  .nav-panel__word {
+    display: block;
+  }
+
+  /* Numeral en lima, cerrando la fila a la derecha. Mono chica, como el
+     sistema de índices del resto del sitio (.pf-meta__num, .svc__num).
+     Sobre tinta el lima contrasta 14.3:1; sobre crema daría 1.16:1. */
+  .nav-panel__num {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--brand);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+    /* alinea con la altura de mayúscula del serif, no con su baseline */
+    align-self: center;
+  }
+
+  /* Estado activo — el research lo marca como señal de "2026": el menú dice
+     dónde estás, no solo a dónde podés ir. El JS pone data-current en el link
+     cuya sección está en viewport.
+     El nombre NO se pinta de lima (el link entero en lima sobre tinta se lee
+     como "seleccionado/deshabilitado", y compite con el numeral). La señal es
+     una barra lima al costado + el numeral encendido: presente pero sobria. */
+  .nav-panel__link[data-current] {
+    /* barra lima en el borde izquierdo, dentro del padding del panel */
+    box-shadow: inset 3px 0 0 0 var(--brand);
+    padding-left: 0.42em;
+  }
+  .nav-panel__link[data-current] .nav-panel__num {
+    /* el numeral activo pasa a crema: invierte la relación con los inactivos
+       (lima), marcando cuál es el actual sin agregar un color nuevo */
+    color: var(--bg);
+  }
+
+  .nav-panel__foot {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding-top: var(--space-l);
+    border-top: 1px solid rgba(244, 242, 236, 0.16);
+  }
+  .nav-panel__mail {
+    font-family: var(--font-body);
+    font-size: var(--text-subhead);
+    color: var(--bg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--brand);
+    align-self: flex-start;
+    padding-bottom: 2px;
+  }
+  .nav-panel__mail:focus-visible,
+  .nav-panel__wa:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+  }
+
+  .nav-panel__wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    align-self: flex-start;
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(244, 242, 236, 0.75);
+    text-decoration: none;
+    min-height: 44px; /* área táctil */
+  }
+  .nav-panel__meta {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(244, 242, 236, 0.55);
+  }
+
+  /* ── Stagger de los links ──────────────────────────────────────────
+     50ms por ítem (valor del research), con SOLAPE intencional sobre la
+     cortina: el primer link arranca a 0.18s, cuando el clip-path va por un
+     tercio. Secuencial (esperar a que termine la cortina) se siente lento;
+     el solape es lo que da la sensación de una sola pieza en movimiento.
+     translateY 100% dentro de un contenedor con overflow oculto = las
+     palabras SUBEN desde detrás de su propia hairline, no aparecen. */
+  .nav-panel__list li {
+    overflow: hidden;
+  }
+  .nav-panel__link {
+    transform: translateY(105%);
+    transition: transform 0.72s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .nav-panel[data-open] .nav-panel__link {
+    transform: translateY(0);
+  }
+  .nav-panel[data-open] .nav-panel__list li:nth-child(1) .nav-panel__link { transition-delay: 0.18s; }
+  .nav-panel[data-open] .nav-panel__list li:nth-child(2) .nav-panel__link { transition-delay: 0.23s; }
+  .nav-panel[data-open] .nav-panel__list li:nth-child(3) .nav-panel__link { transition-delay: 0.28s; }
+
+  /* El pie entra último, más suave — cierra la secuencia */
+  .nav-panel__foot {
+    opacity: 0;
+    transition: opacity 0.5s ease 0.34s;
+  }
+  .nav-panel[data-open] .nav-panel__foot {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* sin cortina ni stagger: el panel simplemente está o no está */
+    .nav-panel,
+    .nav-panel[data-open] {
+      clip-path: none;
+      transition: visibility 0s;
+    }
+    .nav-panel { visibility: hidden; }
+    .nav-panel[data-open] { visibility: visible; }
+    .nav-panel__link {
+      transform: none;
+      transition: none;
+    }
+    .nav-panel__foot {
+      opacity: 1;
+      transition: none;
+    }
+    .nav-burger__line { transition: none; }
   }
 </style>
 
@@ -271,5 +747,151 @@ const { lang, t } = Astro.props;
        */
       navGlobal.classList.add('is-visible');
     }
+
+    /* ── MODO OSCURO del nav sobre secciones dark (Statement) ──
+       Cuando una sección de fondo oscuro cruza la franja superior donde vive el
+       nav (los primeros ~80px del viewport), el nav pasa a modo claro-sobre-
+       oscuro. Se detecta con un IO cuyo rootMargin recorta el viewport a esa
+       franja: la sección "intersecta" solo mientras ocupa la zona del nav. */
+    const darkSections = Array.from(document.querySelectorAll<HTMLElement>('.stu-about'));
+    if (darkSections.length) {
+      const navHeight = 80; // alto máximo del nav (clamp tope)
+      let activeDark = 0;
+      const darkObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            /* la sección dark ocupa la franja del nav si intersecta el root recortado */
+            if (entry.isIntersecting) activeDark++;
+            else activeDark = Math.max(0, activeDark - 1);
+          }
+          navGlobal.classList.toggle('nav-global--on-dark', activeDark > 0);
+        },
+        {
+          /* recorta el root a la franja superior (donde vive el nav): top 0,
+             bottom = viewport - navHeight → solo intersecta cuando la sección
+             está bajo el nav. */
+          rootMargin: `0px 0px ${-(window.innerHeight - navHeight)}px 0px`,
+          threshold: 0,
+        }
+      );
+      darkSections.forEach((s) => darkObserver.observe(s));
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     PANEL DE NAVEGACIÓN MOBILE — 2026-08-06
+     Hasta hoy el nav mobile no tenía navegación: los links estaban
+     display:none sin reemplazo, y el único recorrido era scroll.
+     ═══════════════════════════════════════════════════════════════ */
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+  const panel = document.querySelector<HTMLElement>('[data-panel]');
+
+  if (burger && panel) {
+    let isOpen = false;
+    /* guarda el scroll para restaurarlo al cerrar: en mobile el scroller es
+       document.body (directiva iOS), no window — leerlo de window daría 0. */
+    let savedScroll = 0;
+
+    const open = () => {
+      if (isOpen) return;
+      isOpen = true;
+      savedScroll = document.body.scrollTop;
+
+      panel.setAttribute('data-open', '');
+      panel.removeAttribute('inert');
+      burger.setAttribute('aria-expanded', 'true');
+      burger.setAttribute('aria-label', 'Cerrar menú');
+      /* barra del nav en tinta: el panel es tinta a pantalla completa y la
+         barra crema encima se leía como dos capas pegadas */
+      navGlobal?.setAttribute('data-panel-open', '');
+
+      /* Bloquea el scroll de fondo. En mobile el scroller es el <body>, así
+         que overflow:hidden ahí es lo que corta el scroll — NO en <html>,
+         que en ≤767px ya tiene overflow-y:hidden y no scrollea. */
+      document.body.style.overflow = 'hidden';
+
+      /* foco al primer link: quien navega con teclado/lector entra al panel,
+         no se queda atrás en la barra. */
+      panel.querySelector<HTMLAnchorElement>('[data-panel-link]')?.focus();
+    };
+
+    const close = (restoreFocus = true) => {
+      if (!isOpen) return;
+      isOpen = false;
+
+      panel.removeAttribute('data-open');
+      panel.setAttribute('inert', '');
+      burger.setAttribute('aria-expanded', 'false');
+      burger.setAttribute('aria-label', 'Abrir menú');
+      navGlobal?.removeAttribute('data-panel-open');
+
+      document.body.style.overflow = '';
+      /* restaurar la posición: quitar overflow:hidden puede resetear el
+         scrollTop del body en algunos navegadores */
+      document.body.scrollTop = savedScroll;
+
+      /* devolver el foco al botón SOLO si el cierre fue del usuario (Escape,
+         tap en la X). Si cerró por navegar a un ancla, robar el foco acá
+         sacaría al lector de pantalla de la sección a la que acaba de saltar. */
+      if (restoreFocus) burger.focus();
+    };
+
+    burger.addEventListener('click', () => (isOpen ? close() : open()));
+
+    /* Cerrar al elegir un destino. El scroll al ancla lo hace el navegador;
+       solo hay que devolver el body a su estado scrolleable ANTES de que
+       ocurra, si no el salto queda bloqueado por overflow:hidden. */
+    panel.querySelectorAll<HTMLAnchorElement>('[data-panel-link]').forEach((link) => {
+      link.addEventListener('click', () => close(false));
+    });
+
+    /* Escape cierra — comportamiento esperado de cualquier overlay */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) close();
+    });
+
+    /* Si el viewport pasa a tablet/desktop con el panel abierto (rotar el
+       teléfono, redimensionar), el CSS lo esconde con display:none pero el
+       body se quedaría con overflow:hidden — la página sin scroll y sin
+       forma visible de arreglarlo. Cerrar en el cambio de breakpoint evita
+       ese estado muerto. */
+    const mq = window.matchMedia('(min-width: 768px)');
+    const onBreakpoint = (e: MediaQueryListEvent | MediaQueryList) => {
+      if (e.matches && isOpen) close(false);
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onBreakpoint);
+    else mq.addListener(onBreakpoint); /* Safari iOS < 14 */
+
+    /* ── Indicador de sección activa ──────────────────────────────────
+       El menú marca en lima dónde estás, no solo a dónde podés ir. Un IO
+       sobre las secciones destino mantiene data-current actualizado; el
+       panel lo muestra cuando se abre, sin recalcular nada en ese momento.
+       rootMargin recorta el viewport a su banda central: la sección "activa"
+       es la que ocupa el medio de la pantalla, no la que apenas asoma. */
+    const destinos = ['portfolio', 'services', 'contact'];
+    const linkPorId = new Map<string, HTMLAnchorElement>();
+    panel.querySelectorAll<HTMLAnchorElement>('[data-panel-link]').forEach((a) => {
+      const id = a.getAttribute('href')?.split('#')[1];
+      if (id) linkPorId.set(id, a);
+    });
+
+    const seccionObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const link = linkPorId.get(entry.target.id);
+          if (!link) continue;
+          if (entry.isIntersecting) {
+            /* solo una activa a la vez */
+            linkPorId.forEach((a) => a.removeAttribute('data-current'));
+            link.setAttribute('data-current', '');
+          }
+        }
+      },
+      { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+    );
+    destinos.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) seccionObserver.observe(el);
+    });
   }
 </script>

@@ -99,6 +99,10 @@ const rows = projects.map((p, i) => {
   .pf {
     background-color: var(--bg);
     padding-block: 0;
+    /* Destino de #portfolio (nav desktop y hamburguesa mobile). Sin esto el
+       kicker "TRABAJO SELECCIONADO" quedaba tapado por el nav sticky al
+       navegar. Ligado al alto real del nav — clamp(64px, 9vh, 80px). */
+    scroll-margin-top: calc(clamp(64px, 9vh, 80px) + 8px);
   }
 
   .pf-kicker-wrap {
@@ -190,13 +194,64 @@ const rows = projects.map((p, i) => {
   .pf-name {
     font-family: var(--font-display);
     font-weight: 200;
-    font-size: clamp(3.5rem, 13vw, 5rem);
-    line-height: 1.0;
+    /* --text-display-name (no un clamp propio): la escala mobile de
+       tokens.css lo baja a 42px@375 y el clamp que había acá (56px@375,
+       piso de una curva de desktop) lo ignoraba. A 56px en 335px útiles
+       "Jamón Casero" llenaba el ancho de borde a borde. */
+    font-size: var(--text-display-name);
+    line-height: 1;
     letter-spacing: -0.025em;
     color: var(--ink);
     text-align: center;
     text-transform: none;
     margin: 0;
+  }
+
+  /* En mobile el nombre va A LA IZQUIERDA, no centrado. El centrado viene
+     del patrón Locomotive de desktop, donde la imagen aparece INLINE entre
+     las palabras (.pf-inline, ≥1024px con hover) y el centro tiene sentido
+     compositivo. En mobile esa imagen no existe: el nombre centrado sobre
+     un kicker alineado a la izquierda se lee como descuido, no como
+     decisión. Alineado, el bloque 001· / WEB · MARCA GASTRO / Jamón Casero
+     forma una sola columna con eje común. */
+  /* ═══════════════════════════════════════════════════════════
+     MOBILE (≤767px) — ficha + nombre + captura como UNA unidad
+     Fase 4 del rediseño mobile (2026-08-06). Antes: CERO reglas mobile.
+     ═══════════════════════════════════════════════════════════ */
+  @media (max-width: 767px) {
+    /* Nombre A LA IZQUIERDA. El centrado viene del patrón Locomotive de
+       desktop, donde la imagen aparece INLINE entre las palabras (.pf-inline,
+       ≥1024px con hover) y el centro tiene sentido compositivo. En mobile esa
+       imagen no existe: el nombre centrado sobre un kicker alineado se lee
+       como descuido. Alineado, ficha + nombre + captura forman una columna
+       con un solo eje. */
+    .pf-name {
+      text-align: left;
+      /* -0.025em a 42px aprieta demasiado en pantalla chica: los remates de
+         la serif se tocan. -0.015em mantiene el aire editorial legible. */
+      letter-spacing: -0.015em;
+    }
+
+    /* Ficha técnica pegada al nombre, no flotando arriba: son la misma
+       información (001 · WEB · 2025 · Jamón Casero), no dos bloques. */
+    .pf-meta {
+      margin-bottom: 0.15em;
+      gap: 0;
+    }
+
+    /* La fila respira menos por arriba/abajo y más por el contenido. Con 3
+       proyectos, el padding de desktop (clamp hasta 36px) sumaba ~216px de
+       aire muerto en una lista que ya ocupa 1.45 pantallas. */
+    .pf-row__link {
+      padding-block: var(--space-l);
+    }
+
+    /* La captura arranca más cerca del nombre: es su evidencia, no una
+       sección aparte. */
+    .pf-stack-img {
+      margin-top: var(--space-m);
+      margin-bottom: 0;
+    }
   }
 
   .pf-word {
@@ -212,21 +267,42 @@ const rows = projects.map((p, i) => {
   /* ── Imagen en reposo — mobile/tablet stack ─────────────── */
   .pf-stack-img {
     margin-top: clamp(1.25rem, 3vw, 2rem);
+    /* SIN full-bleed (revertido 2026-08-05): el 100vw/-50vw hacía que las
+       capturas tocaran los dos bordes de la pantalla mientras el resto del
+       contenido respeta el margen — en el iPhone se leía como error de
+       maquetado, no como decisión ("las fotos se ven de borde a borde",
+       William). Las imágenes vuelven a alinear con el texto. */
+    margin-bottom: clamp(2rem, 6vw, 3.5rem);
   }
 
   .pf-stack-img img {
     display: block;
     width: 100%;
     height: auto;
-    /* 16:10 — encuadra el mockup de navegador (trim ~1.85:1) sin recortar la barra */
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
+    /* SIN aspect-ratio forzado: el 16/10 recortaba el encuadre real de cada
+       captura con object-fit:cover (Jamón es 1280×850 = 1.5, Menius 1280×690
+       = 1.86 — ninguna es 1.6). Se veían cortadas arriba y abajo. Dejando que
+       cada imagen use su ratio nativo, se ve completa y sin deformar. */
+    object-fit: contain;
   }
 
-  /* ── Tablet (769-1023): igual stack, título más grande ──── */
-  @media (min-width: 769px) {
+  /* ── Tablet (768-1023): igual stack, título más grande ────
+     Breakpoint unificado a 768px (antes 769px): con 769 el viewport de
+     exactamente 768px no lo cubría ni mobile (≤767) ni tablet (≥769) —
+     quedaba con la base sin overrides. Mobile = ≤767, tablet = ≥768. */
+  @media (min-width: 768px) {
     .pf-name {
       font-size: clamp(5rem, 10vw, 7rem);
+    }
+
+    /* Tablet: se cancela el full-bleed de mobile — a 768px+ hay ancho de
+       sobra y la imagen contenida con margen se ve mejor que cruzando toda
+       la pantalla. */
+    .pf-stack-img {
+      width: auto;
+      margin-left: 0;
+      transform: none;
+      max-width: none;
     }
 
     .pf-stack-img img {

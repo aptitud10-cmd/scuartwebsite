@@ -1,0 +1,198 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'en';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/ai-visibility', 'servicios/ai-visibility');
+
+/* Native EN copy — not literal translation. USD base pricing everywhere
+   (William 2026-08-04); local-currency hint rendered client-side by layout.
+   Stats sourced 2026-08-04: AI search 30% of interactions (<10% in 2023);
+   +70% Gen Z/Millennial adoption. */
+const data: GeoServiceData = {
+  kicker: 'SERVICE N°02 — AI VISIBILITY · GEO',
+  heading: 'Show up in ChatGPT answers, not just Google.',
+  tagline:
+    "Your clients don't search anymore — they ask. If AI doesn't mention you, that client never reaches your door.",
+  cta: 'Check my site for free',
+  shift: {
+    label: 'The behavior already changed',
+    body: "This isn't a prediction — it's measurable. One in three search interactions already goes through an AI engine, and among the generations deciding where to spend today, adoption is past 70%. Waiting \"to see if this grows\" means giving those clients away.",
+    stats: [
+      { num: '30%', note: 'of search interactions go through AI in 2026 — it was under 10% in 2023' },
+      { num: '+70%', note: 'of Gen Z and Millennials use AI search — the generations making buying decisions today' },
+      { num: '4+', note: 'engines answering for your category right now: ChatGPT, Gemini, Perplexity, Claude' },
+    ],
+    sourceNote: 'Figures from 2026 AI search market studies (AI Search Trends — ALM Corp; Reporter Outreach; Sedestral). Ask us for the full sources.',
+  },
+  whatIs: {
+    label: 'What is GEO?',
+    body: 'GEO (Generative Engine Optimization) is making your business show up in AI answers. When someone asks "what\'s the best salon in Queens?" or "which agency do you recommend?", ChatGPT, Perplexity and Gemini answer with specific names. GEO is the work of making one of those names yours. It\'s to 2026 what SEO was to 2010: the ones who moved early kept the category.',
+  },
+  whyNot: {
+    label: "Why doesn't your business show up?",
+    items: [
+      {
+        title: 'AI reads outdated information.',
+        body: "Old hours, former addresses, prices from two years ago — AI repeats whatever its sources say, even when they're wrong. Worse than not showing up is showing up with bad data.",
+      },
+      {
+        title: "Your site doesn't answer questions.",
+        body: 'Generative engines cite pages that directly answer what people ask: what it costs, where it is, what\'s included. A beautiful site that answers nothing is useless to them as a source.',
+      },
+      {
+        title: 'Nobody else mentions you.',
+        body: 'AI models trust third-party mentions: directories, press, reviews, "best of" lists. Without external echoes, your business doesn\'t exist to AI — no matter how good it is.',
+      },
+    ],
+  },
+  engines: {
+    label: 'The engines we audit',
+    body: 'Each engine answers differently and reads different sources. So the audit isn\'t "asking ChatGPT" — it\'s the same battery of real client questions, run in parallel across the four main engines, with their sources tracked.',
+    primary: ['ChatGPT', 'Perplexity', 'Gemini', 'Claude'],
+    secondary: 'Monthly monitoring adds Google AI Overviews and Copilot where they apply to your market.',
+  },
+  how: {
+    label: 'How it works',
+    tiers: [
+      {
+        num: '01',
+        name: 'Audit',
+        priceUSD: 249,
+        priceSuffix: 'one time',
+        body: 'The full picture of your AI presence: where you show up, who is taking your clients, and what wrong information is circulating about your business.',
+        includesLabel: 'Includes',
+        includes: [
+          '25+ real client questions run across ChatGPT, Perplexity, Gemini and Claude',
+          'In your language and your market\'s (English and Spanish where relevant)',
+          'Competitor map: who shows up in your category and why',
+          'The sources AI cites for your industry — i.e., where you need to be',
+          'Wrong information detected (hours, prices, location)',
+          'Prioritized fix plan: what to move first and what to expect from each change',
+          'A designed, plain-English report, delivered in 7 days',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Fix',
+        priceUSD: 900,
+        pricePrefix: 'From',
+        priceSuffix: 'per project',
+        body: 'We execute the audit\'s plan: turning your digital presence into something AI can read, cite and recommend.',
+        includesLabel: 'Includes',
+        includes: [
+          'Answer-first architecture: your pages answer the questions your clients actually ask',
+          'Rewrite of the key pages (services, pricing, location, FAQ)',
+          'Correcting your information at the sources AI reads (Google Business, directories, maps)',
+          'Structured data where it helps (business, services, FAQ)',
+          'Third-party mention plan: where and how to earn the echoes AI listens to',
+          'If your site needs a redesign, that\'s quoted separately — with the audit as its base',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Upkeep',
+        priceUSD: 149,
+        pricePrefix: 'From',
+        priceSuffix: 'per month',
+        body: "AI visibility isn't an achievement, it's a position — and positions get defended by working, not watching. Every month we do something for your presence, and show you the result.",
+        includesLabel: 'Every month includes',
+        includes: [
+          'A new page or FAQ answering what your clients are asking that month',
+          'Your Google Business kept current: hours, photos, services, updates',
+          'Review management — a direct source of what AI says about you',
+          'One new third-party mention pursued (directories, lists, local press)',
+          'Full re-audit across the 4 engines: what you won, what you lost, who moved',
+        ],
+      },
+    ],
+  },
+  checker: {
+    label: 'How does your site stand today?',
+    body: 'Paste your website address and we analyze it instantly: whether AI engines can read you, whether you have schema, whether your content answers questions. No signup, no email, no waiting.',
+    placeholder: 'yoursite.com',
+    inputLabel: 'Your website address',
+    button: 'Analyze my site',
+    note: 'The analysis is technical and automatic. What AI actually says about your business today — that we review together. Message us with your result.',
+    waMessage: 'Hi SCUART, I ran the GEO check on my site:',
+    loadingLabel: 'Analyzing…',
+    prioLabel: 'What would move the needle first',
+    waCta: "Let's talk about fixing it",
+    errorLabel: 'Something went wrong. Try again or message us.',
+  },
+  forWhom: {
+    label: 'Is it for your business?',
+    yesLabel: 'Works very well if',
+    yes: [
+      'People find you by category: "best dentist in...", "agency for...", "salon near..."',
+      'You live on new clients, not just repeat business',
+      "Your competition already shows up in the answers and you don't",
+      'You sell services with a ticket that justifies the investment',
+    ],
+    noLabel: 'Not a priority if',
+    no: [
+      "All your business comes from referrals and you don't need to be found",
+      'Your brand already dominates the category across every engine',
+      'You have no digital presence and no plans for one — the foundation comes first',
+    ],
+  },
+  evidence: {
+    label: 'The proof',
+    body: "We're running this exact audit on SCUART itself. The before and after gets published here — real screenshots, not promises.",
+  },
+  faq: {
+    label: 'Straight answers',
+    items: [
+      {
+        q: 'How much does the GEO service cost?',
+        a: 'The audit is $249 USD (one time, credited toward the fix if you continue), the fix starts at $900 USD depending on the size of your digital presence, and monthly upkeep starts at $149 USD. We bill in US dollars and accept international payments.',
+      },
+      {
+        q: 'How long until I see results?',
+        a: 'The audit takes one week. AI visibility changes typically show within 4 to 12 weeks after the fix, depending on your starting point and how competitive your category is.',
+      },
+      {
+        q: 'Does it work for any business?',
+        a: 'It works best for businesses people search by category: local services, professionals, brands with a clear niche. In the audit we tell you honestly whether it\'s worth it for yours.',
+      },
+      {
+        q: 'Which countries do you work in?',
+        a: 'Across the United States, Latin America and Spain. The work is remote and the team is bilingual — we audit and optimize in English and Spanish, depending on your market.',
+      },
+      {
+        q: 'What do you need from me?',
+        a: 'Your business name, your area, and the competitors you know about. We handle the rest.',
+      },
+      {
+        q: 'Does this replace SEO?',
+        a: "No — it complements it. Google still exists; GEO covers the new front: AI-generated answers, where classic search results don't appear. What you do well for GEO usually improves your SEO too.",
+      },
+      {
+        q: 'How do you measure results?',
+        a: 'With a fixed battery of real questions run every month on the same engines, in fresh conversations with no history. AI answers vary by session, so we measure trend over a representative sample — and we tell you exactly that, without promising "position #1".',
+      },
+      {
+        q: "Does it help if my business doesn't have a website?",
+        a: "You can start with profiles and directories (Google Business, reviews), but the ceiling is low: AI needs a source of your own to read. If you don't have a site, the honest move is building that foundation first — we do that too.",
+      },
+    ],
+  },
+  closing: {
+    statement: "What does AI say about your business? Let's find out.",
+    emailLabel: 'Email info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="AI Visibility (GEO) — Show up in ChatGPT | SCUART"
+  description="GEO service for the US, Latin America and Spain: we audit what ChatGPT, Perplexity and Gemini say about your business and make them recommend you. Audit $249."
+  canonicalURL={`${SITE_URL}/en/services/ai-visibility`}
+  alternates={alternates}
+/>

@@ -46,8 +46,8 @@ const t = getTranslations(lang);
 
 .notfound__num {
   font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(6rem, 20vw, 14rem);
+  font-weight: var(--display-weight-light);
+  font-size: var(--text-display-watermark);
   line-height: 1.0;
   letter-spacing: -0.04em;
   color: var(--hairline);
@@ -56,8 +56,8 @@ const t = getTranslations(lang);
 
 .notfound__title {
   font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: var(--display-weight-light);
+  font-size: var(--text-h2);
   line-height: 1.05;
   letter-spacing: -0.025em;
   color: var(--ink);
@@ -88,9 +88,16 @@ const t = getTranslations(lang);
   text-decoration: none;
   padding: 0.85em 1.5em;
   border-radius: 2px;
-  transition: opacity 0.2s;
-  background-color: var(--brand);
-  color: var(--on-brand);
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  /* Primario = mismo patrón que el CTA del hero (fondo tinta, texto crema).
+     El lima NO se usa como fondo de botón (regla del sistema, tokens.css):
+     es acento puntual, no relleno de superficie. */
+  background-color: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
 }
 
 .notfound__cta--ghost {
@@ -100,7 +107,20 @@ const t = getTranslations(lang);
 }
 
 .notfound__cta:hover {
-  opacity: 0.85;
+  background-color: transparent;
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.notfound__cta--ghost:hover {
+  background-color: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+.notfound__cta:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {

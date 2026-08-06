@@ -1,0 +1,1057 @@
+---
+/**
+ * GeoServiceLayout.astro — Página de servicio AI Visibility · GEO.
+ *
+ * Estructura answer-first (SERVICIO-GEO-SCUART.md + HANDOFF-GEO-LANDING.md):
+ * cada sección responde una pregunta real de cliente, de modo que la propia
+ * página sea citable por motores generativos (comerse la propia medicina).
+ *
+ * Precios: base en USD (mercado LATAM + USA + España). Un hint client-side
+ * muestra el aproximado en la moneda local según el timezone del visitante
+ * (sin APIs externas, sin geolocalización — privacidad y cero dependencias).
+ *
+ * Checker (lead magnet): el visitante pega su URL → se abre WhatsApp con el
+ * pedido armado. v1 sin backend a propósito; se automatiza si hay volumen.
+ *
+ * Sigue el sistema visual del sitio (mismos tokens que CaseStudyLayout):
+ * kicker mono · display serif hairline · hairlines · reveal on scroll.
+ */
+
+import Layout from '../layouts/Layout.astro';
+import Nav from './Nav.astro';
+import FooterSection from './FooterSection.astro';
+import type { Translations } from '../i18n/en';
+import { SITE_URL } from '../i18n/index';
+
+const EMAIL = 'info@scuart.com';
+
+interface Stat {
+  num: string;
+  note: string;
+}
+
+interface Tier {
+  num: string;
+  name: string;
+  /** Monto base en USD (número, para el hint de moneda local) */
+  priceUSD: number;
+  /** "Desde" / "From" — vacío si es precio cerrado */
+  pricePrefix?: string;
+  /** "pago único" / "one time" / "/ mes" */
+  priceSuffix: string;
+  body: string;
+  includesLabel: string;
+  includes: string[];
+}
+
+interface FaqItem {
+  q: string;
+  a: string;
+}
+
+export interface GeoServiceData {
+  kicker: string;
+  heading: string;
+  tagline: string;
+  cta: string;
+  /** sourceNote: atribución visible de las cifras (P4 — sin números huérfanos) */
+  shift: { label: string; body: string; stats: Stat[]; sourceNote: string };
+  whatIs: { label: string; body: string };
+  whyNot: { label: string; items: { title: string; body: string }[] };
+  engines: { label: string; body: string; primary: string[]; secondary: string };
+  how: { label: string; tiers: Tier[] };
+  checker: {
+    label: string;
+    body: string;
+    placeholder: string;
+    /** Label accesible del input — describe el propósito, no repite el placeholder */
+    inputLabel: string;
+    button: string;
+    note: string;
+    /** Texto del mensaje de WhatsApp; la URL del sitio se concatena al final */
+    waMessage: string;
+    /** Estado del botón mientras corre el análisis */
+    loadingLabel: string;
+    /** Encabezado de la lista de prioridades en el resultado */
+    prioLabel: string;
+    /** CTA a WhatsApp que aparece DEBAJO del resultado */
+    waCta: string;
+    /** Mensaje si el fetch falla */
+    errorLabel: string;
+  };
+  forWhom: {
+    label: string;
+    yesLabel: string;
+    yes: string[];
+    noLabel: string;
+    no: string[];
+  };
+  evidence: { label: string; body: string };
+  faq: { label: string; items: FaqItem[] };
+  closing: { statement: string; emailLabel: string; whatsappLabel: string };
+}
+
+interface Props {
+  t: Translations;
+  lang: 'es' | 'en';
+  data: GeoServiceData;
+  title: string;
+  description: string;
+  canonicalURL: string;
+  alternates: { en: string; es: string; xDefault: string };
+}
+
+const { t, lang, data, title, description, canonicalURL, alternates } = Astro.props;
+
+/* JSON-LD Service: declara la oferta ante buscadores y motores generativos. */
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'AI Visibility (GEO)',
+  serviceType: 'Generative Engine Optimization',
+  description,
+  url: canonicalURL,
+  inLanguage: lang,
+  provider: { '@type': 'Organization', '@id': `${SITE_URL}/#organization`, name: 'SCUART' },
+  areaServed: ['US', 'CO', 'MX', 'PE', 'CL', 'AR', 'ES'],
+  offers: data.how.tiers.map((tier) => ({
+    '@type': 'Offer',
+    name: tier.name,
+    price: tier.priceUSD,
+    priceCurrency: 'USD',
+  })),
+};
+
+/* FAQPage: las preguntas reales de la sección FAQ, citables por la SERP y por LLMs. */
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: data.faq.items.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const servicesLabel = lang === 'es' ? 'Servicios' : 'Services';
+const homeUrl = `${SITE_URL}/${lang}`;
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'SCUART', item: homeUrl },
+    { '@type': 'ListItem', position: 2, name: servicesLabel, item: `${homeUrl}#services` },
+    { '@type': 'ListItem', position: 3, name: 'AI Visibility · GEO', item: canonicalURL },
+  ],
+};
+
+const whatsappHref = t.contact.whatsappHref;
+
+/* Numeración editorial de bloques, en orden de render */
+let n = 0;
+const num = () => String(++n).padStart(2, '0');
+
+const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
+---
+
+<Layout
+  title={title}
+  description={description}
+  lang={lang}
+  canonicalURL={canonicalURL}
+  alternates={alternates}
+>
+  <Nav lang={lang} t={t} />
+
+  <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} is:inline />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} is:inline />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} is:inline />
+
+  <article class="geo" data-wa-base={whatsappHref}>
+
+    <!-- ── HERO tipográfico ─────────────────────────────────── -->
+    <header class="geo-hero">
+      <p class="geo-kicker">{data.kicker}</p>
+      <h1 class="geo-hero__heading">{data.heading}</h1>
+      <p class="geo-hero__tagline">{data.tagline}</p>
+      <a class="geo-cta" href="#geo-checker">
+        {data.cta} <span aria-hidden="true">↓</span>
+      </a>
+    </header>
+
+    <!-- ── El cambio de comportamiento — datos, no opinión ──── -->
+    <section class="geo-block" data-geo-reveal>
+      <span class="geo-num">{num()}</span>
+      <h2 class="geo-label">{data.shift.label}</h2>
+      <div class="geo-col3">
+        <p class="geo-body">{data.shift.body}</p>
+        <div class="geo-stats">
+          {data.shift.stats.map((s) => (
+            <div class="geo-stat">
+              <span class="geo-stat__num">{s.num}</span>
+              <span class="geo-stat__note">{s.note}</span>
+            </div>
+          ))}
+        </div>
+        <p class="geo-note">{data.shift.sourceNote}</p>
+      </div>
+    </section>
+
+    <!-- ── Qué es GEO ───────────────────────────────────────── -->
+    <section class="geo-block" data-geo-reveal>
+      <span class="geo-num">{num()}</span>
+      <h2 class="geo-label">{data.whatIs.label}</h2>
+      <p class="geo-body">{data.whatIs.body}</p>
+    </section>
+
+    <!-- ── Por qué no apareces ──────────────────────────────── -->
+    <section class="geo-block" data-geo-reveal>
+      <span class="geo-num">{num()}</span>
+      <h2 class="geo-label">{data.whyNot.label}</h2>
+      <div class="geo-causes">
+        {data.whyNot.items.map((item) => (
+          <div class="geo-cause">
+            <h3 class="geo-cause__title">{item.title}</h3>
+            <p class="geo-body">{item.body}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- ── Los motores que auditamos ────────────────────────── -->
+    <section class="geo-block" data-geo-reveal>
+      <span class="geo-num">{num()}</span>
+      <h2 class="geo-label">{data.engines.label}</h2>
+      <div class="geo-col3">
+        <p class="geo-body">{data.engines.body}</p>
+        <ul class="geo-engines">
+          {data.engines.primary.map((e) => (
+            <li class="geo-engine">{e}</li>
+          ))}
+        </ul>
+        <p class="geo-note">{data.engines.secondary}</p>
+      </div>
+    </section>
+
+    <!-- ── Cómo funciona — escalones con precio USD + hint local ── -->
+    <section class="geo-block" data-geo-reveal>
+      <span class="geo-num">{num()}</span>
+      <h2 class="geo-label">{data.how.label}</h2>
+      <ol class="geo-tiers">
+        {data.how.tiers.map((tier) => (
+          <li class="geo-tier">
+            <span class="geo-num">{tier.num}</span>
+            <h3 class="geo-tier__name">{tier.name}</h3>
+            <p class="geo-tier__price">
+              {tier.pricePrefix ? `${tier.pricePrefix} ` : ''}{usd(tier.priceUSD)} · {tier.priceSuffix}
+              <span class="geo-tier__local" data-usd={tier.priceUSD} data-prefix={tier.pricePrefix ?? ''}></span>
+            </p>
+            <p class="geo-body">{tier.body}</p>
+            <p class="geo-includes__label">{tier.includesLabel}</p>
+            <ul class="geo-includes">
+              {tier.includes.map((inc) => (
+                <li>{inc}</li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <!-- ── Checker — lead magnet: URL → WhatsApp prefilled ──── -->
+    <section class="geo-block geo-checker" id="geo-checker" data-geo-reveal>
+      <span class="geo-num">{num()}</span>
+      <h2 class="geo-label">{data.checker.label}</h2>
+      <div class="geo-col3">
+        <p class="geo-body">{data.checker.body}</p>
+        <form
+          class="geo-checker__form"
+          data-geo-checker
+          data-wa-message={data.checker.waMessage}
+          data-loading-label={data.checker.loadingLabel}
+          data-prio-label={data.checker.prioLabel}
+          data-wa-cta={data.checker.waCta}
+          data-error-label={data.checker.errorLabel}
+        >
+          <input
+            class="geo-checker__input"
+            type="text"
+            name="siteurl"
+            inputmode="url"
+            autocomplete="url"
+            placeholder={data.checker.placeholder}
+            aria-label={data.checker.inputLabel}
+            required
+          />
+          <button class="geo-checker__btn" type="submit">
+            {data.checker.button} <span aria-hidden="true">→</span>
+          </button>
+        </form>
+        <!-- Resultado del análisis — lo llena el JS. aria-live: un lector de
+             pantalla anuncia el score cuando llega. -->
+        <div class="geo-result" data-geo-result aria-live="polite" hidden></div>
+        <p class="geo-note">{data.checker.note}</p>
+      </div>
+    </section>
+
+    <!-- ── Para quién es (y para quién no) ──────────────────── -->
+    <section class="geo-block" data-geo-reveal>
+      <span class="geo-num">{num()}</span>
+      <h2 class="geo-label">{data.forWhom.label}</h2>
+      <div class="geo-forwhom">
+        <div>
+          <p class="geo-includes__label">{data.forWhom.yesLabel}</p>
+          <ul class="geo-includes">
+            {data.forWhom.yes.map((y) => (
+              <li>{y}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p class="geo-includes__label">{data.forWhom.noLabel}</p>
+          <ul class="geo-includes geo-includes--no">
+            {data.forWhom.no.map((x) => (
+              <li>{x}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Evidencia (auto-auditoría SCUART en curso) ───────── -->
+    <section class="geo-block" data-geo-reveal>
+      <span class="geo-num">{num()}</span>
+      <h2 class="geo-label">{data.evidence.label}</h2>
+      <p class="geo-body geo-evidence">{data.evidence.body}</p>
+    </section>
+
+    <!-- ── FAQ answer-first ─────────────────────────────────── -->
+    <section class="geo-block" data-geo-reveal>
+      <span class="geo-num">{num()}</span>
+      <h2 class="geo-label">{data.faq.label}</h2>
+      <dl class="geo-faq">
+        {data.faq.items.map((f) => (
+          <div class="geo-faq__item">
+            <dt class="geo-faq__q">{f.q}</dt>
+            <dd class="geo-faq__a">{f.a}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <!-- ── Cierre + contacto directo (email + WhatsApp) ─────── -->
+    <section class="geo-closing" data-geo-reveal>
+      <p class="geo-closing__statement">{data.closing.statement}</p>
+      <div class="geo-closing__channels">
+        <a class="geo-cta" href={`mailto:${EMAIL}`}>{data.closing.emailLabel}</a>
+        <a class="geo-cta" href={whatsappHref} target="_blank" rel="noopener noreferrer">
+          {data.closing.whatsappLabel} <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </section>
+
+  </article>
+
+  <FooterSection t={t} lang={lang} />
+</Layout>
+
+<style>
+  .geo {
+    background-color: var(--bg);
+    color: var(--ink);
+  }
+
+  /* ── tipos base (mismo lenguaje que CaseStudyLayout) ─────── */
+  .geo-kicker,
+  .geo-num {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-62);
+    font-variant-numeric: tabular-nums;
+  }
+  .geo-label {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight-light);
+    font-size: var(--text-h3);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .geo-body {
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 1.4vw, 1.1875rem);
+    line-height: 1.6;
+    color: var(--ink-mid, var(--ink-62));
+    margin: 0;
+    max-width: 60ch;
+  }
+  .geo-note {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+    color: var(--ink-62);
+    margin: var(--space-s) 0 0;
+    max-width: 55ch;
+  }
+
+  /* ── HERO ─────────────────────────────────────────────────── */
+  .geo-hero {
+    padding: clamp(7rem, 18vh, 12rem) var(--margin) clamp(3rem, 8vh, 6rem);
+    max-width: 1600px;
+    margin-inline: auto;
+  }
+  .geo-hero__heading {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight-hairline);
+    font-size: clamp(2.4rem, 6.5vw, 5.5rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    margin: var(--space-l) 0 0;
+    max-width: 18ch;
+    text-wrap: balance;
+  }
+  .geo-hero__tagline {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(1.25rem, 3vw, 2rem);
+    line-height: 1.25;
+    color: var(--ink-mid, var(--ink-62));
+    margin: var(--space-m) 0 0;
+    max-width: 30ch;
+  }
+
+  /* ── CTA (patrón cs-hero__visit) ──────────────────────────── */
+  .geo-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: var(--space-l);
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 0.3em;
+    transition: gap 0.3s ease, opacity 0.3s ease;
+  }
+  .geo-cta:hover { gap: 0.9em; opacity: 0.7; }
+
+  /* ── BLOQUES ──────────────────────────────────────────────── */
+  .geo-block {
+    max-width: 1600px;
+    margin-inline: auto;
+    padding: clamp(3rem, 7vh, 5.5rem) var(--margin);
+    border-top: 1px solid var(--hairline);
+    display: grid;
+    gap: var(--space-s);
+  }
+  /* contenedor genérico de la 3ª columna cuando hay varios hijos */
+  .geo-col3 {
+    display: grid;
+    gap: var(--space-m);
+  }
+
+  /* ── Stats (el cambio) ────────────────────────────────────── */
+  .geo-stats {
+    display: grid;
+    gap: var(--space-m);
+  }
+  .geo-stat { display: grid; gap: 0.25rem; }
+  .geo-stat__num {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight-hairline);
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .geo-stat__note {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--ink-62);
+    max-width: 34ch;
+  }
+
+  /* ── Causas ───────────────────────────────────────────────── */
+  .geo-causes {
+    display: grid;
+    gap: var(--space-l);
+    margin-top: var(--space-m);
+  }
+  .geo-cause__title {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight-light);
+    font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.4em;
+  }
+
+  /* ── Motores ──────────────────────────────────────────────── */
+  .geo-engines {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+  .geo-engine {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.55em 1em;
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    color: var(--ink);
+  }
+
+  /* ── Escalones ────────────────────────────────────────────── */
+  .geo-tiers {
+    list-style: none;
+    margin: var(--space-m) 0 0;
+    padding: 0;
+    display: grid;
+  }
+  .geo-tier {
+    display: grid;
+    gap: 0.5rem;
+    padding: clamp(1.5rem, 3vh, 2.5rem) 0;
+    border-top: 1px solid var(--hairline);
+  }
+  .geo-tier__name {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight-light);
+    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .geo-tier__price {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin: 0;
+  }
+  /* hint de moneda local — lo llena el script; vacío = no ocupa espacio */
+  .geo-tier__local {
+    display: block;
+    margin-top: 0.35em;
+    color: var(--ink-62);
+    letter-spacing: 0.1em;
+  }
+  .geo-tier__local:empty { display: none; }
+
+  .geo-includes__label {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-62);
+    margin: var(--space-s) 0 0.5em;
+  }
+  .geo-includes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.45em;
+  }
+  .geo-includes li {
+    font-family: var(--font-body);
+    font-size: clamp(0.95rem, 1.2vw, 1.0625rem);
+    line-height: 1.55;
+    color: var(--ink-mid, var(--ink-62));
+    padding-left: 1.2em;
+    position: relative;
+    max-width: 58ch;
+  }
+  .geo-includes li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--ink-62);
+  }
+  .geo-includes--no li::before { content: '✕'; font-size: 0.75em; top: 0.25em; }
+
+  /* ── Checker ──────────────────────────────────────────────── */
+  .geo-checker__form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    max-width: 40rem;
+  }
+
+  /* ── Resultado del chequeo GEO (lo inyecta el JS) ─────────────
+     Mismo lenguaje del resto de la página: hairlines, tinta, radius 2px.
+     Sin cajas con sombra ni colores de semáforo — el ✓/✕ y el peso
+     tipográfico bastan para leer el estado. */
+  .geo-result {
+    /* Más ancho que el form (40rem): el resultado es el momento en que la
+       página entrega valor real y merece más presencia. Los checks a dos
+       columnas en desktop aprovechan el aire que sobraba a la izquierda. */
+    max-width: 52rem;
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+    border-top: 1px solid var(--hairline);
+    padding-top: clamp(1.25rem, 3vw, 2rem);
+  }
+  .geo-result[hidden] { display: none; }
+  .geo-result:focus { outline: none; }
+
+  :global(.geo-result__loading),
+  :global(.geo-result__error) {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--ink-62);
+    margin: 0 0 1rem;
+  }
+
+  :global(.geo-result__head) {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  :global(.geo-result__score) {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 9vw, 4.5rem);
+    line-height: 1;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    position: relative;
+  }
+  /* La barra lima marca el score alto — mismo acento que el resto del sitio.
+     Sobre claro el lima no contrasta como TEXTO, solo como subrayado. */
+  :global(.geo-result__score[data-nivel='alto'])::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 1.8em; bottom: 0.08em;
+    height: 0.08em;
+    background: var(--brand);
+  }
+  :global(.geo-result__score-max) {
+    font-size: 0.3em;
+    color: var(--ink-42);
+    margin-left: 0.1em;
+  }
+  :global(.geo-result__host) {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-62);
+    margin: 0;
+  }
+
+  :global(.geo-result__list) {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+  /* Dos columnas desde tablet: 8 checks en una sola columna obligaban a
+     scrollear para ver el resultado completo. */
+  @media (min-width: 768px) {
+    :global(.geo-result__list) {
+      grid-template-columns: 1fr 1fr;
+      gap: 1.1rem 2rem;
+    }
+  }
+  :global(.geo-result__item) {
+    display: flex;
+    gap: 0.7rem;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+  :global(.geo-result__icon) {
+    flex-shrink: 0;
+    width: 1.2em;
+    font-weight: 600;
+  }
+  :global(.geo-result__item[data-pass='false'] .geo-result__icon) { color: var(--ink); }
+  :global(.geo-result__item[data-pass='true'] .geo-result__icon) { color: var(--ink-42); }
+  /* Lo que FALLA pesa más que lo que pasa — es lo accionable. */
+  :global(.geo-result__item[data-pass='true'] strong) { font-weight: 400; color: var(--ink-62); }
+  :global(.geo-result__detail) {
+    color: var(--ink-62);
+    font-size: 0.875rem;
+  }
+
+  :global(.geo-result__prio) {
+    border-top: 1px solid var(--hairline);
+    padding-top: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  :global(.geo-result__prio-label) {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-62);
+    margin: 0 0 0.6rem;
+  }
+  :global(.geo-result__prio ol) {
+    margin: 0;
+    padding-left: 1.2em;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--ink);
+  }
+  .geo-checker__input {
+    flex: 1 1 16rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--hairline);
+    border-radius: 2px;
+    padding: 0.9em 1em;
+    min-width: 0;
+  }
+  .geo-checker__input::placeholder { color: var(--ink-62); }
+  .geo-checker__input:focus {
+    outline: none;
+    border-color: var(--ink);
+  }
+  .geo-checker__btn {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+    padding: 0.9em 1.6em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    transition: gap 0.3s ease, opacity 0.3s ease;
+  }
+  .geo-checker__btn:hover { gap: 0.9em; opacity: 0.85; }
+
+  /* ── Para quién ───────────────────────────────────────────── */
+  .geo-forwhom {
+    display: grid;
+    gap: var(--space-l);
+    margin-top: var(--space-m);
+  }
+  /* 768px, no 640px (unificado 2026-08-06): a 640px la grilla pasaba a 2
+     columnas dentro de lo que el resto del sitio todavía trata como mobile. */
+  @media (min-width: 768px) {
+    .geo-forwhom { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── Evidencia — nota honesta, sin capturas inventadas ────── */
+  .geo-evidence { font-style: italic; }
+
+  /* ── FAQ ──────────────────────────────────────────────────── */
+  .geo-faq {
+    margin: var(--space-m) 0 0;
+    display: grid;
+    gap: var(--space-l);
+  }
+  .geo-faq__item { margin: 0; }
+  .geo-faq__q {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight-light);
+    font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.4em;
+  }
+  .geo-faq__a {
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 1.4vw, 1.1875rem);
+    line-height: 1.6;
+    color: var(--ink-mid, var(--ink-62));
+    margin: 0;
+    max-width: 60ch;
+  }
+
+  /* ── Cierre ───────────────────────────────────────────────── */
+  .geo-closing {
+    max-width: 1600px;
+    margin-inline: auto;
+    padding: clamp(4rem, 12vh, 9rem) var(--margin);
+    border-top: 1px solid var(--hairline);
+  }
+  .geo-closing__statement {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight-hairline);
+    font-size: var(--text-h2);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin: 0;
+    max-width: 20ch;
+    text-wrap: balance;
+  }
+  .geo-closing__channels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-m) var(--space-l);
+  }
+
+  /* ── DESKTOP: composición asimétrica num/label/contenido ──── */
+  @media (min-width: 900px) {
+    .geo-block {
+      grid-template-columns: minmax(0, 5rem) minmax(0, 1fr) minmax(0, 1.4fr);
+      column-gap: clamp(2rem, 4vw, 4rem);
+      align-items: start;
+    }
+    .geo-block > .geo-num { grid-column: 1; }
+    .geo-block > .geo-label { grid-column: 2; }
+    .geo-block > .geo-body,
+    .geo-block > .geo-col3,
+    .geo-block > .geo-causes,
+    .geo-block > .geo-tiers,
+    .geo-block > .geo-forwhom,
+    .geo-block > .geo-faq { grid-column: 3; margin-top: 0; }
+
+    .geo-stats { grid-template-columns: repeat(3, 1fr); gap: var(--space-m); }
+
+    .geo-tier {
+      grid-template-columns: minmax(0, 4rem) minmax(0, 1fr);
+      column-gap: clamp(1.5rem, 3vw, 3rem);
+    }
+    .geo-tier > .geo-num { grid-column: 1; padding-top: 0.4em; }
+    .geo-tier > .geo-tier__name,
+    .geo-tier > .geo-tier__price,
+    .geo-tier > .geo-body,
+    .geo-tier > .geo-includes__label,
+    .geo-tier > .geo-includes { grid-column: 2; }
+  }
+
+  /* ── Entrada del resultado del checker ────────────────────────
+     Misma curva y duración que [data-geo-reveal] — el resultado se
+     comporta como cualquier bloque del sitio, no como un widget aparte.
+     Los checks entran escalonados con un delay por índice que pone el JS
+     en --i; el score cuenta de 0 a su valor (ver script). */
+  :global(.geo-result__item),
+  :global(.geo-result__prio),
+  :global(.geo-result .geo-cta) {
+    opacity: 0;
+    transform: translateY(14px);
+    animation: geo-result-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: calc(var(--i, 0) * 55ms);
+  }
+
+  @keyframes geo-result-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.geo-result__item),
+    :global(.geo-result__prio),
+    :global(.geo-result .geo-cta) {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ── Reveal (mismo patrón del sitio) ──────────────────────── */
+  [data-geo-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  [data-geo-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-geo-reveal] { opacity: 1; transform: none; }
+  }
+</style>
+
+<script>
+  /* ── Reveal on scroll ─────────────────────────────────────── */
+  const els = document.querySelectorAll('[data-geo-reveal]');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) {
+    els.forEach((el) => el.classList.add('is-visible'));
+  } else {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        }
+      },
+      { rootMargin: '0px 0px -12% 0px' }
+    );
+    els.forEach((el) => io.observe(el));
+  }
+
+  /* ── Hint de moneda local ─────────────────────────────────────
+     Sin APIs ni geolocalización: timezone → moneda, tasas aproximadas.
+     Tasas de referencia al 2026-08-04 (actualizar de vez en cuando):
+     TRM COP 3.144 · MXN 17,7 · CLP 925 · PEN 3,6 · EUR 0,90.
+     ARS omitido a propósito: bimonetario + volatilidad → cualquier tasa
+     fija sería errada en días; ese público lee USD con naturalidad. */
+  const TZ_CURRENCY: Record<string, [string, number, string]> = {
+    'America/Bogota': ['COP', 3144, 'es-CO'],
+    'America/Mexico_City': ['MXN', 17.7, 'es-MX'],
+    'America/Monterrey': ['MXN', 17.7, 'es-MX'],
+    'America/Cancun': ['MXN', 17.7, 'es-MX'],
+    'America/Tijuana': ['MXN', 17.7, 'es-MX'],
+    'America/Lima': ['PEN', 3.6, 'es-PE'],
+    'America/Santiago': ['CLP', 925, 'es-CL'],
+    'Europe/Madrid': ['EUR', 0.9, 'es-ES'],
+    'Atlantic/Canary': ['EUR', 0.9, 'es-ES'],
+  };
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const hit = TZ_CURRENCY[tz];
+    if (hit) {
+      const [currency, rate, locale] = hit;
+      document.querySelectorAll<HTMLElement>('[data-usd]').forEach((el) => {
+        const usdVal = Number(el.dataset.usd);
+        if (!usdVal) return;
+        const local = new Intl.NumberFormat(locale, {
+          style: 'currency',
+          currency,
+          maximumFractionDigits: 0,
+        }).format(usdVal * rate);
+        const prefix = el.dataset.prefix ? `${el.dataset.prefix} ` : '';
+        el.textContent = `≈ ${prefix}${local} ${currency} aprox.`;
+      });
+    }
+  } catch { /* sin hint — la página funciona igual en USD */ }
+
+  /* ── Checker GEO v2: análisis técnico REAL en /api/geo-check ─────
+     v1 mandaba la URL a WhatsApp sin analizar nada — el input con botón
+     parecía una herramienta y no lo era (William 2026-08-05). Ahora el
+     endpoint descarga el sitio y corre checks verificables (robots.txt vs
+     bots de IA, schema, headings, sitemap…) y devuelve un score con las 3
+     prioridades. El contacto por WhatsApp queda DESPUÉS del resultado, ya
+     con el diagnóstico en la mano. */
+  const form = document.querySelector<HTMLFormElement>('[data-geo-checker]');
+  const waBase = document.querySelector<HTMLElement>('[data-wa-base]')?.dataset.waBase;
+  const out = document.querySelector<HTMLElement>('[data-geo-result]');
+
+  if (form && out) {
+    const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const btnHtml = btn?.innerHTML ?? '';
+    const esc = (s: string) =>
+      s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const input = form.querySelector<HTMLInputElement>('input[name="siteurl"]');
+      const url = input?.value.trim();
+      if (!url) return;
+
+      if (btn) { btn.disabled = true; btn.textContent = form.dataset.loadingLabel || 'Analizando…'; }
+      out.hidden = false;
+      out.innerHTML = `<p class="geo-result__loading">${esc(form.dataset.loadingLabel || 'Analizando…')}</p>`;
+
+      try {
+        const res = await fetch('/api/geo-check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+        });
+        const data = await res.json();
+
+        if (!data.ok) {
+          const waMsg = `${form.dataset.waMessage ?? ''} ${url}`;
+          const waLink = waBase
+            ? `${waBase}?text=${encodeURIComponent(waMsg)}`
+            : `mailto:info@scuart.com?subject=${encodeURIComponent('Chequeo GEO')}&body=${encodeURIComponent(waMsg)}`;
+          out.innerHTML =
+            `<p class="geo-result__error">${esc(data.message || 'No pudimos analizar ese sitio.')}</p>` +
+            `<a class="geo-cta" href="${waLink}" target="_blank" rel="noopener noreferrer">${esc(form.dataset.waCta || 'Escribinos y lo vemos a mano')} <span aria-hidden="true">↗</span></a>`;
+          return;
+        }
+
+        const nivel = data.score >= 80 ? 'alto' : data.score >= 55 ? 'medio' : 'bajo';
+        const items = data.checks
+          .map(
+            (c: { pass: boolean; label: string; detail: string }) =>
+              `<li class="geo-result__item" data-pass="${c.pass}">
+                 <span class="geo-result__icon" aria-hidden="true">${c.pass ? '✓' : '✕'}</span>
+                 <span><strong>${esc(c.label)}</strong><br><span class="geo-result__detail">${esc(c.detail)}</span></span>
+               </li>`,
+          )
+          .join('');
+
+        const prios = data.prioridades.length
+          ? `<div class="geo-result__prio">
+               <p class="geo-result__prio-label">${esc(form.dataset.prioLabel || 'Lo que movería la aguja primero')}</p>
+               <ol>${data.prioridades.map((p: { label: string }) => `<li>${esc(p.label)}</li>`).join('')}</ol>
+             </div>`
+          : '';
+
+        const waMsg = `${form.dataset.waMessage ?? ''} ${data.url} (score ${data.score}/100)`;
+        const waLink = waBase
+          ? `${waBase}?text=${encodeURIComponent(waMsg)}`
+          : `mailto:info@scuart.com?subject=${encodeURIComponent('Chequeo GEO')}&body=${encodeURIComponent(waMsg)}`;
+
+        out.innerHTML =
+          `<div class="geo-result__head">
+             <span class="geo-result__score" data-nivel="${nivel}"><span data-score-num>0</span><span class="geo-result__score-max">/100</span></span>
+             <p class="geo-result__host">${esc(data.host)}</p>
+           </div>
+           <ul class="geo-result__list">${items}</ul>
+           ${prios}
+           <a class="geo-cta" href="${waLink}" target="_blank" rel="noopener noreferrer">${esc(form.dataset.waCta || 'Hablemos del resto')} <span aria-hidden="true">↗</span></a>`;
+
+        /* Stagger: cada elemento recibe su índice; el CSS lo convierte en delay.
+           Los checks entran en secuencia, después las prioridades, después el CTA. */
+        const animables = out.querySelectorAll<HTMLElement>('.geo-result__item, .geo-result__prio, .geo-cta');
+        animables.forEach((el, i) => el.style.setProperty('--i', String(i)));
+
+        /* Conteo del score 0 → valor. Da la sensación de "medición" en curso.
+           Se salta si el visitante pidió menos movimiento. */
+        const numEl = out.querySelector<HTMLElement>('[data-score-num]');
+        const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (numEl && !quieto && data.score > 0) {
+          const dur = 900;
+          const t0 = performance.now();
+          const tick = (t: number) => {
+            const p = Math.min(1, (t - t0) / dur);
+            /* easeOutExpo — arranca rápido y frena, como un contador real */
+            const e = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+            numEl.textContent = String(Math.round(data.score * e));
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        } else if (numEl) {
+          numEl.textContent = String(data.score);
+        }
+
+        out.setAttribute('tabindex', '-1');
+        out.focus({ preventScroll: true });
+      } catch {
+        out.innerHTML = `<p class="geo-result__error">${esc(form.dataset.errorLabel || 'Algo falló. Probá de nuevo o escribinos.')}</p>`;
+      } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = btnHtml; }
+      }
+    });
+  }
+</script>

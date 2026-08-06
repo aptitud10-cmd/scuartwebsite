@@ -46,6 +46,9 @@ export const es: Translations = {
    */
   manifesto: {
     kicker: "N°·01 / MANIFESTO",
+    /* Frase de marca original — vende el reposicionamiento (no vendemos webs,
+       vendemos resultado de negocio). El hero ahora dice "DISEÑO + TECNOLOGÍA",
+       así que ya no colisiona con esta línea (2026-08-04). */
     line1: "No hacemos webs.",
     line2a: "Construimos ",
     line2red: "ventajas competitivas.",
@@ -58,11 +61,11 @@ export const es: Translations = {
     kicker: "SCUART — ESTUDIO",
     body: "Diseño y tecnología que trabajan juntos, no por separado.",
     noteLeft: "ESTUDIO INDEPENDIENTE · BILINGÜE · LATAM + USA",
-    noteRight: "Un solo equipo, de la idea al deploy.",
+    noteRight: "Un solo equipo, de principio a fin.",
     ariaLabel: "Diseño y tecnología que trabajan juntos, no por separado.",
   },
 
-  /* ── Servicios — kicker (los 6 items viven en capabilities.items) ── */
+  /* ── Servicios — kicker (los 7 items viven en capabilities.items) ── */
   servicesKicker: "SERVICIOS",
 
   /* ── Studio — Sección fusionada (capabilities + method) ── */
@@ -89,33 +92,41 @@ export const es: Translations = {
       },
       {
         num: "02",
+        name: "AI VISIBILITY · GEO",
+        statement: "",
+        resolves:
+          "Tus clientes ya le preguntan a ChatGPT. Auditamos qué dice la IA de tu negocio y hacemos que te recomiende.",
+        href: "/es/servicios/ai-visibility",
+      },
+      {
+        num: "03",
         name: "SAAS + SYSTEMS",
         statement: "",
         resolves:
           "Productos completos — login, pagos, paneles, APIs. De cero a producción.",
       },
       {
-        num: "03",
+        num: "04",
         name: "AI AUTOMATION",
         statement: "",
         resolves:
           "Automatizamos lo repetitivo para que el equipo se enfoque en lo que importa.",
       },
       {
-        num: "04",
+        num: "05",
         name: "E-COMMERCE",
         statement: "",
         resolves:
           "Tiendas hechas para vender — checkout rápido, inventario, listas para crecer.",
       },
       {
-        num: "05",
+        num: "06",
         name: "ORDERING · BOOKING · WORKFLOWS",
         statement: "",
         resolves: "Pedidos, reservas y operación sin el desorden manual.",
       },
       {
-        num: "06",
+        num: "07",
         name: "BRAND IDENTITY",
         statement: "",
         resolves:
@@ -189,6 +200,7 @@ export const es: Translations = {
     indexLabel: "TRABAJAMOS CON:",
     capabilities: [
       "WEB PLATFORMS",
+      "AI VISIBILITY",
       "SAAS + SYSTEMS",
       "AI AUTOMATION",
       "E-COMMERCE",

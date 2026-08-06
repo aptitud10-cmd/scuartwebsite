@@ -34,7 +34,15 @@
   src:
     url("/fonts/ppeditorialnew-light.woff2") format("woff2"),
     url("/fonts/ppeditorialnew-light.woff") format("woff");
-  font-weight: 300 400; /* el archivo es Light; cubrimos 300-400 para los usos display */
+  /* RANGO COMPLETO 100-900, no "300 400" (fix iOS 2026-08-05).
+     El archivo es UN solo peso (Light). Declarar un rango angosto hace que
+     cualquier font-weight fuera de él quede SIN match — y el sitio pide 100
+     (2 usos), 200 (.pf-name del portfolio) y 500 (--display-weight-heavy:
+     nombres de proyecto y numerales). Chrome tolera el desajuste y sintetiza;
+     Safari iOS es estricto y cae a la serif del sistema: por eso en el iPhone
+     los titulares se veían "ordinarios" mientras en desktop se veían bien.
+     Con 100-900 el mismo archivo atiende todos los pesos que el sitio pide. */
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }

@@ -130,8 +130,8 @@ const resolvedOgDesc = ogDescription ?? description;
     <meta name="twitter:description" content={resolvedOgDesc} />
     <meta name="twitter:image" content={resolvedOgImage} />
 
-    <!-- Browser theme — V3: hueso como color de tema (el hero arranca claro) -->
-    <meta name="theme-color" content="#F0E9DC" />
+    <!-- Browser theme — crema como color de tema (el hero arranca claro) -->
+    <meta name="theme-color" content="#f4f2ec" />
 
     <title>{title}</title>
 
@@ -185,7 +185,9 @@ const resolvedOgDesc = ogDescription ?? description;
       /*
        * Skip-link: visible solo cuando recibe foco (usuarios de teclado/screen reader).
        * Oculto visualmente con translate negativo (no display:none — accesible al foco).
-       * V3: fondo barro-oscuro, texto hueso, mono uppercase, borde terracota.
+       * Fondo tinta (--ink), texto crema (--bg), borde/outline lima (--brand) —
+       * mismo patrón que el resto de los CTAs invertidos del sitio.
+       * Contraste verificado: bg-sobre-ink 16.6:1, brand-sobre-ink 14.3:1 (AAA).
        */
       .skip-link {
         position: absolute;
@@ -194,21 +196,21 @@ const resolvedOgDesc = ogDescription ?? description;
         transform: translateY(-100%);
         z-index: 9999;
         padding: 0.75rem 1.25rem;
-        background-color: #241710; /* --barro-oscuro */
-        color: #F0E9DC; /* --hueso */
+        background-color: var(--ink);
+        color: var(--bg);
         font-family: 'Hanken Grotesk', sans-serif;
         font-size: 0.75rem;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.1em;
         text-decoration: none;
-        border-bottom: 1px solid #A4471F; /* --terracota */
+        border-bottom: 1px solid var(--brand);
         transition: transform 0.15s ease;
       }
 
       .skip-link:focus {
         transform: translateY(0);
-        outline: 2px solid #A4471F; /* --terracota */
+        outline: 2px solid var(--brand);
         outline-offset: 2px;
       }
     </style>
@@ -217,7 +219,7 @@ const resolvedOgDesc = ogDescription ?? description;
     <!--
       B5 FIX: skip-link para usuarios de teclado.
       Visible solo al recibir foco (posición absoluta fuera de pantalla por defecto,
-      entra al viewport en :focus). Fondo --carbon, texto --crema, mono — coherente
+      entra al viewport en :focus). Fondo --ink, texto --bg, mono — coherente
       con la identidad del sitio. z-index sobre todo el contenido incluyendo el nav.
     -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -256,7 +258,42 @@ const resolvedOgDesc = ogDescription ?? description;
          (body-scroll-container). Conflicto crítico: Lenis asume window como
          scroller, pero en mobile el scroller es document.body (directiva iOS).
          Research 4.2: Estrategia A recomendada. */
-      const isMobile = window.matchMedia('(max-width: 768px)').matches;
+      /* 767px, NO 768px (unificado 2026-08-06 junto a global.css y tokens.css).
+         Este valor DEBE coincidir exactamente con el media query que mueve el
+         scroller al <body> en global.css. Si acá dijera 768 y allá 767, en un
+         viewport de exactamente 768px el scroller sería `window` pero este
+         código escucharía `document.body` — un listener sobre un elemento que
+         no scrollea, y encima saltearía Lenis. Mobile = ≤767px en todo el sitio. */
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+
+      /* ═══════════════════════════════════════════════════════════════
+         MOBILE: avisarle a ScrollTrigger que el scroll ocurrió.
+
+         MEDIDO EN IPHONE REAL (página /es/diag, 2026-08-05) — no supuesto:
+           scroller real   BODY
+           window.scrollY  0      ← window NUNCA se mueve
+           body.scrollTop  1103
+           ev. window      0      ← window NO recibe un solo evento
+           ev. body        541
+         global.css mueve el scroll del root al <body> en ≤768px (directiva
+         iOS de CLAUDE.md). ScrollTrigger escucha `window`, que ahí está
+         muerto: sus triggers nunca se actualizan y toda animación por scroll
+         queda congelada. Chrome DevTools en modo mobile NO reproduce esto
+         (sigue scrolleando window), por eso el bug solo se ve en el iPhone.
+
+         EL FIX ES ESTE LISTENER, nada más. Con él, el mismo test dio
+         ST progress 0.68 y la opacidad subió de 0.08 a 0.71.
+
+         NO agregar acá scrollerProxy() ni ScrollTrigger.defaults({scroller}):
+         se intentó el 2026-08-05 y rompió TODAS las animaciones en Safari iOS
+         — `scroller` no es opción válida de defaults() (se ignora, dejando los
+         triggers apuntando a window mientras el proxy declara otro scroller),
+         y este script no tiene orden garantizado frente a los <script> de cada
+         componente, que ya crearon sus triggers antes.
+         ═══════════════════════════════════════════════════════════════ */
+      if (isMobile) {
+        document.body.addEventListener('scroll', () => ScrollTrigger.update(), { passive: true });
+      }
 
       if (!reducedMotion && !isMobile) {
         const lenis = new Lenis({

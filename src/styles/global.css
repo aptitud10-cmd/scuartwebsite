@@ -1,6 +1,6 @@
 /**
  * global.css — Reset, base y grain
- * B1 "Arquitecto" claro: yeso + tinta + único acento verde (ART_DIRECTION.md §2-§3)
+ * Sistema claro: crema + tinta + único acento lima (ART_DIRECTION.md §2-§3)
  */
 
 @import "./fonts.css";
@@ -28,7 +28,7 @@ html {
 }
 
 body {
-  /* B1: yeso + tinta. El sitio es claro en todas las secciones. */
+  /* Crema + tinta. El sitio es claro en todas las secciones. */
   background-color: var(--bg);
   color: var(--ink);
   font-family: var(--font-body);
@@ -45,7 +45,15 @@ body {
  * SOLUCIÓN: mover el scroller del root al <body> en mobile.
  * Solo en ≤768px: en desktop el scroll sigue en window (Lenis lo necesita).
  * ─────────────────────────────────────────────────────────────────── */
-@media (max-width: 768px) {
+/* 767px, no 768px (unificado 2026-08-06). Antes este bloque usaba 768px
+   INCLUSIVE mientras tokens.css usa ≤767px: en un viewport de exactamente
+   768px el scroller se movía al <body> pero los tokens mobile NO aplicaban.
+   Ese ancho es el de un iPad en portrait — el caso más común de tablet.
+   OJO: el listener de ScrollTrigger en Layout.astro usa max-width:768px;
+   ese SÍ debe seguir cubriendo 768px o el scroll del body quedaría sin
+   avisarle a ScrollTrigger en ese ancho exacto. Son dos condiciones
+   distintas a propósito: el listener es defensivo, los tokens son diseño. */
+@media (max-width: 767px) {
   html {
     height: 100%;
     overflow-y: hidden; /* el html ya NO scrollea en mobile */
@@ -59,13 +67,12 @@ body {
   }
 }
 
-/* ── GRAIN — grano sutil sobre yeso ────────────────────────────────
+/* ── GRAIN — grano sutil sobre crema ───────────────────────────────
  * Material, no efecto. Anti "div de color plano" (R1 anti-slop).
- * Opacidad 0.03: muchísimo más sutil que la dirección terracota anterior.
- * El yeso B1 es "papel técnico liso", no papel prensado — el grano
- * solo evita que #F5F4F0 se lea como un div vacío en pantallas grandes.
+ * Opacidad 0.03: muy sutil.
+ * El crema del sistema es "papel técnico liso", no papel prensado — el grano
+ * solo evita que --bg se lea como un div vacío en pantallas grandes.
  * SIN drift/animación (el grano es textura de papel, no screensaver).
- * SIN capa ambar de calor (esa capa era para el mood gastronómico descartado).
  * ─────────────────────────────────────────────────────────────────── */
 body::after {
   content: "";
@@ -82,8 +89,8 @@ body::after {
 
 /* ── Tipografía base ─────────────────────────────────────────────── */
 /*
- * Fraunces display: solo en momentos de máxima jerarquía.
- * Geist Sans body: todo lo demás.
+ * PP Editorial New (display): solo en momentos de máxima jerarquía.
+ * Geist Sans (body): todo lo demás.
  * Contraste extremo de escala — la brecha es el diseño.
  */
 h1,
@@ -122,7 +129,7 @@ video {
 .line-mask {
   display: block;
   overflow: hidden;
-  /* padding-bottom preserva los descenders de Fraunces con leading 1.02 */
+  /* padding-bottom preserva los descenders de PP Editorial New con leading apretado */
   padding-bottom: 0.08em;
   margin-bottom: -0.08em;
 }
@@ -143,7 +150,7 @@ video {
 
 /* ── Selección ───────────────────────────────────────────────────── */
 ::selection {
-  /* V4: selección lima sobre el negro del cuerpo */
+  /* Selección lima — único acento cromático del sistema */
   background-color: var(--brand);
   color: var(--on-brand);
 }

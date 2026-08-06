@@ -206,8 +206,8 @@ const EMAIL = 'info@scuart.com';
 
 .foot__tagline {
   font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(2.25rem, 6vw, 5rem);
+  font-weight: var(--display-weight-light);
+  font-size: var(--text-h2);
   line-height: 1.02;
   letter-spacing: -0.02em;
   color: var(--ink);
@@ -235,11 +235,50 @@ const EMAIL = 'info@scuart.com';
   color: var(--ink-62); /* --ink-42 daba 2.7:1 — AA pide 4.5:1 (QA 2026-07-21) */
 }
 
-@media (max-width: 640px) {
+/* ═══════════════════════════════════════════════════════════
+   MOBILE (≤767px) — Fase 4 del rediseño mobile (2026-08-06).
+   Antes: UNA sola regla (el colapso genérico de flex a columna).
+   Breakpoint unificado a 767px (antes 640px) — ver tokens.css §escala mobile.
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
   .foot__row {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-s);
+  }
+
+  /* max-width en ch NO aplica en mobile: 38ch (descriptor) y 18ch (tagline)
+     son más anchos que los 327px útiles, así que nunca limitan nada — pero
+     el 18ch del tagline SÍ fuerza quiebres cerrados cuando la tipografía
+     sube a 38px con la escala mobile. Quitarlos deja que el ancho real de
+     la pantalla decida el quiebre. */
+  .foot__descriptor,
+  .foot__tagline {
+    max-width: none;
+  }
+
+  /* Los links del pie son destinos táctiles: 44px de alto mínimo. Estaban
+     como <a> inline sin padding, igual que el toggle de idioma del nav. */
+  .foot__nav a,
+  .foot__link--small {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  /* El nav del pie en columna: en fila, con 44px de alto cada link, los
+     tres quedaban apretados contra el borde derecho. */
+  .foot__nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  /* Menos aire entre capas: el clamp(1.25rem, 3vh, 2rem) de padding-block
+     por CADA una de las 4 filas sumaba ~130px en una sección que ya ocupa
+     0.71 pantallas. */
+  .foot__row {
+    padding-block: var(--space-s);
   }
 }
 

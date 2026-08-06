@@ -110,8 +110,8 @@ const steps: MethodStep[] = t.method.steps;
 
 .stu-step__num {
   font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(3rem, 12vw, 5rem);
+  font-weight: var(--display-weight-light);
+  font-size: var(--text-display-watermark);
   line-height: 0.9;
   letter-spacing: -0.03em;
   color: var(--ink-62);
@@ -120,8 +120,8 @@ const steps: MethodStep[] = t.method.steps;
 
 .stu-step__verb {
   font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(2rem, 5vw, 3.25rem);
+  font-weight: var(--display-weight-light);
+  font-size: var(--text-names);
   line-height: 1.0;
   letter-spacing: -0.025em;
   color: var(--ink);
@@ -202,7 +202,7 @@ const steps: MethodStep[] = t.method.steps;
   .stu-step:first-child { border-left: none; padding-left: 0; }
 
   .stu-step__num {
-    font-size: clamp(8rem, 15vw, 15rem);
+    /* font-size lo da el token base */
     line-height: 0.72;
     color: rgba(20, 19, 15, 0.14);
     /* el numeral gigante como marca de agua del paso */
@@ -210,7 +210,7 @@ const steps: MethodStep[] = t.method.steps;
   }
 
   .stu-step__verb {
-    font-size: clamp(2.5rem, 3.4vw, 4rem);
+    /* font-size lo da el token base */
     margin-top: 0;
   }
 

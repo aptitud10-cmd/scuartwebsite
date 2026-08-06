@@ -1,14 +1,14 @@
 /**
  * tokens.css — Sistema de design tokens
  *
- * SISTEMA V4 "RESTRINGIDO" — un solo color + negro/hueso
+ * SISTEMA ACTUAL — un solo color de marca + crema/tinta
  * (ART_DIRECTION_V4_RESTRINGIDO.md, aprobado William 2026-06-17)
  */
 
 :root {
   /* ══════════════════════════════════════════════════════════════
-     SISTEMA V4 "RESTRINGIDO" — un solo color + negro/hueso
-     Cuerpo OSCURO de punta a punta. UN color de marca (--brand) usado
+     SISTEMA ACTUAL — un solo color de marca + crema/tinta
+     Cuerpo CLARO de punta a punta. UN color de marca (--brand) usado
      como bisturí (<8% superficie): CTA, hover, underline, foco, numeral
      activo, glifo *. NUNCA fondo de sección. Énfasis = itálica, no color.
      El blend mix-difference vive SOLO en el hero (sobre el video).
@@ -17,16 +17,16 @@
   /* EL color de marca — Volt lima ácido. TOKEN AISLADO para afinar en vivo. */
   --brand: #c6f24e;
   --brand-press: #b2dd3e; /* hover/pressed del CTA — ~10% más oscuro */
-  --on-brand: #0e0e0c; /* texto sobre relleno --brand (= el negro del fondo) */
+  --on-brand: #0e0e0c; /* texto sobre relleno --brand (= el negro del fondo del CTA/botón) */
 
   /* Acento de TEXTO (glifos, numeral activo, ®, itálica de énfasis).
-     Sobre blanco el lima no contrasta → acento en tinta, como Locomotive.
-     Para volver a NEGRO: cambiar a var(--brand) (el lima sí contrasta sobre negro). */
+     Sobre el crema del cuerpo el lima no contrasta lo suficiente → acento en
+     tinta, como Locomotive. El lima sí se usa como acento de texto en los
+     momentos oscuros del sitio (ej. sobre --ink en el hero). */
   --accent-text: var(--ink);
 
-  /* Fondo y tinta del cuerpo — PRUEBA BLANCO (como Locomotive)
-     Para volver a negro: --bg #0e0e0c, --ink #f2efe9, transparencias rgba(242,239,233,..) */
-  --bg: #f4f2ec; /* hueso claro — fondo del cuerpo. NUNCA #fff puro */
+  /* Fondo y tinta del cuerpo — sistema claro (como Locomotive) */
+  --bg: #f4f2ec; /* crema claro — fondo del cuerpo. NUNCA #fff puro */
   --surface: #ece9e1; /* elevación sutilísima */
   --canvas-arena: #dcd6c8; /* arena cálida — lienzo de screenshots en páginas de caso.
                               Más profundo que --surface para que la pieza flote sobre --bg
@@ -62,36 +62,50 @@
   --font-display: "PP Editorial New", "Fraunces Variable", serif;
   --font-body: "Geist Sans", sans-serif;
 
-  /* Pesos display */
-  --display-weight-light: 300; /* titulares gigantes — peso bajo = elegante en grande */
-  --display-weight-normal: 400; /* itálica de acento, H3/nombres portfolio */
-  --display-weight-heavy: 500; /* nombres de proyecto, numerales de sección */
+  /* Pesos display — PP Editorial New solo trae cortes reales 200/300/400.
+     500 NO existe en el archivo → nunca usarlo en display (sintetiza bold falso). */
+  --display-weight-hairline: 200; /* nombres de proyecto/caso gigantes — extra-fino, elegante a gran tamaño */
+  --display-weight-light: 300; /* titulares y statements — peso base del display */
+  --display-weight-normal: 400; /* itálica de acento */
+  --display-weight-heavy: 500; /* LEGADO: no usar en --font-display (fuera del archivo); solo mono/body si hiciera falta */
 
   /* Tracking y leading display */
   --display-tracking: -0.025em; /* titulares grandes casi tocándose en horizontal */
   --display-leading: 1.02; /* editorial apretado, no interlineado de cuerpo */
 
   /* ══════════════════════════════════════════════════════════════
-     ESCALA TIPOGRÁFICA FLUIDA
-     Mobile-first: mínimo en 375px, máximo en 1440px+.
+     ESCALA TIPOGRÁFICA FLUIDA — 7 niveles display + cuerpo/UI.
+     Los rangos reflejan la JERARQUÍA REAL del sitio (calibrados sobre los
+     tamaños que ya usaban las secciones), para unificar SIN encoger nada.
+     Cada nivel tiene UN rol claro. Toda sección display mapea a uno de estos.
+     Mobile-first: mínimo en 375px, máximo en ~1440px+.
      ══════════════════════════════════════════════════════════════ */
 
-  /* Display XXL — Hero H1, Manifiesto */
-  --text-h1: clamp(3rem, 9vw, 9rem); /* 48px → ~144px */
-  /* Display XL — H2 de sección */
-  --text-h2: clamp(2.25rem, 5.5vw, 5rem); /* 36px → 80px */
-  /* Display L — H3, nombre de proyecto */
-  --text-names: clamp(1.75rem, 3.5vw, 3rem); /* 28px → 48px */
+  /* NIVEL 1 — Watermark/numeral gigante (404 "404", numeral de paso Studio).
+     Es el nivel decorativo más grande; puede exceder el viewport a propósito. */
+  --text-display-watermark: clamp(6rem, 18vw, 15rem);
+  /* NIVEL 2 — Nombre de proyecto/caso (Portfolio, hero de caso). El protagonista
+     más grande del contenido real. Peso hairline (200). */
+  --text-display-name: clamp(3.5rem, 11vw, 11rem);
+  /* NIVEL 3 — Hero H1 / Manifiesto / clímax de contacto (statements principales). */
+  --text-h1: clamp(1.9rem, 7.5vw, 8.5rem);
+  /* NIVEL 4 — Email/CTA de contacto (grande pero por debajo del H1 del hero). */
+  --text-cta: clamp(2.5rem, 7.5vw, 6.5rem);
+  /* NIVEL 5 — Statement de sección (Statement dark, footer tagline). */
+  --text-h2: clamp(2.25rem, 5.6vw, 6rem);
+  /* NIVEL 6 — Nombre de servicio / verbo de paso / statement de contacto. */
+  --text-names: clamp(1.9rem, 4vw, 4rem);
+  /* NIVEL 7 — Título de bloque / label display chico. */
+  --text-h3: clamp(1.75rem, 4vw, 3rem);
+
   /* Lead/subhead */
   --text-subhead: clamp(1.125rem, 1.6vw, 1.375rem); /* 18px → 22px */
   /* Body */
   --text-body: clamp(1rem, 1.1vw, 1.0625rem); /* 16px → 17px */
   /* Índice mono / metadatos */
   --text-mono: clamp(0.6875rem, 0.3vw + 0.6rem, 0.8125rem); /* 11px → 13px */
-  /* CTA contact */
-  --text-cta: clamp(2.5rem, 10vw, 8rem);
-  /* Statement clímax de contacto — 1 línea siempre (white-space:nowrap, verificado 375px) */
-  --text-empecemos: clamp(2.75rem, 8vw, 9rem);
+  /* Statement clímax de contacto — alias de h1 para 1 línea (nowrap verificado 375px) */
+  --text-empecemos: var(--text-h1);
 
   /* ══════════════════════════════════════════════════════════════
      SPACING FLUIDO (8-base)
@@ -114,4 +128,119 @@
     5vw,
     7rem
   ); /* márgenes amplios — el contenido NO llega al borde */
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ESCALA MOBILE PROPIA (≤767px) — William 2026-08-06
+   ══════════════════════════════════════════════════════════════════════
+
+   POR QUÉ EXISTE ESTE BLOQUE:
+   Los tokens de arriba son un único clamp() continuo cada uno, de 375px a
+   1440px+. Auditoría 2026-08-06: en 375px NINGÚN token recibe un número
+   decidido para mobile — recibe el piso de una curva calibrada mirando
+   desktop. Peor: en --text-h1, --text-cta y --space-2xl el término vw cae
+   POR DEBAJO del mínimo en 375px, o sea que en mobile el clamp ni siquiera
+   escala: queda topado en un piso elegido como "lo más chico tolerable" al
+   comprimir desktop. Eso es exactamente lo que William reportó — "puro
+   desktop responsivo a móvil".
+
+   Los síntomas confirmados en el código eran defensas contra esto:
+     ManifestoSection.astro:160  overflow-wrap:anywhere  "anti-overflow mobile"
+     ManifestoSection.astro:84   min-height:42svh        (77% de aire muerto)
+     StatementSection.astro:180  min-height:auto         (medio viewport negro)
+   Tres parches para tapar que la escala no era mobile.
+
+   CRITERIO DE LOS VALORES (referencia: iPhone 375×812, 335px útiles):
+     - ESPACIO: baja fuerte. 96px de separación entre secciones es el 12% del
+       alto visible de un iPhone — ritmo de desktop. En mobile el aire se mide
+       contra la pantalla, no contra el ancho.
+     - DISPLAY GIGANTE (watermark, name): baja. 56px de nombre de proyecto en
+       335px útiles obliga quiebres feos; el gesto "gigante" no traduce.
+     - H1 / STATEMENT: SUBE. Es lo único que sube. El titular debe dominar la
+       pantalla — a 30px competía con el subhead de 18px (ratio 1.7:1, plano).
+       A 44px el ratio es 2.4:1 y hay jerarquía real.
+     - CUERPO: intacto. 16px es correcto y accesible; no se toca.
+
+   Desktop y tablet NO se ven afectados: este bloque solo aplica ≤767px.
+   ══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  :root {
+    /* ── TIPOGRAFÍA — valores fijos, no clamps ──────────────────────
+       Fijos a propósito: entre 375px y 767px el ancho útil cambia poco
+       (335px → 727px) y un clamp acá solo reintroduce la escala continua
+       que causó el problema. Los pocos que sí ganan con escalar (h1,
+       statement) llevan un clamp ACOTADO a ese rango, no a 1440px. */
+
+    /* NIVEL 1 — watermark. 96px→68px: a 96px se comía el ancho completo
+       y forzaba overflow-x:clip como defensa. Sigue siendo decorativo
+       y dominante, pero cabe. */
+    --text-display-watermark: clamp(
+      4.25rem,
+      16vw,
+      6.5rem
+    ); /* 68px@375 → 104px@767 */
+
+    /* NIVEL 2 — nombre de proyecto (Portfolio). 56px→42px. En 335px
+       útiles, "ETNIA BRAIDS" a 56px con tracking -0.025em quiebra en dos
+       líneas apretadas. A 42px entra limpio y el nombre sigue siendo el
+       elemento más grande de su fila. */
+    --text-display-name: clamp(
+      2.625rem,
+      10vw,
+      4.5rem
+    ); /* 42px@375 → 72px@767 */
+
+    /* NIVEL 3 — H1 / Manifiesto / clímax. 30.4px→44px. EL ÚNICO QUE SUBE.
+       El visual-critic ya había marcado el titular como "chico, tímido" en
+       375px y HeroSection.astro:315 lo parchó con un override local
+       (piso 54px) SOLO para el hero. Con el token arreglado, Manifiesto y
+       Statement heredan la misma corrección sin parche propio. */
+    --text-h1: clamp(2.75rem, 11.5vw, 5.5rem); /* 44px@375 → 88px@767 */
+
+    /* NIVEL 4 — email/CTA de contacto. 40px→34px. ContactSection.astro:344
+       ya lo bajaba a mano a 35.6px con un clamp propio porque el email
+       desbordaba. Se corrige en el token; ese override queda redundante. */
+    --text-cta: clamp(2.125rem, 8vw, 3.5rem); /* 34px@375 → 56px@767 */
+
+    /* NIVEL 5 — statement de sección (dark, footer). 36px→38px.
+       Sube apenas: es el segundo nivel de jerarquía y a 36px quedaba
+       demasiado cerca del H1 corregido. */
+    --text-h2: clamp(2.375rem, 9vw, 4rem); /* 38px@375 → 64px@767 */
+
+    /* NIVEL 6 — nombre de servicio. 30.4px→28px. Baja un punto: son 6 filas
+       apiladas; a 30px la lista de servicios ocupaba casi dos pantallas. */
+    --text-names: clamp(1.75rem, 6.5vw, 2.5rem); /* 28px@375 → 47px@767 */
+
+    /* NIVEL 7 — título de bloque. 28px→24px, misma razón que el anterior. */
+    --text-h3: clamp(1.5rem, 5.5vw, 2rem); /* 24px@375 → 40px@767 */
+
+    /* Subhead 18px→17px: a 18px competía con el H1. El contraste de escala
+       es el diseño; bajarlo un punto abre la brecha. */
+    --text-subhead: 1.0625rem;
+
+    /* Body 16px y mono 11px SIN CAMBIO — son correctos y accesibles.
+       (--text-body y --text-mono se heredan del :root de arriba.) */
+
+    /* ── ESPACIO — el cambio más grande ─────────────────────────────
+       Todos bajan. En mobile el aire se mide contra el ALTO de pantalla
+       (812px), no contra el ancho. Un ritmo de desktop escalado por vw
+       deja huecos que se leen como secciones vacías. */
+    --space-2xs: 0.25rem; /* 4px  — sin cambio real */
+    --space-xs: 0.5rem; /* 8px  — sin cambio real */
+    --space-s: 0.875rem; /* 16px → 14px */
+    --space-m: 1.25rem; /* 24px → 20px */
+    --space-l: 1.75rem; /* 32px → 28px */
+    --space-xl: 2.5rem; /* 48px → 40px */
+    --space-2xl: 3rem; /* 64px → 48px */
+    --space-3xl: 3.5rem; /* 96px → 56px — el más agresivo: 96px era el 12%
+                             del alto de un iPhone SOLO de separación */
+
+    /* ── MARGEN LATERAL ─────────────────────────────────────────────
+       20px→24px. SUBE, contra la tendencia del resto. A 20px el contenido
+       queda incómodamente cerca del borde en un teléfono en la mano, y en
+       un iPhone con esquinas redondeadas se lee apretado. 24px es el
+       margen editorial estándar de mobile. */
+    --margin: 1.5rem; /* 24px */
+    --gutter: 1rem; /* 16px */
+  }
 }

@@ -1,26 +1,29 @@
 ---
 /**
- * ServicesSection.astro — Los 6 servicios de SCUART. REDISEÑO 2026-07-26 (v2).
+ * ServicesSection.astro — Los 7 servicios de SCUART.
+ * REDISEÑO 2026-08-04 (v4): lista tipográfica pura, SIN imágenes.
  *
- * PROBLEMA: "larguero de texto sin movimiento ni wow". Rechazado: agrandar
- * tipografía; numerales gigantes estáticos en zig-zag.
+ * POR QUÉ SE SACARON LAS IMÁGENES (decisión William 2026-08-04):
+ * Los "diagramas isométricos" eran mockups de stock con lorem-ipsum inglés
+ * visible dentro ("Headline text sanding here", "Case study preview",
+ * "www.website.com"). Se veían como template/IA, no como pieza de SCUART.
+ * Ningún encuadre CSS arregla contenido de imagen genérico. Las agencias top
+ * resuelven servicios con TIPOGRAFÍA, no ilustración de stock. El drama lo hace
+ * el contraste tipográfico y el gesto de foco — como Monolog.
  *
- * SOLUCIÓN (DESIGN_RESEARCH_SERVICIOS_PROCESO_2026-07, mecánica #3 + #1):
- * PIN + HIGHLIGHT SECUENCIAL — patrón canónico de agencias premiadas 2026.
- * La lista se clava en pantalla; al scrollear, UN servicio se resalta por vez
- * (se agranda + acento lima + los otros se atenúan). El usuario controla el
- * avance con su propio scroll → deja de ser "6 textos que se leen de golpe".
- * Un numeral gigante muta en vivo (01→06) sincronizado con el servicio activo.
- *
- * ⚠️ DESKTOP-ONLY (≥1024px). Regla de William + advertencia del research:
- * el pin puede romper el body-scroll-container de iOS. TODO el motion nuevo se
- * registra SOLO dentro de ScrollTrigger.matchMedia('(min-width:1024px)').
- * Mobile/tablet (<1024px) = layout apilado simple con reveal por fila, IDÉNTICO
- * a lo que ya funcionaba. NO se toca.
+ * UN SOLO MARKUP, tres tratamientos por viewport (no reflow):
+ *   MOBILE <768px: lista vertical, nombre grande, descripción siempre visible,
+ *     hairlines, reveal por fila (IntersectionObserver).
+ *   TABLET 768-1279px: misma lista con más aire; descripción siempre visible.
+ *   DESKTOP ≥1280px: gesto Monolog — filas atenuadas, la que tiene el cursor
+ *     (o la primera por defecto) se resalta a tinta plena y expande su
+ *     descripción. Numeral que muta a un lado. Sin imagen: el foco lo lleva
+ *     el contraste activo/inactivo.
  *
  * COMPOSICIÓN (visual-composition):
- *   N1 — servicio activo (grande, lima). N2 — numeral gigante que muta.
- *   N3 — servicios inactivos (atenuados) + beneficio + kicker.
+ *   N1 — nombre del servicio en foco (serif display grande).
+ *   N2 — numeral + descripción del servicio en foco.
+ *   N3 — servicios inactivos atenuados (jerarquía por opacidad).
  */
 
 import type { Translations, CapabilityService } from '../i18n/en';
@@ -32,63 +35,63 @@ interface Props {
 const { t } = Astro.props;
 const kicker = t.servicesKicker;
 const items: CapabilityService[] = t.capabilities.items;
-
-/* Diagramas isométricos por servicio (generados, aprobados por William 2026-07-27).
-   Orden alineado a capabilities.items: 01 WEB · 02 SAAS · 03 AI · 04 ECOMMERCE ·
-   05 ORDERING · 06 BRAND. Cada uno SUGIERE su servicio (no abstracto). */
-const svcImages = [
-  '/images/servicios/web-platforms.webp',
-  '/images/servicios/saas.webp',
-  '/images/servicios/ai.webp',
-  '/images/servicios/ecommerce.webp',
-  '/images/servicios/ordering.webp',
-  '/images/servicios/brand.webp',
-];
 ---
 
 <section class="svc" id="services" aria-label={kicker} data-svc>
   <p class="svc__kicker">{kicker}</p>
 
-  <div class="svc__stage" data-svc-stage>
-    <!-- Panel visual: el diagrama del servicio activo (solo desktop, lo cruza el JS).
-         Se apilan las 6 imágenes; el JS muestra solo la del servicio en foco. -->
-    <div class="svc__visual" aria-hidden="true" data-svc-visual>
-      {items.map((item, i) => (
-        <img
-          class="svc__img"
-          src={svcImages[i]}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          data-svc-img
-          data-index={i}
-        />
-      ))}
+  <ol class="svc__list" data-svc-list>
+    <!-- Columna izquierda desktop (solo ≥1280px, CSS): numeral gigante que muta
+         con el foco + índice/contador que ancla el vacío inferior (fix critic
+         2026-08-04: la columna quedaba con un hueco muerto debajo del numeral). -->
+    <div class="svc__aside" aria-hidden="true">
       <span class="svc__bignum" data-svc-bignum>01</span>
+      <div class="svc__index">
+        <span class="svc__index-count" data-svc-index-count>01</span>
+        <span class="svc__index-sep">/</span>
+        <span class="svc__index-total">{String(items.length).padStart(2, '0')}</span>
+        <span class="svc__index-label">CAPACIDADES</span>
+      </div>
+      <!-- Nota de alcance — lenguaje propio del sitio (mismo "de principio a fin"
+           del hero/statement), teje el sistema SCUART en esta sección en vez de
+           dejar el gesto como calco de Monolog (critic 2026-08-04). -->
+      <p class="svc__scope">Un solo equipo.<br />De principio a fin.</p>
     </div>
-
-    <ol class="svc__list" data-svc-list>
-      {items.map((item, i) => (
-        <li class="svc__row" data-svc-row data-index={i}>
-          <span class="svc__num" aria-hidden="true">{item.num}</span>
-          <h2 class="svc__name">{item.name}</h2>
+    {items.map((item, i) => (
+      <li class="svc__row" data-svc-row data-index={i}>
+        <span class="svc__num" aria-hidden="true">{item.num}</span>
+        <div class="svc__body">
+          <h2 class="svc__name">
+            {item.href ? (
+              <a class="svc__link" href={item.href}>
+                {item.name} <span class="svc__arrow" aria-hidden="true">→</span>
+              </a>
+            ) : (
+              item.name
+            )}
+          </h2>
           <p class="svc__resolves">{item.resolves}</p>
-        </li>
-      ))}
-    </ol>
-  </div>
+        </div>
+      </li>
+    ))}
+  </ol>
 </section>
 
 <style>
   /* ═══════════════════════════════════════════════════════════
-     SERVICIOS — fondo crema.
-     BASE (mobile/tablet <1024px): lista apilada simple con reveal.
-     DESKTOP (≥1024px): pin + highlight secuencial + numeral que muta.
+     SERVICIOS — lista tipográfica, fondo crema.
+     BASE (mobile): descripción siempre visible, hairlines, aire generoso.
+     TABLET: más margen.
+     DESKTOP ≥1280px: gesto Monolog (atenuar + foco expande descripción).
      ═══════════════════════════════════════════════════════════ */
   .svc {
     background-color: var(--bg);
     padding: var(--space-2xl) var(--margin);
     overflow-x: clip;
+    /* Destino de #services (nav desktop y hamburguesa mobile). Sin esto el
+       kicker "SERVICIOS" quedaba tapado por el nav sticky al navegar.
+       Ligado al alto real del nav — clamp(64px, 9vh, 80px). */
+    scroll-margin-top: calc(clamp(64px, 9vh, 80px) + 8px);
   }
 
   .svc__kicker {
@@ -103,13 +106,6 @@ const svcImages = [
     border-bottom: 1px solid var(--hairline);
   }
 
-  .svc__stage { position: relative; }
-
-  /* ── Panel visual (mobile): oculto. En mobile mandan las filas de texto;
-     meter 6 diagramas grandes apilados haría un mega-larguero. Solo desktop. ── */
-  .svc__visual { display: none; }
-  .svc__bignum { display: none; }
-
   .svc__list {
     list-style: none;
     margin: 0;
@@ -118,336 +114,424 @@ const svcImages = [
     flex-direction: column;
   }
 
-  /* ─── FILA base (mobile/tablet) ─── */
+  /* Columna izquierda desktop: oculta por defecto (mobile/tablet). */
+  .svc__aside { display: none; }
+
+  /* ── Fila base (mobile) — numeral arriba, nombre, descripción ── */
   .svc__row {
     display: grid;
     grid-template-columns: auto 1fr;
-    grid-template-areas:
-      "num name"
-      ".   resolves";
     column-gap: var(--space-m);
-    row-gap: var(--space-2xs);
     align-items: baseline;
+    padding-block: var(--space-l);
     border-bottom: 1px solid var(--hairline);
-    padding-block: clamp(1.5rem, 3.5vh, 2.5rem);
+  }
+  .svc__row:first-child {
+    border-top: 1px solid var(--hairline);
   }
 
   .svc__num {
-    grid-area: num;
     font-family: var(--font-body);
     font-size: var(--text-mono);
     font-weight: 400;
     letter-spacing: 0.1em;
     color: var(--ink-62);
     font-variant-numeric: tabular-nums;
+    line-height: 1;
+    padding-top: 0.55em; /* alinea el numeral chico con la mayúscula del nombre */
+  }
+
+  .svc__body {
+    min-width: 0;
   }
 
   .svc__name {
-    grid-area: name;
     font-family: var(--font-display);
-    font-weight: 300;
-    font-size: clamp(1.9rem, 5vw, 2.75rem);
+    font-weight: var(--display-weight-light);
+    /* --text-names (no un clamp propio): la escala mobile de tokens.css lo
+       baja a 28px@375. El clamp que había acá daba 32px — piso de una curva
+       de desktop — y con 6 servicios apilados la lista ocupaba 1.66
+       pantallas de puro nombre. */
+    font-size: var(--text-names);
     line-height: 1.02;
     letter-spacing: -0.02em;
     color: var(--ink);
     margin: 0;
   }
 
+  .svc__link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .svc__link .svc__arrow {
+    display: inline-block;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .svc__link:hover .svc__arrow,
+  .svc__link:focus-visible .svc__arrow {
+    transform: translateX(0.35em);
+  }
+
+  .svc__arrow {
+    display: inline-block;
+    font-size: 0.5em;
+    vertical-align: 0.22em;
+    margin-left: 0.1em;
+    color: var(--ink-62);
+  }
+
   .svc__resolves {
-    grid-area: resolves;
     font-family: var(--font-body);
     font-size: var(--text-body);
     line-height: 1.5;
     color: var(--ink-mid);
-    margin: 0;
-    max-width: 52ch;
+    margin: var(--space-xs) 0 0 0;
+    max-width: 46ch;
   }
 
-  /* ─── reveal base (mobile/tablet) — lo aplica el JS ─── */
-  .svc-animate-base .svc__row {
+  /* reveal mobile/tablet — lo aplica el JS */
+  .svc-animate .svc__row {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(16px);
   }
 
   /* ═══════════════════════════════════════════════════════════
-     DESKTOP ≥1024px — PIN + HIGHLIGHT SECUENCIAL.
-     La escena ocupa el alto del viewport; el numeral gigante vive
-     a la izquierda, la lista a la derecha. El servicio activo se
-     agranda y toma color; los demás se atenúan. Lo orquesta el JS.
+     MOBILE (≤767px) — el numeral sale de la columna, gana el nombre
+     Fase 4 del rediseño mobile (2026-08-06). Antes: CERO reglas mobile.
      ═══════════════════════════════════════════════════════════ */
-  @media (min-width: 1024px) {
-    /* Sin pin: la sección tiene su propio padding vertical (antes 0 porque el
-       pin manejaba el alto). */
+  @media (max-width: 767px) {
+    /* UNA columna, no dos. El grid `auto 1fr` reservaba el ancho del numeral
+       MÁS 20px de column-gap: ~44px menos de ancho para el nombre, en una
+       pantalla que solo tiene 327px útiles. En mobile el numeral pasa a ser
+       un metadato ARRIBA del nombre (como la ficha del portfolio), no una
+       columna que compite por el ancho. */
+    .svc__row {
+      grid-template-columns: 1fr;
+      column-gap: 0;
+      row-gap: 0.35em;
+      padding-block: var(--space-m);
+    }
+
+    .svc__num {
+      /* ya no alinea con la mayúscula del nombre — ahora va encima */
+      padding-top: 0;
+      /* mismo tratamiento que .pf-meta__num del portfolio: el sitio usa un
+         solo sistema de índices */
+      letter-spacing: 0.12em;
+    }
+
+    /* La descripción arranca pegada al nombre: son una unidad de lectura.
+       46ch en 327px de ancho no limita nada (el texto quiebra antes), así
+       que el max-width solo agrega una restricción que nunca aplica. */
+    .svc__resolves {
+      margin-top: 0.5em;
+      max-width: none;
+    }
+
+    /* El kicker separa menos: --space-xl (40px) era el aire de una sección
+       que en desktop tiene mucho más contenido debajo. */
+    .svc__kicker {
+      margin-bottom: var(--space-l);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     TABLET 768-1279px — misma lista, más aire, numeral en su columna.
+     ═══════════════════════════════════════════════════════════ */
+  @media (min-width: 768px) and (max-width: 1279px) {
+    .svc__row {
+      grid-template-columns: 3.5rem 1fr;
+      column-gap: var(--space-l);
+      padding-block: var(--space-xl);
+    }
+    .svc__name {
+      font-size: clamp(2.75rem, 6vw, 3.75rem);
+    }
+    .svc__resolves {
+      font-size: var(--text-body);
+      max-width: 54ch;
+      margin-top: var(--space-s);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     DESKTOP ≥1280px — gesto MONOLOG.
+     Grid 2 columnas: numeral gigante que muta (izq) + lista (der).
+     Filas atenuadas por defecto; la que tiene el cursor (o la primera) se
+     resalta a tinta plena y expande su descripción. Sin imagen.
+     ═══════════════════════════════════════════════════════════ */
+  @media (min-width: 1280px) {
     .svc { padding-block: var(--space-2xl); }
 
     .svc__kicker {
       margin-bottom: var(--space-xl);
-      padding-top: 0;
-    }
-
-    .svc__stage {
-      display: grid;
-      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-      align-items: center;
-      gap: clamp(2rem, 6vw, 6rem);
-      /* Sin pin: el alto lo da el contenido (el panel de imagen es alto de por
-         sí). min-height moderado para que respire, NO 100vh forzado que
-         obligaba a scrollear la sección entera. */
-      min-height: 80vh;
-    }
-
-    /* ── Panel visual — columna izquierda. El diagrama del servicio activo. ── */
-    .svc__visual {
-      display: block;
-      grid-column: 1;
-      position: relative;
-      align-self: center;
-      justify-self: stretch;
-      aspect-ratio: 4 / 5;
-      max-height: 78vh;
-    }
-
-    /* Las 6 imágenes apiladas; solo la activa es visible (crossfade). */
-    .svc__img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      opacity: 0;
-      transform: scale(0.985);
-      transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.19,1,0.22,1);
-      pointer-events: none;
-    }
-    .svc__img[data-active] {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    /* Numeral que muta — acento chico arriba-izquierda del panel, no protagonista */
-    .svc__bignum {
-      display: block;
-      position: absolute;
-      top: -0.1em;
-      left: 0;
-      z-index: 2;
-      font-family: var(--font-display);
-      font-weight: 300;
-      font-size: clamp(3.5rem, 5vw, 5rem);
-      line-height: 0.8;
-      letter-spacing: -0.03em;
-      color: var(--ink);
-      font-variant-numeric: tabular-nums;
-      user-select: none;
-    }
-    .svc__bignum::after {
-      content: '';
-      position: absolute;
-      left: 0.06em;
-      bottom: 0.08em;
-      width: 0.5em;
-      height: 0.07em;
-      background: var(--brand);
     }
 
     .svc__list {
-      grid-column: 2;
-      gap: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 0.42fr) minmax(0, 0.58fr);
+      grid-auto-rows: min-content;
+      align-content: center;
+      column-gap: clamp(2rem, 6vw, 6rem);
+      min-height: 72vh;
+      position: relative;
     }
 
-    /* Filas desktop: sin hairlines, sin grid de 2 áreas — cada una es un
-       bloque que se resalta/atenúa. */
+    /* Columna izquierda: numeral gigante (arriba) + índice/contador (abajo).
+       El índice ancla el hueco inferior que el critic marcó como vacío muerto.
+       Toda la columna es sticky y centrada verticalmente en el bloque. */
+    .svc__aside {
+      display: flex;
+      flex-direction: column;
+      grid-column: 1;
+      grid-row: 1 / -1;
+      position: sticky;
+      /* ── STICKY QUE NO SE ESCAPA (fix William 2026-08-05) ──────────────
+         Síntoma: "el número se mete arriba" — al final de la sección el
+         numeral salía del viewport, cortado por el nav (medido: numTop
+         -355px al 90% del scroll).
+
+         Causa real (medida, no supuesta): el aside mide 536px y la PRIMERA
+         FILA del grid medía 536.4px — el propio aside la estiraba, porque
+         con `grid-row: 1/-1` sobre `grid-auto-rows: min-content` su altura
+         define la fila. Eso dejaba al sticky un recorrido de apenas ~496px
+         (lista 1032 − aside 536): agotado ese margen, la columna se iba
+         arrastrada por su contenedor. No era el `top` ni el `align-self`.
+
+         Fix: el aside deja de aportar altura a la fila (height:0 + un alto
+         propio acotado al viewport visible). Así el grid dimensiona sus
+         filas solo con las filas de servicios y el sticky recorre toda la
+         lista. */
+      top: clamp(5.5rem, 12vh, 9rem);
+      align-self: start;
+      justify-self: start;
+      height: 0; /* no aporta altura a la fila del grid */
+      max-height: 0;
+      overflow: visible;
+      pointer-events: none;
+      gap: clamp(2rem, 5vh, 4rem);
+    }
+    .svc__bignum {
+      font-family: var(--font-display);
+      font-weight: var(--display-weight-light);
+      /* Atado también a la ALTURA del viewport (fix 2026-08-05): con solo vw
+         el numeral llegaba a 256px de cuerpo y la columna entera a 536px —
+         más de media pantalla. En el último tramo del scroll no había lugar
+         entre el nav y el borde y el número quedaba cortado arriba. min() con
+         vh lo hace ceder en pantallas bajas sin achicarlo en las grandes. */
+      font-size: clamp(7rem, min(18vw, 30vh), 16rem);
+      line-height: 0.82;
+      letter-spacing: -0.04em;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      display: inline-block;
+      position: relative;
+    }
+    /* barra lima bajo el numeral — el único acento de color */
+    .svc__bignum::after {
+      content: '';
+      position: absolute;
+      left: 0.04em;
+      bottom: 0.12em;
+      width: 0.42em;
+      height: 0.06em;
+      background: var(--brand);
+    }
+
+    /* Índice/contador — ancla el vacío inferior, lenguaje editorial (mono, hairline).
+       Contador vivo NN / 07 · CAPACIDADES; el NN muta con el servicio en foco. */
+    .svc__index {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5ch;
+      padding-top: var(--space-m);
+      border-top: 1px solid var(--hairline);
+      font-family: var(--font-body);
+      font-variant-numeric: tabular-nums;
+      color: var(--ink-62);
+      letter-spacing: 0.02em;
+    }
+    .svc__index-count {
+      font-size: var(--text-h3);
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1;
+    }
+    .svc__index-sep,
+    .svc__index-total {
+      font-size: var(--text-body);
+      color: var(--ink-42);
+    }
+    .svc__index-label {
+      margin-left: 0.75ch;
+      font-size: var(--text-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-62);
+      align-self: center;
+    }
+
+    /* Nota de alcance — serif fina, voz editorial del sitio. Cierra la columna. */
+    .svc__scope {
+      margin: var(--space-m) 0 0 0;
+      font-family: var(--font-display);
+      font-weight: var(--display-weight-light);
+      font-size: var(--text-h3);
+      line-height: 1.12;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+
+    /* Las filas ocupan la columna derecha, apiladas */
     .svc__row {
+      grid-column: 2;
       display: block;
-      border-bottom: none;
-      /* menos padding → la lista llena mejor su columna (menos aire muerto) */
-      padding-block: clamp(0.45rem, 1vh, 0.9rem);
-      /* inactivo MÁS apagado → contraste dramático activo/inactivo (patrón
-         Monolog: la lista gris, solo el activo pleno). Antes 0.28 apenas se
-         distinguía. */
-      opacity: 0.22; /* estado inactivo por defecto */
+      border: none;
+      padding-block: clamp(0.5rem, 1.1vh, 1rem);
+      /* atenuado por defecto (patrón Monolog) — 0.4 mantiene legibilidad
+         ambiental: los inactivos se LEEN, no son fantasmas (fix critic
+         2026-08-04: 0.24 los dejaba casi invisibles en reposo). */
+      opacity: 0.4;
       transition: opacity 0.5s ease;
+      cursor: default;
     }
+    .svc__row:first-child { border-top: none; }
 
-    .svc__row .svc__num {
-      display: inline-block;
-      margin-right: 1em;
-      vertical-align: middle;
-      opacity: 0; /* el numeral chico se oculta en desktop; manda el gigante */
-    }
+    .svc__num { display: none; } /* manda el numeral gigante */
 
-    .svc__row .svc__name {
-      display: inline-block;
-      vertical-align: middle;
-      /* más grande → presencia tipográfica tipo Monolog (la lista es el
-         protagonista, no un larguero tímido) */
-      font-size: clamp(2.25rem, 4vw, 4rem);
-      line-height: 1.06;
+    .svc__name {
+      font-size: clamp(2.4rem, 3.6vw, 3.5rem);
+      line-height: 1.04;
       transition: color 0.4s ease;
     }
 
-    .svc__row .svc__resolves {
+    .svc__resolves {
       max-width: 46ch;
-      margin-top: 0.5rem;
       max-height: 0;
       overflow: hidden;
       opacity: 0;
+      margin-top: 0;
       transition: max-height 0.5s ease, opacity 0.4s ease, margin-top 0.4s ease;
     }
 
-    /* SERVICIO ACTIVO — resaltado */
+    /* SERVICIO ACTIVO */
     .svc__row[data-active] {
       opacity: 1;
-    }
-    .svc__row[data-active] .svc__name {
-      /* activo: color pleno. Sin scale — el contraste opacidad/color ya lo
-         destaca; el scale se veía nervioso al saltar entre servicios. */
-      color: var(--ink);
     }
     .svc__row[data-active] .svc__resolves {
       max-height: 6rem;
       opacity: 1;
-      margin-top: 0.75rem;
+      margin-top: 0.6rem;
     }
-
-    /* En desktop NO se usa el reveal-base (lo maneja el pin) */
-    .svc-animate-base .svc__row { opacity: 0.28; transform: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .svc-animate-base .svc__row { opacity: 1; transform: none; }
-    /* Con reduced-motion en desktop: mostrar todo, sin atenuar ni pin */
+    .svc-animate .svc__row { opacity: 1 !important; transform: none !important; }
     .svc__row { opacity: 1 !important; }
-    .svc__row .svc__resolves { max-height: none !important; opacity: 1 !important; }
-    .svc__row .svc__num { opacity: 0.62 !important; }
+    .svc__resolves { max-height: none !important; opacity: 1 !important; }
   }
 </style>
 
 <script>
   /**
-   * Servicios — dos vías, seleccionadas por ancho:
-   *   <1024px (BASE): reveal por fila con IntersectionObserver-like (GSAP
-   *     ScrollTrigger simple). Igual que la versión que ya funcionaba en mobile.
-   *   ≥1024px (DESKTOP): pin + highlight secuencial + numeral que muta.
-   *
-   * Todo el motion se registra dentro de ScrollTrigger.matchMedia — así el
-   * bloque desktop JAMÁS corre en mobile (no toca el body-scroll de iOS) y GSAP
-   * limpia/recrea automáticamente al cruzar el breakpoint (resize).
+   * Servicios — dos vías por ancho:
+   *   <1280px: reveal por fila (IntersectionObserver nativo). Descripción
+   *     siempre visible por CSS. OJO: en mobile el scroller es document.body
+   *     (directiva iOS body-scroll-container), por eso IO nativo + red de
+   *     seguridad, no window.scrollY.
+   *   ≥1280px: gesto Monolog — hover sobre una fila la activa; numeral gigante
+   *     muta. La primera activa por defecto.
    */
 
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const section = document.querySelector<HTMLElement>('[data-svc]');
   const list = document.querySelector<HTMLElement>('[data-svc-list]');
 
-  if (section && list && !prefersReduced) {
-    (async () => {
-      try {
-        const { gsap } = await import('gsap');
-        const { ScrollTrigger } = await import('gsap/ScrollTrigger');
-        gsap.registerPlugin(ScrollTrigger);
+  /* ── Numeral gigante desktop: se inyecta solo si aplica (evita DOM muerto en
+       mobile). Vive dentro del grid como columna izquierda. ── */
+  const rows = section ? Array.from(section.querySelectorAll<HTMLElement>('[data-svc-row]')) : [];
 
-        const rows = gsap.utils.toArray<HTMLElement>('[data-svc-row]');
-        const bignum = section.querySelector<HTMLElement>('[data-svc-bignum]');
-        const imgs = gsap.utils.toArray<HTMLElement>('[data-svc-img]');
+  /* ─────────── <1280px: reveal por fila ───────────
+     Solo sub-desktop: en ≥1280px manda el gesto Monolog (filas atenuadas por
+     CSS), y el reveal pondría opacity:0 que nunca se limpiaría. */
+  if (section && list && !prefersReduced && !window.matchMedia('(min-width: 1280px)').matches) {
+    section.classList.add('svc-animate');
 
-        ScrollTrigger.matchMedia({
-          /* ─────────── DESKTOP ≥1024px: HOVER-to-preview (gesto Monolog) ──
-             SIN pin (decisión William 2026-07-28: el pin trababa el scroll
-             hasta pasar los 6 servicios). La sección se scrollea normal; los
-             servicios se exploran con el CURSOR: al pasar el mouse sobre un
-             nombre, su diagrama aparece al instante. Como Monolog. */
-          '(min-width: 1024px)': () => {
-            const setActive = (idx: number) => {
-              rows.forEach((r, i) => {
-                if (i === idx) r.setAttribute('data-active', '');
-                else r.removeAttribute('data-active');
-              });
-              /* Diagrama del servicio activo (crossfade por CSS) */
-              imgs.forEach((im, i) => {
-                if (i === idx) im.setAttribute('data-active', '');
-                else im.removeAttribute('data-active');
-              });
-              if (bignum) {
-                const n = String(idx + 1).padStart(2, '0');
-                if (bignum.textContent !== n) {
-                  /* micro-transición del numeral al mutar */
-                  gsap.fromTo(
-                    bignum,
-                    { yPercent: 8, opacity: 0.4 },
-                    { yPercent: 0, opacity: 1, duration: 0.45, ease: 'expo.out', overwrite: true },
-                  );
-                  bignum.textContent = n;
-                }
-              }
-            };
-            /* Primer servicio activo por defecto (antes de tocar nada) */
-            setActive(0);
+    const revealRow = (row: HTMLElement) => {
+      row.style.transition =
+        'opacity 0.5s cubic-bezier(0.16,1,0.3,1), transform 0.5s cubic-bezier(0.16,1,0.3,1)';
+      row.style.opacity = '1';
+      row.style.transform = 'translateY(0)';
+    };
+    const revealAll = () => rows.forEach(revealRow);
+    const safety = window.setTimeout(revealAll, 1200);
 
-            /* Hover sobre un servicio → su diagrama al instante. */
-            const onRowEnter = (e: Event) => {
-              const row = e.currentTarget as HTMLElement;
-              const idx = Number(row.getAttribute('data-index'));
-              if (Number.isNaN(idx)) return;
-              setActive(idx);
-            };
+    let pending: HTMLElement[] = [];
+    let scheduled = false;
+    const flush = () => {
+      const batch = pending.splice(0, 3);
+      batch.forEach((r, i) => window.setTimeout(() => revealRow(r), i * 60));
+      scheduled = false;
+      if (pending.length) schedule();
+    };
+    const schedule = () => {
+      if (scheduled) return;
+      scheduled = true;
+      window.setTimeout(flush, 60);
+    };
 
-            rows.forEach((r) => {
-              r.style.cursor = 'default';
-              r.addEventListener('mouseenter', onRowEnter);
-            });
-
-            return () => {
-              rows.forEach((r) => {
-                r.removeAttribute('data-active');
-                r.style.cursor = '';
-                r.removeEventListener('mouseenter', onRowEnter);
-              });
-            };
-          },
-
-          /* ─────────── MOBILE/TABLET <1024px: reveal simple ───────────
-             OJO: en mobile el scroller es document.body (directiva iOS
-             body-scroll-container), NO window. ScrollTrigger observa el
-             scroll del root por defecto, así que su trigger 'top 80%' NO
-             dispara de forma fiable acá → las filas quedaban en opacity:0
-             PARA SIEMPRE (pantalla en blanco). Por eso el reveal mobile usa
-             IntersectionObserver nativo (observa el viewport real, ajeno a
-             qué elemento scrollea) + un timeout de seguridad que garantiza
-             que el contenido NUNCA quede invisible aunque todo falle. */
-          '(max-width: 1023px)': () => {
-            section.classList.add('svc-animate-base');
-
-            const reveal = () => {
-              gsap.to(rows, {
-                opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.08,
-                overwrite: true,
-              });
-            };
-
-            /* Red de seguridad dura: pase lo que pase, a los 1.2s el
-               contenido se muestra. Si el observer ya reveló, este to()
-               es un no-op (mismos valores). */
-            const safety = window.setTimeout(reveal, 1200);
-
-            const io = new IntersectionObserver((entries, obs) => {
-              if (entries.some((e) => e.isIntersecting)) {
-                window.clearTimeout(safety);
-                reveal();
-                obs.disconnect();
-              }
-            }, { rootMargin: '0px 0px -20% 0px' });
-            io.observe(list);
-
-            return () => { window.clearTimeout(safety); io.disconnect(); };
-          },
+    const io = new IntersectionObserver(
+      (entries, obs) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            window.clearTimeout(safety);
+            pending.push(entry.target as HTMLElement);
+            schedule();
+            obs.unobserve(entry.target);
+          }
         });
-      } catch (err) {
-        console.error('[ServicesSection] motion init failed:', err);
-        document.querySelectorAll<HTMLElement>('[data-svc-row]').forEach((r) => {
-          r.style.opacity = '1';
-          r.style.transform = 'none';
-        });
-      }
-    })();
+      },
+      { rootMargin: '0px 0px -15% 0px' },
+    );
+    rows.forEach((r) => io.observe(r));
+  }
+
+  /* ─────────── ≥1280px: gesto Monolog ─────────── */
+  if (section && list) {
+    const mqDesktop = window.matchMedia('(min-width: 1280px)');
+    const bignum = section.querySelector<HTMLElement>('[data-svc-bignum]');
+    const indexCount = section.querySelector<HTMLElement>('[data-svc-index-count]');
+
+    const setActive = (idx: number) => {
+      rows.forEach((r, i) => {
+        if (i === idx) r.setAttribute('data-active', '');
+        else r.removeAttribute('data-active');
+      });
+      const n = String(idx + 1).padStart(2, '0');
+      if (bignum && bignum.textContent !== n) bignum.textContent = n;
+      if (indexCount && indexCount.textContent !== n) indexCount.textContent = n;
+    };
+
+    const onEnter = (e: Event) => {
+      const idx = Number((e.currentTarget as HTMLElement).getAttribute('data-index'));
+      if (!Number.isNaN(idx)) setActive(idx);
+    };
+
+    const enableDesktop = () => {
+      setActive(0);
+      rows.forEach((r) => r.addEventListener('mouseenter', onEnter));
+    };
+    const disableDesktop = () => {
+      rows.forEach((r) => {
+        r.removeEventListener('mouseenter', onEnter);
+        r.removeAttribute('data-active');
+      });
+    };
+
+    if (mqDesktop.matches) enableDesktop();
+    mqDesktop.addEventListener('change', (e) => {
+      if (e.matches) enableDesktop();
+      else disableDesktop();
+    });
   }
 </script>

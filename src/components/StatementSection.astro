@@ -45,20 +45,13 @@ const c = COPY[lang as 'es' | 'en'];
 
 <div class="stu-part stu-about" id="studio-what" aria-label={c.whatWeDoLabel}>
 
-  <!-- Video de fondo — fallback negro mientras no exista el archivo -->
-  <video
-    class="stu-about__video"
-    autoplay
-    loop
-    muted
-    playsinline
-    preload="metadata"
-    aria-hidden="true"
-    poster="/studio-bg-poster.jpg"
-  >
-    <source src="/studio-bg.webm" type="video/webm" />
-    <source src="/studio-bg.mp4" type="video/mp4" />
-  </video>
+  <!-- Fondo negro sólido (--bg-dark vía CSS). Antes había un <video> que
+       apuntaba a /studio-bg.{webm,mp4,poster} — archivos que NO existen →
+       3× 404 por pageview + contraste impredecible del texto en
+       mix-blend-difference sobre frames variables + video que no se pausaba
+       con prefers-reduced-motion. Quitarlo cierra los tres problemas: la
+       sección ya se veía como bloque negro con la frase iluminándose, que es
+       el diseño real. Si algún día hay video, se re-agrega con los archivos. -->
 
   <div class="stu-about__inner">
 
@@ -83,12 +76,17 @@ const c = COPY[lang as 'es' | 'en'];
 .stu-about {
   position: relative;
   isolation: isolate;
-  background-color: #0a0a0a; /* fallback negro hasta que exista el video */
+  background-color: #0a0a0a; /* fondo negro sólido (único momento dark del sitio) */
 
-  /* Full-bleed */
-  margin-left: calc(-1 * var(--margin));
-  margin-right: calc(-1 * var(--margin));
-  padding: 0; /* el contenido se posiciona dentro de __inner */
+  /* Full-bleed robusto: el fondo negro llega a los bordes del viewport SIN
+     depender de compensar un padding del <main> (que no tiene ninguno). Usa
+     100vw centrado con left-50%/translateX. Así el bleed es exacto en todo
+     viewport y el padding del __inner (--margin) es el ÚNICO responsable del
+     aire lateral del texto → nada toca el borde. */
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  padding: 0; /* el aire lo pone __inner */
 
   /* Pantalla completa (decisión de William). svh = small viewport height:
      no se pelea con la barra dinámica de Safari en mobile. Antes esto era
@@ -102,27 +100,21 @@ const c = COPY[lang as 'es' | 'en'];
   overflow: hidden;
 }
 
-/* Video de fondo — cubre toda la sección */
-.stu-about__video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* Contenedor del texto — sobre el video, en blend-difference */
+/* Contenedor del texto — sobre el fondo negro, en blend-difference */
 .stu-about__inner {
   position: relative;
   z-index: 1;
   width: 100%;
-  /* Padding lateral con piso: las notas de esquina se cortaban contra los
-     bordes cuando --margin era chico. max() garantiza aire mínimo. */
-  padding: var(--space-2xl) max(var(--margin), 2.5rem);
-  /* mix-blend-difference: el truco de Trionn. El texto blanco se
-     invierte contra el video → legible sobre claro y oscuro. */
+  box-sizing: border-box;
+  /* Padding lateral GARANTIZADO: la sección es full-bleed (margin negativo
+     saca el bloque a los bordes del viewport). Este padding repone el aire para
+     que NADA (ni la frase ni las anotaciones de esquina) toque el borde.
+     Piso 1.5rem en mobile chico, hasta --margin en desktop. */
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-2xl);
+  padding-left: max(var(--margin), 1.5rem);
+  padding-right: max(var(--margin), 1.5rem);
+  /* mix-blend-difference: el texto se invierte contra el fondo → legible. */
   mix-blend-mode: difference;
 }
 
@@ -138,13 +130,18 @@ const c = COPY[lang as 'es' | 'en'];
    GSAP falla, todo se ve. */
 .stu-about__statement {
   font-family: var(--font-display); /* PP Editorial New — misma voz que todo el sitio */
-  font-weight: 300;
-  font-size: clamp(2.5rem, 5.6vw, 6rem);
-  line-height: 1.1;
-  letter-spacing: -0.015em;
-  color: #e8e6e0; /* hueso-tenue: el crema del sistema, no un gris cualquiera */
+  font-weight: var(--display-weight-light);
+  /* PICO DRAMÁTICO (2026-08-02): es el único momento oscuro del sitio → debe ser
+     el texto MÁS grande de todo. Sube de --text-h2 a un rango propio mayor que
+     el hero, para que domine. La iluminación por scroll (JS abajo) le da el
+     golpe. */
+  font-size: clamp(2.5rem, 6.5vw, 7.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: #ffffff; /* blanco puro: el encendido de la frase debe ser máximo contraste */
   text-align: center;
-  max-width: 18em; /* serif light pide algo más de ancho por línea que la sans */
+  /* max-width más apretado → saltos de línea más dramáticos, la frase respira menos y golpea más */
+  max-width: 15em;
   margin: 0 auto var(--space-2xl) auto; /* mx-auto: centrada en la página */
 }
 
@@ -176,13 +173,21 @@ const c = COPY[lang as 'es' | 'en'];
 /* ── MOBILE (<768px): anotaciones en flujo, apiladas bajo la frase ── */
 @media (max-width: 767px) {
   .stu-about {
+    /* Sin 100svh forzado en mobile: la sección toma el alto de su contenido
+       (frase + anotaciones) + padding. Antes heredaba 100svh de la regla base
+       y, como el contenido se apila arriba, quedaba medio viewport de NEGRO
+       MUERTO abajo. Ahora el bloque negro abraza el contenido, sin hueco. */
+    min-height: auto;
     align-items: flex-start;
   }
   .stu-about__inner {
     display: flex;
     flex-direction: column;
     gap: var(--space-l);
-    padding-top: calc(var(--space-2xl) + 3rem); /* deja respiro bajo el nav */
+    /* Padding vertical generoso arriba y abajo → el negro respira alrededor del
+       texto sin dejar un vacío enorme. */
+    padding-top: calc(var(--space-2xl) + 2rem); /* respiro bajo el nav */
+    padding-bottom: var(--space-2xl);
   }
   .stu-about__statement {
     max-width: 100%;
@@ -264,19 +269,47 @@ const c = COPY[lang as 'es' | 'en'];
       /* aria:'none' — el texto visible ya es legible; sin esto SplitText mete
          un aria-label prohibido en el <p> (axe aria-prohibited-attr, QA 2026-07-22). */
       const split = new SplitText(statementEl, { type: 'words', autoSplit: true, aria: 'none' });
-      gsap.set(split.words, { opacity: 0.18 });
+      /* Arranca casi invisible (0.08): apenas se intuye sobre el negro. El
+         contraste con el blanco encendido hace el efecto mucho más dramático —
+         la frase "se prende" con el scroll en vez de solo aclararse. */
+      gsap.set(split.words, { opacity: 0.08 });
 
-      gsap.to(split.words, {
-        opacity: 1,
-        ease: 'none',
-        stagger: 0.5, // cada palabra se ilumina un poco después de la anterior
-        scrollTrigger: {
-          trigger: aboutEl,
-          start: 'top 75%',
-          end: 'center 45%',
-          scrub: true, // atado al scroll: avanza/retrocede con la rueda
+      /* Rango de scroll DISTINTO por viewport (gsap.matchMedia):
+         - Desktop: recorrido más largo (la sección es 100svh, hay scroll de sobra).
+         - Mobile: recorrido CORTO y que arranca ya entrada la sección, para que
+           las letras se enciendan RÁPIDO (no "se demoran") y terminen antes de
+           que el usuario pase de largo. */
+      const mm = gsap.matchMedia();
+      mm.add(
+        {
+          isDesktop: '(min-width: 768px)',
+          isMobile: '(max-width: 767px)',
         },
-      });
+        (ctx) => {
+          const { isMobile } = ctx.conditions as { isMobile: boolean };
+          gsap.to(split.words, {
+            opacity: 1,
+            ease: 'none',
+            stagger: 0.5,
+            scrollTrigger: {
+              trigger: aboutEl,
+              /* ARRANQUE MÁS ABAJO (William 2026-08-05, ref. Trionn): antes era
+                 'top 90%' — las palabras empezaban a encenderse con la sección
+                 apenas asomada (10% visible), así que para cuando el usuario la
+                 miraba ya estaban casi todas blancas y el efecto no se veía.
+                 En Trionn el texto se completa cuando la sección va por la MITAD
+                 del scroll. 'top 55%' = arranca con la sección bien entrada en
+                 pantalla; el end en 'center'/'top' cierra a mitad de recorrido. */
+              start: isMobile ? 'top 60%' : 'top 50%',
+              /* end atado a 'bottom' (no 'center'): el recorrido cubre TODA la
+                 altura de la sección, así el encendido acompaña el scroll en
+                 vez de completarse antes de que el usuario termine de pasarla. */
+              end: isMobile ? 'bottom 75%' : 'bottom 70%',
+              scrub: true,
+            },
+          });
+        }
+      );
 
       /* (2) Anotaciones de esquina — fade-up escalonado (one-shot) */
       if (annotationEls.length) {

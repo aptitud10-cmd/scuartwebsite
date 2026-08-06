@@ -1,16 +1,16 @@
 ---
 /**
  * ManifestoSection.astro — LA sección de marca de SCUART.
- * V3: fondo terracota full-bleed, grano fuerte, Fraunces display.
+ * Sistema actual: fondo crema (--bg) a pantalla completa, tinta (--ink) como
+ * texto, PP Editorial New como display.
  *
- * ART_DIRECTION_V3_FINAL.md §5-MANIFESTO:
- * - Fondo --terracota (#A4471F) a pantalla completa con grano más fuerte (soft-light 0.08).
- * - Tipografía: Fraunces light 300, leading 1.02, letra hueso.
- * - Acento: --ambar en Fraunces itálica 400 (sobre terracota ~3.5:1 a 32px+ — OK display).
- * - Kicker: Hanken 500 uppercase tracking +0.14em, hueso 65%.
- * - Composición escalonada: line1 izquierda, line2 sangrada → rompe la grilla.
- * - Motion: máscara por líneas (patrón V3 del hero), una sola vez. Sin parallax.
- * - Corte directo hero→terracota: sin border-top (la alternancia ES el diseño).
+ * - Fondo --bg (crema) a pantalla completa, cuerpo claro de punta a punta.
+ * - Tipografía: PP Editorial New light (var(--display-weight-light)), leading 1.05, letra tinta.
+ * - Acento: itálica de PP Editorial New (peso 400), sin cambio de color — el
+ *   énfasis es tipográfico, no cromático.
+ * - Kicker: Geist Sans 500 uppercase tracking +0.14em, tinta 62%.
+ * - Composición centrada: kicker / statement / ancla reparten el 100svh en tercios.
+ * - Motion: máscara por líneas (patrón del hero), una sola vez. Sin parallax.
  * - prefers-reduced-motion: todo estático y visible.
  */
 
@@ -26,19 +26,18 @@ const { t } = Astro.props;
 <section class="manifesto" aria-label={t.manifesto.ariaLabel}>
 
   <!--
-    Kicker — Hanken 500 uppercase, tracking +0.14em.
-    Sistema de índices V3: "N°·01 / MANIFESTO".
-    Color: hueso al 65% de opacidad sobre terracota.
+    Kicker — Geist Sans 500 uppercase, tracking +0.14em.
+    Sistema de índices: "N°·01 / MANIFESTO".
+    Color: tinta al 62% de opacidad sobre crema.
     Igual en EN y ES (coherencia del sistema técnico).
   -->
   <p class="manifesto-kicker">{t.manifesto.kicker}</p>
 
   <!--
-    Statement — Fraunces light 300, escalonado intencionalmente.
-    Line1: alineada al margen izquierdo (col 1).
-    Line2: sangrada hacia la derecha — rompe la grilla (spec §5).
+    Statement — PP Editorial New light, centrado.
     HTML real server-rendered: indexable sin JS.
-    El acento (line2red) va en Fraunces itálica ambar — NO rojo (V3).
+    El acento (line2red) va en itálica de PP Editorial New, color heredado
+    (no hay cambio de color en el énfasis — el sistema usa itálica, no tinta distinta).
   -->
   <div class="manifesto-statement">
     <p class="manifesto-line manifesto-line--1">{t.manifesto.line1}</p>
@@ -48,47 +47,49 @@ const { t } = Astro.props;
   </div>
 
   <!--
-    Ancla inferior — tercer punto de peso que completa el 100vh (evita el
-    "vacío" de dos líneas centradas en pantalla completa). Reutiliza el label
-    del portfolio (la sección que sigue): el ancla ES el puente hacia el
-    trabajo. aria-hidden: es señalética visual, no contenido navegable
-    (el portfolio ya tiene su propio encabezado).
+    ANCLA INFERIOR ELIMINADA (William 2026-08-05): repetía el label del
+    portfolio ("TRABAJO SELECCIONADO") a menos de una pantalla del kicker real
+    de esa sección — el usuario leía lo mismo dos veces seguidas. El manifiesto
+    cierra con su frase; el portfolio se presenta solo con su propio encabezado.
   -->
-  <p class="manifesto-anchor" aria-hidden="true">{t.portfolio.sectionLabel} <span class="manifesto-anchor__arrow">↓</span></p>
 
 </section>
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   MANIFESTO SECTION — V3
+   MANIFESTO SECTION
    Mobile-first: 375px base. md: 768px. lg: 1280px.
-   Fondo: --terracota. LA sección de marca del sitio.
-   Corte directo con el hero (hueso→terracota): sin border.
+   Fondo: --bg (crema). LA sección de marca del sitio.
    ═══════════════════════════════════════════════════════════ */
 
 .manifesto {
-  /* V4 Restringido: cuerpo oscuro de punta a punta (ART_DIRECTION_V4_RESTRINGIDO §4.1) */
+  /* Cuerpo claro de punta a punta — mismo fondo crema que el resto del sitio */
   background-color: var(--bg);
   position: relative;
   overflow: hidden;
 
-  /* Pantalla completa (decisión William 2026-07-28). Antes ocupaba solo el
-     alto del contenido (~624px en 900) y se leía "corta". El statement de
-     marca merece el viewport entero.
-     svh = small viewport height: no se pelea con la barra dinámica de Safari.
-     La grilla de 3 filas reparte ese alto en tercios (kicker arriba /
-     statement al centro / ancla abajo) para que el 100vh se LLENE con
-     jerarquía en vez de dejar crema muerto — el error de centrar 2 líneas
-     solas en pantalla completa. */
-  min-height: 100svh;
+  /* ALTURA POR CONTENIDO (William 2026-08-05) — antes era min-height:100svh
+     con una grilla de 3 filas. Medido en 375px: 127px de contenido real sobre
+     812px de sección = 84% de crema vacío; la sección se leía a medio llenar,
+     no como espacio negativo intencional. (El 100svh venía de la decisión
+     2026-07-28, cuando el problema era el opuesto: se leía "corta". El punto
+     medio es este: sin pantalla completa forzada, pero con padding generoso
+     que le da presencia de pausa entre la sección dark y el portfolio.)
+     El min-height chico evita que quede como una franja apretada en pantallas
+     grandes, sin llegar a forzar el viewport entero. */
+  /* 60svh en mobile dejaba 487px de sección con 113px de frase (77% aire): el
+     min-height mandaba, no el contenido. 42svh acompaña al texto en pantallas
+     chicas; desde tablet vuelve a 60svh, donde la frase ya mide ~364px y el
+     aire cae a un tercio (respiro normal). */
+  min-height: 42svh;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto 1fr;   /* kicker arriba, statement ocupa el resto */
+  align-content: center;
   box-sizing: border-box;
 
-  /* Aire vertical proporcional al viewport (vh) en vez de tokens fijos: en
-     pantallas altas el kicker/ancla no se pegan a los bordes. */
-  padding-top: clamp(2rem, 8vh, 6rem);
-  padding-bottom: clamp(1.5rem, 6vh, 4.5rem);
+  /* Aire vertical proporcional al viewport (vh) en vez de tokens fijos. */
+  padding-top: clamp(3rem, 10vh, 7rem);
+  padding-bottom: clamp(3rem, 10vh, 7rem);
   padding-left: var(--margin);
   padding-right: var(--margin);
 }
@@ -96,7 +97,7 @@ const { t } = Astro.props;
 /* ─── KICKER ─────────────────────────────────────────────── */
 /*
  * Geist 500 uppercase +0.14em tracking — sistema de índices.
- * Color: blanco 55% + difference (reacciona al plano azul, da un matiz legible).
+ * Color: tinta 62% sobre crema (var(--ink-62)).
  */
 .manifesto-kicker {
   position: relative;
@@ -106,7 +107,7 @@ const { t } = Astro.props;
   font-family: var(--font-body);   /* Geist Sans */
   font-size: var(--text-mono);     /* clamp(0.6875rem, 0.3vw + 0.6rem, 0.8125rem) = 11-13px */
   font-weight: 500;
-  color: var(--ink-62);            /* hueso 62% sobre negro */
+  color: var(--ink-62);            /* tinta 62% sobre crema */
   text-transform: uppercase;
   letter-spacing: 0.14em;           /* sistema de índices: +0.14em exacto */
   line-height: 1.4;
@@ -129,63 +130,30 @@ const { t } = Astro.props;
   margin-inline: auto;
 }
 
-/* ─── ANCLA INFERIOR ─────────────────────────────────────────
- * Tercer punto de peso que cierra el 100vh. Mismo lenguaje del kicker
- * (Geist 500 uppercase +0.14em) para que lean como par arriba/abajo.
- * La flecha ↓ señala el portfolio que sigue.
- */
-.manifesto-anchor {
-  position: relative;
-  z-index: 1;
-  grid-row: 3;                     /* fila inferior del 100vh */
-  align-self: end;
-  font-family: var(--font-body);
-  font-size: var(--text-mono);
-  font-weight: 500;
-  color: var(--ink-62);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  line-height: 1.4;
-  margin: 0;
-  text-align: center;
-}
-
-.manifesto-anchor__arrow {
-  display: inline-block;
-  margin-left: 0.4em;
-  /* rebote sutil y lento — invita a bajar sin gritar */
-  animation: manifesto-anchor-bob 2.4s ease-in-out infinite;
-}
-
-@keyframes manifesto-anchor-bob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(0.25em); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .manifesto-anchor__arrow { animation: none; }
-}
+/* ANCLA INFERIOR: reglas eliminadas junto con su markup (2026-08-05) —
+   duplicaba el label del portfolio. Ver comentario en el HTML. */
 
 /* ─── LÍNEAS ─────────────────────────────────────────────── */
 /*
- * Fraunces Variable weight 300 (light) — en tamaño display grande el peso bajo es elegante.
- * Leading 1.02: apretado editorial (ART_DIRECTION §3: "1.0–1.05").
- * Tracking: -0.025em (ART_DIRECTION §3: "-0.02 a -0.03em en display grande").
- * Color: hueso (#F0E9DC) sobre terracota → contraste ~5:1 (OK para display ≥24px).
- * Escala: clamp(2rem, 5.5vw, 4.5rem) — Display L del doc. En Fraunces sin wdth axis.
+ * PP Editorial New weight light (var(--display-weight-light)) — en tamaño
+ * display grande el peso bajo es elegante.
+ * Leading 1.05: apretado editorial.
+ * Tracking: -0.025em.
+ * Color: tinta (var(--ink)) sobre crema (var(--bg)) → contraste ~16:1.
+ * Escala: var(--text-h1) — nivel 3 de la escala tipográfica del sitio.
  */
 .manifesto-line {
   font-family: var(--font-display);   /* PP Editorial New */
-  font-weight: 300;                   /* light — elegante en gigante */
+  font-weight: var(--display-weight-light);   /* light — elegante en gigante */
   font-style: normal;
   /* Centrado grande + escala protagonista: ~83px @1280px. Sube de 64→83px
      para que el statement de marca NO quede más chico que los nombres del
      portfolio (~109px) — corrige jerarquía invertida, queda por debajo a
      propósito (el portfolio es el techo de escala del sitio). */
-  font-size: clamp(2.5rem, 6.5vw, 5.75rem);
+  font-size: var(--text-h1);
   line-height: 1.05;
   letter-spacing: -0.025em;
-  color: var(--ink);                  /* hueso cálido sobre negro */
+  color: var(--ink);                  /* tinta sobre crema */
   margin: 0;
   text-align: center;                 /* centrado grande */
   text-wrap: balance;                 /* quiebre equilibrado de cada frase */
@@ -202,14 +170,14 @@ const { t } = Astro.props;
 }
 
 /* ─── ACENTO — ITÁLICA (no color) ───────────────────────────
- * Sistema unificado (§5): el énfasis YA NO es un color distinto (ámbar muere).
- * Es la ITÁLICA de PP Editorial New. El color lo da el difference, igual que el resto.
+ * El énfasis no es un color distinto: es la ITÁLICA de PP Editorial New.
+ * El color se hereda de la línea (tinta sobre crema), igual que el resto.
  * <em> correcto semánticamente: el acento es énfasis tipográfico.
  */
 .manifesto-accent {
   font-style: italic;
-  font-weight: 400;      /* itálica con más expresión que el 300 upright */
-  color: inherit;        /* hereda el blanco+difference de la línea */
+  font-weight: 400;      /* itálica con más expresión que el peso light upright */
+  color: inherit;        /* hereda la tinta de la línea */
 }
 
 /* ─── REVEAL — sistema V3 de máscara por líneas ────────────
@@ -239,7 +207,7 @@ const { t } = Astro.props;
 /* ─── reduced-motion ─────────────────────────────────────── */
 /*
  * Sin motion: el reveal NO se activa.
- * El color terracota, el grano y la tipografía SE MANTIENEN (son identidad, no motion).
+ * El fondo crema, el grano y la tipografía SE MANTIENEN (son identidad, no motion).
  * El sitio queda 100% legible y navegable sin ninguna animación.
  */
 @media (prefers-reduced-motion: reduce) {
@@ -250,19 +218,68 @@ const { t } = Astro.props;
 }
 
 /* ═══════════════════════════════════════════════════════════
-   TABLET (768px+) — escala intermedia
+   MOBILE (≤767px) — la frase manda, sin centrado ni aire muerto
+   Fase 4 del rediseño mobile (2026-08-06). Antes: CERO reglas mobile.
    ═══════════════════════════════════════════════════════════ */
-@media (min-width: 768px) {
+@media (max-width: 767px) {
+  .manifesto {
+    /* min-height fuera. Con --text-h1 a 44px (escala mobile de tokens.css)
+       la frase ya mide ~200px y el contenido define el alto. El 42svh era
+       un número calibrado a mano cuando la tipografía daba 30px y sobraba
+       aire — con la escala arreglada, forzar alto vuelve a crear el vacío
+       que ese mismo parche intentaba tapar. */
+    min-height: 0;
+    /* padding proporcional al ancho, no al alto: en un teléfono el 10vh son
+       81px arriba Y abajo, que es más pausa de la que la frase necesita. */
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+  }
+
+  /* ALINEADO A LA IZQUIERDA, no centrado. El centrado es un gesto de
+     pantalla ancha: sobre 327px útiles una frase de 4 líneas centradas
+     genera bordes irregulares a ambos lados y se lee como poema, no como
+     statement de marca. Alineado, el bloque comparte eje con el kicker,
+     con el portfolio y con todo el resto del sitio en mobile. */
+  .manifesto-kicker,
   .manifesto-line {
-    hyphens: none;
-    overflow-wrap: normal;
+    text-align: left;
+  }
+
+  .manifesto-statement {
+    margin-inline: 0;
+  }
+
+  .manifesto-kicker {
+    /* separa el kicker de la frase: el grid ya no reparte alto libre */
+    margin-bottom: var(--space-m);
+  }
+
+  .manifesto-line {
+    /* leading un punto más suelto que el 1.05 de desktop: a 44px en 4 líneas,
+       1.05 empasta los renglones (los descenders de la serif casi tocan la
+       línea siguiente). 1.12 los separa sin romper el apretado editorial. */
+    line-height: 1.12;
+    /* text-wrap:balance NO en mobile: iguala el largo de los renglones, lo
+       que en 4 líneas angostas produce quiebres arbitrarios a mitad de idea.
+       Con el texto alineado a la izquierda, el quiebre natural lee mejor. */
+    text-wrap: initial;
   }
 }
 
 /* ═══════════════════════════════════════════════════════════
-   DESKTOP (1280px+) — sangría dramática, escala máxima
+   TABLET (768px+) — escala intermedia
    ═══════════════════════════════════════════════════════════ */
-@media (min-width: 1280px) {
+@media (min-width: 768px) {
+  /* Desde tablet la frase crece (~364px en desktop) y el 60svh le queda bien:
+     el aire baja a ~1/3, que es respiro editorial, no vacío. */
+  .manifesto {
+    min-height: 60svh;
+  }
+
+  /* overflow-wrap:anywhere existe SOLO en mobile como anti-desborde
+     ("ventajas competitivas." a 44px). Desde tablet sobra el ancho.
+     (El bloque duplicado de 1280px se eliminó el 2026-08-06: repetía
+     exactamente estas dos declaraciones, ya activas desde 768px.) */
   .manifesto-line {
     hyphens: none;
     overflow-wrap: normal;
@@ -290,12 +307,11 @@ const { t } = Astro.props;
       gsap.registerPlugin(SplitText, ScrollTrigger);
 
       const kicker = section.querySelector<HTMLElement>('.manifesto-kicker');
-      const anchor = section.querySelector<HTMLElement>('.manifesto-anchor');
       const statementEl = section.querySelector<HTMLElement>('.manifesto-statement');
       const lines = Array.from(section.querySelectorAll<HTMLElement>('.manifesto-line'));
 
-      /* Kicker y ancla comparten el mismo fade suave — leen como par arriba/abajo */
-      const chrome = [kicker, anchor].filter(Boolean) as HTMLElement[];
+      /* Fade suave del kicker (el ancla inferior se eliminó en 2026-08-05) */
+      const chrome = [kicker].filter(Boolean) as HTMLElement[];
       if (chrome.length) {
         gsap.set(chrome, { opacity: 0 });
         ScrollTrigger.create({

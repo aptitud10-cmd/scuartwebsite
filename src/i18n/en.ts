@@ -22,6 +22,8 @@ export interface CapabilityService {
   statement: string;
   /** Una línea que explica qué problema resuelve — nativo por idioma. */
   resolves: string;
+  /** Página dedicada del servicio (opcional) — ruta con prefijo de idioma. */
+  href?: string;
 }
 
 export interface PortfolioProject {
@@ -272,6 +274,9 @@ export const en: Translations = {
    */
   manifesto: {
     kicker: "N°·01 / MANIFESTO",
+    /* Original brand line — sells the repositioning (we don't sell websites, we
+       sell business results). The hero now says "DESIGN + TECHNOLOGY", so it no
+       longer collides with this line (2026-08-04). */
     line1: "We don't build websites.",
     line2a: "We build ",
     line2red: "competitive advantages.",
@@ -284,11 +289,11 @@ export const en: Translations = {
     kicker: "SCUART — STUDIO",
     body: "Design and technology that work together, not apart.",
     noteLeft: "INDEPENDENT STUDIO · BILINGUAL · LATAM + USA",
-    noteRight: "One team, from idea to deploy.",
+    noteRight: "One team, start to finish.",
     ariaLabel: "Design and technology that work together, not apart.",
   },
 
-  /* ── Servicios — kicker (los 6 items viven en capabilities.items) ── */
+  /* ── Servicios — kicker (los 7 items viven en capabilities.items) ── */
   servicesKicker: "SERVICES",
 
   /* ── Studio — Sección fusionada (capabilities + method) ── */
@@ -317,33 +322,41 @@ export const en: Translations = {
       },
       {
         num: "02",
+        name: "AI VISIBILITY · GEO",
+        statement: "",
+        resolves:
+          "Your clients already ask ChatGPT. We audit what AI says about your business and make it recommend you.",
+        href: "/en/services/ai-visibility",
+      },
+      {
+        num: "03",
         name: "SAAS + SYSTEMS",
         statement: "",
         resolves:
           "Full products — login, payments, dashboards, APIs. From zero to production.",
       },
       {
-        num: "03",
+        num: "04",
         name: "AI AUTOMATION",
         statement: "",
         resolves:
           "We automate the repetitive so the team focuses on what matters.",
       },
       {
-        num: "04",
+        num: "05",
         name: "E-COMMERCE",
         statement: "",
         resolves:
           "Stores built to sell — fast checkout, inventory, ready to grow.",
       },
       {
-        num: "05",
+        num: "06",
         name: "ORDERING · BOOKING · WORKFLOWS",
         statement: "",
         resolves: "Orders, bookings and operations without the manual mess.",
       },
       {
-        num: "06",
+        num: "07",
         name: "BRAND IDENTITY",
         statement: "",
         resolves:
@@ -413,6 +426,7 @@ export const en: Translations = {
     indexLabel: "WE WORK WITH:",
     capabilities: [
       "WEB PLATFORMS",
+      "AI VISIBILITY",
       "SAAS + SYSTEMS",
       "AI AUTOMATION",
       "E-COMMERCE",

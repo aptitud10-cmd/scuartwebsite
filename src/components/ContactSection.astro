@@ -109,13 +109,18 @@ const copiedLabel = isES ? '¡Copiado!' : 'Copied!';
 <style>
 /* ═══════════════════════════════════════════════════════════
    CONTACTO — sobrio, el email es el diseño.
-   Sistema del portafolio: hueso, tinta, hairlines, serif Light.
+   Sistema del portafolio: crema, tinta, hairlines, serif Light.
    ═══════════════════════════════════════════════════════════ */
 
 .contact {
   background-color: var(--bg);
   padding: calc(var(--space-2xl) * 1.25) var(--margin) var(--space-2xl);
-  scroll-margin-top: 72px;
+  /* scroll-margin ligado al ALTO REAL del nav, no a un 72px fijo. El nav mide
+     clamp(64px, 9vh, 80px): con 72px fijo el título quedaba parcialmente
+     tapado en pantallas altas (nav 80px) y sobraba aire en las bajas. Importa
+     más desde 2026-08-06: la hamburguesa mobile navega a #contact y el salto
+     tiene que dejar el título completo a la vista. +8px de respiro. */
+  scroll-margin-top: calc(clamp(64px, 9vh, 80px) + 8px);
   position: relative;
 }
 
@@ -132,8 +137,8 @@ const copiedLabel = isES ? '¡Copiado!' : 'Copied!';
     right: calc(var(--margin) * 0.35);
     writing-mode: vertical-rl;
     font-family: var(--font-display);
-    font-weight: 300;
-    font-size: clamp(2.25rem, 3.5vw, 3.5rem);
+    font-weight: var(--display-weight-light);
+    font-size: var(--text-names);
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: rgba(20, 19, 15, 0.5);
@@ -164,8 +169,8 @@ const copiedLabel = isES ? '¡Copiado!' : 'Copied!';
 
 .contact__statement {
   font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(1.75rem, 3.6vw, 3.25rem);
+  font-weight: var(--display-weight-light);
+  font-size: var(--text-names);
   line-height: 1.05;
   letter-spacing: -0.025em;
   color: var(--ink);
@@ -184,8 +189,8 @@ const copiedLabel = isES ? '¡Copiado!' : 'Copied!';
 .contact__email {
   display: inline-block;
   font-family: var(--font-display);
-  font-weight: 300;
-  font-size: clamp(2.5rem, 7.5vw, 6.5rem);
+  font-weight: var(--display-weight-light);
+  font-size: var(--text-cta);
   line-height: 1;
   letter-spacing: -0.03em;
   color: var(--ink);
@@ -339,10 +344,15 @@ const copiedLabel = isES ? '¡Copiado!' : 'Copied!';
   margin: 0;
 }
 
-@media (max-width: 640px) {
-  .contact__email {
-    font-size: clamp(1.6rem, 9.5vw, 2.5rem);
-  }
+/* Breakpoint unificado a 767px (antes 640px). La auditoría 2026-08-06
+   encontró SEIS breakpoints distintos en el proyecto (640/767/768/769/
+   1024/1280): entre 641 y 767px esta sección ya estaba en modo desktop
+   mientras StatementSection seguía en mobile. Mobile = ≤767px en todo
+   el sitio. */
+/* NOTA: .contact__email ya NO lleva override de font-size acá. --text-cta
+   vale 34px en mobile desde la escala propia de tokens.css; el clamp que
+   había (35.6px@375) era el parche que compensaba los 40px del token roto. */
+@media (max-width: 767px) {
   .contact__email-row {
     gap: 1rem;
   }

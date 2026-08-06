@@ -1,36 +1,39 @@
 ---
 /**
- * HeroSection.astro — Hero V3 "Locomotive" — VIDEO FULL-BLEED
+ * HeroSection.astro — Hero "portada de dossier editorial"
  *
- * PATRÓN (referencia: locomotive.ca, traída por William 2026-06-16):
- *   Un video ocupa TODA la pantalla (full-bleed, 100svh).
- *   El texto va ENCIMA del video, no al lado:
- *     - Nav minimal arriba: wordmark + links + "Let's talk" (CTA).
- *     - Wordmark grande abajo-izquierda: nombre del estudio en Fraunces, naranja.
- *   Cero grid de 12 columnas, cero ficha técnica, cero coordenadas, cero numeral.
- *   Es una sola imagen viva con tipografía sobreimpresa.
+ * ORIGEN: composición aprobada por William en producción (main, 2026-06-07):
+ *   kicker → headline 3 líneas con el "+" como único acento → capacidades
+ *   001-004 → subhead → CTA. Referencia que William validó (2026-07-30).
  *
- * COLOR — copia el esquema Locomotive (decisión de William):
- *   Cyan/celeste sobre el video para TODO el texto (nav + wordmark), igual que
- *   Locomotive usa un solo color de acento. Token AISLADO aquí (--hero-accent),
- *   NO toca la paleta global (yeso + verde botella del resto del sitio).
- *   ⚠️ El cuerpo del sitio sigue en su paleta — el hero es la "portada" cyan.
+ * REESCRITURA 2026-08-04 (dirección director creativo, tras BLOCK del
+ * visual-critic nota 7.5 — "se lee como template de estudio Framer": kicker
+ * mono + titular serif + índice numerado a la derecha era EXACTAMENTE el
+ * layout genérico que el critic reconoce). El copy y el sistema de ciclo se
+ * conservan intactos; lo que cambia es la COMPOSICIÓN:
  *
- * VIDEO — placeholder hasta que William lo cree/consiga:
- *   <video> apunta a /video/hero.mp4 (+ .webm opcional). MIENTRAS no exista,
- *   se ve la capa .hero-fallback (base cyan/roja animada) por debajo del <video>
- *   transparente, así el hero se ve completo HOY. Cuando William ponga el archivo
- *   en /public/video/hero.mp4, arranca solo — CERO cambios de código.
- *   autoplay muted loop playsinline = autoplay permitido en todos los browsers.
+ *   - Se mata el split de dos columnas (titular izq / índice der). Todo pasa
+ *     a UNA columna alineada al margen izquierdo, estructura vertical tipo
+ *     dossier editorial.
+ *   - Barra superior de firma (SCUART / EST. 2025 · NYC + LATAM) reemplaza
+ *     el kicker suelto — es la cabecera de un documento, no un label de hero.
+ *   - El bloque-frase gana JERARQUÍA DE TAMAÑO real: tesis 0.62, conector
+ *     0.34, beneficio-que-cicla 1.0 (el más grande de toda la página). Antes
+ *     las tres líneas eran del mismo tamaño (--text-h1 plano) — el critic
+ *     marcó eso como "todo igual, sin jerarquía".
+ *   - Barra marcadora lima bajo el beneficio: se redimensiona al ancho de
+ *     cada palabra del ciclo. Es el elemento vivo del hero.
+ *   - El índice numerado 001-004 vertical se reemplaza por una línea de
+ *     texto corrido sin números, en una banda inferior junto al CTA.
+ *   - La grilla de líneas verticales decorativas (.grid-lines) se elimina:
+ *     era decoración sin función que reforzaba el look "template".
  *
- * --font-display: "Fraunces Variable", serif
- *   SWAP A PP EDITORIAL NEW: cambiar SOLO el token en tokens.css.
+ * FONT: --font-display de esta branch es SERIF (PP Editorial New / Fraunces).
  *
- * MOTION — GSAP:
- *   - Video/poster: scale 1.06 → 1, opacity in, 1.6s expo.out (entra como telón).
- *   - Nav: fade + y, 0.6s.
- *   - Wordmark: line-reveal por líneas con máscara (yPercent 110→0), stagger.
- *   prefers-reduced-motion: todo estático visible, sin scale.
+ * PROGRESSIVE ENHANCEMENT:
+ *   El H1 es HTML real server-rendered, visible sin JS. GSAP es enhancement
+ *   no-bloqueante — si falla, el hero se ve completo estático. El "+" se
+ *   pinta en lima vía CSS puro (.h1-word--plus), no depende de JS.
  *
  * .hero-v3 — clase conservada: el IntersectionObserver de Nav.astro la usa.
  */
@@ -45,687 +48,1034 @@ const { t } = Astro.props;
 
 const lang = t.nav.langHref === '/es' ? 'en' : 'es';
 
-/*
- * Wordmark abajo-izquierda — dos líneas, serif display.
- * Descriptor propio (2026-07-22): antes era réplica literal de Locomotive
- * ("Digital-first Design Agency") — texto de otra marca y encima "Agency",
- * cuando SCUART se define como ESTUDIO en todo el resto del sitio.
- * Ahora: estudio de diseño y tecnología, bilingüe. Localizado ES/EN.
- */
-const wordmarkName = 'SCUART';
-/* Descriptor del hero — enriquecido con keyword "web" (SEO 2026-07-28) sin
-   ensuciar el minimalismo: sigue corto, ahora nombra lo que el sitio hace. */
-const wordmarkDescriptor =
-  lang === 'es'
-    ? 'Estudio de diseño y desarrollo web'
-    : 'Web design & development studio';
+/* ── Copy del hero, hardcodeado por idioma (patrón de esta branch: el copy
+   visible del hero NO vive en el i18n, solo el ariaLabel). ── */
+/* ── Copy del hero. Estructura (William 2026-08-04): recupera el copy de marca
+   que vende directo ("DISEÑO + TECNOLOGÍA / PARA NEGOCIOS QUE NECESITAN / …")
+   y le suma el gesto vivo: la última palabra CICLA el beneficio real de negocio
+   (VERSE MEJOR → VENDER MÁS → CRECER → DESTACAR). Así el copy que ya funcionaba
+   gana un movimiento que demuestra el resultado, sin jerga técnica.
+     tesis (con "+" acento) → conector → palabra-beneficio que cicla.
+   cycle[0] lo rinde el server (indexable / sin-JS); el resto rota con JS. ── */
+const copy = {
+  es: {
+    signatureMeta: 'EST. 2025 · NYC + LATAM',
+    /* tesis: DISEÑO + TECNOLOGÍA. El "+" es signo tipográfico (acento), en
+       LIMA — es el glifo con significado del hero. */
+    thesis: [
+      { word: 'DISEÑO', accent: false },
+      { word: '+', accent: true },
+      { word: 'TECNOLOGÍA', accent: false },
+    ],
+    /* conector: minúscula itálica (Fraunces) — respiro editorial */
+    connector: 'para negocios que necesitan',
+    /* palabra-beneficio que cicla. Todas mayúscula display, en tinta. */
+    cycle: ['VERSE MEJOR.', 'VENDER MÁS.', 'CRECER.', 'DESTACAR.'],
+    subhead:
+      'Webs premium, plataformas y sistemas digitales para negocios ambiciosos en USA y LATAM. Un solo equipo, de principio a fin.',
+    cta: 'EMPEZAR PROYECTO',
+  },
+  en: {
+    signatureMeta: 'EST. 2025 · NYC + LATAM',
+    thesis: [
+      { word: 'DESIGN', accent: false },
+      { word: '+', accent: true },
+      { word: 'TECHNOLOGY', accent: false },
+    ],
+    connector: 'for businesses that need to',
+    cycle: ['LOOK SHARP.', 'SELL MORE.', 'GROW.', 'STAND OUT.'],
+    subhead:
+      'Premium websites, platforms and digital systems for ambitious businesses across the US and LATAM. One team, start to finish.',
+    cta: 'START A PROJECT',
+  },
+};
 
-/* CTA superior derecha — "Let's talk" / "Hablemos" */
-const letsTalk = lang === 'es' ? 'Hablemos' : "Let's talk";
+const c = copy[lang];
+
+/* Capacidades — línea de texto corrido, SIN números (reemplaza el índice
+   001-004 vertical que el visual-critic marcó como "ficha técnica de
+   estudio" genérica). Términos técnicos en inglés en ambos idiomas
+   (convención del sitio, igual que PORTFOLIO). */
+const capabilities = [
+  'WEB PLATFORMS',
+  'SAAS + SYSTEMS',
+  'AI AUTOMATION',
+  'ORDERING · BOOKING · WORKFLOWS',
+];
 ---
 
-<section class="hero-v3" aria-label={t.hero.ariaLabel}>
+<section class="hero-v3 hero" aria-label={t.hero.ariaLabel}>
 
-  <!-- ────────────────────────────────────────────────────────────────
-       VIDEO FULL-BLEED — el fondo es la composición
-       ──────────────────────────────────────────────────────────────── -->
-  <div class="hero-media" aria-hidden="true">
-    <!--
-      FONDO PROVISIONAL — rojo Locomotive animado (decisión William 2026-06-16):
-      mientras no exista el video real (Runway → montaje en Premiere), esta capa
-      .hero-fallback muestra un rojo saturado con un brillo que se mueve lento.
-      El mix-blend-mode de nav/wordmark hace que el texto reaccione (sobre rojo → cyan),
-      así se ve la estética final HOY sin video.
+  <!-- Grano de textura (mejora 2026-07-30): SVG fractalNoise inline como
+       data-URI. Le da al crema plano una textura de impreso premium sin peso
+       de imagen ni JS. Muy sutil (opacity baja), pointer-events:none. -->
+  <div class="hero-grain" aria-hidden="true"></div>
 
-      SWAP A VIDEO REAL: poné el archivo en /public/video/hero.mp4
-      (opcional /public/video/hero.webm para mejor compresión) y arranca solo.
-      El <video> se monta ENCIMA del fallback (z-index) y lo tapa al cargar.
-      Si el video no existe, el <video> queda transparente y se ve el rojo.
-    -->
-    <div class="hero-fallback"></div>
-    <video
-      class="hero-video"
-      autoplay
-      muted
-      loop
-      playsinline
-      preload="metadata"
-    >
-      <source src="/video/hero.webm" type="video/webm" />
-      <source src="/video/hero.mp4" type="video/mp4" />
-    </video>
+  <!-- Barra superior de firma — cabecera de dossier, reemplaza el kicker
+       suelto. Izquierda: wordmark. Derecha: metadato de estudio. Hairline
+       cruza debajo de toda la fila. -->
+  <div class="hero-signature">
+    <span class="hero-signature__mark">SCUART</span>
+    <span class="hero-signature__meta">{c.signatureMeta}</span>
   </div>
 
-  <!-- ────────────────────────────────────────────────────────────────
-       NAV MINIMAL — sobre el video, arriba
-       ──────────────────────────────────────────────────────────────── -->
-  <header class="hero-nav" role="navigation" aria-label="Navegación principal">
-    <a href={`/${lang}`} class="hero-nav__brand" aria-label="SCUART — Inicio">
-      SCUART<sup class="hero-nav__reg" aria-hidden="true">®</sup>
-    </a>
-
-    <!--
-      Links centrales — patrón Locomotive: una sola tira separada por comas
-      ("Work, Agency, Careers, Store"). Las comas son pseudo-elementos ::after
-      (CSS) con su propio margin — no dependen del whitespace del HTML, que
-      el flex colapsa. En blanco (no acento), como la referencia.
-    -->
-    <nav class="hero-nav__center" aria-label="Secciones">
-      <a href={`/${lang}#portfolio`} class="hero-nav__link" data-comma>{t.nav.portfolio}</a>
-      <a href={`/${lang}#services`} class="hero-nav__link" data-comma>{t.nav.method}</a>
-      <a href={`/${lang}#contact`} class="hero-nav__link">{t.nav.contact}</a>
-    </nav>
-
-    <div class="hero-nav__right">
-      <!-- Switch de idioma movido al footer (decisión William 2026-06-16):
-           hero más limpio; el usuario cambia idioma desde el pie de página. -->
-      <a href={`/${lang}#contact`} class="hero-nav__cta">{letsTalk}</a>
-    </div>
-  </header>
-
-  <!-- ────────────────────────────────────────────────────────────────
-       WORDMARK — abajo-izquierda, grande, sobre el video.
-       Patrón Locomotive: recuadro de disciplinas + nombre + descriptor + asterisco.
-       El recuadro (DIS/DEV/AI) es el equivalente SCUART del OPS/DES/DEV de ellos.
-       ──────────────────────────────────────────────────────────────── -->
-  <div class="hero-wordmark">
-    <h1 class="hero-wordmark__name">
-      <!--
-        Recuadro de disciplinas — SVG, geometría de Locomotive (OPS | DES/DEV):
-        · marco exterior apaisado
-        · VERTICAL completa al ~55% → separa DIS (izquierda, centrada en toda la altura)
-          de la zona derecha
-        · HORIZONTAL solo en la mitad DERECHA (de la vertical al borde) → separa DEV/AI
-        DIS NO es cruzado por ninguna línea (queda en su celda alta intacto).
-        viewBox apaisado 200×76, stroke grueso (4 ≈ líneas de Locomotive).
-      -->
-      <svg class="hero-disc" viewBox="0 0 200 76" role="img"
-           aria-label="Disciplinas: Diseño, Desarrollo, AI" preserveAspectRatio="xMidYMid meet">
-        <!-- marco exterior -->
-        <rect x="2" y="2" width="196" height="72" fill="none" stroke="#fff" stroke-width="4"/>
-        <!-- HORQUILLA ⊣ como Locomotive: vertical larga + brazo horizontal a la DERECHA -->
-        <!-- VERTICAL LARGA: de arriba a abajo. Separa DIS de DEV/AI -->
-        <line x1="100" y1="8" x2="100" y2="68" stroke="#fff" stroke-width="4"/>
-        <!-- BRAZO HORIZONTAL: a la DERECHA, largo, casi hasta el borde (separa DEV de AI). -->
-        <line x1="100" y1="38" x2="192" y2="38" stroke="#fff" stroke-width="4"/>
-        <!-- textos: DIS centrado en la mitad izquierda, DEV/AI a la derecha de la vertical -->
-        <text x="50"  y="39" fill="#fff" text-anchor="middle" dominant-baseline="central" class="hero-disc__txt">DIS</text>
-        <text x="150" y="22" fill="#fff" text-anchor="middle" dominant-baseline="central" class="hero-disc__txt">DEV</text>
-        <text x="150" y="56" fill="#fff" text-anchor="middle" dominant-baseline="central" class="hero-disc__txt">AI</text>
-      </svg>
-      <span class="hero-wordmark__word" data-reveal>{wordmarkName}<sup class="hero-wordmark__reg" aria-hidden="true">®</sup></span>
+  <!-- Bloque-frase — el corazón del hero. UNA columna, alineada a izquierda.
+       Jerarquía por TAMAÑO (no por peso — todo 300): tesis 0.62 · conector
+       0.34 · beneficio-que-cicla 1.0 (el más grande de la página). -->
+  <div class="hero-frase">
+    <h1 class="hero-h1">
+      <span class="h1-line h1-line--thesis" data-line="thesis">
+        {c.thesis.map((token, i) => (
+          <>
+            {i > 0 && <span class="h1-space" aria-hidden="true"> </span>}
+            <span class={`h1-word${token.accent ? ' h1-word--plus' : ''}`}>{token.word}</span>
+          </>
+        ))}
+      </span>
+      <span class="h1-line h1-line--connector" data-line="connector">
+        <span class="h1-word">{c.connector}</span>
+      </span>
+      <span class="h1-line h1-line--result" data-line="result">
+        {/* Palabra-resultado que cicla. data-cycle lleva la lista JSON; el JS
+           rota el textContent con fade y re-dimensiona la barra marcadora.
+           Sin JS queda cycle[0] fijo y la barra queda al ancho de esa
+           palabra vía CSS (width: 100% del span inline-block). */}
+        <span class="h1-cycle-wrap">
+          <span
+            class="h1-word h1-word--accent h1-cycle"
+            data-cycle={JSON.stringify(c.cycle)}
+            aria-label={c.cycle.join(', ')}
+          >{c.cycle[0]}</span>
+          <span class="h1-cycle-bar" aria-hidden="true"></span>
+        </span>
+      </span>
     </h1>
-    <p class="hero-wordmark__descriptor" data-reveal>
-      {wordmarkDescriptor}<!-- Asterisco AUTÉNTICO de PP Editorial New (carácter de la fuente) -->
-      <span class="hero-wordmark__star" aria-hidden="true">*</span>
+
+    <!-- Subhead — debajo del bloque-frase, ancho completo (no a un costado) -->
+    <p class="hero-subhead">{c.subhead}</p>
+  </div>
+
+  <!-- Banda inferior de cierre — reemplaza el índice numerado vertical.
+       CTA a la izquierda, capacidades como línea corrida a la derecha.
+       Hairline cruza arriba de toda la fila. -->
+  <div class="hero-band">
+    <a class="hero-cta" href={`/${lang}#contact`}>
+      {c.cta} <span aria-hidden="true">→</span>
+    </a>
+    <p class="hero-band__caps">
+      {capabilities.map((label, i) => (
+        <>
+          {i > 0 && <span class="hero-band__sep" aria-hidden="true"> · </span>}
+          <span>{label}</span>
+        </>
+      ))}
     </p>
   </div>
-
-  <!-- Scroll cue — esquina inferior derecha -->
-  <span class="hero-scroll-cue" aria-hidden="true">↓</span>
 
 </section>
 
 <style>
-/* ═══════════════════════════════════════════════════════════════════
-   HERO "LOCOMOTIVE" — RÉPLICA EXACTA del sistema tipográfico de locomotive.ca
-   Valores extraídos del sitio real (computed styles @1440px, 2026-06-16):
-     - Nav:      HelveticaNowDisplay 26px / 400 / sin tracking / Title Case
-                 → acá: Geist Sans (sans neutra equivalente).
-     - Wordmark: LocomotiveNew (serif custom) 70px / 400 / line-height 1.1
-                 → acá: Fraunces (tu serif licenciada).
-     - left: 40px exacto (brand y wordmark). Wordmark pegado al fondo.
-     - COLOR: el texto es BLANCO. NO tiene color propio: el efecto de color que
-       cambia según el video lo da `mix-blend-mode: difference` en el contenedor
-       (.hero-nav y .hero-wordmark). Sobre claro → oscuro; sobre rojo → cyan; etc.
-       Esto es EXACTAMENTE lo que hace Locomotive (clases .c-header y
-       .c-home-hero_content tienen mix-blend-mode: difference).
-   Mobile-first: 375px base → md:768px → lg:1280px.
-   ═══════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   HERO — portada de dossier editorial. Paleta redesign-v3
+   (crema/tinta/lima). Mobile-first: 375px base. md: 768px. lg: 1280px.
+   ═══════════════════════════════════════════════════════════ */
 
-.hero-v3 {
-  /* left exacto de Locomotive = 40px. Lo usamos como margen del hero. */
-  --hero-edge: 40px;
-
+.hero {
   position: relative;
   min-height: 100svh;
-  height: 100svh;
-  overflow: hidden;
-  background-color: #0b0b0a;      /* base oscura mientras carga el video/poster */
-  isolation: isolate;             /* CRÍTICO: aísla el mix-blend al hero, no a toda la página */
   display: flex;
   flex-direction: column;
+  padding-left: var(--margin);
+  padding-right: var(--margin);
+  /* padding-top explícito con safe-area (iPhone notch) — antes dependía
+     solo del clamp(vh) de .hero-signature, que no conoce el inset real. */
+  padding-top: max(0px, env(safe-area-inset-top));
+  /* --cookiebar-h: altura real de la barra de cookies, publicada por
+     CookieBanner.astro (0px cuando no está). La barra es position:fixed y no
+     ocupa flujo — sin esto la banda inferior del hero (CTA + capacidades)
+     queda TAPADA por el banner en la primera visita. */
+  padding-bottom: calc(var(--space-l) + var(--cookiebar-h, 0px));
+  background-color: var(--bg);
+  color: var(--ink);
+  max-width: 100%;
+  overflow-x: clip;
 }
 
-/* ── Video full-bleed ─────────────────────────────────────────────── */
-.hero-media {
+/* ─── GRANO / TEXTURA ────────────────────────────────────── */
+/* inset:0 por defecto (relativo a .hero). En desktop (≥1280px) .hero gana
+   max-width y el grain se libera a full-bleed real vía 100vw/-50vw — ver
+   media query desktop más abajo. */
+.hero-grain {
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
 }
 
-.hero-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center center;
-  will-change: transform, opacity;
-  z-index: 1;                      /* ENCIMA del fallback: al cargar el video real, lo tapa */
-  /* Oculto hasta que HAYA video real cargado (clase .is-ready la pone el JS en loadeddata).
-     Así un /video/hero.mp4 inexistente NO muestra un recuadro roto/negro: manda el rojo. */
-  opacity: 0;
-}
-
-.hero-video.is-ready {
-  opacity: 1;
-}
-
-/* ── Fondo provisional rojo Locomotive (sin video) ──────────────────
- * Rojo saturado con un brillo radial que respira y se desplaza lento.
- * Queda DEBAJO del <video> (z-index 0). Cuando el video real cargue,
- * el <video> opaco lo tapa. Si no hay video, esto es lo que se ve.
- * El mix-blend-mode de nav/wordmark convierte el blanco en cyan sobre este rojo.
- */
-.hero-fallback {
-  position: absolute;
-  inset: -20%;                     /* más grande que el viewport: el brillo puede salir y entrar */
-  z-index: 0;
-  background-color: #d61f16;       /* rojo bombero Locomotive (base) */
-  background-image:
-    radial-gradient(60% 55% at 35% 35%, #ff5a3c 0%, rgba(255,90,60,0) 60%),
-    radial-gradient(70% 60% at 70% 70%, #ff3a24 0%, rgba(214,31,22,0) 65%),
-    linear-gradient(130deg, #b3140d 0%, #e7251c 50%, #b3140d 100%);
-  will-change: transform;
-  /* Estado base = primer frame de hero-drift: sin esto, en CPU lenta el
-     elemento pinta sin transform y salta al arrancar la animación (CLS
-     0.63 en tablet, QA 2026-07-21). */
-  transform: scale(1.1) translate3d(-6%, -4%, 0);
-  /* dos animaciones: el bloque entero deriva, y los brillos pulsan */
-  animation:
-    hero-drift 9s ease-in-out infinite alternate,
-    hero-pulse 5s ease-in-out infinite alternate;
-}
-
-/* Deriva del bloque — desplazamiento amplio y visible (el "brillo" cruza la pantalla) */
-@keyframes hero-drift {
-  0%   { transform: scale(1.1) translate3d(-6%, -4%, 0); }
-  100% { transform: scale(1.18) translate3d(6%, 4%, 0); }
-}
-
-/* Pulso de saturación/brillo — la luz "respira" notoriamente */
-@keyframes hero-pulse {
-  0%   { filter: saturate(0.95) brightness(0.92); }
-  100% { filter: saturate(1.25) brightness(1.12); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-fallback { animation: none; transform: scale(1.1); }
-}
-
-/* Sin scrim: mix-blend-mode: difference ya garantiza contraste contra cualquier fondo. */
-
-/* ════════════════════════════════════════════════════════════════════
-   NAV — réplica Locomotive: 26px, blanco, mix-blend difference
-   ════════════════════════════════════════════════════════════════════ */
-.hero-nav {
+/* ─── BARRA SUPERIOR DE FIRMA ────────────────────────────── */
+/* Cabecera de dossier: wordmark izquierda, metadato de estudio derecha,
+   hairline cruza debajo de toda la fila. Geist mono uppercase chico. */
+.hero-signature {
   position: relative;
-  z-index: 3;
+  z-index: 2;
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
-  padding:
-    max(var(--hero-edge), env(safe-area-inset-top))
-    max(var(--hero-edge), env(safe-area-inset-right))
-    0
-    max(var(--hero-edge), env(safe-area-inset-left));
-  /* EL EFECTO: el texto blanco se invierte según el video que tiene detrás */
-  mix-blend-mode: difference;
-  color: #fff;
+  gap: var(--space-s);
+  font-family: var(--font-body);
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  margin-top: clamp(88px, 14vh, 120px);
+  padding-bottom: var(--space-s);
+  border-bottom: 1px solid var(--hairline);
+  flex-shrink: 0;
+  opacity: 0; /* GSAP revela */
+}
+.hero-signature__mark {
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.1em;
+}
+.hero-signature__meta {
+  font-weight: 400;
+}
+
+/* ─── BLOQUE-FRASE ───────────────────────────────────────── */
+.hero-frase {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  margin-top: var(--space-l);
+}
+
+/* ─── H1 ─────────────────────────────────────────────────── */
+.hero-h1 {
+  font-family: var(--font-display);
+  /* Peso LIGHT (300): PP Editorial New solo tiene el corte Light (fonts.css
+     declara font-weight 300 400). Es el peso base de todo el sitio. La
+     jerarquía entre líneas la da el TAMAÑO (ver .h1-line--thesis/--result),
+     no el peso — todas las líneas son 300. */
+  font-weight: var(--display-weight-light);
+  line-height: var(--display-leading);
+  letter-spacing: var(--display-tracking);
+  color: var(--ink);
+  hyphens: manual;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+.h1-line { display: block; }
+.h1-word { display: inline-block; }
+
+/* Tesis (DISEÑO + TECNOLOGÍA): registro MEDIANO — 0.62 del beneficio.
+   Base MOBILE (375px→767px): piso subido a 30px→40px con letter-spacing
+   propio -0.01em (no el -0.025em de --display-tracking, que a 30px se ve
+   apretado). Tablet/desktop pisan estos valores en sus media queries. */
+.h1-line--thesis {
+  font-size: clamp(1.875rem, 2.551vw + 1.277rem, 2.5rem); /* 30px@375 → 40px@767 */
+  letter-spacing: -0.01em;
+}
+
+/* El "+" de la tesis — glifo con significado, en LIMA. CSS-first: se ve lima
+   sin depender de JS (progressive enhancement correcto). */
+.h1-word--plus { color: var(--brand); }
+
+/* Conector editorial: minúscula itálica, CHICO — 0.34 del beneficio.
+   Rompe el muro de mayúsculas (visual-critic 2026-08-03) y hace VISIBLE lo
+   que la frase ya dice: el ojo salta de la tesis al beneficio. La itálica
+   cae en Fraunces (2º en --font-display) — PP Editorial no tiene itálico. */
+.h1-line--connector {
+  /* Base MOBILE (375px→767px): piso 16px→19px, letter-spacing propio.
+     Tablet/desktop pisan estos valores en sus media queries. */
+  font-size: clamp(1rem, 0.765vw + 0.821rem, 1.1875rem); /* 16px@375 → 19px@767 */
+  text-transform: lowercase;
+  font-style: italic;
+  font-weight: var(--display-weight-normal);
+  color: var(--ink-mid);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0.2em 0 0.2em;
+}
+.h1-line--connector .h1-space { letter-spacing: 0; }
+
+/* Beneficio que cicla: el registro MÁS GRANDE de toda la página. Domina la
+   composición (nivel 1 de jerarquía, ≥40% del peso visual del hero). En
+   TINTA — el lima se reserva para el "+" y la barra marcadora, nunca texto
+   grande sobre crema (rechina a esta escala).
+   Mínimo local 2.5rem (no el 1.9rem de --text-h1): en 375px el visual-critic
+   marcó el titular como "chico, tímido". --text-h1 es token global (lo usan
+   Manifesto/Statement/Contact) — se sube el piso SOLO acá, override local del
+   hero, sin tocar el token. El tope 8.5rem se mantiene igual al de --text-h1. */
+.h1-line--result {
+  /* Base MOBILE (375px→767px). Antes era un override local fijo (54px@375)
+     que existía SOLO para compensar que --text-h1 daba 30px en mobile —
+     un parche contra el token roto. Con la escala mobile propia en
+     tokens.css (2026-08-06) el token ya da 44px, así que el beneficio
+     vuelve a derivarse de él: 1.25 × --text-h1 = 55px@375. Mantiene el
+     tamaño que el critic pidió, pero ahora ESCALA con el sistema en vez
+     de estar clavado — si William ajusta --text-h1, el hero sigue.
+     line-height/letter-spacing propios — puede wrappear a 2 líneas, es
+     deseable (domina más). Tablet/desktop pisan esto en sus media queries. */
+  font-size: calc(var(--text-h1) * 1.25);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  margin-top: 0.05em;
+  /* aire abajo para que la barra lima (bottom:-0.14em) caiga fuera del texto
+     sin que el subhead se le suba encima */
+  padding-bottom: 0.18em;
+  /* ALTURA RESERVADA PARA 2 LÍNEAS (fix William 2026-08-05, "el sitio
+     temblequea cuando las palabras grandes cambian"): las palabras del ciclo
+     tienen largo distinto — "VERSE MEJOR." envuelve a 2 líneas en 375px y
+     "CRECER." entra en 1. Sin reserva, el bloque cambiaba de alto en cada
+     rotación y EMPUJABA todo lo de abajo (medido: salto de 55px en 375px, la
+     banda del CTA se movía igual). Tablet y desktop ya tenían su min-height;
+     mobile no. 2.04em = 2 × line-height(1.02) — el alto de dos líneas. */
+  min-height: 2.04em;
+}
+.h1-word--accent { color: var(--ink); }
+
+/* Envoltorio de la palabra-cicla + su barra marcadora. inline-block para que
+   la barra se posicione relativa a este bloque y no al H1 completo. */
+.h1-cycle-wrap {
+  position: relative;
+  display: inline-block;
+}
+.h1-cycle {
+  display: inline-block;
+  will-change: transform, opacity;
+  padding-bottom: 0.05em; /* aire para que el fade vertical no se recorte */
+}
+
+/* Barra marcadora lima — tipo resaltador, bajo el beneficio. El JS mide
+   getClientRects() de .h1-cycle y posiciona la barra bajo la ÚLTIMA línea
+   (left/width vía inline style) — necesario porque cuando el beneficio
+   wrappea a 2 líneas (mobile, a veces tablet), el bounding box completo
+   del span daría el ancho de la línea más larga y una posición incorrecta.
+   Sin JS: left:0/width:100% del wrap, que envuelve exactamente a cycle[0]
+   en una sola línea (estático, sin animación) — progressive enhancement. */
+.h1-cycle-bar {
+  position: absolute;
+  left: 0;
+  /* bottom NEGATIVO (fix William 2026-08-06: "la raya lima está muy pegada").
+     Antes era 0.08em POSITIVO, que mete la barra DENTRO de la caja de texto:
+     con line-height 1.02 el descender de la serif casi la toca y se lee como
+     subrayado apretado, no como resaltador. En negativo la barra cae por
+     DEBAJO de la línea base y respira.
+     En em, así escala con el font-size dinámico de tablet/desktop. */
+  bottom: -0.22em;
+  height: 0.09em;
+  width: 100%;
+  background-color: var(--brand);
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+.h1-space { display: inline; }
+
+/* word-clip / word-inner: inyectados por GSAP para el word-reveal.
+   SIN máscara vertical (bug 2026-08-03: recortaba diacríticos Ñ/Í). El
+   reveal es fade+slide corto en .word-inner, no necesita recortar nada. */
+:global(.word-clip) {
+  display: inline-block;
+  vertical-align: bottom;
+}
+:global(.word-inner) { display: inline-block; }
+
+/* ─── SUBHEAD ────────────────────────────────────────────── */
+.hero-subhead {
+  position: relative;
+  font-family: var(--font-body);
+  font-size: var(--text-subhead);
+  font-weight: 400;
+  color: var(--ink-mid);
+  line-height: 1.5;
+  margin-top: var(--space-l);
+  max-width: 48ch;
   opacity: 0; /* GSAP revela */
 }
 
-/* Todo el texto del nav es BLANCO — el color lo crea el blend, no el texto. */
-.hero-nav__brand {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 1.625rem;          /* 26px exacto */
-  letter-spacing: -0.01em;
-  color: #fff;
-  text-decoration: none;
-  line-height: 1.2;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.06em;
-  flex-shrink: 0;
-}
-
-.hero-nav__reg {
-  font-size: 0.5em;
-  color: #fff;
-  vertical-align: super;
-}
-
-/*
- * Links centrales — "Work, Services, Contact": una tira, Title Case, blanco, 26px.
- * Posición a la DERECHA-centro (como Locomotive: el bloque de links vive cerca
- * del CTA, no pegado al brand). margin-left:auto los empuja a la derecha;
- * el gap con .hero-nav__right los separa del "Let's talk".
- * Ocultos en mobile.
- */
-.hero-nav__center {
-  display: none;
-  align-items: baseline;
-  margin-left: auto;            /* empuja el bloque de links a la derecha */
-  margin-right: clamp(2rem, 6vw, 5rem);  /* separación del CTA "Let's talk" */
-}
-
-.hero-nav__link {
-  font-family: var(--font-body);
-  font-size: 1.625rem;          /* 26px exacto */
-  font-weight: 400;
-  color: #fff;
-  text-decoration: none;
-  /* Los labels YA vienen en Title Case desde i18n — sin transform */
-  letter-spacing: 0;
-  line-height: 1.2;
+/* ─── BANDA INFERIOR DE CIERRE ───────────────────────────── */
+.hero-band {
   position: relative;
-  background-image: linear-gradient(#fff, #fff);
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 0% 1px;
-  transition: background-size 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  padding-bottom: 2px;
-}
-
-/* Coma + espacio entre links (no en el último) */
-.hero-nav__link[data-comma]::after {
-  content: ',\00a0';
-  color: #fff;
-}
-
-.hero-nav__link:hover {
-  background-size: 100% 1px;
-}
-
-.hero-nav__link:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
-}
-
-.hero-nav__right {
+  z-index: 2;
   display: flex;
-  align-items: baseline;
-  gap: 1.5rem;
-  flex-shrink: 0;
-}
-
-.hero-nav__lang {
-  display: flex;
-  align-items: baseline;
-  gap: 0.3em;
-  font-family: var(--font-body);
-  font-size: 1.625rem;          /* 26px exacto */
-  font-weight: 400;
-  text-transform: uppercase;     /* "EN"/"ES" códigos de idioma */
-  letter-spacing: 0;
-  line-height: 1.2;
-}
-
-.hero-nav__lang-active {
-  color: #fff;
-}
-
-.hero-nav__lang-sep {
-  color: #fff;
-  opacity: 0.5;
-}
-
-.hero-nav__lang-other {
-  color: #fff;
-  opacity: 0.55;
-  text-decoration: none;
-  transition: opacity 0.2s ease;
-}
-
-.hero-nav__lang-other:hover {
-  opacity: 1;
-}
-
-.hero-nav__lang-other:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
-}
-
-/* CTA "Let's talk" — blanco, Title Case, 26px, igual que los links */
-.hero-nav__cta {
-  font-family: var(--font-body);
-  font-size: 1.625rem;          /* 26px exacto */
-  font-weight: 400;
-  color: #fff;
-  text-decoration: none;
-  text-transform: none;
-  letter-spacing: 0;
-  line-height: 1.2;
-  position: relative;
-  background-image: linear-gradient(#fff, #fff);
-  background-repeat: no-repeat;
-  background-position: 0 100%;
-  background-size: 0% 1px;
-  transition: background-size 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  padding-bottom: 2px;
-}
-
-.hero-nav__cta:hover {
-  background-size: 100% 1px;
-}
-
-.hero-nav__cta:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
-}
-
-/* ════════════════════════════════════════════════════════════════════
-   WORDMARK — abajo-izquierda. Réplica Locomotive: serif 70px, blanco, blend.
-   ════════════════════════════════════════════════════════════════════ */
-.hero-wordmark {
-  position: relative;
-  z-index: 3;
-  margin-top: auto; /* pegado al fondo */
-  padding:
-    0
-    var(--hero-edge)
-    max(var(--hero-edge), calc(env(safe-area-inset-bottom) + 1.5rem))
-    max(var(--hero-edge), env(safe-area-inset-left));
-  /* MISMO efecto que el nav: el wordmark blanco reacciona al video */
-  mix-blend-mode: difference;
-  color: #fff;
-}
-
-/*
- * Wordmark — DOS líneas de la MISMA serif, MISMO tamaño (70px @desktop),
- * peso 400, line-height 1.1. Blanco (el blend le da el color).
- * Es UN bloque tipográfico sólido, como "Locomotive® / Digital-first Design Agency".
- */
-.hero-wordmark__name,
-.hero-wordmark__descriptor {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-style: normal;
-  font-size: clamp(2.5rem, 11vw, 4.375rem);   /* 70px @desktop */
-  line-height: 1.1;
-  letter-spacing: -0.005em;
-  color: #fff;
-  margin: 0;
-}
-
-.hero-wordmark__name {
-  display: flex;
-  align-items: flex-start;      /* recuadro alineado al TOPE (como Locomotive) */
-  gap: 0.3em;
-}
-
-.hero-wordmark__word {
-  display: inline-flex;
+  flex-direction: column;
   align-items: flex-start;
-  gap: 0.04em;
-}
-
-.hero-wordmark__reg {
-  font-size: 0.32em;
-  font-weight: 400;
-  color: #fff;
-  vertical-align: super;
-  margin-top: 0.3em;
-}
-
-/* ── Recuadro de disciplinas DIS/DEV/AI ──────────────────────────────
- * RÉPLICA EXACTA del OPS/DES/DEV de Locomotive. Medidas reales extraídas
- * del DevTools de locomotive.ca (wordmark 70px): recuadro 176.92 × 88.48 px.
- *   → altura  = 88.48/70  = 1.264em (relativo al font-size del wordmark)
- *   → ancho   = 176.92/70 = 2.527em
- *   → ratio apaisado ~2:1. Celda izquierda alta (DIS) + columna derecha (DEV/AI).
- * El recuadro se mide en `em` del wordmark, NO en su propio font-size,
- * para que escale 1:1 con la palabra en todos los breakpoints.
- */
-.hero-disc {
-  /* Locomotive: recuadro y palabra arrancan en el MISMO margen (sin sobresalir).
-     El recuadro alinea su tope y base con la mayúscula de la línea 1.
-     Altura = cap-height de "SCUART" (~57px = 0.82em @70px). */
-  height: 0.82em;
-  width: auto;
+  gap: var(--space-m);
+  margin-top: var(--space-l);
+  padding-top: var(--space-s);
+  border-top: 1px solid var(--hairline);
   flex-shrink: 0;
-  align-self: flex-start;
-  margin-top: 0.03em;          /* tope del recuadro = techo de la mayúscula */
-  overflow: visible;
+  opacity: 0; /* GSAP revela */
 }
 
-/* Texto dentro del SVG — sans del sitio, tamaño en unidades del viewBox (200×76) */
-.hero-disc__txt {
+/* ─── CTA ────────────────────────────────────────────────── */
+.hero-cta {
   font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 17px;              /* más chico, con aire, como Locomotive */
-  letter-spacing: 0.5px;
+  font-size: var(--text-mono);
+  font-weight: 500;
+  color: var(--ink);
   text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-decoration: none;
+  padding: 0.75em 1.5em;
+  border: 1px solid var(--hairline-strong);
+  flex-shrink: 0;
+  min-height: 48px; /* touch target */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  transition: border-color 0.25s ease, background-color 0.25s ease, color 0.25s ease;
+}
+.hero-cta:hover,
+.hero-cta:focus-visible {
+  border-color: var(--brand);
+  background-color: var(--brand);
+  color: var(--on-brand);
+}
+/* la flecha del CTA — hover desktop la desplaza (ver media query 1280px) */
+.hero-cta span {
+  display: inline-block;
+  transition: transform 0.2s ease;
 }
 
-.hero-disc__col .hero-disc__cell--sm:first-child {
-  border-bottom: 1px solid #fff;
-}
-
-/* ── Asterisco auténtico de PP Editorial New (carácter de la fuente) ── */
-.hero-wordmark__star {
-  font-family: var(--font-display);
-  font-weight: 400;
-  margin-left: -0.05em;
-  font-size: 1em;               /* mismo cuerpo que el descriptor */
-  line-height: 1;
-}
-
-/* ── Scroll cue ───────────────────────────────────────────────────── */
-.hero-scroll-cue {
-  position: absolute;
-  z-index: 3;
-  right: var(--hero-edge);
-  bottom: max(var(--hero-edge), calc(env(safe-area-inset-bottom) + 1rem));
+/* ─── CAPACIDADES — línea corrida, sin números ───────────── */
+.hero-band__caps {
   font-family: var(--font-body);
-  font-size: 1.25rem;
+  font-size: var(--text-mono);
   font-weight: 400;
-  color: #fff;
-  mix-blend-mode: difference;
-  opacity: 0.85;
-  display: none; /* se muestra desde tablet */
+  color: var(--ink-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 46ch;
+}
+.hero-band__sep { opacity: 0.5; }
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE (hasta 767px) — el beneficio DOMINA, cartel vertical.
+   Base del archivo ya es mobile-first; estas reglas son las que SOLO
+   aplican <768px y deben pisar la cascada de tablet/desktop más abajo
+   (CTA full-width, orden de la banda, alineación de capacidades).
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  .hero-cta {
+    width: 100%;
+    min-height: 56px;
+  }
+  .hero-band__caps {
+    /* no heredar el text-align:right de tablet — cuidado con la cascada */
+    text-align: left;
+  }
 }
 
-/* ════════════════════════════════════════════════════════════════════
-   TABLET (768px+)
-   ════════════════════════════════════════════════════════════════════ */
-@media (min-width: 768px) {
-  .hero-nav__center {
+/* ═══════════════════════════════════════════════════════════
+   TABLET (720px–1279px) — layout dedicado, mata el hueco vertical.
+   Dos sub-rangos: portrait 720-1023px, landscape 1024-1279px.
+   Portal extendido desde 720px (no 768px) para foldables/iPad mini.
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 720px) and (max-width: 1279px) {
+  .hero {
+    min-height: auto;
+    padding-bottom: 48px;
+  }
+  .hero-signature {
+    margin-top: 64px; /* fijo, no clamp con 14vh — evita el hueco vertical */
+  }
+  .hero-band {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .hero-cta {
+    width: auto; /* resetea el full-width heredado del mobile base */
+  }
+  .hero-band__caps {
+    text-align: right;
+  }
+
+  /* Tamaños fijos (no clamp heredado) + transición corta entre sub-rangos
+     para suavizar la rotación física de iPad (720-1023 ⇄ 1024-1279). */
+  .h1-line--thesis,
+  .h1-line--connector {
+    transition: font-size 180ms ease, margin-top 180ms ease;
+  }
+  .h1-line--thesis { font-size: 3.4rem; letter-spacing: -0.02em; }
+  .h1-line--connector {
+    font-size: 1.7rem;
+    letter-spacing: -0.01em;
+    /* RITMO PROPIO de tablet (critic 2026-08-04: el conector casi chocaba el
+       beneficio → se veía "desktop apretado"). Aire vertical explícito arriba
+       y abajo del conector para que la diagonal respire en el viewport medio,
+       no sea un reflow comprimido del desktop. */
+    margin-top: 0.5em;
+    margin-bottom: 0.65em;
+  }
+  /* .h1-line--result: 5rem es el TOPE en tablet (bajado de 5.6 → deja aire para
+     que el conector no colisione; la palabra más larga sigue ocupando buena
+     parte del ancho sin comerse la línea de arriba). El JS escala .h1-cycle
+     hacia abajo desde este tope — ver bloque "font-size dinámico" más abajo. */
+  .h1-line--result {
+    font-size: 5rem;
+    letter-spacing: -0.03em;
+    transition: margin-top 180ms ease;
+  }
+  .hero-subhead {
+    font-size: 19px;
+    max-width: 40ch;
+  }
+}
+
+/* Sub-rango landscape (1024-1279px): un paso más grande, todavía tablet
+   (no entra al desktop grid hasta 1280px). El tope del dinámico sube a
+   6.8rem acorde. */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .h1-line--thesis { font-size: 4.1rem; }
+  .h1-line--connector { font-size: 2rem; margin-top: 0.55em; margin-bottom: 0.7em; }
+  .h1-line--result { font-size: 6rem; }
+}
+
+/* ─── FONT-SIZE DINÁMICO POR PALABRA (tablet 720px+ / desktop) ───────────
+   Compartido entre tablet y desktop: el JS mide cada palabra del ciclo y
+   escala .h1-cycle hacia abajo desde el tope (font-size de .h1-line--result,
+   calibrado para que la palabra MÁS LARGA ocupe ~90% del ancho útil) —
+   nunca lo supera. Anclaje por la BASE: .h1-line--result pasa a flex con
+   align-items:flex-end y min-height fija al tope, así el cambio de tamaño
+   entre palabras crece/encoge hacia ARRIBA sin mover la barra lima ni el
+   resto del layout. En mobile (<720px) NO se activa — el beneficio wrappea
+   por alto ahí, no por ancho, y usa tamaño fijo (54-72px) sin JS. */
+@media (min-width: 720px) {
+  .h1-line--result {
     display: flex;
+    align-items: flex-end;
+    /* Beneficio ANCLADO A LA DERECHA (decisión William 2026-08-04): las
+       palabras del ciclo tienen anchos muy distintos ("VERSE MEJOR." llena,
+       "CRECER." no). Con el beneficio a la izquierda, las cortas dejaban un
+       hueco a la DERECHA que reintroducía el "vacío desktop" que motivó todo
+       el rediseño. Anclado a la derecha, el aire de las palabras cortas queda
+       a la IZQUIERDA, bajo el conector sangrado — se lee como escalón editorial
+       (diagonal: tesis ancho → conector sangrado izq → beneficio der), no como
+       hueco. La barra lima (hija de .h1-cycle-wrap, width:100% del wrap) sigue
+       a la palabra automáticamente. Solo tablet+desktop; mobile (<720px) queda
+       a la izquierda porque ahí el beneficio wrappea a 2 líneas y domina por alto. */
+    justify-content: flex-end;
+    /* min-height = line-height heredado de .hero-h1 (1.02, tablet) — em
+       relativo al font-size del propio elemento (el tope). Desktop pisa
+       este valor a 0.92em porque ahí .h1-line--result declara line-height
+       propio (0.92) — ver media query 1280px. */
+    min-height: 1.02em;
   }
-
-  .hero-scroll-cue {
-    display: inline;
-  }
-
-  .hero-wordmark__name,
-  .hero-wordmark__descriptor {
-    font-size: clamp(3.5rem, 8vw, 4.375rem);
+  /* el JS aplica el font-size dinámico en .h1-cycle-wrap (no en .h1-cycle
+     directamente) para que .h1-cycle-bar — hijo del wrap, no de .h1-cycle —
+     herede el mismo em-context vía cascada normal. Si el font-size dinámico
+     viviera solo en .h1-cycle, la barra (bottom/height en em) seguiría
+     tomando el em del tope heredado de .h1-line--result, quedando gruesa/
+     mal ubicada bajo palabras cortas. */
+  .h1-cycle-wrap {
+    transition: font-size 0.42s cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 
-/* ════════════════════════════════════════════════════════════════════
-   DESKTOP (1280px+) — 70px exacto como Locomotive
-   ════════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════
+   DESKTOP (1280px+) — el texto ocupa el ancho, mata el vacío.
+   ═══════════════════════════════════════════════════════════ */
 @media (min-width: 1280px) {
-  .hero-wordmark__name,
-  .hero-wordmark__descriptor {
-    font-size: 4.375rem;   /* 70px exacto */
+  .hero {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    /* SIN align-content:start (fix 2026-08-04): empaquetaba las tres filas
+       arriba y anulaba el 1fr — la fila del medio no se estiraba, la banda
+       (CTA + capacidades) quedaba pegada al contenido y caía FUERA del
+       viewport. El CTA, que es el botón que convierte, no se veía en desktop
+       aunque sí en mobile y tablet. Con el 1fr activo la fila central absorbe
+       el aire sobrante y empuja la banda al fondo, dentro de la pantalla. */
+    max-width: 1728px;
+    margin-inline: auto;
+    /* height fijo: el hero es una portada, ocupa exactamente una pantalla.
+       Sin esto el contenido vuelve a empujar la banda fuera. Se DESCUENTA
+       --cookiebar-h: con height:100vh a secas el grid reparte sobre la altura
+       completa y la banda cae bajo el banner aunque haya padding-bottom (el
+       padding empuja hacia adentro pero el reparto ya ocurrió). Restándolo del
+       alto, el grid resuelve sobre el espacio realmente disponible. */
+    min-height: calc(100vh - var(--cookiebar-h, 0px));
+    height: calc(100vh - var(--cookiebar-h, 0px));
+    /* el padding-bottom de la regla base ya no debe sumar la barra: el alto la
+       descuenta. Vuelve al espaciado normal. */
+    padding-bottom: var(--space-l);
   }
-}
-
-/* Ultrawide: Locomotive escala un poco; mantenemos proporción sobria */
-@media (min-width: 1920px) {
-  .hero-wordmark__name,
-  .hero-wordmark__descriptor {
-    font-size: 5.5rem;
+  /* el grano/textura recupera full-bleed real: .hero ya no es 100% del
+     viewport (tiene max-width:1728px centrado), así que el grain se libera
+     del contenedor con el truco 100vw/-50vw. overflow-x:clip en .hero
+     (heredado, ver regla base) contiene cualquier desborde horizontal. */
+  .hero-grain {
+    left: 50%;
+    right: auto;
+    width: 100vw;
+    margin-left: -50vw;
   }
-}
 
-/* ── Máscaras de line-reveal (las inserta el script) ──────────────── */
-.line-mask {
-  display: block;
-  overflow: hidden;
-}
+  .hero-frase {
+    /* align-self:center, no start (fix 2026-08-04): con el 1fr activo la fila
+       central tiene toda la altura sobrante — centrar el bloque-frase reparte
+       el aire arriba y abajo en vez de acumular ~280px muertos bajo la firma. */
+    align-self: center;
+    /* El --space-l (64px) fijo de la regla base desbordaba la fila y empujaba
+       la banda del CTA bajo la barra de cookies; pero margin-top:0 dejaba el
+       titular chocando contra la firma. Un mínimo proporcional resuelve las
+       dos: separa de la cabecera y cede cuando falta altura. */
+    margin-top: clamp(8px, 1.6vh, 40px);
+  }
 
-.line-inner {
-  display: block;
-}
+  /* ── Márgenes que ceden (fix 2026-08-04) ──────────────────────────
+     Medición a 1280×800: signature 43px + frase 541px + band 157px = 741px
+     de contenido, MÁS 240px de márgenes fijos (112 + 64 + 64) = 981px en un
+     viewport de 800. El grid no podía resolverlo porque los márgenes viven
+     DENTRO de las filas: el 1fr no tiene nada que absorber. Se cambian por
+     valores proporcionales a la altura real de pantalla, con tope bajo — así
+     el aire se reparte en pantallas altas y se comprime en las bajas, y la
+     banda con el CTA siempre entra. */
+  .hero-signature {
+    margin-top: clamp(28px, 4vh, 56px);
+  }
+  /* Subhead DEBAJO del bloque-frase, en su propia franja vertical (NO absolute
+     a la altura del beneficio — eso lo solapaba con palabras largas del ciclo
+     como "DESTACAR." que crecen hacia la izquierda, tapando el texto. Bug
+     critic 2026-08-04). Acá el subhead nunca comparte banda horizontal con el
+     beneficio: cada uno en su fila. El aire del interior de la diagonal (con
+     palabras cortas) se lee como respiro del ciclo vivo, no como hueco.
+     margin-top proporcional (no --space-l fijo): en pantallas bajas los 64px
+     fijos empujaban la banda del CTA fuera del viewport. */
+  .hero-subhead {
+    max-width: 44ch;
+    margin-top: clamp(20px, 3vh, 40px);
+  }
+  /* La banda vuelve a UNA fila en desktop (CTA izq / capacidades der). En
+     column medía 157px de alto y era la causa principal de que el CTA cayera
+     fuera en 1280×700 — el bloque de tablet ya la ponía en row, pero acá se
+     reafirma junto al gap reducido. */
+  .hero-band {
+    margin-top: clamp(12px, 2vh, 40px);
+    padding-top: clamp(12px, 2vh, 24px);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-m);
+  }
+  .hero-band__caps {
+    text-align: right;
+  }
 
-/* ── reduced-motion: estático, sin scale ──────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .hero-nav { opacity: 1; }
-  .hero-video { transform: none !important; opacity: 1 !important; }
+  /* Las tres líneas se atan al ANCHO y a la ALTURA del viewport (fix
+     2026-08-04). Antes solo miraban vw: en una pantalla baja (1280×700, laptop
+     con barra de tareas) el titular conservaba su tamaño de 1280×800 y la
+     banda con el CTA volvía a caer fuera. Con min(vw, vh) el bloque-frase cede
+     cuando falta altura y el CTA entra en todos los casos. */
+  .h1-line--result {
+    /* clamp(...) = el TOPE del dinámico: font-size calibrado para que la
+       palabra MÁS LARGA del ciclo ("VERSE MEJOR.") ocupe ~90% del ancho
+       útil. El JS escala .h1-cycle hacia abajo desde acá para las palabras
+       más cortas, nunca lo supera. */
+    font-size: clamp(4.5rem, min(13vw, 21vh), 15rem);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    min-height: 0.92em; /* pisa el 1.02em del bloque 720px — line-height propio de este breakpoint */
+  }
+  .h1-line--thesis {
+    font-size: clamp(3rem, min(8vw, 13vh), 9.3rem);
+    line-height: 1.0;
+    letter-spacing: -0.025em;
+  }
+  .h1-line--connector {
+    font-size: clamp(1.8rem, min(4.4vw, 7vh), 5.1rem);
+    text-indent: 8%;
+    letter-spacing: 0;
+  }
+  .h1-cycle-bar {
+    height: 0.10em;
+  }
+
+  /* Hover CTA (desktop): la flecha se desplaza 3px además del fondo lima
+     que ya aplica en todos los tamaños. */
+  .hero-cta:hover span,
+  .hero-cta:focus-visible span {
+    transform: translateX(3px);
+  }
 }
 </style>
 
 <script>
   /**
-   * Hero V3 "Locomotive" — Motion GSAP.
+   * Animación GSAP del hero — portada de dossier.
    *
-   * PROGRESSIVE ENHANCEMENT: wordmark y nav son HTML server-rendered;
-   * sin JS se ven igual (CSS deja .hero-nav en opacity:0 → el script lo revela;
-   * si el script no corre, el bloque reduced-motion del CSS lo deja visible).
+   * PROGRESSIVE ENHANCEMENT: todo el hero es HTML/CSS visible por defecto.
+   * Si este script falla, el hero se ve completo estático. Nunca invisible.
    *
-   * SECUENCIA:
-   * 1. Video/poster: scale 1.06→1 + opacity 0→1, 1.6s expo.out. Telón que entra.
-   * 2. Nav: fade + y -8→0, 0.6s.
-   * 3. Wordmark: line-reveal por líneas (máscara real, yPercent 110→0), stagger.
-   * 4. Scroll cue: loop sutil.
+   * Secuencia:
+   * 1. Barra de firma (fade)
+   * 2. H1 reveal: tesis (split, stagger) + conector + beneficio (fade+slide)
+   * 3. Barra marcadora lima: wipe (scaleX 0→1) sincronizado con el beneficio
+   * 4. Subhead + banda inferior (fade)
    *
-   * prefers-reduced-motion: todo visible de inmediato (CSS ya lo cubre; el JS no corre).
+   * EL GESTO: el beneficio en tinta cicla (VERSE MEJOR → VENDER MÁS → …) y la
+   * barra lima se re-dimensiona al ancho de cada palabra — es el elemento
+   * vivo del hero. Ligero (textContent + fade + transform), no toca CWV.
+   * REDUCED-MOTION: todo estático visible, sin ciclo, barra ya dibujada al
+   * ancho de cycle[0] vía CSS (width:100%).
    */
 
   import { gsap } from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-  gsap.registerPlugin(ScrollTrigger);
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isDesktop = window.matchMedia('(min-width: 769px)').matches;
+  const isDesktop = window.matchMedia('(min-width: 1280px)').matches;
+  /* Font-size dinámico por palabra: SOLO tablet (720px+) y desktop. En
+     mobile el beneficio domina por ALTO (wrappea a 2 líneas), no por ancho
+     — se queda con el tamaño fijo de la spec mobile (54-72px), sin JS. */
+  const fluidWidthActive = window.matchMedia('(min-width: 720px)').matches;
 
-  /* Video real: solo se vuelve visible (.is-ready) cuando carga de verdad.
-     Mientras /video/hero.mp4 no exista, queda oculto y manda el fondo rojo. */
-  const videoEl = document.querySelector<HTMLVideoElement>('.hero-video');
-  if (videoEl) {
-    const reveal = () => videoEl.classList.add('is-ready');
-    if (videoEl.readyState >= 2) reveal();
-    else videoEl.addEventListener('loadeddata', reveal, { once: true });
-  }
+  /* Mide la ÚLTIMA línea renderizada de .h1-cycle y devuelve su posición
+     relativa a .h1-cycle-wrap (el contenedor position:relative de la barra).
+     getClientRects() da un DOMRect por línea de texto — cuando el beneficio
+     wrappea (mobile, a veces tablet), el bounding box completo del span
+     daría el ancho de la línea MÁS LARGA y la posición de la PRIMERA línea:
+     mal para una barra que debe quedar bajo la última. Tomamos el último
+     rect explícitamente. */
+  const measureLastLineRect = (cycleEl: HTMLElement, wrapEl: HTMLElement): { left: number; width: number } => {
+    const rects = cycleEl.getClientRects();
+    const lastRect = rects.length > 0 ? rects[rects.length - 1] : cycleEl.getBoundingClientRect();
+    const wrapRect = wrapEl.getBoundingClientRect();
+    return { left: lastRect.left - wrapRect.left, width: lastRect.width };
+  };
+
+  /* ── Font-size dinámico por palabra (tablet/desktop) ──
+     Calcula, para cada palabra del ciclo, el font-size que la acerca a
+     TARGET_RATIO (90%) del ancho útil, con TOPE = el font-size que ya trae
+     .h1-line--result por CSS (calibrado para que la palabra MÁS LARGA del
+     ciclo ocupe ~90%). Las palabras más cortas escalan hacia ese tope sin
+     pasarlo nunca — measured width crece linealmente con font-size, así que
+     scale = targetWidth / widthAtTope da el tamaño exacto en una sola
+     medición (sin iterar). Usa un medidor oculto (misma fuente/tracking)
+     para no tocar el DOM visible mientras mide. */
+  const TARGET_RATIO = 0.9;
+  const computeWordFontSizes = (
+    words: string[],
+    cycleEl: HTMLElement,
+    heroFrase: HTMLElement
+  ): number[] => {
+    const topFontSizePx = parseFloat(getComputedStyle(cycleEl).fontSize);
+    const usefulWidth = heroFrase.getBoundingClientRect().width;
+    const targetWidth = usefulWidth * TARGET_RATIO;
+
+    /* medidor oculto: mismo font-family/weight/letter-spacing que .h1-cycle,
+       fuera de flujo (position:fixed, visibility:hidden) para no causar
+       reflow visible ni afectar el layout real mientras mide. */
+    const measurer = document.createElement('span');
+    const cs = getComputedStyle(cycleEl);
+    measurer.style.position = 'fixed';
+    measurer.style.visibility = 'hidden';
+    measurer.style.left = '-9999px';
+    measurer.style.top = '0';
+    measurer.style.whiteSpace = 'nowrap';
+    measurer.style.fontFamily = cs.fontFamily;
+    measurer.style.fontWeight = cs.fontWeight;
+    measurer.style.fontStyle = cs.fontStyle;
+    measurer.style.letterSpacing = cs.letterSpacing;
+    measurer.style.fontSize = `${topFontSizePx}px`;
+    document.body.appendChild(measurer);
+
+    const sizes = words.map((word) => {
+      measurer.textContent = word;
+      const widthAtTop = measurer.getBoundingClientRect().width;
+      if (widthAtTop <= 0) return topFontSizePx;
+      const scale = Math.min(1, targetWidth / widthAtTop);
+      return topFontSizePx * scale;
+    });
+
+    document.body.removeChild(measurer);
+    return sizes;
+  };
 
   if (!reducedMotion) {
-    const heroNav    = document.querySelector<HTMLElement>('.hero-nav');
-    const heroVideo  = document.querySelector<HTMLElement>('.hero-video, .hero-fallback');
-    const heroMedia  = document.querySelector<HTMLElement>('.hero-media');
-    const revealEls  = document.querySelectorAll<HTMLElement>('[data-reveal]');
-    const scrollCue  = document.querySelector<HTMLElement>('.hero-scroll-cue');
+    /* ── Word-split del H1 ──
+       Envuelve cada palabra en clip>inner para el reveal escalonado. La
+       palabra ciclante (.h1-cycle) se EXCLUYE del split: su textContent debe
+       quedar intacto para que el ciclado JS lo reemplace. Igual entra en el
+       reveal, como bloque completo. */
+    const heroH1 = document.querySelector<HTMLElement>('.hero-h1');
+    let wordInners: HTMLElement[] = [];
 
-    /* ── Construir máscaras de line-reveal sobre cada elemento [data-reveal] ── */
-    const inners: HTMLElement[] = [];
-    revealEls.forEach((el) => {
+    if (heroH1) {
       try {
-        const original = el.innerHTML;
-        const mask = document.createElement('span');
-        mask.className = 'line-mask';
-        const inner = document.createElement('span');
-        inner.className = 'line-inner';
-        inner.innerHTML = original;
-        mask.appendChild(inner);
-        el.innerHTML = '';
-        el.appendChild(mask);
-        inners.push(inner);
-      } catch (_) {
-        /* Fallback: queda el texto plano visible */
-      }
-    });
+        const wordSpans = heroH1.querySelectorAll<HTMLElement>('.h1-word:not(.h1-cycle)');
+        wordSpans.forEach((wordEl) => {
+          const text = wordEl.textContent ?? '';
+          const isPlus = wordEl.classList.contains('h1-word--plus');
 
-    /* ── Bloquear scroll durante la secuencia de entrada (desktop: Lenis; mobile: body) ──
-       Lenis puede no estar listo al momento que corre este script (Layout.astro lo carga
-       en el body pero los scripts de componentes también son módulos). Esperamos el evento
-       'lenis:ready' para obtener la instancia, con fallback a window.__lenis si ya está. */
-    type LenisInstance = { stop: () => void; start: () => void };
-    let lenisInstance: LenisInstance | null = null;
+          const clip = document.createElement('span');
+          clip.className = 'word-clip';
 
-    const getLenis = (): LenisInstance | null =>
-      ((window as unknown as Record<string, unknown>)['__lenis'] as LenisInstance) ?? null;
+          const inner = document.createElement('span');
+          inner.className = 'word-inner';
+          if (isPlus) inner.classList.add('h1-word--plus');
+          inner.textContent = text;
 
-    const blockScroll = () => {
-      if (isDesktop) {
-        const l = getLenis();
-        if (l) l.stop();
-      } else {
-        /* Mobile: el scroller es document.body. Congelamos overflow temporalmente. */
-        document.body.style.overflow = 'hidden';
-      }
-    };
-
-    const unblockScroll = () => {
-      if (isDesktop) {
-        const l = getLenis();
-        if (l) l.start();
-      } else {
-        document.body.style.overflow = '';
-      }
-    };
-
-    /* ── Estados iniciales ──────────────────────────────── */
-    const heroVideoEl = document.querySelector<HTMLElement>('.hero-video');
-    if (heroVideoEl) gsap.set(heroVideoEl, { scale: 1.06, transformOrigin: 'center center' });
-    if (heroNav) gsap.set(heroNav, { opacity: 0, y: -8 });
-    if (inners.length) gsap.set(inners, { yPercent: 110 });
-
-    /* ── Timeline ───────────────────────────────────────── */
-    blockScroll();
-
-    const tl = gsap.timeline({
-      defaults: { ease: 'expo.out' },
-      onComplete: () => {
-        unblockScroll();
-      },
-    });
-
-    if (heroVideoEl) tl.to(heroVideoEl, { scale: 1, duration: 1.6 }, 0);
-    if (heroNav) tl.to(heroNav, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, 0.25);
-    if (inners.length) tl.to(inners, { yPercent: 0, duration: 1.1, stagger: 0.12 }, 0.45);
-
-    /* Scroll cue — loop sutil al terminar */
-    tl.call(() => {
-      if (scrollCue) {
-        gsap.to(scrollCue, { y: 7, duration: 0.9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-      }
-    });
-
-    /* ── Parallax de salida del hero video [propuesta SCUART, desktop only, cortable] ──
-       El video se desplaza más lento que el scroll al salir, creando profundidad.
-       RIESGO: con mix-blend-mode:difference activo, puede titilado del texto.
-       Si titila visualmente: eliminar este bloque ScrollTrigger. */
-    if (isDesktop && heroMedia) {
-      const heroSection = document.querySelector<HTMLElement>('.hero-v3');
-      if (heroSection) {
-        ScrollTrigger.create({
-          trigger: heroSection,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true,
-          onUpdate: (self) => {
-            gsap.set(heroMedia, { yPercent: self.progress * -10 });
-          },
+          clip.appendChild(inner);
+          wordEl.replaceWith(clip);
+          wordInners.push(inner);
         });
+      } catch (_) {
+        wordInners = [];
       }
+    }
+
+    /* la palabra ciclante entra al reveal como bloque entero (sin split) */
+    const cycleEl = heroH1?.querySelector<HTMLElement>('.h1-cycle') ?? null;
+    const cycleBar = heroH1?.querySelector<HTMLElement>('.h1-cycle-bar') ?? null;
+    const cycleWrap = heroH1?.querySelector<HTMLElement>('.h1-cycle-wrap') ?? null;
+    const heroFrase = document.querySelector<HTMLElement>('.hero-frase');
+
+    /* ── Referencias DOM ── */
+    const signature = document.querySelector<HTMLElement>('.hero-signature');
+    const heroSubhead = document.querySelector<HTMLElement>('.hero-subhead');
+    const heroBand = document.querySelector<HTMLElement>('.hero-band');
+
+    /* ── Estados iniciales ── */
+    gsap.set(signature, { opacity: 0 });
+    gsap.set(heroSubhead, { opacity: 0 });
+    gsap.set(heroBand, { opacity: 0 });
+
+    /* Reveal sin máscara: fade + slide corto (no yPercent:110 tras un clip,
+       que exponía/recortaba diacríticos). Sobrio y a prueba de tildes. */
+    if (wordInners.length > 0) gsap.set(wordInners, { opacity: 0, yPercent: 40 });
+    if (cycleEl) gsap.set(cycleEl, { opacity: 0, yPercent: 40 });
+    /* la barra arranca colapsada — el wipe la revela al final del reveal */
+    if (cycleBar) gsap.set(cycleBar, { scaleX: 0 });
+
+    /* ── Timeline principal ── */
+    const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+
+    tl.to(signature, { opacity: 1, duration: 0.6 });
+
+    /* Desktop (≥1280px): stagger/duration más marcados — la tesis ocupa
+       mucho más ancho ahí y el reveal palabra-por-palabra se nota más. */
+    const thesisStagger = isDesktop ? 0.09 : 0.07;
+    const resultDuration = isDesktop ? 0.95 : 0.85;
+
+    if (wordInners.length > 0) {
+      tl.to(wordInners, { opacity: 1, yPercent: 0, duration: 0.85, stagger: thesisStagger }, '-=0.3');
+    }
+    if (cycleEl) {
+      tl.to(cycleEl, { opacity: 1, yPercent: 0, duration: resultDuration }, '<+0.15');
+    }
+    /* wipe de la barra, izq→der, al final del reveal del beneficio */
+    if (cycleBar) {
+      tl.to(cycleBar, { scaleX: 1, duration: 0.5, ease: 'power3.out' }, '-=0.35');
+    }
+
+    tl.to(heroSubhead, { opacity: 1, duration: 0.7 }, '-=0.15');
+    tl.to(heroBand, { opacity: 1, duration: 0.6 }, '<+0.1');
+
+    /* ── EL GESTO: el beneficio CICLA y la barra lima se re-dimensiona ──
+       "VERSE MEJOR." → "VENDER MÁS." → "CRECER." → "DESTACAR."
+       Demuestra el resultado real de negocio en vez de solo nombrarlo. La
+       barra lima acompaña como un resaltador que se ajusta al ancho de cada
+       palabra: colapsa (scaleX→0) y vuelve a crecer al ancho nuevo.
+       document.fonts.ready asegura que la medición de ancho no se haga con
+       la fuente fallback (FOUT) antes de que cargue PP Editorial New. */
+    if (cycleEl && cycleWrap) {
+      let words: string[] = [];
+      try {
+        words = JSON.parse(cycleEl.dataset.cycle ?? '[]');
+      } catch (_) {
+        words = [];
+      }
+      if (words.length > 1) {
+        let idx = 0;
+        const HOLD = 1900; // ms que cada palabra queda quieta
+        /* tamaños precalculados por palabra (tablet/desktop). null en mobile
+           — ahí el font-size queda fijo por CSS (54-72px), sin dinámico. */
+        let wordFontSizes: number[] | null = null;
+
+        /* posiciona la barra bajo la ÚLTIMA línea del beneficio (left+width,
+           no solo width) — necesario en 2 líneas (mobile, a veces tablet). */
+        const resizeBar = () => {
+          if (!cycleBar || !cycleEl || !cycleWrap) return;
+          const { left, width } = measureLastLineRect(cycleEl, cycleWrap);
+          gsap.set(cycleBar, { left, width });
+        };
+
+        const cycleNext = () => {
+          idx = (idx + 1) % words.length;
+          gsap.to(cycleEl, {
+            opacity: 0,
+            yPercent: -18,
+            duration: 0.3,
+            ease: 'power2.in',
+          });
+          if (cycleBar) {
+            gsap.to(cycleBar, { scaleX: 0, duration: 0.25, ease: 'power2.in', transformOrigin: 'right center' });
+          }
+          gsap.delayedCall(0.3, () => {
+            if (!cycleEl) return;
+            cycleEl.textContent = words[idx];
+            gsap.fromTo(
+              cycleEl,
+              { opacity: 0, yPercent: 22 },
+              { opacity: 1, yPercent: 0, duration: 0.42, ease: 'expo.out' }
+            );
+            /* Font-size dinámico (tablet/desktop): anima .h1-cycle-wrap al
+               tamaño precalculado de esta palabra, EN PARALELO con el fade+
+               slide (misma duración 0.42s) — no como salto separado. Anclado
+               por flex-end en .h1-line--result (CSS), así el cambio de
+               tamaño crece/encoge hacia ARRIBA sin mover la barra ni el
+               resto del layout. */
+            if (cycleWrap && wordFontSizes && wordFontSizes[idx] != null) {
+              gsap.to(cycleWrap, {
+                fontSize: wordFontSizes[idx],
+                duration: 0.42,
+                ease: 'expo.out',
+                onComplete: () => {
+                  /* remide la barra recién cuando el font-size llegó a su
+                     valor final — getClientRects() sobre el tamaño real. */
+                  if (cycleBar && cycleEl && cycleWrap) {
+                    const { left, width } = measureLastLineRect(cycleEl, cycleWrap);
+                    gsap.set(cycleBar, { transformOrigin: 'left center', left, width });
+                    gsap.fromTo(cycleBar, { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: 'power3.out', delay: 0.08 });
+                  }
+                },
+              });
+              return;
+            }
+            /* mobile (sin dinámico): la barra se remide de inmediato, tal
+               como antes. */
+            if (cycleBar && cycleWrap) {
+              const { left, width } = measureLastLineRect(cycleEl, cycleWrap);
+              gsap.set(cycleBar, { transformOrigin: 'left center', left, width });
+              gsap.fromTo(cycleBar, { scaleX: 0 }, { scaleX: 1, duration: 0.4, ease: 'power3.out', delay: 0.08 });
+            }
+          });
+        };
+
+        /* espera a que la fuente display esté lista antes de la primera
+           medición — evita que la barra (y los font-sizes dinámicos) se
+           calculen con la fuente fallback (FOUT) antes de que cargue PP
+           Editorial New. */
+        document.fonts.ready
+          .then(() => {
+            if (fluidWidthActive && cycleEl && cycleWrap && heroFrase) {
+              wordFontSizes = computeWordFontSizes(words, cycleEl, heroFrase);
+              /* aplica el tamaño de cycle[0] (ya visible) sin animación —
+                 es el estado inicial, no una transición. */
+              gsap.set(cycleWrap, { fontSize: wordFontSizes[0] });
+            }
+            resizeBar();
+          })
+          .catch(() => {
+            resizeBar();
+          });
+
+        /* ── Timer del ciclo ──────────────────────────────────────────────
+           BUG ARREGLADO 2026-08-06 (William: "las letras del hero no rotan"):
+           el visibilitychange creaba un setInterval NUEVO en cada vuelta a la
+           pestaña SIN garantizar que el anterior estuviera limpio. En iOS,
+           bloquear/desbloquear el teléfono dispara visibilitychange cada vez:
+           a los pocos ciclos había N intervalos corriendo sobre el mismo
+           elemento, cada uno avanzando `idx` por su cuenta. El efecto visible
+           es que las palabras saltan, parpadean o parecen congelarse — no que
+           "no hay animación", sino que hay varias peleándose.
+           Ahora: un único timer, con `start` idempotente (no arranca si ya
+           hay uno) y `stop` que además anula la referencia. */
+        let timer: number | null = null;
+        const startCycle = () => {
+          if (timer !== null) return; /* idempotente: nunca dos a la vez */
+          timer = window.setInterval(cycleNext, HOLD + 720);
+        };
+        const stopCycle = () => {
+          if (timer === null) return;
+          window.clearInterval(timer);
+          timer = null;
+        };
+
+        /* arranca solo si la pestaña está visible: si el usuario abrió el sitio
+           en una pestaña de fondo, el ciclo espera a que la mire de verdad. */
+        if (!document.hidden) startCycle();
+
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) stopCycle();
+          else startCycle();
+        });
+
+        /* pagehide: iOS mete la página en bfcache al cambiar de app. Sin esto
+           el intervalo sigue vivo en una página congelada y al volver se suma
+           al que crea visibilitychange. */
+        window.addEventListener('pagehide', stopCycle);
+        window.addEventListener('pageshow', () => {
+          if (!document.hidden) startCycle();
+        });
+
+        /* re-mide la barra (y recalcula los font-sizes dinámicos, porque el
+           ancho útil cambió) si el viewport cambia de tamaño (resize/rotate
+           entre tablet/desktop). En mobile sigue sin dinámico. */
+        window.addEventListener(
+          'resize',
+          () => {
+            const stillFluid = window.matchMedia('(min-width: 720px)').matches;
+            if (stillFluid && cycleEl && cycleWrap && heroFrase) {
+              wordFontSizes = computeWordFontSizes(words, cycleEl, heroFrase);
+              gsap.set(cycleWrap, { fontSize: wordFontSizes[idx] });
+            }
+            if (cycleBar && cycleEl && cycleWrap) {
+              const { left, width } = measureLastLineRect(cycleEl, cycleWrap);
+              gsap.set(cycleBar, { transformOrigin: 'left center', left, width });
+            }
+          },
+          { passive: true }
+        );
+      }
+    }
+  } else {
+    /* ── reduced-motion: todo visible de inmediato, sin ciclo, MISMO tamaño
+       grande del beneficio (reduced-motion no implica versión chica). Sin
+       CAMBIOS de tamaño dinámicos (no hay ciclo, no hay para qué animar) —
+       pero cycle[0] SÍ toma su tamaño calculado (tablet/desktop) una única
+       vez y queda estático ahí, igual que el resto del sistema. La barra se
+       mide bajo la última línea igual que en el modo animado — cycle[0]
+       puede wrappear a 2 líneas en mobile angosto. ── */
+    const allAnimated = document.querySelectorAll<HTMLElement>(
+      '.hero-signature, .hero-subhead, .hero-band'
+    );
+    gsap.set(allAnimated, { opacity: 1 });
+
+    const cycleElStatic = document.querySelector<HTMLElement>('.h1-cycle');
+    const cycleBarStatic = document.querySelector<HTMLElement>('.h1-cycle-bar');
+    const cycleWrapStatic = document.querySelector<HTMLElement>('.h1-cycle-wrap');
+    const heroFraseStatic = document.querySelector<HTMLElement>('.hero-frase');
+    if (cycleElStatic && cycleBarStatic && cycleWrapStatic) {
+      const setStaticBar = () => {
+        if (fluidWidthActive && heroFraseStatic) {
+          let wordsStatic: string[] = [];
+          try {
+            wordsStatic = JSON.parse(cycleElStatic.dataset.cycle ?? '[]');
+          } catch (_) {
+            wordsStatic = [];
+          }
+          if (wordsStatic.length > 0) {
+            const sizes = computeWordFontSizes(wordsStatic, cycleElStatic, heroFraseStatic);
+            gsap.set(cycleWrapStatic, { fontSize: sizes[0] });
+          }
+        }
+        const { left, width } = measureLastLineRect(cycleElStatic, cycleWrapStatic);
+        gsap.set(cycleBarStatic, { left, width, scaleX: 1 });
+      };
+      document.fonts.ready.then(setStaticBar).catch(setStaticBar);
     }
   }
 </script>

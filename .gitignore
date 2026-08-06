@@ -131,8 +131,21 @@ scripts/audit-sections.mjs
 AUDITORIA_*.md
 DISCOVERY_*.md
 LISTA_SCREENSHOTS_*.md
+HANDOFF-*.md
+SERVICIO-*.md
 screenshots-portfolio/
 # Documento interno de precios — NUNCA en el repo público.
 SCUART-Pricing-*.pdf
 # Scripts temporales de captura en la raíz.
 shot-*-temp.mjs
+# Diagnóstico/captura de sesión en la raíz (2026-08-05): se acumulaban sueltos
+# y ensuciaban `git status` en cada sesión de trabajo visual.
+diag-*.mjs
+shot-*.mjs
+audit-*.mjs
+geo-tmp.mjs
+.svcshots/
+# Capturas sueltas en la raíz (incluye las de nombre corrupto que dejaba
+# Playwright al recibir una ruta Windows sin escapar).
+/*.png
+Userswilli*.png
