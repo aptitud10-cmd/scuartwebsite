@@ -16,6 +16,9 @@ const data: CaseStudyData = {
   siteUrl: 'https://menius.app',
   // vista del sitio recortada (sin navbar del cliente) → browser-mockup dark
   heroImage: '/images/casos/menius-hero-crop.webp',
+  // recorte al contenido para mobile: la captura completa (ratio 2.19) dejaba
+  // el contenido diminuto en 346px de ancho (William 2026-08-04)
+  heroImageMobile: '/images/casos/menius-hero-crop-tight.webp',
   heroImageAlt: 'Menius — landing del producto: pedidos online sin comisión',
   // canvas arena cálida: el screenshot oscuro contrasta, se lee, y la pieza
   // flota sobre --bg. Antes #0e0e0e (negro sobre negro, ilegible — William 2026-07-28).
@@ -27,6 +30,9 @@ const data: CaseStudyData = {
       label: 'El problema',
       body: 'Los restaurantes pierden hasta el 30% de cada pedido en comisiones de apps de delivery. Necesitaban un canal propio — menú digital, pedidos online y pagos directos a su cuenta — sin depender de plataformas de terceros ni pagar por cada transacción.',
       image: '/images/casos/menius-precios-crop.webp',
+      // mobile: solo la columna "Pro". La tabla de 3 columnas es ilegible a
+      // 346px; la columna destacada comunica lo mismo y se lee.
+      imageMobile: '/images/casos/menius-precios-crop-pro.webp',
       imageAlt: 'Menius — planes y precios sin comisiones',
       ratio: 'wide',
       bg: 'var(--canvas-arena)',

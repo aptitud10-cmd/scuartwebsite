@@ -16,6 +16,11 @@ const data: CaseStudyData = {
   siteUrl: 'https://etniabraids.com',
   // vista del sitio recortada (sin navbar del cliente) → browser-mockup dark
   heroImage: '/images/casos/etnia-hero-crop.webp',
+  /* En mobile el hero usa la vista MOBILE del sitio (vertical, llena la
+     pantalla) en vez de la captura desktop panorámica, que a 346px de ancho
+     medía 159px y era ilegible. Este caso no la usaba en ningún otro bloque,
+     así que no se duplica. (William 2026-08-04) */
+  heroImageMobile: '/images/casos/etnia-mobile.webp',
   heroImageAlt: 'Etnia Braids — landing editorial del sitio, el arte de las trenzas',
   // canvas arena cálida en todos los bloques (William 2026-07-28)
   heroBg: 'var(--canvas-arena)',
@@ -39,6 +44,9 @@ const data: CaseStudyData = {
       body: 'El salón necesitaba más que una web bonita: un sistema de reservas real. Diseñamos un flujo propio — elegir servicio, día y hora — con depósito cobrado por Stripe. Cada servicio tiene su duración y precio, y la cita queda confirmada y en agenda automáticamente. No es una plantilla genérica: es un sistema hecho a la medida del negocio.',
       // vista del flujo de reserva (paso servicio) → browser-mockup dark sobre arena
       image: '/images/casos/etnia-servicios.webp',
+      // recorte al contenido para mobile (ratio 2.03 → 1.41): sin el negro
+      // vacío alrededor, el texto se lee en 346px (William 2026-08-04)
+      imageMobile: '/images/casos/etnia-servicios-tight.webp',
       imageAlt: 'Etnia Braids — catálogo de servicios con precios',
       ratio: 'wide',
       bg: 'var(--canvas-arena)',
@@ -50,6 +58,7 @@ const data: CaseStudyData = {
       body: 'El trabajo se cobra por adelantado con depósito, así que la agenda se gestiona sola — sin llamadas, sin WhatsApp manual, sin huecos en el calendario. Lo que justifica el ticket alto no es solo el diseño: es la infraestructura de reservas y pagos que corre por detrás.',
       // vista del flujo de reserva (paso horario) → browser-mockup dark sobre arena
       image: '/images/casos/etnia-reserva.webp',
+      imageMobile: '/images/casos/etnia-reserva-tight.webp',
       imageAlt: 'Etnia Braids — flujo de reserva con selección de horario',
       ratio: 'wide',
       bg: 'var(--canvas-arena)',

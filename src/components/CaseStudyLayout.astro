@@ -55,6 +55,13 @@ interface CaseBlock {
   frame?: boolean;
   /** variante del mockup/fondo: 'dark' para apps oscuras */
   theme?: 'light' | 'dark';
+  /**
+   * Recorte al CONTENIDO para mobile (<768px). Las capturas de pantalla completa
+   * tienen ratio ~2.1 con mucho aire vacío: a 346px de ancho el contenido queda
+   * ilegible. El recorte sube el ratio a ~1.4-1.6 → mismo ancho, contenido mucho
+   * más grande. Opcional: si falta, mobile usa `image`. (William 2026-08-04)
+   */
+  imageMobile?: string;
 }
 
 export interface CaseStudyData {
@@ -71,6 +78,8 @@ export interface CaseStudyData {
   /** browser-mockup en el hero */
   heroFrame?: boolean;
   heroTheme?: 'light' | 'dark';
+  /** recorte al contenido para mobile (<768px) — ver CaseBlock.imageMobile */
+  heroImageMobile?: string;
   blocks: CaseBlock[];
   credits: Credit[];
   next?: { name: string; href: string };
@@ -187,11 +196,17 @@ const blockDims = await Promise.all(
             <span class="cs-frame__dot"></span>
             <span class="cs-frame__url">{siteHost}</span>
           </div>
-          <img src={data.heroImage} alt={data.heroImageAlt} width={heroDims.w} height={heroDims.h} loading="eager" decoding="async" />
+          <picture>
+            {data.heroImageMobile && <source media="(max-width: 767px)" srcset={data.heroImageMobile} />}
+            <img src={data.heroImage} alt={data.heroImageAlt} width={heroDims.w} height={heroDims.h} loading="eager" decoding="async" />
+          </picture>
         </figure>
       ) : (
         <figure class="cs-shot" data-cs-tilt>
-          <img src={data.heroImage} alt={data.heroImageAlt} width={heroDims.w} height={heroDims.h} loading="eager" decoding="async" />
+          <picture>
+            {data.heroImageMobile && <source media="(max-width: 767px)" srcset={data.heroImageMobile} />}
+            <img src={data.heroImage} alt={data.heroImageAlt} width={heroDims.w} height={heroDims.h} loading="eager" decoding="async" />
+          </picture>
         </figure>
       )}
     </div>
@@ -219,11 +234,17 @@ const blockDims = await Promise.all(
                   <span class="cs-frame__dot"></span>
                   <span class="cs-frame__url">{siteHost}</span>
                 </div>
-                <img src={block.image} alt={block.imageAlt ?? ''} width={blockDims[i].w} height={blockDims[i].h} loading="lazy" decoding="async" />
+                <picture>
+                  {block.imageMobile && <source media="(max-width: 767px)" srcset={block.imageMobile} />}
+                  <img src={block.image} alt={block.imageAlt ?? ''} width={blockDims[i].w} height={blockDims[i].h} loading="lazy" decoding="async" />
+                </picture>
               </figure>
             ) : (
               <figure class="cs-shot" data-cs-tilt>
-                <img src={block.image} alt={block.imageAlt ?? ''} width={blockDims[i].w} height={blockDims[i].h} loading="lazy" decoding="async" />
+                <picture>
+                  {block.imageMobile && <source media="(max-width: 767px)" srcset={block.imageMobile} />}
+                  <img src={block.image} alt={block.imageAlt ?? ''} width={blockDims[i].w} height={blockDims[i].h} loading="lazy" decoding="async" />
+                </picture>
               </figure>
             )}
           </div>
@@ -496,6 +517,57 @@ const blockDims = await Promise.all(
   .cs-frame--dark .cs-frame__bar { background: #1a1a1a; }
   .cs-frame--dark .cs-frame__dot { background: rgba(255, 255, 255, 0.22); }
   .cs-frame--dark .cs-frame__url { background: #0e0e0e; color: rgba(255, 255, 255, 0.55); }
+
+  /* ═══════════════════════════════════════════════════════════
+     MOBILE <768px — LAS CAPTURAS MANDAN.
+     Problema (William 2026-08-04, verificado por visual-critic contra
+     locomotive.ca y unseen.co): el mockup de navegador ocupaba ~19% del ancho
+     con ~316px de aire vacío a cada lado; el sitio adentro era ilegible. Era
+     el bloque desktop con max-width, sin regla mobile propia.
+     Fix (3 puntos del critic):
+       1. El canvas pierde su padding grueso y sus márgenes laterales → la
+          captura ocupa casi todo el viewport.
+       2. Se saca el chrome del browser-mockup (semáforo + barra URL): en
+          390px ese cromo le come proporción al único contenido que vale.
+       3. La captura pasa a ser el elemento dominante del bloque.
+     ═══════════════════════════════════════════════════════════ */
+  @media (max-width: 767px) {
+    .cs-canvas {
+      /* casi full-bleed: solo un respiro mínimo contra el borde */
+      margin-inline: 12px;
+      padding: 10px;
+      margin-bottom: clamp(2rem, 6vh, 3rem);
+      border-radius: 8px;
+    }
+
+    /* el halo blureado no aporta a este tamaño y roba contraste */
+    .cs-halo { opacity: 0.28; inset: 4%; }
+
+    /* Browser-mockup: se oculta la barra de chrome (dots + URL). La captura
+       queda sola, a ancho completo del canvas. */
+    .cs-frame__bar { display: none; }
+    .cs-frame {
+      max-width: none;
+      border-radius: 6px;
+      box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Tope de alto para piezas VERTICALES (capturas mobile del sitio).
+       Sin tope crecían hasta el 88% del viewport — una sola imagen ocupaba casi
+       toda la pantalla y tapaba que hay más contenido abajo (William 2026-08-07).
+       62svh las deja dominantes pero proporcionadas, en línea con las otras
+       piezas verticales del sitio que sí funcionan (~55-70%). Las horizontales
+       no lo necesitan: su alto ya lo limita el ancho. */
+    .cs-shot img,
+    .cs-frame img {
+      max-height: 62svh;
+      width: auto;
+      max-width: 100%;
+      margin-inline: auto;
+      border-radius: 6px;
+    }
+    .cs-shot { max-width: none; width: 100%; }
+  }
 
   /* ── BLOQUES texto ────────────────────────────────────────── */
   .cs-block__text {

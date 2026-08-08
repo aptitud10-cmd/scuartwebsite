@@ -16,6 +16,9 @@ const data: CaseStudyData = {
   siteUrl: 'https://etniabraids.com',
   // site view cropped (no client navbar) → dark browser-mockup
   heroImage: '/images/casos/etnia-hero-crop.webp',
+  // mobile hero uses the site's MOBILE view (vertical) — the desktop capture
+  // measured 159px tall at 346px wide and was unreadable.
+  heroImageMobile: '/images/casos/etnia-mobile.webp',
   heroImageAlt: 'Etnia Braids — editorial site landing, the art of braids',
   // warm arena canvas across all blocks (William 2026-07-28)
   heroBg: 'var(--canvas-arena)',
@@ -39,6 +42,7 @@ const data: CaseStudyData = {
       body: 'The salon needed more than a pretty website: a real booking system. We built a custom flow — pick a service, day and time — with the deposit charged through Stripe. Each service has its own duration and price, and the appointment is confirmed and scheduled automatically. Not a generic template: a system built to fit the business.',
       // booking-flow view (service step) → dark browser-mockup on arena
       image: '/images/casos/etnia-servicios.webp',
+      imageMobile: '/images/casos/etnia-servicios-tight.webp',
       imageAlt: 'Etnia Braids — services catalog with pricing',
       ratio: 'wide',
       bg: 'var(--canvas-arena)',
@@ -50,6 +54,7 @@ const data: CaseStudyData = {
       body: 'Work is charged upfront with a deposit, so the calendar manages itself — no calls, no manual WhatsApp, no gaps in the schedule. What justifies the higher ticket isn\'t just the design: it\'s the booking and payments infrastructure running behind it.',
       // booking-flow view (time step) → dark browser-mockup on arena
       image: '/images/casos/etnia-reserva.webp',
+      imageMobile: '/images/casos/etnia-reserva-tight.webp',
       imageAlt: 'Etnia Braids — booking flow with time selection',
       ratio: 'wide',
       bg: 'var(--canvas-arena)',

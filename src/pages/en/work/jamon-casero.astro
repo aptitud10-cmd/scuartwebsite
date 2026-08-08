@@ -17,6 +17,8 @@ const data: CaseStudyData = {
   siteUrl: 'https://jamoncasero.com.co',
   // site view cropped (no client navbar) → dark browser-mockup
   heroImage: '/images/casos/jamon-hero-crop.webp',
+  // mobile: left-68% crop (ratio 2.17 -> 1.48) — keeps the wordmark + CTA
+  heroImageMobile: '/images/casos/jamon-hero-mobile.webp',
   heroImageAlt: 'Jamón Casero — site landing: the roast on wood',
   // warm arena canvas across all blocks (William 2026-07-28)
   heroBg: 'var(--canvas-arena)',
@@ -30,6 +32,8 @@ const data: CaseStudyData = {
       body: 'A brand with over 55 years of tradition, but no digital presence. We designed its online identity: product photography front and center, characterful typography, and a warm palette that evokes the artisanal process. The site speaks to both the end customer and the distributor, with WhatsApp ordering built in.',
       // site view (product block with pricing) → dark browser-mockup on arena
       image: '/images/casos/jamon-producto.webp',
+      // mobile: only the product photo (no UI column)
+      imageMobile: '/images/casos/jamon-pernil.webp',
       imageAlt: 'Jamón Casero — product block from the site with pricing',
       ratio: 'wide',
       bg: 'var(--canvas-arena)',
@@ -41,6 +45,7 @@ const data: CaseStudyData = {
       body: 'The brand rests on a family recipe passed down through generations. The site puts that story ahead of the catalog: build trust in the craft first, then take the order. The editorial identity turns the artisanal process into the selling point.',
       // editorial detail (the recipe book) — no chrome → arena canvas
       image: '/images/casos/jamon-detalle.webp',
+      imageMobile: '/images/casos/jamon-libro.webp',
       imageAlt: 'Jamón Casero — the family recipe book',
       ratio: 'wide',
       bg: 'var(--canvas-arena)',

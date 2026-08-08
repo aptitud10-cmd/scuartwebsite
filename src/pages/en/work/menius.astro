@@ -16,6 +16,8 @@ const data: CaseStudyData = {
   siteUrl: 'https://menius.app',
   // site view cropped (no client navbar) → dark browser-mockup
   heroImage: '/images/casos/menius-hero-crop.webp',
+  // content-tight crop for mobile (see CaseStudyLayout.imageMobile)
+  heroImageMobile: '/images/casos/menius-hero-crop-tight.webp',
   heroImageAlt: 'Menius — product landing: online orders with no commission',
   // warm arena canvas: the dark screenshot contrasts and stays legible.
   heroBg: 'var(--canvas-arena)',
@@ -26,6 +28,8 @@ const data: CaseStudyData = {
       label: 'The problem',
       body: 'Restaurants lose up to 30% of every order to delivery-app commissions. They needed their own channel — digital menu, online orders, and payments straight to their account — without depending on third-party platforms or paying per transaction.',
       image: '/images/casos/menius-precios-crop.webp',
+      // mobile: only the "Pro" column — the 3-column table is unreadable at 346px
+      imageMobile: '/images/casos/menius-precios-crop-pro.webp',
       imageAlt: 'Menius — plans and pricing with no commission',
       ratio: 'wide',
       bg: 'var(--canvas-arena)',

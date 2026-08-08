@@ -17,6 +17,12 @@ const data: CaseStudyData = {
   siteUrl: 'https://jamoncasero.com.co',
   // vista del sitio recortada (sin navbar del cliente) → browser-mockup dark
   heroImage: '/images/casos/jamon-hero-crop.webp',
+  /* mobile: recorte al 68% izquierdo del hero (ratio 2.17 → 1.48). Conserva
+     JAMON CASERO + el CTA + parte del pernil, así sigue leyéndose como sitio
+     web pero sin la franja panorámica que a 346px medía 159px de alto.
+     No se usa jamon-mobile.webp acá porque el bloque "En tu bolsillo" ya la
+     muestra (se duplicaría). (William 2026-08-07) */
+  heroImageMobile: '/images/casos/jamon-hero-mobile.webp',
   heroImageAlt: 'Jamón Casero — landing del sitio: el pernil sobre madera',
   // canvas arena cálida en todos los bloques (William 2026-07-28)
   heroBg: 'var(--canvas-arena)',
@@ -30,6 +36,10 @@ const data: CaseStudyData = {
       body: 'Una marca con más de 55 años de tradición, pero sin presencia digital. Diseñamos su identidad online: fotografía de producto en primer plano, tipografía con carácter y una paleta cálida que evoca el proceso artesanal. El sitio le habla al consumidor final y al distribuidor a la vez, con pedidos por WhatsApp integrados.',
       // vista del sitio (bloque de producto con precio) → browser-mockup dark sobre arena
       image: '/images/casos/jamon-producto.webp',
+      /* mobile: SOLO la foto del pernil (sin la columna de UI a la izquierda).
+         La sección completa a 346px de ancho medía 165px de alto y no se leía
+         nada; la foto sola es la pieza potente. (William 2026-08-07) */
+      imageMobile: '/images/casos/jamon-pernil.webp',
       imageAlt: 'Jamón Casero — bloque de producto del sitio con precio',
       ratio: 'wide',
       bg: 'var(--canvas-arena)',
@@ -41,6 +51,11 @@ const data: CaseStudyData = {
       body: 'La marca se sostiene en una receta de familia transmitida por generaciones. El sitio prioriza esa historia por encima del catálogo: primero se construye la confianza en el oficio, después se pide el pedido. La identidad editorial hace del proceso artesanal el argumento de venta.',
       // detalle editorial (el libro de recetas) — sin chrome → canvas arena
       image: '/images/casos/jamon-detalle.webp',
+      /* mobile: SOLO la foto del libro de recetas (vertical, ratio 0.75). La
+         sección de 2 columnas + stats era ilegible a 346px; el texto de esa
+         sección ya está en el body del bloque. Se conserva la foto ORIGINAL
+         (con la palabra "pernil" legible), no una generada. */
+      imageMobile: '/images/casos/jamon-libro.webp',
       imageAlt: 'Jamón Casero — el libro de recetas familiar',
       ratio: 'wide',
       bg: 'var(--canvas-arena)',
