@@ -149,3 +149,9 @@ geo-tmp.mjs
 # Playwright al recibir una ruta Windows sin escapar).
 /*.png
 Userswilli*.png
+
+# Scripts de captura/medición y su salida JSON en la raíz (herramientas de
+# sesión visual: shots.mjs, measure-type.mjs, audit-out.json). Se regeneran.
+shots.mjs
+measure-type.mjs
+audit-out.json

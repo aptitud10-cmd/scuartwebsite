@@ -1,5 +1,4 @@
 import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
@@ -18,7 +17,6 @@ export default defineConfig({
   },
 
   integrations: [
-    react(),
     sitemap({
       i18n: {
         defaultLocale: 'en',
@@ -34,7 +32,7 @@ export default defineConfig({
    * En Astro 5.x, 'hybrid' fue eliminado: 'static' es ahora el modo híbrido.
    * Los endpoints que declaran `export const prerender = false` optan por SSR.
    * Esto mantiene hero/portfolio/método 100% prerendered sin tocarlos.
-   * El adaptador Vercel convierte el endpoint /api/contact en una Serverless Function.
+   * El adaptador Vercel convierte el endpoint /api/geo-check en una Serverless Function.
    */
   output: 'static',
   adapter: vercel(),

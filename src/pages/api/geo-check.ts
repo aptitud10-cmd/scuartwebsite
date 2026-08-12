@@ -54,7 +54,50 @@ function rateLimited(ip: string): boolean {
   return prev.length > RATE_LIMIT_MAX;
 }
 
-/* ── Normalizar y validar la URL (anti-SSRF) ────────────────── */
+import { lookup } from "node:dns/promises";
+
+/* ── Anti-SSRF ──────────────────────────────────────────────────
+   Este endpoint es público y sin auth: un atacante podría intentar que el
+   servidor haga fetch de direcciones INTERNAS (metadata de la nube 169.254.169.254,
+   127.0.0.1, redes privadas). La defensa tiene tres capas — las tres necesarias:
+     1. normalizeUrl: rechaza el hostname literal si YA es una IP privada/loopback.
+     2. isPrivateIp + resolución DNS: bloquea DNS-rebinding (un dominio público
+        cuyo registro A apunta a una IP interna pasaría la capa 1). Se resuelve
+        el DNS y se valida CADA IP antes de conectar.
+     3. redirect: "manual" en fetchText: un dominio público que responde
+        302 → http://169.254.169.254 evadiría todo si siguiéramos redirects.
+        Cada salto se re-valida por normalizeUrl + DNS. */
+
+/* ¿La IP (v4 o v6) cae en un rango privado/reservado que no debe alcanzarse? */
+function isPrivateIp(ip: string): boolean {
+  const a = ip.toLowerCase();
+  // IPv6
+  if (a.includes(":")) {
+    if (a === "::1" || a === "::") return true;
+    if (a.startsWith("fe80")) return true; // link-local
+    if (a.startsWith("fc") || a.startsWith("fd")) return true; // ULA fc00::/7
+    // IPv4 mapeada en IPv6 (::ffff:10.x.x.x) → validar la parte v4
+    const m = a.match(/::ffff:(\d+\.\d+\.\d+\.\d+)$/);
+    if (m) return isPrivateIp(m[1]);
+    return false;
+  }
+  // IPv4
+  const p = a.split(".").map(Number);
+  if (p.length !== 4 || p.some((n) => Number.isNaN(n) || n < 0 || n > 255))
+    return true; // malformada → bloquear por las dudas
+  const [x, y] = p;
+  return (
+    x === 0 || // 0.0.0.0/8
+    x === 127 || // loopback
+    x === 10 || // privada
+    (x === 172 && y >= 16 && y <= 31) || // privada
+    (x === 192 && y === 168) || // privada
+    (x === 169 && y === 254) || // link-local / metadata cloud
+    (x === 100 && y >= 64 && y <= 127) || // CGNAT 100.64.0.0/10
+    x >= 224 // multicast/reservado 224.0.0.0/4 en adelante
+  );
+}
+
 function normalizeUrl(raw: string): URL | null {
   let s = raw.trim();
   if (!s) return null;
@@ -66,23 +109,35 @@ function normalizeUrl(raw: string): URL | null {
     return null;
   }
   if (u.protocol !== "http:" && u.protocol !== "https:") return null;
-  const h = u.hostname.toLowerCase();
-  /* Bloquear loopback, redes privadas y metadata de cloud */
+  // Solo puertos web estándar (bloquea 6379/Redis, 22/SSH, etc.).
+  if (u.port && u.port !== "80" && u.port !== "443") return null;
+  const h = u.hostname.toLowerCase().replace(/^\[|\]$/g, ""); // quita brackets IPv6
   if (
     h === "localhost" ||
     h.endsWith(".localhost") ||
     h.endsWith(".internal") ||
-    h === "169.254.169.254" ||
-    /^127\./.test(h) ||
-    /^10\./.test(h) ||
-    /^192\.168\./.test(h) ||
-    /^172\.(1[6-9]|2\d|3[01])\./.test(h) ||
-    /^\[?::1\]?$/.test(h) ||
-    !h.includes(".")
+    !h.includes(".") && !h.includes(":") // sin punto ni ':' = no es hostname/IP válido público
   ) {
     return null;
   }
+  // Si el hostname YA es una IP literal, validarla directo.
+  if (/^[\d.]+$/.test(h) || h.includes(":")) {
+    if (isPrivateIp(h)) return null;
+  }
   return u;
+}
+
+/* Resuelve el DNS del host y rechaza si ALGUNA IP resuelta es privada (anti-rebinding). */
+async function hostResolvesToPublicIp(hostname: string): Promise<boolean> {
+  // Si ya es IP literal, normalizeUrl la validó; no hay DNS que resolver.
+  if (/^[\d.]+$/.test(hostname) || hostname.includes(":")) return true;
+  try {
+    const results = await lookup(hostname, { all: true });
+    if (!results.length) return false;
+    return results.every((r) => !isPrivateIp(r.address));
+  } catch {
+    return false; // no resuelve → no conectar
+  }
 }
 
 async function fetchText(
@@ -91,22 +146,39 @@ async function fetchText(
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch(url, {
-      signal: ctrl.signal,
-      redirect: "follow",
-      headers: {
-        "User-Agent": "SCUART-GEO-Checker/1.0 (+https://scuart.com)",
-        Accept: "text/html,application/xhtml+xml,text/plain,*/*",
-      },
-    });
-    const buf = await res.arrayBuffer();
-    const slice =
-      buf.byteLength > MAX_HTML_BYTES ? buf.slice(0, MAX_HTML_BYTES) : buf;
-    return {
-      ok: res.ok,
-      status: res.status,
-      text: new TextDecoder("utf-8").decode(slice),
-    };
+    let current = url;
+    // Seguimos redirects a mano, re-validando cada destino (anti-SSRF por redirect).
+    for (let hop = 0; hop < 4; hop++) {
+      const target = normalizeUrl(current);
+      if (!target) return { ok: false, status: 0, text: "" };
+      if (!(await hostResolvesToPublicIp(target.hostname)))
+        return { ok: false, status: 0, text: "" };
+
+      const res = await fetch(target.href, {
+        signal: ctrl.signal,
+        redirect: "manual",
+        headers: {
+          "User-Agent": "SCUART-GEO-Checker/1.0 (+https://scuart.com)",
+          Accept: "text/html,application/xhtml+xml,text/plain,*/*",
+        },
+      });
+      // 3xx con Location → re-validar el destino en la próxima vuelta.
+      if (res.status >= 300 && res.status < 400) {
+        const loc = res.headers.get("location");
+        if (!loc) return { ok: false, status: res.status, text: "" };
+        current = new URL(loc, target.href).href; // resuelve relativas
+        continue;
+      }
+      const buf = await res.arrayBuffer();
+      const slice =
+        buf.byteLength > MAX_HTML_BYTES ? buf.slice(0, MAX_HTML_BYTES) : buf;
+      return {
+        ok: res.ok,
+        status: res.status,
+        text: new TextDecoder("utf-8").decode(slice),
+      };
+    }
+    return { ok: false, status: 0, text: "" }; // demasiados redirects
   } catch {
     return { ok: false, status: 0, text: "" };
   } finally {
@@ -152,7 +224,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
       headers: { "Content-Type": "application/json" },
     });
 
-  if (rateLimited(clientAddress ?? "unknown")) {
+  // clientAddress viene del `x-forwarded-for` (Vercel), que puede llegar como
+  // lista "ip_real, proxy1, proxy2". Tomar SOLO la primera (la del cliente) para
+  // que el atacante no evada el rate-limit rotando IPs falsas en el resto de la
+  // lista. Sigue siendo best-effort (el Map es per-instance en serverless), pero
+  // deja de ser trivialmente evadible.
+  const clientIp = (clientAddress ?? "unknown").split(",")[0].trim();
+  if (rateLimited(clientIp)) {
     return json(
       {
         error: "rate_limited",
@@ -321,22 +399,37 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     weight: 1,
   });
 
-  /* 7 — Formato answer-first: headings que son preguntas */
-  const headings = [...html.matchAll(/<h[23][^>]*>([\s\S]*?)<\/h[23]>/gi)].map(
-    m => decodeEntities(m[1].replace(/<[^>]+>/g, "").trim())
-  );
-  const preguntas = headings.filter(h =>
+  /* 7 — Formato answer-first: contenido pregunta-respuesta. Se busca en TRES
+     lugares, porque un FAQ moderno puede vivir en cualquiera y un checker que
+     solo miraba <h2>/<h3> daba falso negativo a sitios que SÍ tienen FAQ:
+       · <h2>/<h3> con forma de pregunta (FAQ clásico con headings)
+       · <summary> (FAQ en acordeón <details>/<summary> — el patrón más común)
+       · schema FAQPage en JSON-LD (el formato que los motores generativos
+         realmente consumen — si está, cuenta aunque el HTML no tenga headings). */
+  const answerNodes = [
+    ...html.matchAll(/<h[23][^>]*>([\s\S]*?)<\/h[23]>/gi),
+    ...html.matchAll(/<summary[^>]*>([\s\S]*?)<\/summary>/gi),
+  ].map(m => decodeEntities(m[1].replace(/<[^>]+>/g, "").trim()));
+  const preguntasEnHtml = answerNodes.filter(h =>
     /\?|^(cómo|qué|por qué|cuánto|cuándo|dónde|quién|how|what|why|when|where|who)\b/i.test(
       h
     )
-  );
+  ).length;
+  // FAQPage en JSON-LD cuenta como formato answer-first presente (los motores lo
+  // leen directo). `tipos` se computó en el check de schema (arriba).
+  const tieneFaqSchema = tipos.has("FAQPage") || tipos.has("QAPage");
+  const preguntas = tieneFaqSchema
+    ? Math.max(preguntasEnHtml, 2) // schema FAQPage ⇒ el check pasa
+    : preguntasEnHtml;
   checks.push({
     id: "answer-first",
     label: "Contenido que responde preguntas",
-    pass: preguntas.length >= 2,
-    detail: preguntas.length
-      ? `${preguntas.length} secciones con formato pregunta-respuesta.`
-      : "Ningún subtítulo plantea una pregunta. Los motores generativos citan contenido que responde preguntas concretas.",
+    pass: preguntas >= 2,
+    detail: tieneFaqSchema
+      ? "Tenés un FAQ en schema (FAQPage) — el formato que los motores citan directo."
+      : preguntas > 0
+        ? `${preguntas} secciones con formato pregunta-respuesta.`
+        : "Ningún subtítulo plantea una pregunta. Los motores generativos citan contenido que responde preguntas concretas.",
     weight: 2,
   });
 
