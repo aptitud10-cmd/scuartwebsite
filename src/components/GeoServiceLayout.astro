@@ -880,8 +880,14 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   /* ── DESKTOP: composición asimétrica num/label/contenido ──── */
   @media (min-width: 900px) {
     .geo-block {
-      grid-template-columns: minmax(0, 5rem) minmax(0, 1fr) minmax(0, 1.4fr);
-      column-gap: clamp(2rem, 4vw, 4rem);
+      /* num angosto · label como índice lateral estrecho · contenido protagónico.
+         Antes el label era 1fr elástico: con títulos cortos ("Por qué no rinde")
+         dejaba una columna casi vacía y comprimía el contenido a la derecha, con
+         mucho aire muerto. Ahora el label es una columna estrecha fija (patrón
+         editorial de índice) y el contenido absorbe todo el ancho restante →
+         texto ancho, legible, sin hueco. */
+      grid-template-columns: minmax(0, 4rem) minmax(0, 15rem) minmax(0, 1fr);
+      column-gap: clamp(2rem, 4vw, 4.5rem);
       align-items: start;
     }
     .geo-block > .geo-num { grid-column: 1; }
