@@ -142,6 +142,11 @@ const faqSchema = {
 
 const servicesLabel = lang === 'es' ? 'Servicios' : 'Services';
 const homeUrl = `${SITE_URL}/${lang}`;
+/* Destino del CTA del hero: el ancla #geo-checker SOLO existe cuando la página
+   trae bloque `checker` (hoy solo AI Visibility). En las demás páginas de
+   servicio ese ancla no existe y el botón no llevaba a ningún lado — apuntamos
+   a la sección de contacto de la home, que siempre existe. */
+const heroCtaHref = data.checker ? '#geo-checker' : `${homeUrl}#contact`;
 const breadcrumbSchema = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
@@ -181,8 +186,8 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
       <p class="geo-kicker">{data.kicker}</p>
       <h1 class="geo-hero__heading">{data.heading}</h1>
       <p class="geo-hero__tagline">{data.tagline}</p>
-      <a class="geo-cta" href="#geo-checker">
-        {data.cta} <span aria-hidden="true">↓</span>
+      <a class="geo-cta" href={heroCtaHref}>
+        {data.cta} <span aria-hidden="true">{data.checker ? '↓' : '→'}</span>
       </a>
     </header>
 
