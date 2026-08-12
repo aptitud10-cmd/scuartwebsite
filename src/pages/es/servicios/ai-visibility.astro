@@ -20,13 +20,13 @@ const data: GeoServiceData = {
   cta: 'Chequear mi sitio gratis',
   shift: {
     label: 'El comportamiento ya cambió',
-    body: 'No es una predicción: es medible. Una de cada tres interacciones de búsqueda ya pasa por un motor de IA, y en las generaciones que hoy deciden dónde gastar, la adopción supera el 70%. El que espera "a ver si esto crece" está regalando esos clientes.',
+    body: 'No es una predicción: es medible. Dos de cada tres personas ya ven respuestas generadas por IA cuando buscan, y en las generaciones que hoy deciden dónde gastar, tres de cada cuatro usan IA a diario. El que espera "a ver si esto crece" está regalando esos clientes.',
     stats: [
-      { num: '30%', note: 'de las interacciones de búsqueda ya pasan por IA en 2026 — era menos del 10% en 2023' },
-      { num: '+70%', note: 'de Gen Z y Millennials usan búsqueda con IA — las generaciones que deciden compras hoy' },
-      { num: '4+', note: 'motores responden por tu categoría ahora mismo: ChatGPT, Gemini, Perplexity, Claude' },
+      { num: '65%', note: 'de los adultos ya ve resúmenes de IA en sus búsquedas (Pew Research, 2026)' },
+      { num: '74%', note: 'de Gen Z y Millennials usan IA en su día a día — las generaciones que deciden compras hoy (Deloitte, 2026)' },
+      { num: '−25%', note: 'proyecta Gartner que caerá la búsqueda tradicional para 2026, a medida que los usuarios migran a la IA' },
     ],
-    sourceNote: 'Cifras de estudios del mercado de búsqueda con IA, 2026 (AI Search Trends — ALM Corp; Reporter Outreach; Sedestral). Pedinos las fuentes completas.',
+    sourceNote: 'Fuentes primarias verificables: Pew Research Center (uso de IA en búsqueda, 2026); Deloitte Gen Z & Millennial Survey 2026; Gartner (predicción de volumen de búsqueda). Links completos a pedido.',
   },
   whatIs: {
     label: '¿Qué es GEO?',
@@ -90,6 +90,7 @@ const data: GeoServiceData = {
           'Datos estructurados donde aportan (negocio, servicios, FAQ)',
           'Plan de menciones de terceros: dónde y cómo conseguir los ecos que la IA escucha',
           'Si tu sitio necesita rediseño, se cotiza aparte — con el diagnóstico como base',
+          'Aplicable a sitios que podamos editar directamente. Si tu sitio corre en una plataforma cerrada que no da acceso, te entregamos el diagnóstico y el plan exacto para que tu equipo lo ejecute — o te proponemos rehacerlo bien.',
         ],
       },
       {
@@ -103,7 +104,7 @@ const data: GeoServiceData = {
         includes: [
           'Una página o FAQ nueva respondiendo lo que tus clientes preguntan ese mes',
           'Tu Google Business al día: horarios, fotos, servicios, novedades',
-          'Gestión de reseñas — fuente directa de lo que la IA dice de ti',
+          'Sistema de reseñas listo para que las pidas + respuesta a las que llegan (las reseñas reales las dejan tus clientes — así las valora la IA)',
           'Una mención nueva de terceros perseguida (directorios, listas, prensa local)',
           'Re-auditoría completa en los 4 motores: qué ganaste, qué perdiste, quién se movió',
         ],
@@ -112,16 +113,16 @@ const data: GeoServiceData = {
   },
   checker: {
     label: '¿Cómo está tu sitio hoy?',
-    body: 'Pega la dirección de tu sitio y lo analizamos al instante: si los motores de IA pueden leerte, si tenés schema, si tu contenido responde preguntas. Sin registro, sin email, sin espera.',
+    body: 'Pega la dirección de tu sitio y lo analizamos al instante: si los motores de IA pueden leerte, si tienes schema, si tu contenido responde preguntas. Sin registro, sin email, sin espera.',
     placeholder: 'tusitio.com',
     inputLabel: 'Dirección de tu sitio web',
     button: 'Analizar mi sitio',
-    note: 'El análisis es técnico y automático. Lo que la IA responde hoy sobre tu negocio lo revisamos juntos — escribinos con el resultado.',
+    note: 'El análisis es técnico y automático. Lo que la IA responde hoy sobre tu negocio lo revisamos juntos — escríbenos con el resultado.',
     waMessage: 'Hola SCUART, analicé mi sitio con el chequeo GEO:',
     loadingLabel: 'Analizando…',
     prioLabel: 'Lo que movería la aguja primero',
     waCta: 'Hablemos de cómo arreglarlo',
-    errorLabel: 'Algo falló. Probá de nuevo o escribinos.',
+    errorLabel: 'Algo falló. Prueba de nuevo o escríbenos.',
   },
   forWhom: {
     label: '¿Es para tu negocio?',
@@ -160,11 +161,15 @@ const data: GeoServiceData = {
       },
       {
         q: '¿En qué países trabajan?',
-        a: 'En toda Latinoamérica, Estados Unidos y España. El trabajo es remoto y el equipo es bilingüe — auditamos y optimizamos en español y en inglés, según el mercado de tu negocio.',
+        /* "el equipo es bilingüe" → "trabajamos en español e inglés"
+           (auditoría de copy 2026-08-10): el original afirmaba una composición
+           de equipo; el reemplazo dice la capacidad real, que es lo que le
+           importa al cliente y es verificable. */
+        a: 'En toda Latinoamérica, Estados Unidos y España. El trabajo es remoto y trabajamos en español e inglés — auditamos y optimizamos según el mercado de tu negocio.',
       },
       {
         q: '¿Qué necesitan de mí?',
-        a: 'El nombre de tu negocio, tu zona y tus competidores conocidos. El resto lo hacemos nosotros.',
+        a: 'El nombre de tu negocio, tu zona, tus competidores conocidos y acceso a tus perfiles (Google Business, redes). Lo técnico lo hacemos todo nosotros. La única parte que depende de ti son las reseñas: nosotros armamos el sistema completo — el guion, el QR, el mensaje listo — y tú lo activas con tus clientes contentos, porque una reseña real solo la puede dejar quien te visitó (y así es como la IA las valora). Te dejamos todo servido; tú solo lo pones a andar con tu gente.',
       },
       {
         q: '¿Esto reemplaza el SEO?',
@@ -177,6 +182,10 @@ const data: GeoServiceData = {
       {
         q: '¿Sirve si mi negocio no tiene sitio web?',
         a: 'Se puede empezar por perfiles y directorios (Google Business, reseñas), pero el techo es bajo: la IA necesita una fuente propia que leer. Si no tienes sitio, lo honesto es construir esa base primero — y también lo hacemos.',
+      },
+      {
+        q: '¿Esto viene incluido si me construyen el sitio?',
+        a: 'Sí. Todo sitio que construimos sale con la base de GEO de fábrica — arquitectura answer-first, datos estructurados y contenido que la IA puede leer y citar, sin costo aparte. Los tres planes de arriba (diagnóstico, arreglo, mantenimiento) son para negocios que YA tienen un sitio hecho por otro y quieren ganar visibilidad en IA sin rehacerlo. Si tu sitio corre en una plataforma que no podemos editar, te damos el diagnóstico y el plan; el arreglo requiere un sitio al que tengamos acceso.',
       },
     ],
   },

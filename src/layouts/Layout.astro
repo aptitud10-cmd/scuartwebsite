@@ -195,11 +195,17 @@ const resolvedOgDesc = ogDescription ?? description;
         left: 0;
         transform: translateY(-100%);
         z-index: 9999;
-        padding: 0.75rem 1.25rem;
+        /* 0.75rem daba 43px de alto — a 1px del mínimo táctil (auditoría
+           2026-08-10). El skip-link es el primer control del documento para
+           quien navega por teclado o lector de pantalla. */
+        padding: 0.875rem 1.25rem;
         background-color: var(--ink);
         color: var(--bg);
-        font-family: 'Hanken Grotesk', sans-serif;
-        font-size: 0.75rem;
+        /* --font-body (Geist Sans), no 'Hanken Grotesk': esa familia nunca
+           tuvo @font-face ni archivo, así que el skip-link caía al sans-serif
+           del sistema en vez de la tipografía del sitio (auditoría 2026-08-10). */
+        font-family: var(--font-body);
+        font-size: var(--text-mono);
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.1em;

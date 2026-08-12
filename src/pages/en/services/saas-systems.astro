@@ -1,0 +1,186 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'en';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/saas-systems', 'servicios/saas-systems');
+
+/* Native EN copy. P4 — every capability claimed here is built and running in
+   Menius (menius.app), SCUART's own product: multi-tenant with a subdomain per
+   restaurant, Stripe payments with no per-order commission, real-time orders.
+   No claim about client volume (copy audit 2026-08-10). */
+const data: GeoServiceData = {
+  kicker: 'SERVICE N°03 — SAAS + SYSTEMS',
+  heading: 'Custom software, from zero to production.',
+  tagline:
+    'Most design studios outsource anything with a backend. We build and operate our own product: we know what it costs to keep one running.',
+  cta: "Let's talk about your product",
+
+  shift: {
+    label: 'The proof is in production',
+    body: "Menius is a SaaS for digital menus and restaurant ordering. We designed it, built it and operate it. It is not a prototype or a portfolio piece: it runs in production, charges through Stripe and maintains itself. Everything offered on this page was built there first.",
+    stats: [
+      { num: '53 tables', note: 'with 187 row-level security policies and a daily automated check that none of them drift' },
+      { num: '3 gateways', note: 'Stripe Connect, MercadoPago and Wompi — each business collects into its own account, with encrypted keys' },
+      { num: '2 native apps', note: 'iOS and Android in React Native: one for the diner, one for the driver with background GPS' },
+    ],
+    sourceNote:
+      'Verifiable at menius.app. It is SCUART\'s own product, not client work — which is why we can show how it is built inside.',
+  },
+
+  whatIs: {
+    label: 'What a complete product is',
+    body: 'Complete digital products: the part the user sees and all the machinery behind it. Accounts and access, payments and subscriptions, admin panels, databases, integrations with other services, and the infrastructure to keep all of it running as it grows. It works both for a product sold by subscription and for an internal system replacing a spreadsheet that has run out of room.',
+  },
+
+  whyNot: {
+    label: 'When a business needs this',
+    items: [
+      {
+        title: 'The operation runs on spreadsheets and WhatsApp.',
+        body: 'It works until it does not: duplicated data, lost orders, nobody sure which file is the current one. A custom system turns that process into something that does not depend on someone remembering.',
+      },
+      {
+        title: 'The product idea needs to exist to be validated.',
+        body: 'There is a point where polishing the deck stops helping: you need something working that people can use and pay for. We build the first real version, not a mockup.',
+      },
+      {
+        title: 'The software they use does not fit the business.',
+        body: 'Tools that charge per transaction, that do not do quite what is needed, or that force the process to bend around them. Menius came out of exactly that problem: delivery apps take up to 30% of every order.',
+      },
+    ],
+  },
+
+  how: {
+    label: 'From idea to production',
+    tiers: [
+      {
+        num: '01',
+        name: 'Definition',
+        priceUSD: 900,
+        pricePrefix: 'From',
+        priceSuffix: 'one-off',
+        body: 'Before writing code you need to know what is being built. This stage delivers the document any team could build from — including one that is not us.',
+        includesLabel: 'Includes',
+        includes: [
+          'Interviews to understand the real process, not the one in the manual',
+          'Written scope: what goes in the first version and what waits',
+          'Data model and proposed architecture, with the reasoning shown',
+          'Key screens designed, not described',
+          'Time and cost estimate per stage, with the assumptions visible',
+          'The document is yours whether you continue with us or not',
+        ],
+      },
+      {
+        num: '02',
+        name: 'First version',
+        priceUSD: 6500,
+        pricePrefix: 'From',
+        priceSuffix: 'per project',
+        body: 'The product working, in production, with real users able to use it. Deliberately scoped: what validates the idea, not everything that could be built.',
+        includesLabel: 'Includes',
+        includes: [
+          'User accounts, access and permissions',
+          'Stripe payments: one-off, subscription or commission, depending on the model',
+          'Admin panel to run the business without touching code',
+          'Database with per-client isolation if the product is multi-tenant',
+          'Automatic emails where the process needs them',
+          'Published on your domain, with automatic deploys and backups',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Operation and growth',
+        priceUSD: 450,
+        pricePrefix: 'From',
+        priceSuffix: 'per month',
+        body: 'A live product needs someone looking after it. This plan is for when the system is in production and has to keep growing without breaking.',
+        includesLabel: 'Every month includes',
+        includes: [
+          'Monitoring: if something goes down, we know before your users do',
+          'Security and dependency updates',
+          'Verified backups — we test that they can actually be restored',
+          'Development hours for new features, agreed each month',
+          'Usage report: what gets used, what does not, where users get stuck',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: 'Is it worth building?',
+    yesLabel: 'It works well if',
+    yes: [
+      'You have a process handled by hand that no longer scales',
+      'You want to launch a digital product and need the first real version',
+      'The software you use charges per transaction or does not do what you need',
+      'You need several clients or locations using the same system with separate data',
+    ],
+    noLabel: 'It is not a priority if',
+    no: [
+      'An existing tool solves 90% of your problem — we will tell you so in the first conversation',
+      'You need the product finished in three weeks: that is not realistic for software with payments and accounts',
+      'There is nobody on the business side who can make decisions about the product',
+    ],
+  },
+
+  faq: {
+    label: 'Questions from people commissioning software',
+    items: [
+      {
+        q: 'What does it cost to build a product?',
+        a: 'Definition starts at $900 USD and a first version from $6,500 USD. The range is wide because it depends on how many user roles there are, whether there are payments, and whether the system must serve multiple clients with isolated data. The definition stage exists precisely to turn that range into a number.',
+      },
+      {
+        q: 'How long does a first version take?',
+        a: 'Definition takes 2 to 3 weeks. A first version with accounts and payments, 10 to 16 weeks depending on scope. We prefer to ship something working sooner and keep adding, rather than disappear for six months.',
+      },
+      {
+        q: 'What stack do you use for a product?',
+        a: 'Astro or Next.js depending on the project, Supabase for database and authentication, Stripe for payments, and Vercel for hosting. It is the same stack as Menius, which runs in production — not technology we would be trying for the first time on your project.',
+      },
+      {
+        q: 'Is the code mine?',
+        a: 'Yes. The repository is in your name from day one and you have full access. If at any point you decide to continue with another team, nothing holds you back.',
+      },
+      {
+        q: 'What happens if the product grows a lot?',
+        a: 'The architecture is chosen with that in mind from the start: a properly indexed database, per-client isolation, and infrastructure that scales without a rewrite. That is the difference between building on a considered foundation and on a stretched prototype.',
+      },
+      {
+        q: 'Do you build mobile apps?',
+        /* Corrected 2026-08-11 — see the ES file. The previous answer claimed we
+           don't build native apps, which is false: Menius ships two Expo apps. */
+        a: 'Yes. We build native iOS and Android apps with React Native and Expo: push notifications, camera, background location and biometric access. Menius has two — one for the diner, one for the driver — currently distributed as internal builds. If your product needs to ship on the App Store and Google Play, that process is part of the project scope.',
+      },
+      {
+        q: 'Can I start with just the definition?',
+        a: 'Yes, and often that is the right move. You come away with a document and screens you can use to get quotes from anyone, or to present the project to a partner. There is no obligation to continue.',
+      },
+      {
+        /* Replaces the "outside Colombia" question — see the ES file. */
+        q: 'What happens if we stop working together?',
+        a: 'The repository, the database and the service accounts are in your name, and the architecture documentation ships with the project. Any team can pick it up without archaeology. That is why the definition stage exists: without that document, the knowledge lives only in the head of whoever built it.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Tell us what your business needs to solve.',
+    emailLabel: 'Email info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Custom SaaS and systems development | SCUART"
+  description="Complete digital products: accounts, Stripe payments, admin panels and multi-tenant architecture. We build and operate Menius, our own SaaS in production. From $6,500 USD."
+  canonicalURL={`${SITE_URL}/en/services/saas-systems`}
+  alternates={alternates}
+/>

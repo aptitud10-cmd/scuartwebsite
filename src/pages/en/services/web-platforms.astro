@@ -1,0 +1,185 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'en';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/web-platforms', 'servicios/web-platforms');
+
+/* Native EN copy, not a literal translation of the ES page (same convention as
+   the rest of the site). P4 — every claim here is backed by real work:
+   Jamón Casero (digital identity, mobile-first, WhatsApp orders), Etnia Braids
+   (editorial site + Stripe bookings), and this very site's stack. */
+const data: GeoServiceData = {
+  kicker: 'SERVICE N°01 — WEB PLATFORMS',
+  heading: 'A site that loads fast, gets found, and converts.',
+  tagline:
+    'Most business websites are expensive brochures. This service builds the other thing: a site that works every day.',
+  cta: "Let's talk about your project",
+
+  shift: {
+    label: 'Why most websites underperform',
+    body: "A slow site loses visitors before it shows anything, and a site that isn't built for search never comes up when someone looks for what you sell. The difference between a site that works and one that merely exists is rarely how it looks: it's how fast it loads, whether search engines understand it, and whether a visitor finds what they came for.",
+    stats: [
+      { num: '0 JS', note: 'JavaScript by default: we build in Astro, which ships plain HTML and adds interactivity only where it earns its place' },
+      { num: 'Mobile', note: 'most of your visitors arrive on a phone — the design starts there, it is not adapted afterwards' },
+      { num: 'WCAG AA', note: 'contrast, touch targets and keyboard navigation verified with tools, not by eye' },
+    ],
+    sourceNote:
+      'All three are verifiable on this very site: it runs on the stack we sell.',
+  },
+
+  whatIs: {
+    label: 'What a web platform includes',
+    body: "It isn't \"a website\". It's the whole thing: the structure that decides what a visitor sees first, the design that makes the business look credible, the code that makes it load fast on a phone with average signal, and the technical groundwork so search engines — and now AI engines — understand what it's about. If the business needs bookings, payments or orders, that gets built to fit too: we don't bolt on a plugin.",
+  },
+
+  whyNot: {
+    label: 'Why a site underperforms',
+    items: [
+      {
+        title: "The site doesn't reflect what the business is worth.",
+        body: 'Brands with years of craft behind them and no digital presence, or a template site that makes them look smaller than they are. Jamón Casero had 55+ years of tradition and no website: the work was translating that craft into a digital identity that could carry it.',
+      },
+      {
+        title: 'The site is slow and loses the visitor.',
+        body: "Heavy themes, dozens of plugins, unoptimized images. The fix isn't a speed trick at the end: it's picking an architecture that doesn't create the problem. We ship static HTML and add behavior only where it helps.",
+      },
+      {
+        title: 'The site looks good but does nothing.',
+        body: "A catalogue that never leads to an order, a form nobody fills in. Every section needs a job. At Jamón Casero the order comes through WhatsApp, where the customer already is; at Etnia Braids the booking closes with a deposit and the calendar runs itself.",
+      },
+    ],
+  },
+
+  how: {
+    label: 'The three routes',
+    tiers: [
+      {
+        num: '01',
+        name: 'Essential site',
+        priceUSD: 1200,
+        pricePrefix: 'From',
+        priceSuffix: 'per project',
+        body: 'For a business that needs a serious, well-built digital presence without systems behind it. It is the base you can grow from.',
+        includesLabel: 'Includes',
+        includes: [
+          'Up to 5 sections or pages, structured around what your customer is looking for',
+          'Custom design — not a template with your logo on it',
+          'Phone, tablet and desktop, each reviewed on its own',
+          'Technical groundwork for search: structured data, sitemap, metadata',
+          'WCAG AA accessibility verified with tools',
+          'Form or direct WhatsApp contact, depending on how your customer buys',
+          'Published on your domain, with SSL and automatic deploys',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Site with a system',
+        priceUSD: 3500,
+        pricePrefix: 'From',
+        priceSuffix: 'per project',
+        body: 'When the site has to do more than inform: book, charge, take orders or manage content. This is what we built for Etnia Braids.',
+        includesLabel: 'Everything above, plus',
+        includes: [
+          'Bookings or orders built to fit the business — not a generic plugin forced into shape',
+          'Stripe payments: deposit, full payment or retainer, however you work',
+          'A panel to manage content without depending on us',
+          'Automatic confirmation emails to the customer and the business',
+          'Two languages if your market needs it, each with its own URLs',
+          'Analytics configured so you know which pages bring real enquiries',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Ongoing care',
+        priceUSD: 180,
+        pricePrefix: 'From',
+        priceSuffix: 'per month',
+        body: 'A published site is not a finished site. This plan is for businesses that want it to keep improving instead of ageing.',
+        includesLabel: 'Every month includes',
+        includes: [
+          'Content updates: prices, services, photos, news',
+          'Speed monitoring and uptime checks',
+          'Backups and security updates',
+          'One change or improvement a month, guided by the data',
+          'A simple report: what happened, what we did, what to do next',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: 'Do you need a new site?',
+    yesLabel: 'It works well if',
+    yes: [
+      'Your business already works and the site is not up to what it is worth',
+      'Most of your customers find or contact you from a phone',
+      'You need the site to do something concrete: orders, bookings, qualified enquiries',
+      'You sell a service or product where trust decides the sale',
+    ],
+    noLabel: 'It is not a priority if',
+    no: [
+      'You only need a contact page and already have a strong social presence',
+      'You are looking for the lowest price on the market — we do not compete there',
+      'You are not yet clear on what you sell or to whom: that gets defined first, and we work on that too',
+    ],
+  },
+
+  faq: {
+    label: 'What people usually ask',
+    items: [
+      {
+        q: 'What does a website cost?',
+        a: 'An essential site starts at $1,200 USD and a site with bookings or payments from $3,500 USD. The final price depends on how many sections it has and how custom the system is. After a 30-minute conversation we give you a fixed number, not a range.',
+      },
+      {
+        q: 'How soon is the site live?',
+        a: 'An essential site takes 3 to 4 weeks. One with bookings or payments, 6 to 8. The part that varies most is not development: it is how long the content — copy, photos, prices — takes to arrive from your side.',
+      },
+      {
+        q: 'What technology does the site run on?',
+        a: 'Astro for the site, which ships HTML without unnecessary JavaScript; Vercel for hosting, with automatic deploys and SSL; Stripe when there are payments. This very site runs on that stack — you can measure its speed right now.',
+      },
+      {
+        q: 'Can I edit the content myself?',
+        a: 'Yes, on projects with an admin panel. On essential sites, text and photo changes come through the care plan, or on request. We decide based on how often you actually need to change things.',
+      },
+      {
+        q: 'Will the site rank on Google?',
+        a: 'The technical groundwork is done: structure, structured data, sitemap, speed. That is necessary but not sufficient — ranking for competitive searches is separate, sustained work. Saying it plainly beats promising first place.',
+      },
+      {
+        q: 'What if my customers ask ChatGPT instead of Google?',
+        a: 'That is exactly what is happening, which is why we have a dedicated service for it. Every site we build is readable by AI engines from day one, and if you want to work that visibility properly, that is AI Visibility · GEO.',
+      },
+      {
+        /* Replaces the "outside Colombia" question — see the ES file. */
+        q: 'Is the site in my name?',
+        a: 'Yes. The domain, the hosting and the code sit in your accounts from the start. Nothing ties you to us: if you want to continue with another team tomorrow, you take everything without asking our permission.',
+      },
+      {
+        q: 'What do you need from me to start?',
+        a: 'A conversation about the business, then: copy or the main ideas, photos if you have them, and access to the domain. If there are no professional photos, we will say so — sometimes that is a better investment than another section of the site.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Tell us what your business needs to solve.',
+    emailLabel: 'Email info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Web design and development for business | SCUART"
+  description="Custom websites for businesses across LATAM, the US and Spain: fast, accessible and built for search. Essential sites from $1,200 USD, with bookings or payments from $3,500 USD."
+  canonicalURL={`${SITE_URL}/en/services/web-platforms`}
+  alternates={alternates}
+/>

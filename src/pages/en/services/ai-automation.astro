@@ -1,0 +1,183 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'en';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/ai-automation', 'servicios/ai-automation');
+
+/* Native EN copy. P4 — see the ES file for the full verified inventory. Every
+   capability claimed here is built and running in Menius, SCUART's own product.
+   NOT claimed: RAG with embeddings, automatic menu translation, AI pricing. */
+const data: GeoServiceData = {
+  kicker: 'SERVICE N°04 — AI AUTOMATION',
+  heading: 'AI automation that does the work, not that suggests it.',
+  tagline:
+    'The difference between a chatbot and a useful assistant is whether it can execute. Ours creates the promotion, changes the price and sends the campaign — it does not explain how to do it.',
+  cta: "Let's talk about your process",
+
+  shift: {
+    label: 'What we have already built with it',
+    body: 'Everything offered on this page runs in Menius, our own product, today. These are not demo integrations: they are features real businesses use daily, with cost controls, per-plan limits and abuse protection. When we say we know how to do this, you can go and watch it working.',
+    stats: [
+      { num: 'Photo → menu', note: 'a photo of a printed menu becomes a full digital catalogue: categories, prices, variants, extras and dietary tags' },
+      { num: '10 actions', note: 'the tools the dashboard assistant can execute on its own against real business data' },
+      { num: '17 jobs', note: 'automated processes running in production: alerts, billing, reminders, reports' },
+    ],
+    sourceNote:
+      'Verifiable at menius.app. It is our own product, not client work — which is why we can explain how it is built inside.',
+  },
+
+  whatIs: {
+    label: 'What we automate',
+    body: 'Repetitive tasks that eat someone\'s hours today: typing data in by hand from paper or PDFs, answering the same thing over and over, reading reports to find what changed, writing text that always follows the same shape. Useful automation is not "adding a chatbot": it is identifying the mechanical work, building the process that does it, and leaving the person deciding instead of typing.',
+  },
+
+  whyNot: {
+    label: 'What doing it by hand costs',
+    items: [
+      {
+        title: 'Typing information in by hand from documents.',
+        body: 'Menus, catalogues, price lists, invoices, paper forms. In Menius, uploading a photo of the printed menu generates the full catalogue: each dish with its category, price, size variants, add-ons and vegetarian or gluten-free tags. What used to take an afternoon takes under a minute.',
+      },
+      {
+        title: 'Answering the same thing every time.',
+        body: 'Common questions, review replies, follow-up messages. The draft gets written in your business\'s voice and a person approves it before it goes out. In Menius, the owner\'s reply to a review writes itself and gets checked in seconds.',
+      },
+      {
+        title: 'Nobody looks at the data until it is too late.',
+        body: 'The reports exist but nobody opens them. Useful automation flips that: the system reviews the data and tells you when something changed. Menius runs jobs that spot customers who stopped ordering, products running out of stock, and sales that fall outside the normal range.',
+      },
+    ],
+  },
+
+  how: {
+    label: 'Start with what weighs most',
+    tiers: [
+      {
+        num: '01',
+        name: 'Process assessment',
+        priceUSD: 600,
+        pricePrefix: 'From',
+        priceSuffix: 'one-off',
+        body: 'Before automating, you need to know what is worth automating. Some tasks are not, and we will say so.',
+        includesLabel: 'Includes',
+        includes: [
+          'A survey of the repetitive tasks eating time today',
+          'How much each one costs per week, in concrete numbers',
+          'What can be automated now, what should stay as it is, and why',
+          'Estimated monthly running cost: AI models are paid per use',
+          'Priorities ordered by real savings, not by what sounds most modern',
+          'The document is yours whether you continue with us or not',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Custom automation',
+        priceUSD: 2800,
+        pricePrefix: 'From',
+        priceSuffix: 'per process',
+        body: 'We build the automated process, integrated with your tools. In our own code, not assembled on platforms that charge per run.',
+        includesLabel: 'Includes',
+        includes: [
+          'Extracting data from photos, PDFs or scanned documents into structured information',
+          'Assistants that execute real actions in your systems, not just talk',
+          'Text and image generation in your brand\'s voice and style',
+          'Scheduled jobs: periodic checks, alerts, automatic reports',
+          'Usage limits and spend controls so costs do not run away',
+          'A log of everything the system does, so it can be audited',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Operation and tuning',
+        priceUSD: 320,
+        pricePrefix: 'From',
+        priceSuffix: 'per month',
+        body: 'AI models change, prices change, and so do business processes. This plan keeps everything running and taking advantage of what comes out.',
+        includesLabel: 'Every month includes',
+        includes: [
+          'Monitoring that the automations keep running and keep producing good results',
+          'Model spend tracking, with an alert if something goes outside the expected range',
+          'Instruction tuning when output drifts from what you expect',
+          'Migration to newer models when it makes sense on cost or quality',
+          'Monthly report: how much ran, what it cost, how much time it saved',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: 'Is there anything to automate?',
+    yesLabel: 'It works well if',
+    yes: [
+      'Someone on your team spends hours copying data from one place to another',
+      'You receive information on paper, PDFs or photos that has to be typed into a system',
+      'The same questions or messages get answered every day',
+      'You have accumulated data nobody has time to review',
+    ],
+    noLabel: 'It is not a priority if',
+    no: [
+      'The process changes its rules every week: stabilise it first',
+      'The volume is low — automating something that happens twice a month rarely pays for itself',
+      'You are looking to replace people: this works better taking the mechanical work off them, not substituting them',
+    ],
+  },
+
+  faq: {
+    label: 'What worries people about AI',
+    items: [
+      {
+        q: 'What does it cost to automate a process?',
+        a: 'The assessment starts at $600 USD and each automation from $2,800 USD, depending on how complex the process is and how many systems it has to talk to. On top of that is the AI model usage cost, paid per use, which we estimate during the assessment.',
+      },
+      {
+        q: 'Which AI models do you use?',
+        a: 'Claude for reasoning tasks and assistants with tools, Gemini for reading documents and images given its cost-to-quality ratio, and image generation models like FLUX when visual material is needed. We choose per task and per budget, not by fashion.',
+      },
+      {
+        q: 'Do you use n8n, Make or Zapier?',
+        a: 'No. We build in our own code. Those platforms are fine for prototypes, but they charge per run, get expensive at scale, and leave your business logic inside a third-party service. What we build lives in your infrastructure and the code is yours.',
+      },
+      {
+        q: 'What if the AI gets it wrong?',
+        a: 'It is designed assuming it will. Processes touching money or customer communication require human approval before executing; ones that only read or classify run on their own with everything logged. During the assessment we define where each control goes.',
+      },
+      {
+        q: 'What does it cost to run per month?',
+        a: 'It depends on volume. In Menius, reading a full menu from a photo costs cents per use. A conversational assistant with data access costs more. In the assessment we give you an estimated range, and we build with usage limits so there are no surprises.',
+      },
+      {
+        q: 'Does it integrate with what I already use?',
+        a: 'If your system has an API, yes. If it does not, we can work against the database or build the integration. We check this during the assessment before promising anything — it is the part where the work gets underestimated most.',
+      },
+      {
+        q: 'Is my data used to train models?',
+        a: 'No. We use the providers\' commercial APIs, which do not train on data sent through that channel. We also sanitise what goes into the models and apply protections against instruction manipulation, the same as in Menius.',
+      },
+      {
+        /* Replaces the "outside Colombia" question — see the ES file. */
+        q: 'What happens when the model we use becomes obsolete?',
+        a: 'It will: models get discontinued every few months. That is why the code does not talk to a provider directly but to our own layer, which lets us swap it without rebuilding the automation. Menius runs models from three different providers with cascading fallback when one fails — the same architecture we apply on client projects.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Tell us which task is eating your time.',
+    emailLabel: 'Email info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="AI automation for business | SCUART"
+  description="Custom AI automation: document and image extraction, assistants that execute real actions, and scheduled jobs. Assessment from $600 USD."
+  canonicalURL={`${SITE_URL}/en/services/ai-automation`}
+  alternates={alternates}
+/>

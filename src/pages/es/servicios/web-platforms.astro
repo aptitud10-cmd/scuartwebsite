@@ -1,0 +1,192 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'es';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/web-platforms', 'servicios/web-platforms');
+
+/* Copy neutro LATAM, sin voseo (convención es.ts).
+   Precios base en USD; el hint de moneda local lo pone el layout client-side.
+   P4 — TODO lo que se afirma acá es verificable contra trabajo real:
+     · Jamón Casero  → identidad digital, mobile-first, pedidos por WhatsApp
+     · Etnia Braids  → sitio editorial + reservas con Stripe
+     · Menius        → landing del SaaS propio
+   NO se menciona ninguna tecnología ni capacidad que no esté en esos casos
+   o en el stack de este mismo sitio (Astro, Vercel, GSAP, schema, i18n). */
+const data: GeoServiceData = {
+  kicker: 'SERVICIO N°01 — WEB PLATFORMS',
+  heading: 'Un sitio que carga rápido, se encuentra y convierte.',
+  tagline:
+    'La mayoría de los sitios de negocio son folletos caros. Este servicio construye la otra cosa: una pieza que trabaja todos los días.',
+  cta: 'Conversemos tu proyecto',
+
+  shift: {
+    label: 'Por qué la mayoría de los sitios no rinden',
+    body: 'Un sitio lento pierde visitantes antes de mostrar nada, y uno que no está pensado para buscadores no aparece cuando alguien busca lo que vendes. La diferencia entre un sitio que trabaja y uno que solo existe casi nunca está en cómo se ve: está en cuánto tarda en cargar, en si el buscador lo entiende, y en si el visitante encuentra rápido lo que vino a buscar.',
+    stats: [
+      { num: '0 JS', note: 'de JavaScript por defecto: construimos en Astro, que envía HTML puro y solo agrega interactividad donde hace falta' },
+      { num: 'Mobile', note: 'la mayoría de tus visitantes llega desde el teléfono — el diseño arranca ahí, no se adapta después' },
+      { num: 'WCAG AA', note: 'contraste, tamaños táctiles y navegación por teclado verificados con herramientas, no a ojo' },
+    ],
+    sourceNote:
+      'Los tres puntos son verificables en este mismo sitio: está construido con el stack que vendemos.',
+  },
+
+  whatIs: {
+    label: '¿Qué incluye una web platform?',
+    body: 'No es "una página web". Es el conjunto: la estructura que decide qué ve primero el visitante, el diseño que hace que el negocio se vea confiable, el código que hace que cargue rápido en un teléfono con señal mediana, y la base técnica para que los buscadores —y ahora los motores de IA— entiendan de qué se trata. Si el negocio necesita reservas, pagos o pedidos, eso también se construye a medida: no se pega un plugin encima.',
+  },
+
+  whyNot: {
+    label: 'Por qué un sitio no rinde',
+    items: [
+      {
+        title: 'El sitio no transmite lo que vale el negocio.',
+        body: 'Marcas con años de oficio y cero presencia digital, o con una web de plantilla que las hace ver más chicas de lo que son. Jamón Casero llevaba más de 55 años de tradición sin sitio propio: el trabajo fue traducir ese oficio a una identidad digital que lo sostuviera.',
+      },
+      {
+        title: 'El sitio carga lento y se pierde al visitante.',
+        body: 'Temas pesados, decenas de plugins, imágenes sin optimizar. La solución no es un truco de velocidad al final: es elegir una arquitectura que no genere el problema. Enviamos HTML estático y agregamos comportamiento solo donde aporta.',
+      },
+      {
+        title: 'El sitio se ve bien pero no hace nada.',
+        body: 'Un catálogo que no lleva al pedido, un formulario que nadie completa. Cada sección tiene que tener un trabajo asignado. En Jamón Casero el pedido entra por WhatsApp, que es donde el cliente ya está; en Etnia Braids la reserva se cierra con depósito y la agenda se maneja sola.',
+      },
+    ],
+  },
+
+  how: {
+    label: 'Los tres caminos',
+    tiers: [
+      {
+        num: '01',
+        name: 'Sitio esencial',
+        priceUSD: 1200,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por proyecto',
+        body: 'Para un negocio que necesita una presencia digital seria y bien hecha, sin sistemas por detrás. Es la base sobre la que después se puede crecer.',
+        includesLabel: 'Incluye',
+        includes: [
+          'Hasta 5 secciones o páginas, con la estructura decidida según lo que tu cliente busca',
+          'Diseño propio — no una plantilla con tu logo encima',
+          'Adaptado a teléfono, tablet y escritorio, cada uno revisado por separado',
+          'Base técnica para buscadores: datos estructurados, sitemap, metadatos',
+          'Accesibilidad WCAG AA verificada con herramientas',
+          'Formulario o contacto directo por WhatsApp, según cómo compre tu cliente',
+          'Publicado en tu dominio, con certificado y despliegue automático',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Sitio con sistema',
+        priceUSD: 3500,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por proyecto',
+        body: 'Cuando el sitio tiene que hacer algo más que informar: reservar, cobrar, recibir pedidos o administrar contenido. Es lo que construimos para Etnia Braids.',
+        includesLabel: 'Todo lo anterior, más',
+        includes: [
+          'Reservas o pedidos a medida del negocio — no un plugin genérico adaptado a la fuerza',
+          'Cobros con Stripe: depósito, pago total o seña, según cómo trabajes',
+          'Panel para administrar el contenido sin depender de nosotros',
+          'Correos automáticos de confirmación al cliente y al negocio',
+          'Dos idiomas si tu mercado lo necesita, con URLs propias para cada uno',
+          'Medición configurada para saber qué páginas traen consultas reales',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Acompañamiento',
+        priceUSD: 180,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por mes',
+        body: 'Un sitio publicado no es un sitio terminado. Este plan es para negocios que quieren que siga mejorando en vez de envejecer.',
+        includesLabel: 'Cada mes incluye',
+        includes: [
+          'Actualizaciones de contenido: precios, servicios, fotos, novedades',
+          'Monitoreo de velocidad y de que todo siga funcionando',
+          'Copias de seguridad y actualizaciones de seguridad',
+          'Un cambio o mejora por mes según lo que muestren los datos',
+          'Reporte simple: qué pasó, qué se hizo, qué conviene hacer después',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: '¿Necesitas un sitio nuevo?',
+    yesLabel: 'Funciona muy bien si',
+    yes: [
+      'Tu negocio ya funciona y el sitio no está a la altura de lo que vale',
+      'La mayoría de tus clientes te encuentra o te contacta desde el teléfono',
+      'Necesitas que el sitio haga algo concreto: pedidos, reservas, consultas calificadas',
+      'Vendes un servicio o producto donde la confianza decide la compra',
+    ],
+    noLabel: 'No es prioridad si',
+    no: [
+      'Solo necesitas una página de contacto y ya tienes buena presencia en redes',
+      'Buscas el precio más bajo del mercado — no competimos ahí',
+      'Todavía no tienes claro qué vendes ni a quién: eso se define antes, y también lo trabajamos',
+    ],
+  },
+
+  faq: {
+    label: 'Lo que suelen preguntarnos',
+    items: [
+      {
+        q: '¿Cuánto cuesta un sitio?',
+        a: 'Un sitio esencial arranca en $1.200 USD y uno con sistema de reservas o pagos desde $3.500 USD. El precio final depende de cuántas secciones tenga y de qué tan a medida sea el sistema. Después de una conversación de 30 minutos te pasamos un número cerrado, no un rango.',
+      },
+      {
+        q: '¿En cuánto tiempo tengo el sitio publicado?',
+        a: 'Un sitio esencial toma entre 3 y 4 semanas. Uno con sistema de reservas o pagos, entre 6 y 8. La parte que más varía no es el desarrollo: es cuánto tarda en llegar el contenido —textos, fotos, precios— de tu lado.',
+      },
+      {
+        q: '¿Sobre qué tecnología corre el sitio?',
+        a: 'Astro para el sitio, que envía HTML sin JavaScript innecesario; Vercel para publicarlo, con despliegue automático y certificado incluido; Stripe cuando hay cobros. Este mismo sitio usa ese stack: puedes medir su velocidad ahora mismo.',
+      },
+      {
+        q: '¿Puedo editar el contenido yo?',
+        a: 'Sí, en los proyectos con panel de administración. En los sitios esenciales los cambios de texto y foto entran por el plan de acompañamiento, o los hacemos por pedido. Lo decidimos según qué tan seguido necesites cambiar cosas.',
+      },
+      {
+        q: '¿El sitio va a aparecer en Google?',
+        a: 'La base técnica queda lista: estructura, datos estructurados, sitemap, velocidad. Eso es condición necesaria, no suficiente — posicionar para búsquedas competidas es un trabajo aparte y sostenido. Lo honesto es decirlo así en vez de prometer primeros puestos.',
+      },
+      {
+        q: '¿Y si mis clientes ya no buscan en Google sino en ChatGPT?',
+        a: 'Es exactamente lo que está pasando, y por eso tenemos un servicio dedicado. Todo sitio que construimos queda con la base para que los motores de IA puedan leerlo, y si quieres trabajar esa visibilidad a fondo, eso es AI Visibility · GEO.',
+      },
+      {
+        /* Reemplaza "¿Trabajan fuera de Colombia?" (2026-08-11): esa pregunta
+           estaba IDÉNTICA en 6 de las 7 páginas de servicio, y encima
+           encasillaba al estudio como local justo cuando el posicionamiento es
+           LATAM + USA + España. Cada página lleva ahora una pregunta propia. */
+        q: '¿El sitio queda a mi nombre?',
+        a: 'Sí. El dominio, el hosting y el código quedan en cuentas tuyas desde el principio. No hay nada que te ate a nosotros: si mañana quieres seguir con otro equipo, se lleva todo sin pedirnos permiso.',
+      },
+      {
+        q: '¿Qué necesitan de mí para empezar?',
+        a: 'Una conversación sobre el negocio, y después: textos o las ideas principales, fotos si las tienes, y acceso al dominio. Si no hay fotos profesionales, lo hablamos — a veces conviene invertir ahí antes que en otra sección del sitio.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Cuéntanos qué necesita resolver tu negocio.',
+    emailLabel: 'Escribir a info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Diseño y desarrollo web para negocios | SCUART"
+  description="Sitios web a medida para negocios en LATAM, USA y España: rápidos, accesibles y listos para buscadores. Sitio esencial desde $1.200 USD, con reservas o pagos desde $3.500 USD."
+  canonicalURL={`${SITE_URL}/es/servicios/web-platforms`}
+  alternates={alternates}
+/>

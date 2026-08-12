@@ -1,0 +1,194 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'es';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/saas-systems', 'servicios/saas-systems');
+
+/* Copy neutro LATAM, sin voseo (convención es.ts).
+   P4 — CADA capacidad afirmada acá está construida y en producción en Menius
+   (menius.app), producto propio de SCUART: arquitectura multi-tenant con
+   subdominio por restaurante, pagos con Stripe sin comisión por pedido,
+   pedidos en tiempo real, y generación de menú desde una foto.
+   NO se afirma volumen de clientes (auditoría de copy 2026-08-10) — lo que
+   prueba capacidad es la arquitectura, no cuántos la usan. */
+const data: GeoServiceData = {
+  kicker: 'SERVICIO N°03 — SAAS + SYSTEMS',
+  heading: 'Software a medida, de cero a producción.',
+  tagline:
+    'La mayoría de los estudios de diseño subcontrata todo lo que tiene backend. Nosotros construimos y operamos un producto propio: sabemos lo que cuesta sostener uno.',
+  cta: 'Conversemos tu producto',
+
+  shift: {
+    label: 'La prueba está en producción',
+    body: 'Menius es un SaaS de menús digitales y pedidos para restaurantes. Lo diseñamos, lo construimos y lo operamos. No es un prototipo ni un proyecto de portafolio: corre en producción, cobra con Stripe y se mantiene solo. Todo lo que ofrecemos en esta página está construido ahí primero.',
+    stats: [
+      { num: '53 tablas', note: 'con 187 políticas de seguridad a nivel de fila y una tarea automática que verifica cada día que ninguna se degrade' },
+      { num: '3 pasarelas', note: 'Stripe Connect, MercadoPago y Wompi — cada negocio cobra en su propia cuenta, con sus llaves cifradas' },
+      { num: '2 apps nativas', note: 'iOS y Android con React Native: una para el comensal, otra para el repartidor con GPS en segundo plano' },
+    ],
+    sourceNote:
+      'Verificable en menius.app. Es producto propio de SCUART, no trabajo de cliente — por eso podemos mostrar cómo está hecho por dentro.',
+  },
+
+  whatIs: {
+    label: '¿Qué es un producto completo?',
+    body: 'Productos digitales completos: la parte que ve el usuario y toda la maquinaria que hay detrás. Cuentas y accesos, cobros y suscripciones, paneles de administración, bases de datos, integraciones con otros servicios, y la infraestructura para que todo eso siga funcionando cuando crezca. Sirve tanto para un producto que se vende por suscripción como para un sistema interno que reemplaza una planilla de cálculo que ya no da más.',
+  },
+
+  whyNot: {
+    label: 'Cuándo un negocio necesita esto',
+    items: [
+      {
+        title: 'La operación se maneja con planillas y WhatsApp.',
+        body: 'Funciona hasta que deja de funcionar: datos duplicados, pedidos que se pierden, nadie sabe cuál es la versión buena del archivo. Un sistema a medida convierte ese proceso en algo que no depende de que alguien se acuerde.',
+      },
+      {
+        title: 'La idea de producto necesita existir para validarse.',
+        body: 'Hay un momento en que seguir puliendo la presentación no aporta: hace falta algo funcionando que la gente pueda usar y pagar. Construimos la primera versión real, no una maqueta.',
+      },
+      {
+        title: 'El software que usan no se adapta al negocio.',
+        body: 'Herramientas que cobran comisión por transacción, que no hacen exactamente lo que hace falta, o que obligan a cambiar el proceso para adaptarse a ellas. Menius nació de ese problema: las apps de delivery se llevan hasta el 30% de cada pedido.',
+      },
+    ],
+  },
+
+  how: {
+    label: 'De la idea a producción',
+    tiers: [
+      {
+        num: '01',
+        name: 'Definición',
+        priceUSD: 900,
+        pricePrefix: 'Desde',
+        priceSuffix: 'pago único',
+        body: 'Antes de escribir código hay que saber qué se construye. Esta etapa entrega el documento con el que cualquier equipo podría construirlo — incluido otro que no seamos nosotros.',
+        includesLabel: 'Incluye',
+        includes: [
+          'Entrevistas para entender el proceso real, no el que dice el manual',
+          'Alcance escrito: qué entra en la primera versión y qué queda para después',
+          'Modelo de datos y arquitectura propuesta, con las decisiones justificadas',
+          'Pantallas principales diseñadas, no descritas',
+          'Estimación de tiempo y costo por etapa, con los supuestos a la vista',
+          'El documento es tuyo, sigas o no con nosotros',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Primera versión',
+        priceUSD: 6500,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por proyecto',
+        body: 'El producto funcionando, en producción, con usuarios reales pudiendo usarlo. Acotado a propósito: lo que valida la idea, no todo lo que se podría hacer.',
+        includesLabel: 'Incluye',
+        includes: [
+          'Cuentas de usuario, accesos y permisos',
+          'Cobros con Stripe: pago único, suscripción o comisión, según el modelo',
+          'Panel de administración para operar el negocio sin tocar código',
+          'Base de datos con aislamiento por cliente si el producto es multi-tenant',
+          'Correos automáticos donde el proceso los necesita',
+          'Publicado en tu dominio, con despliegue automático y copias de seguridad',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Operación y evolución',
+        priceUSD: 450,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por mes',
+        body: 'Un producto vivo necesita quien lo cuide. Este plan es para cuando el sistema ya está en producción y tiene que seguir creciendo sin romperse.',
+        includesLabel: 'Cada mes incluye',
+        includes: [
+          'Monitoreo: si algo se cae, nos enteramos antes que tus usuarios',
+          'Actualizaciones de seguridad y de dependencias',
+          'Copias de seguridad verificadas — probamos que se puedan restaurar',
+          'Horas de desarrollo para funciones nuevas, acordadas cada mes',
+          'Reporte de uso: qué se usa, qué no, dónde se traban los usuarios',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: '¿Vale la pena construirlo?',
+    yesLabel: 'Funciona muy bien si',
+    yes: [
+      'Tienes un proceso que hoy se maneja a mano y ya no escala',
+      'Quieres lanzar un producto digital y necesitas la primera versión real',
+      'El software que usas te cobra comisión por transacción o no hace lo que necesitas',
+      'Necesitas que varios clientes o sucursales usen el mismo sistema con datos separados',
+    ],
+    noLabel: 'No es prioridad si',
+    no: [
+      'Una herramienta que ya existe resuelve el 90% de tu problema — te lo vamos a decir en la primera conversación',
+      'Necesitas el producto terminado en tres semanas: no es un plazo realista para software con pagos y cuentas',
+      'No hay nadie del lado del negocio que pueda decidir sobre el producto',
+    ],
+  },
+
+  faq: {
+    label: 'Dudas de quien encarga software',
+    items: [
+      {
+        q: '¿Cuánto cuesta construir un producto?',
+        a: 'La definición arranca en $900 USD y la primera versión desde $6.500 USD. El rango es amplio porque depende de cuántos roles de usuario haya, si hay pagos, y si el sistema debe servir a varios clientes con datos aislados. La etapa de definición existe justamente para convertir ese rango en un número.',
+      },
+      {
+        q: '¿Cuánto tarda una primera versión?',
+        a: 'La definición toma entre 2 y 3 semanas. Una primera versión con cuentas y pagos, entre 10 y 16 semanas según el alcance. Preferimos entregar algo funcionando antes y seguir agregando, en vez de desaparecer seis meses.',
+      },
+      {
+        q: '¿Qué stack usan para un producto?',
+        a: 'Astro o Next.js según el proyecto, Supabase para base de datos y autenticación, Stripe para cobros, y Vercel para publicar. Es el mismo stack de Menius, que corre en producción — no tecnología que estemos probando por primera vez con tu proyecto.',
+      },
+      {
+        q: '¿El código es mío?',
+        a: 'Sí. El repositorio queda a tu nombre desde el primer día y tienes acceso completo. Si en algún momento decides seguir con otro equipo, no hay nada que te retenga.',
+      },
+      {
+        q: '¿Qué pasa si el producto crece mucho?',
+        a: 'La arquitectura se elige pensando en eso desde el principio: base de datos con índices bien puestos, aislamiento por cliente, y una infraestructura que escala sin rediseñar todo. Es la diferencia entre construir sobre una base pensada y sobre un prototipo estirado.',
+      },
+      {
+        q: '¿Hacen aplicaciones móviles?',
+        /* Corregido 2026-08-11: la versión anterior decía que NO hacíamos apps
+           nativas. Es falso — Menius tiene dos apps Expo/React Native con push,
+           cámara, GPS en segundo plano y biometría. Se aclara lo de las tiendas
+           porque hoy se distribuyen como builds internos (eas.json: distribution
+           "internal", buildType "apk", submit vacío). */
+        a: 'Sí. Construimos aplicaciones nativas para iOS y Android con React Native y Expo: notificaciones push, cámara, ubicación en segundo plano y acceso por biometría. Menius tiene dos —una para el comensal y otra para el repartidor—, hoy distribuidas como builds internos. Si tu producto necesita publicarse en App Store y Google Play, ese trámite entra en el alcance del proyecto.',
+      },
+      {
+        q: '¿Puedo empezar solo con la definición?',
+        a: 'Sí, y en muchos casos es lo recomendable. Sales con un documento y unas pantallas que te sirven para cotizar con quien quieras, o para presentar el proyecto a un socio. No hay obligación de continuar.',
+      },
+      {
+        /* Reemplaza "¿Trabajan fuera de Colombia?" (2026-08-11) — ver nota en
+           web-platforms. Esta página pregunta por lo que más preocupa a quien
+           encarga software: qué pasa si el proveedor desaparece. */
+        q: '¿Qué pasa si dejamos de trabajar juntos?',
+        a: 'El repositorio, la base de datos y las cuentas de servicios están a tu nombre, y la documentación de arquitectura se entrega con el proyecto. Cualquier equipo puede continuarlo sin arqueología. Es la razón por la que la etapa de definición existe: sin ese documento, el conocimiento vive solo en la cabeza de quien construyó.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Cuéntanos qué necesita resolver tu negocio.',
+    emailLabel: 'Escribir a info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Desarrollo de SaaS y sistemas a medida | SCUART"
+  description="Productos digitales completos: cuentas, pagos con Stripe, paneles y arquitectura multi-tenant. Construimos y operamos Menius, nuestro propio SaaS en producción. Desde $6.500 USD."
+  canonicalURL={`${SITE_URL}/es/servicios/saas-systems`}
+  alternates={alternates}
+/>

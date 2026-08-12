@@ -1,0 +1,185 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'en';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/ecommerce', 'servicios/ecommerce');
+
+/* Native EN copy. P4 — see the ES file for the verified inventory. Everything
+   claimed here is built and running in Menius. We do NOT claim Shopify or
+   WooCommerce experience — the FAQ says so plainly. */
+const data: GeoServiceData = {
+  kicker: 'SERVICE N°05 — E-COMMERCE',
+  heading: 'Your own store, with no commission per sale.',
+  tagline:
+    'Platforms take a percentage of every sale and keep the relationship with your customer. A custom store costs once and then it is yours.',
+  cta: "Let's talk about your store",
+
+  shift: {
+    label: 'What the convenience costs',
+    body: 'Starting on a platform is easy, and for a while it makes sense. The problem shows up as volume grows: the commission that was small on a few sales becomes a significant fixed cost, and your catalogue, customers and history live in a system you do not control. The maths changes with how much you sell — it is worth running the numbers before deciding.',
+    stats: [
+      { num: '0%', note: 'commission on your sales: you pay the card fee to the processor, nothing to us' },
+      { num: '3 gateways', note: 'Stripe, MercadoPago and Wompi already integrated — chosen by country and how your customer pays' },
+      { num: 'Your domain', note: 'the store, your customer data and their purchase history are yours, not a platform\'s' },
+    ],
+    sourceNote:
+      'All three gateways are implemented and running in production in Menius, with per-business keys encrypted in the database.',
+  },
+
+  whatIs: {
+    label: 'What your own store includes',
+    body: 'A store built around how you actually sell: the catalogue with its variants and options, the cart, the checkout, payments, coupons, stock control and the panel to run all of it. It is not a configured template: pricing, shipping and discount logic gets built around the real rules of the business. And if you sell something that does not fit the platform mould — options that depend on each other, or made-to-order preparation — that is exactly where a custom store wins.',
+  },
+
+  whyNot: {
+    label: 'What the platform charges you',
+    items: [
+      {
+        title: 'Commission eats the margin.',
+        body: 'A percentage on every sale plus the processor fee. Menius came out of this problem in restaurants, where delivery apps take up to 30% of every order. With your own store, the only variable cost is what the card charges.',
+      },
+      {
+        title: 'The product does not fit the platform mould.',
+        body: 'Variants that change the price, paid add-ons, options that only appear once you picked another one, minimum orders by zone. In Menius that is built as a conditional modifier system — the kind of rule a generic platform handles with workarounds.',
+      },
+      {
+        title: 'The customers belong to the platform, not to you.',
+        body: 'Purchase history, contact details and the ability to sell to them again all sit on the other side. With your own store you get the CRM, the segmentation and a loyalty programme if you want one — all of it built in Menius.',
+      },
+    ],
+  },
+
+  how: {
+    label: 'Scaled to your catalogue',
+    tiers: [
+      {
+        num: '01',
+        name: 'Essential store',
+        priceUSD: 2800,
+        pricePrefix: 'From',
+        priceSuffix: 'per project',
+        body: 'Catalogue, cart, checkout and payments. To sell properly from day one, with no extra machinery.',
+        includesLabel: 'Includes',
+        includes: [
+          'Catalogue with categories, photos, variants and priced add-ons',
+          'Cart and checkout designed for the phone, where most of it comes from',
+          'Payments through Stripe, MercadoPago or Wompi depending on your country',
+          'Stock control with low-inventory alerts',
+          'Coupons and discounts with rules: minimum order, expiry, maximum uses',
+          'A panel to load products, see orders and change statuses',
+          'Published on your domain, with SSL and automatic deploys',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Store with operations',
+        priceUSD: 5500,
+        pricePrefix: 'From',
+        priceSuffix: 'per project',
+        body: 'When the store has to carry a real operation: shipping rules, returning customers, multiple locations.',
+        includesLabel: 'Everything above, plus',
+        includes: [
+          'Shipping calculated by distance or zone, with a configurable minimum order',
+          'Order tracking for the customer, with no account required',
+          'CRM with segmentation: frequent, inactive and at-risk customers',
+          'Loyalty programme with points and referrals',
+          'Scheduled orders and conditional options across products',
+          'Multiple locations, each with its own catalogue and stock',
+          'Two languages with translatable product content, not just the interface',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Operation and growth',
+        priceUSD: 300,
+        pricePrefix: 'From',
+        priceSuffix: 'per month',
+        body: 'A store that takes money cannot be down or out of date. This plan keeps it running and keeps it growing.',
+        includesLabel: 'Every month includes',
+        includes: [
+          'Monitoring with alerts if something fails, before your customer notices',
+          'Security updates and verified backups',
+          'Loading and adjusting products, prices and promotions',
+          'Sales report: what sells, what gets abandoned in the cart, which hours perform',
+          'One improvement a month decided by the data, not by hunch',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: 'Is it time for your own store?',
+    yesLabel: 'It works well if',
+    yes: [
+      'You already sell and the platform commission has become a significant cost',
+      'Your product has variants, add-ons or options that depend on each other',
+      'You want your customer history and data under your own control',
+      'You need custom shipping rules, minimums or made-to-order preparation',
+    ],
+    noLabel: 'It is not a priority if',
+    no: [
+      'You have not validated that the product sells yet: starting on a platform is cheaper for testing',
+      'You sell few units a month — the commission still costs less than the build',
+      'You need to be selling next week: a custom store does not get built in that time',
+    ],
+  },
+
+  faq: {
+    label: 'Before leaving the platform',
+    items: [
+      {
+        q: 'What does a store cost?',
+        a: 'An essential store starts at $2,800 USD and one with full operations from $5,500 USD. The price depends on catalogue size, how particular your pricing and shipping rules are, and whether you need multiple locations.',
+      },
+      {
+        q: 'Do you work with Shopify or WooCommerce?',
+        a: 'No, and we would rather say so plainly: we build custom stores on our own stack. If what you need is a standard store with a simple catalogue, Shopify is probably the better option for you and we will tell you that in the first conversation.',
+      },
+      {
+        q: 'When does a custom store beat a platform?',
+        a: 'The maths is simple: compare the annual commission against the cost of the build. At low volume, the platform wins. Past a certain point, or when the product does not fit the standard mould, a custom store pays for itself. We run that number with your real figures in the first conversation.',
+      },
+      {
+        q: 'Which payment gateways do you integrate?',
+        a: 'Stripe, MercadoPago and Wompi — all three are implemented and running in production in Menius. The choice depends on the country and how your customers pay. The money goes straight into your processor account; it never passes through us.',
+      },
+      {
+        q: 'Do you charge commission per sale?',
+        a: 'No. We charge for the build and, if you take it, the monthly plan. The only deduction per sale is the payment processor fee, which goes to Stripe, MercadoPago or Wompi.',
+      },
+      {
+        q: 'Can I load the products myself?',
+        a: 'Yes, that is what the panel is for. And if your catalogue is on paper or in a PDF, we can automate the loading: in Menius, a photo of the printed menu generates the full catalogue with prices, variants and add-ons.',
+      },
+      {
+        q: 'How soon can I be selling?',
+        a: 'An essential store takes 5 to 7 weeks, and one with full operations 8 to 12. What matters most is the catalogue: how many products there are and how complex their options get.',
+      },
+      {
+        /* Replaces the "outside Colombia" question — see the ES file. */
+        q: 'Can I migrate what I already have on another platform?',
+        a: 'Yes, and it is part of the project: catalogue, customers and purchase history come across. What does not migrate are reviews, which stay tied to the original platform. If you sell in several places, your own store can run as the main channel without closing the others overnight.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Tell us what you sell and how.',
+    emailLabel: 'Email info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Custom online stores, no commission per sale | SCUART"
+  description="Custom stores with Stripe, MercadoPago and Wompi: catalogue with variants, coupons, stock and CRM. No commission on your sales. From $2,800 USD."
+  canonicalURL={`${SITE_URL}/en/services/ecommerce`}
+  alternates={alternates}
+/>

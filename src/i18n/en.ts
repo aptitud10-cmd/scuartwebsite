@@ -142,6 +142,10 @@ export interface Translations {
     portfolio: string;
     method: string;
     contact: string;
+    /** Etiqueta del enlace a la página de servicio GEO / AI Visibility */
+    geo: string;
+    /** Ruta de la página GEO — localizada (/es/servicios/… vs /en/services/…) */
+    geoHref: string;
     langLabel: string;
     langHref: string;
   };
@@ -257,6 +261,11 @@ export const en: Translations = {
     portfolio: "Work",
     method: "Services",
     contact: "Contact",
+    /* Enlace a la página GEO (auditoría 2026-08-10). Existía, tenía contenido
+       propio y estaba en el sitemap, pero solo se llegaba por el ítem 02 de la
+       lista de servicios: el servicio diferenciador enterrado a dos clics. */
+    geo: "AI Visibility",
+    geoHref: "/en/services/ai-visibility",
     langLabel: "ES",
     langHref: "/es",
   },
@@ -274,14 +283,16 @@ export const en: Translations = {
    */
   manifesto: {
     kicker: "N°·01 / MANIFESTO",
-    /* Original brand line — sells the repositioning (we don't sell websites, we
-       sell business results). The hero now says "DESIGN + TECHNOLOGY", so it no
-       longer collides with this line (2026-08-04). */
-    line1: "We don't build websites.",
-    line2a: "We build ",
-    line2red: "competitive advantages.",
+    /* REWRITTEN 2026-08-10 — see the ES file for the full rationale. The old
+       line ("We don't build websites. / We build competitive advantages.") was
+       contradicted five times by the site itself, including the hero subhead
+       right above it, and was the category's founding cliché. Same typographic
+       structure (two lines, single accent on the second). */
+    line1: "We don't just ship a website.",
+    line2a: "We ship the ",
+    line2red: "system that makes it work.",
     ariaLabel:
-      "Manifesto — We don't build websites. We build competitive advantages.",
+      "Manifesto — We don't just ship a website. We ship the system that makes it work.",
   },
 
   /* ── Statement dark — scroll-reveal por palabra (portfolio → servicios) ── */
@@ -302,7 +313,8 @@ export const en: Translations = {
     whatWeDoLabel: "WHAT WE DO",
     howWeWorkLabel: "HOW WE WORK",
     aboutStatement:
-      "We make your brand feel unforgettable, with websites that earn trust, not just attention — designed with intent, not trend.",
+      /* Synced 2026-08-11 with StatementSection.astro — see the ES file. */
+      "We design the brand and build the system that holds it up.",
   },
 
   /* ── Servicios — los 6 reales, sincronizados con es.ts (fix auditoría
@@ -319,6 +331,7 @@ export const en: Translations = {
         statement: "",
         resolves:
           "Sites that load fast, rank on search and turn visitors into clients.",
+        href: "/en/services/web-platforms",
       },
       {
         num: "02",
@@ -334,33 +347,43 @@ export const en: Translations = {
         statement: "",
         resolves:
           "Full products — login, payments, dashboards, APIs. From zero to production.",
+        href: "/en/services/saas-systems",
       },
       {
         num: "04",
         name: "AI AUTOMATION",
         statement: "",
+        /* Rewritten 2026-08-11 — see the ES file. The old line failed the
+           competitor test; this one names what is actually built in Menius. */
         resolves:
-          "We automate the repetitive so the team focuses on what matters.",
+          "A photo of a printed menu becomes a digital catalogue. Assistants that execute, not that chat.",
+        href: "/en/services/ai-automation",
       },
       {
         num: "05",
         name: "E-COMMERCE",
         statement: "",
+        /* Rewritten 2026-08-11 — names the real argument (no commission) and the
+           gateways that are actually integrated. */
         resolves:
-          "Stores built to sell — fast checkout, inventory, ready to grow.",
+          "Your own store, no commission per sale. Stripe, MercadoPago and Wompi already integrated.",
+        href: "/en/services/ecommerce",
       },
       {
         num: "06",
         name: "ORDERING · BOOKING · WORKFLOWS",
         statement: "",
         resolves: "Orders, bookings and operations without the manual mess.",
+        href: "/en/services/ordering-booking",
       },
       {
         num: "07",
         name: "BRAND IDENTITY",
         statement: "",
+        /* Rewritten 2026-08-11 — the old line failed the competitor test. */
         resolves:
-          "A visual system that stays consistent everywhere — not assembled by accident.",
+          "A logo is not a brand. Type, colour, photography and voice as an applicable system.",
+        href: "/en/services/brand-identity",
       },
     ],
   },

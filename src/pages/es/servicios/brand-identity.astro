@@ -1,0 +1,194 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'es';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/brand-identity', 'servicios/brand-identity');
+
+/* Copy neutro LATAM, sin voseo (convención es.ts).
+   P4 — respaldado por identidad real construida en los tres casos:
+     · Jamón Casero → identidad digital para marca de 55 años sin presencia
+       online; la identidad sirvió DESPUÉS de base para punto de venta y empaque
+     · Etnia Braids → estética editorial premium, la fotografía como peso de
+       marca, voz definida ("nosotras")
+     · Menius → sistema de marca de producto propio
+   DECISIÓN DE WILLIAM (2026-08-11): NO se mencionan herramientas de producción
+   (ninguna agencia detalla su software). La página habla de criterio y sistema,
+   que es lo que el cliente compra.
+   NO se afirma: naming, registro de marca, ni packaging estructural — no hay
+   trabajo que lo respalde. La FAQ lo dice de frente. */
+const data: GeoServiceData = {
+  kicker: 'SERVICIO N°07 — BRAND IDENTITY',
+  heading: 'Una identidad que decide, no que decora.',
+  tagline:
+    'Un logo no es una marca. La marca es el sistema completo de decisiones que hace que todo lo que publicas se reconozca como tuyo — y que el negocio se vea del tamaño que realmente tiene.',
+  cta: 'Conversemos tu marca',
+
+  shift: {
+    label: 'Por qué la identidad decide la venta',
+    body: 'Antes de leer una palabra, el cliente ya decidió si el negocio le parece confiable. Eso pasa en el primer segundo y es puramente visual: la tipografía, el color, el espacio, la calidad de las fotos. Un negocio con 55 años de oficio pero identidad de improvisado compite en desventaja contra uno nuevo que se ve serio. La identidad no es maquillaje: es el argumento que se lee antes que el argumento.',
+    stats: [
+      { num: '55 años', note: 'de tradición sin presencia digital: el punto de partida de Jamón Casero, donde la identidad tenía que estar a la altura del oficio' },
+      { num: 'Un sistema', note: 'no un logo suelto: tipografía, color, uso de fotografía y voz, definidos para que se apliquen sin nosotros' },
+      { num: 'Fuera del sitio', note: 'la identidad de Jamón Casero sirvió después como base del material de punto de venta y del empaque' },
+    ],
+    sourceNote:
+      'Todo lo de esta página está aplicado en los tres casos del portafolio — se puede ver funcionando, no solo descrito.',
+  },
+
+  whatIs: {
+    label: '¿Qué es una identidad de marca?',
+    body: 'El conjunto de decisiones visuales y de lenguaje que hacen que tu negocio se reconozca. Qué tipografías se usan y para qué. Qué colores, en qué proporción y con qué contraste. Cómo se tratan las fotos. Cuánto aire respira cada pieza. Cómo habla la marca: qué dice, qué no dice, y en qué tono. Un sistema bien hecho no es un archivo bonito: es un conjunto de reglas que cualquiera puede aplicar después sin que la marca se desarme.',
+  },
+
+  whyNot: {
+    label: 'Lo que pasa sin un sistema',
+    items: [
+      {
+        title: 'El negocio vale más de lo que aparenta.',
+        body: 'Oficio real, años de trabajo, producto que la gente elige — y una imagen que no lo sostiene. Jamón Casero llevaba más de medio siglo de tradición familiar sin presencia digital: el trabajo fue traducir esa historia a una identidad que la hiciera visible, con la receta de familia como argumento de venta y no como dato de color.',
+      },
+      {
+        title: 'Cada pieza se ve de una marca distinta.',
+        body: 'El sitio dice una cosa, el Instagram otra, el volante otra. Pasa cuando hay un logo pero no hay sistema: cada pieza la resuelve alguien distinto sin reglas comunes. Definir la tipografía, la paleta y el uso de la fotografía convierte decisiones sueltas en un lenguaje.',
+      },
+      {
+        title: 'La categoría se ve toda igual.',
+        body: 'Los mismos colores, las mismas fotos, el mismo tono. Diferenciarse rara vez es cuestión de gritar más fuerte: en Etnia Braids la decisión fue tratar el trabajo como oficio y no como servicio, con estética editorial y la fotografía llevando el peso. Esa decisión define más la marca que cualquier logo.',
+      },
+    ],
+  },
+
+  how: {
+    label: 'Hasta dónde llega el sistema',
+    tiers: [
+      {
+        num: '01',
+        name: 'Identidad esencial',
+        priceUSD: 900,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por proyecto',
+        body: 'Lo mínimo para que el negocio se vea coherente y serio en todo lo que publica. Pensada para acompañar un sitio nuevo.',
+        includesLabel: 'Incluye',
+        includes: [
+          'Marca principal y sus variantes: horizontal, compacta, para fondo claro y oscuro',
+          'Paleta de color con proporciones de uso y contraste verificado para accesibilidad',
+          'Sistema tipográfico: qué fuente para titulares, cuál para lectura y en qué escala',
+          'Criterio de fotografía: qué tipo de imagen sirve a la marca y cuál la contradice',
+          'Guía breve y práctica, escrita para usarse — no un manual de 80 páginas que nadie abre',
+          'Archivos en los formatos que vas a necesitar, listos para imprenta y pantalla',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Sistema de marca',
+        priceUSD: 2400,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por proyecto',
+        body: 'Cuando la marca tiene que sostener varios formatos y varias manos. Es el nivel al que trabajamos Jamón Casero y Etnia Braids.',
+        includesLabel: 'Todo lo anterior, más',
+        includes: [
+          'Posicionamiento escrito: qué promete la marca, a quién y por qué le creerían',
+          'Voz y tono: cómo habla, con ejemplos de lo que sí y lo que no diría',
+          'Sistema de aplicación: redes, presentaciones, material impreso, punto de venta',
+          'Piezas de arranque diseñadas para copiar el patrón, no solo describirlo',
+          'Reglas de composición: grilla, aire, jerarquía — lo que hace que todo se vea de la misma familia',
+          'Sesión de entrega para que quien maneje la marca sepa aplicarla',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Marca aplicada',
+        priceUSD: 350,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por mes',
+        body: 'Para negocios sin diseñador propio que necesitan piezas nuevas cada mes sin que la marca se desarme.',
+        includesLabel: 'Cada mes incluye',
+        includes: [
+          'Piezas de campaña, redes o material impreso según lo que necesites',
+          'Adaptación de la identidad a formatos nuevos que vayan apareciendo',
+          'Actualización de la guía cuando el sistema crece',
+          'Revisión de piezas hechas por terceros antes de que salgan',
+          'Un ajuste de sistema por mes si algo no está funcionando en la práctica',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: '¿Tu marca lo necesita?',
+    yesLabel: 'Funciona muy bien si',
+    yes: [
+      'El negocio ya funciona pero se ve más chico o más improvisado de lo que es',
+      'Cada pieza que publicas parece de una marca distinta',
+      'Vas a construir un sitio y quieres que la identidad lo sostenga desde el principio',
+      'Compites en una categoría donde todos se ven parecido',
+    ],
+    noLabel: 'No es prioridad si',
+    no: [
+      'Todavía no está claro qué vendes ni a quién: eso se define antes, y es parte del trabajo de posicionamiento',
+      'Solo necesitas un logo para un trámite y no vas a usar el sistema',
+      'Tienes una identidad que funciona bien y solo hace falta aplicarla mejor — dilo y trabajamos sobre eso',
+    ],
+  },
+
+  faq: {
+    label: 'Dudas sobre el proceso',
+    items: [
+      {
+        q: '¿Cuánto cuesta una identidad de marca?',
+        a: 'Una identidad esencial arranca en $900 USD y un sistema completo desde $2.400 USD. La diferencia está en el alcance: si es la marca y sus reglas básicas, o si además incluye posicionamiento escrito, voz, y el sistema de aplicación a varios formatos.',
+      },
+      {
+        q: '¿Cuánto tarda el proceso de identidad?',
+        a: 'Una identidad esencial entre 2 y 3 semanas. Un sistema completo entre 4 y 6. La etapa que más varía es la primera: entender el negocio y acordar la dirección. Cuando eso está claro, lo demás avanza rápido.',
+      },
+      {
+        q: '¿Cuántas propuestas presentan?',
+        a: 'Una dirección desarrollada, no tres para elegir. Presentar tres opciones suena generoso pero traslada la decisión al cliente y suele terminar en una mezcla que no funciona. Trabajamos la dirección contigo antes de diseñar, y después la refinamos juntos — con dos rondas de ajuste incluidas.',
+      },
+      {
+        q: '¿Hacen naming o registro de marca?',
+        a: 'No. Trabajamos sobre un nombre que ya exista. El naming y el registro legal son especialidades distintas y preferimos decirlo antes que hacerlo a medias — si necesitas eso, es mejor buscar a alguien dedicado.',
+      },
+      {
+        q: '¿Sirve si no voy a hacer un sitio con ustedes?',
+        a: 'Sí, la identidad es un trabajo que se sostiene solo y los archivos son tuyos. Dicho eso, donde más rinde es cuando identidad y sitio se construyen juntos: la identidad de Jamón Casero terminó sirviendo de base para su material de punto de venta y su empaque, y eso pasa cuando el sistema está pensado para salir de la pantalla.',
+      },
+      {
+        q: '¿Qué pasa con las fotos?',
+        a: 'Definimos el criterio: qué tipo de imagen construye la marca y cuál la contradice. Si el negocio necesita fotografía profesional de producto, lo decimos con honestidad — a veces esa inversión rinde más que cualquier otra cosa que podamos hacer, y no tiene sentido esquivarlo.',
+      },
+      {
+        q: '¿Y si ya tengo un logo?',
+        a: 'Se puede trabajar sobre lo que hay. A veces el logo está bien y lo que falta es todo lo demás: tipografía, paleta, criterio de fotografía, reglas de composición. En la primera conversación te decimos si conviene conservarlo, ajustarlo o rehacerlo, y por qué.',
+      },
+      {
+        /* Reemplaza "¿Trabajan fuera de Colombia?" (2026-08-11) — ver nota en
+           web-platforms. En identidad, la objeción real es el miedo a pagar por
+           algo subjetivo que no guste. Conviene responderla de frente. */
+        q: '¿Y si no me gusta el resultado?',
+        a: 'Por eso la dirección se acuerda antes de diseñar, no después: cuando presentamos la propuesta ya sabes qué esperar. Están incluidas dos rondas de ajuste. Si aun así la dirección no es la correcta, la conversación honesta es reconocerlo temprano — no seguir ajustando algo que partió mal.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Cuéntanos qué debería transmitir tu marca.',
+    emailLabel: 'Escribir a info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Identidad de marca para negocios | SCUART"
+  description="Identidad de marca como sistema: tipografía, color, criterio de fotografía, voz y reglas de aplicación. Identidad esencial desde $900 USD, sistema completo desde $2.400 USD."
+  canonicalURL={`${SITE_URL}/es/servicios/brand-identity`}
+  alternates={alternates}
+/>

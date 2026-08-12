@@ -58,9 +58,14 @@ export interface GeoServiceData {
   shift: { label: string; body: string; stats: Stat[]; sourceNote: string };
   whatIs: { label: string; body: string };
   whyNot: { label: string; items: { title: string; body: string }[] };
-  engines: { label: string; body: string; primary: string[]; secondary: string };
+  /* OPCIONAL desde 2026-08-10: este layout dejó de ser exclusivo de GEO y ahora
+     sirve a todas las páginas de servicio. `engines` (los motores de IA que se
+     auditan) solo aplica a GEO — el resto de los servicios omite el campo y la
+     sección no se renderiza. */
+  engines?: { label: string; body: string; primary: string[]; secondary: string };
   how: { label: string; tiers: Tier[] };
-  checker: {
+  /* OPCIONAL — la herramienta que analiza una URL en vivo existe solo para GEO. */
+  checker?: {
     label: string;
     body: string;
     placeholder: string;
@@ -86,7 +91,9 @@ export interface GeoServiceData {
     noLabel: string;
     no: string[];
   };
-  evidence: { label: string; body: string };
+  /* OPCIONAL — "la prueba". Un servicio sin caso publicado todavía omite el campo
+     en vez de mostrar una sección que anuncia que no hay prueba. */
+  evidence?: { label: string; body: string };
   faq: { label: string; items: FaqItem[] };
   closing: { statement: string; emailLabel: string; whatsappLabel: string };
 }
@@ -218,20 +225,22 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
       </div>
     </section>
 
-    <!-- ── Los motores que auditamos ────────────────────────── -->
-    <section class="geo-block" data-geo-reveal>
-      <span class="geo-num">{num()}</span>
-      <h2 class="geo-label">{data.engines.label}</h2>
-      <div class="geo-col3">
-        <p class="geo-body">{data.engines.body}</p>
-        <ul class="geo-engines">
-          {data.engines.primary.map((e) => (
-            <li class="geo-engine">{e}</li>
-          ))}
-        </ul>
-        <p class="geo-note">{data.engines.secondary}</p>
-      </div>
-    </section>
+    <!-- ── Los motores que auditamos (solo GEO) ─────────────── -->
+    {data.engines && (
+      <section class="geo-block" data-geo-reveal>
+        <span class="geo-num">{num()}</span>
+        <h2 class="geo-label">{data.engines.label}</h2>
+        <div class="geo-col3">
+          <p class="geo-body">{data.engines.body}</p>
+          <ul class="geo-engines">
+            {data.engines.primary.map((e) => (
+              <li class="geo-engine">{e}</li>
+            ))}
+          </ul>
+          <p class="geo-note">{data.engines.secondary}</p>
+        </div>
+      </section>
+    )}
 
     <!-- ── Cómo funciona — escalones con precio USD + hint local ── -->
     <section class="geo-block" data-geo-reveal>
@@ -258,41 +267,43 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
       </ol>
     </section>
 
-    <!-- ── Checker — lead magnet: URL → WhatsApp prefilled ──── -->
-    <section class="geo-block geo-checker" id="geo-checker" data-geo-reveal>
-      <span class="geo-num">{num()}</span>
-      <h2 class="geo-label">{data.checker.label}</h2>
-      <div class="geo-col3">
-        <p class="geo-body">{data.checker.body}</p>
-        <form
-          class="geo-checker__form"
-          data-geo-checker
-          data-wa-message={data.checker.waMessage}
-          data-loading-label={data.checker.loadingLabel}
-          data-prio-label={data.checker.prioLabel}
-          data-wa-cta={data.checker.waCta}
-          data-error-label={data.checker.errorLabel}
-        >
-          <input
-            class="geo-checker__input"
-            type="text"
-            name="siteurl"
-            inputmode="url"
-            autocomplete="url"
-            placeholder={data.checker.placeholder}
-            aria-label={data.checker.inputLabel}
-            required
-          />
-          <button class="geo-checker__btn" type="submit">
-            {data.checker.button} <span aria-hidden="true">→</span>
-          </button>
-        </form>
-        <!-- Resultado del análisis — lo llena el JS. aria-live: un lector de
-             pantalla anuncia el score cuando llega. -->
-        <div class="geo-result" data-geo-result aria-live="polite" hidden></div>
-        <p class="geo-note">{data.checker.note}</p>
-      </div>
-    </section>
+    <!-- ── Checker — lead magnet: URL → WhatsApp prefilled (solo GEO) ──── -->
+    {data.checker && (
+      <section class="geo-block geo-checker" id="geo-checker" data-geo-reveal>
+        <span class="geo-num">{num()}</span>
+        <h2 class="geo-label">{data.checker.label}</h2>
+        <div class="geo-col3">
+          <p class="geo-body">{data.checker.body}</p>
+          <form
+            class="geo-checker__form"
+            data-geo-checker
+            data-wa-message={data.checker.waMessage}
+            data-loading-label={data.checker.loadingLabel}
+            data-prio-label={data.checker.prioLabel}
+            data-wa-cta={data.checker.waCta}
+            data-error-label={data.checker.errorLabel}
+          >
+            <input
+              class="geo-checker__input"
+              type="text"
+              name="siteurl"
+              inputmode="url"
+              autocomplete="url"
+              placeholder={data.checker.placeholder}
+              aria-label={data.checker.inputLabel}
+              required
+            />
+            <button class="geo-checker__btn" type="submit">
+              {data.checker.button} <span aria-hidden="true">→</span>
+            </button>
+          </form>
+          <!-- Resultado del análisis — lo llena el JS. aria-live: un lector de
+               pantalla anuncia el score cuando llega. -->
+          <div class="geo-result" data-geo-result aria-live="polite" hidden></div>
+          <p class="geo-note">{data.checker.note}</p>
+        </div>
+      </section>
+    )}
 
     <!-- ── Para quién es (y para quién no) ──────────────────── -->
     <section class="geo-block" data-geo-reveal>
@@ -318,12 +329,14 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
       </div>
     </section>
 
-    <!-- ── Evidencia (auto-auditoría SCUART en curso) ───────── -->
-    <section class="geo-block" data-geo-reveal>
-      <span class="geo-num">{num()}</span>
-      <h2 class="geo-label">{data.evidence.label}</h2>
-      <p class="geo-body geo-evidence">{data.evidence.body}</p>
-    </section>
+    <!-- ── Evidencia — opcional: se omite si el servicio aún no tiene prueba ── -->
+    {data.evidence && (
+      <section class="geo-block" data-geo-reveal>
+        <span class="geo-num">{num()}</span>
+        <h2 class="geo-label">{data.evidence.label}</h2>
+        <p class="geo-body geo-evidence">{data.evidence.body}</p>
+      </section>
+    )}
 
     <!-- ── FAQ answer-first ─────────────────────────────────── -->
     <section class="geo-block" data-geo-reveal>
@@ -382,7 +395,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   }
   .geo-body {
     font-family: var(--font-body);
-    font-size: clamp(1rem, 1.4vw, 1.1875rem);
+    font-size: var(--text-body);
     line-height: 1.6;
     color: var(--ink-mid, var(--ink-62));
     margin: 0;
@@ -390,7 +403,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   }
   .geo-note {
     font-family: var(--font-body);
-    font-size: 0.85rem;
+    font-size: var(--text-mono);
     line-height: 1.5;
     letter-spacing: 0.02em;
     color: var(--ink-62);
@@ -407,7 +420,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   .geo-hero__heading {
     font-family: var(--font-display);
     font-weight: var(--display-weight-hairline);
-    font-size: clamp(2.4rem, 6.5vw, 5.5rem);
+    font-size: var(--text-h1);
     line-height: 1.02;
     letter-spacing: -0.03em;
     margin: var(--space-l) 0 0;
@@ -418,7 +431,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
     font-family: var(--font-display);
     font-weight: 300;
     font-style: italic;
-    font-size: clamp(1.25rem, 3vw, 2rem);
+    font-size: var(--text-subhead);
     line-height: 1.25;
     color: var(--ink-mid, var(--ink-62));
     margin: var(--space-m) 0 0;
@@ -444,19 +457,21 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   }
   .geo-cta:hover { gap: 0.9em; opacity: 0.7; }
 
-  /* Área táctil en mobile (auditoría Fase 5, 2026-08-06): los CTAs medían
-     21px de alto. Mismo patrón que .cs-hero__visit — pseudo-elemento en vez
-     de min-height, porque el border-bottom es el subrayado del diseño y
-     estirar la caja lo despegaría del texto. */
-  @media (max-width: 767px) {
-    .geo-cta {
-      position: relative;
-    }
-    .geo-cta::after {
-      content: '';
-      position: absolute;
-      inset: -12px -8px;
-    }
+  /* Área táctil (auditoría Fase 5, 2026-08-06; alcance corregido 2026-08-11):
+     los CTAs medían 21px de alto. Mismo patrón que .cs-hero__visit —
+     pseudo-elemento en vez de min-height, porque el border-bottom es el
+     subrayado del diseño y estirar la caja lo despegaría del texto.
+
+     SIN media query: estaba limitado a ≤767px, así que en iPad estos CTAs
+     —los enlaces más importantes de una página de servicio— seguían con un
+     blanco de 22px. */
+  .geo-cta {
+    position: relative;
+  }
+  .geo-cta::after {
+    content: '';
+    position: absolute;
+    inset: -12px -8px;
   }
 
   /* ── BLOQUES ──────────────────────────────────────────────── */
@@ -483,13 +498,13 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   .geo-stat__num {
     font-family: var(--font-display);
     font-weight: var(--display-weight-hairline);
-    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-size: var(--text-names);
     line-height: 1;
     letter-spacing: -0.02em;
   }
   .geo-stat__note {
     font-family: var(--font-body);
-    font-size: 0.9rem;
+    font-size: var(--text-mono);
     line-height: 1.5;
     color: var(--ink-62);
     max-width: 34ch;
@@ -504,7 +519,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   .geo-cause__title {
     font-family: var(--font-display);
     font-weight: var(--display-weight-light);
-    font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+    font-size: var(--text-h3);
     line-height: 1.1;
     letter-spacing: -0.01em;
     margin: 0 0 0.4em;
@@ -547,7 +562,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   .geo-tier__name {
     font-family: var(--font-display);
     font-weight: var(--display-weight-light);
-    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    font-size: var(--text-h3);
     line-height: 1.05;
     letter-spacing: -0.02em;
     margin: 0;
@@ -588,7 +603,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   }
   .geo-includes li {
     font-family: var(--font-body);
-    font-size: clamp(0.95rem, 1.2vw, 1.0625rem);
+    font-size: var(--text-body);
     line-height: 1.55;
     color: var(--ink-mid, var(--ink-62));
     padding-left: 1.2em;
@@ -630,7 +645,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   :global(.geo-result__loading),
   :global(.geo-result__error) {
     font-family: var(--font-body);
-    font-size: 0.9375rem;
+    font-size: var(--text-body);
     color: var(--ink-62);
     margin: 0 0 1rem;
   }
@@ -643,7 +658,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   }
   :global(.geo-result__score) {
     font-family: var(--font-display);
-    font-size: clamp(3rem, 9vw, 4.5rem);
+    font-size: var(--text-h2);
     line-height: 1;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
@@ -671,6 +686,31 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
     color: var(--ink-62);
     margin: 0;
   }
+  :global(.geo-result__headtext) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  :global(.geo-result__scorelabel) {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-62);
+    margin: 0;
+  }
+  :global(.geo-result__disclaimer) {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--ink-62);
+    margin: 0;
+    max-width: 42ch;
+  }
+  :global(.geo-result__disclaimer strong) {
+    color: var(--ink-92, var(--ink-62));
+    font-weight: 600;
+  }
 
   :global(.geo-result__list) {
     list-style: none;
@@ -691,7 +731,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
     display: flex;
     gap: 0.7rem;
     font-family: var(--font-body);
-    font-size: 0.9375rem;
+    font-size: var(--text-body);
     line-height: 1.5;
     color: var(--ink);
   }
@@ -706,7 +746,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   :global(.geo-result__item[data-pass='true'] strong) { font-weight: 400; color: var(--ink-62); }
   :global(.geo-result__detail) {
     color: var(--ink-62);
-    font-size: 0.875rem;
+    font-size: var(--text-mono);
   }
 
   :global(.geo-result__prio) {
@@ -726,14 +766,14 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
     margin: 0;
     padding-left: 1.2em;
     font-family: var(--font-body);
-    font-size: 0.9375rem;
+    font-size: var(--text-body);
     line-height: 1.7;
     color: var(--ink);
   }
   .geo-checker__input {
     flex: 1 1 16rem;
     font-family: var(--font-body);
-    font-size: 1rem;
+    font-size: var(--text-body);
     color: var(--ink);
     background: transparent;
     border: 1px solid var(--hairline);
@@ -795,14 +835,14 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   .geo-faq__q {
     font-family: var(--font-display);
     font-weight: var(--display-weight-light);
-    font-size: clamp(1.3rem, 2.2vw, 1.75rem);
+    font-size: var(--text-h3);
     line-height: 1.1;
     letter-spacing: -0.01em;
     margin: 0 0 0.4em;
   }
   .geo-faq__a {
     font-family: var(--font-body);
-    font-size: clamp(1rem, 1.4vw, 1.1875rem);
+    font-size: var(--text-body);
     line-height: 1.6;
     color: var(--ink-mid, var(--ink-62));
     margin: 0;
@@ -1035,7 +1075,10 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
         out.innerHTML =
           `<div class="geo-result__head">
              <span class="geo-result__score" data-nivel="${nivel}"><span data-score-num>0</span><span class="geo-result__score-max">/100</span></span>
-             <p class="geo-result__host">${esc(data.host)}</p>
+             <div class="geo-result__headtext">
+               <p class="geo-result__scorelabel">Preparación técnica · ${esc(data.host)}</p>
+               <p class="geo-result__disclaimer">Esto mide si la IA <strong>puede</strong> leerte. No mide si te <strong>menciona</strong> — eso se sabe preguntándole a los motores, y es el diagnóstico.</p>
+             </div>
            </div>
            <ul class="geo-result__list">${items}</ul>
            ${prios}

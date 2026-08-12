@@ -1,0 +1,197 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'es';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/ai-automation', 'servicios/ai-automation');
+
+/* Copy neutro LATAM, sin voseo (convención es.ts).
+   P4 — TODO lo afirmado acá está construido y corriendo en Menius, producto
+   propio de SCUART. Inventario verificado en el código (2026-08-11):
+     · Digitalización de menú desde foto → api/ai/import-menu (Gemini visión,
+       extrae categorías, variantes, extras, modificadores y tags dietarios)
+     · Generación de fotos de plato → api/ai/generate-image (pipeline fal.ai
+       flux-pro/kontext + nano-banana-2, con style anchors por categoría)
+     · Mejora de fotos existentes → api/ai/enhance (FLUX.2 Pro Edit)
+     · Asistente del dashboard → api/ai/chat (Claude Sonnet con 10 herramientas
+       que ejecutan acciones reales en la base de datos)
+     · Optimizador de menú, respuesta a reseñas, copy de campañas, posts sociales
+     · 17 tareas programadas en producción (vercel.json)
+   NO se afirma: RAG con embeddings (el chat usa contexto inyectado, no búsqueda
+   vectorial), traducción automática de menús (es manual), ni optimización de
+   precios con IA (el optimizador da insights de menú, no fija precios). */
+const data: GeoServiceData = {
+  kicker: 'SERVICIO N°04 — AI AUTOMATION',
+  heading: 'Automatización con IA que hace el trabajo, no que lo sugiere.',
+  tagline:
+    'La diferencia entre un chatbot y un asistente útil es si puede ejecutar. El nuestro crea la promoción, cambia el precio y manda la campaña — no te explica cómo hacerlo.',
+  cta: 'Conversemos tu proceso',
+
+  shift: {
+    label: 'Lo que ya construimos con esto',
+    body: 'Todo lo que ofrecemos en esta página corre hoy en Menius, nuestro producto. No son integraciones de demostración: son funciones que usan negocios reales todos los días, con control de costos, límites por plan y protección contra abuso. Cuando decimos que sabemos hacerlo, se puede ir a verlo funcionando.',
+    stats: [
+      { num: 'Foto → menú', note: 'una foto del menú impreso se convierte en catálogo digital completo: categorías, precios, variantes, extras y etiquetas dietarias' },
+      { num: '10 acciones', note: 'las herramientas que el asistente del panel puede ejecutar por sí mismo sobre datos reales del negocio' },
+      { num: '17 tareas', note: 'procesos automáticos corriendo en producción: alertas, cobros, recordatorios, reportes' },
+    ],
+    sourceNote:
+      'Verificable en menius.app. Es producto propio, no trabajo de cliente — por eso podemos contar cómo está hecho por dentro.',
+  },
+
+  whatIs: {
+    label: '¿Qué automatizamos?',
+    body: 'Tareas repetitivas que hoy consumen horas de alguien: cargar datos a mano desde papel o PDF, responder lo mismo una y otra vez, revisar informes para encontrar lo que cambió, redactar textos que siguen siempre la misma estructura. La automatización útil no es "poner un chatbot": es identificar el trabajo mecánico, construir el proceso que lo hace solo, y dejar a la persona decidiendo en vez de tipeando.',
+  },
+
+  whyNot: {
+    label: 'Lo que cuesta hacerlo a mano',
+    items: [
+      {
+        title: 'Cargar información a mano desde documentos.',
+        body: 'Menús, catálogos, listas de precios, facturas, formularios en papel. En Menius, subir una foto del menú impreso genera el catálogo completo: cada plato con su categoría, precio, variantes de tamaño, agregados y etiquetas de vegetariano o sin gluten. Lo que tomaba una tarde entera toma menos de un minuto.',
+      },
+      {
+        title: 'Responder siempre lo mismo.',
+        body: 'Consultas frecuentes, respuestas a reseñas, mensajes de seguimiento. Se automatiza el borrador con el tono de tu negocio y una persona aprueba antes de enviar. En Menius, la respuesta del dueño a una reseña se redacta sola y se revisa en segundos.',
+      },
+      {
+        title: 'Nadie mira los datos hasta que ya es tarde.',
+        body: 'Los informes existen pero nadie los abre. La automatización útil invierte eso: el sistema revisa los datos y avisa cuando algo cambió. En Menius hay tareas que detectan clientes que dejaron de comprar, productos que se están quedando sin stock y ventas que se salen de lo normal.',
+      },
+    ],
+  },
+
+  how: {
+    label: 'Empezar por lo que más pesa',
+    tiers: [
+      {
+        num: '01',
+        name: 'Diagnóstico de procesos',
+        priceUSD: 600,
+        pricePrefix: 'Desde',
+        priceSuffix: 'pago único',
+        body: 'Antes de automatizar hay que saber qué conviene automatizar. Algunas tareas no valen la pena y te lo vamos a decir.',
+        includesLabel: 'Incluye',
+        includes: [
+          'Relevamiento de las tareas repetitivas que hoy consumen tiempo',
+          'Cuánto tiempo cuesta cada una por semana, con números concretos',
+          'Qué se puede automatizar hoy, qué conviene dejar como está y por qué',
+          'Costo estimado de operación mensual: los modelos de IA se pagan por uso',
+          'Prioridades ordenadas por ahorro real, no por lo que suene más moderno',
+          'El documento es tuyo, sigas o no con nosotros',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Automatización a medida',
+        priceUSD: 2800,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por proceso',
+        body: 'Construimos el proceso automático e integrado a tus herramientas. Con código propio, no armado sobre plataformas que cobran por ejecución.',
+        includesLabel: 'Incluye',
+        includes: [
+          'Extracción de datos desde fotos, PDF o documentos escaneados a información estructurada',
+          'Asistentes que ejecutan acciones reales en tus sistemas, no que solo conversan',
+          'Generación de textos e imágenes con el tono y el estilo de tu marca',
+          'Tareas programadas: revisiones periódicas, alertas, informes automáticos',
+          'Límites de uso y control de gasto para que el costo no se dispare',
+          'Registro de todo lo que hace el sistema, para poder auditarlo',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Operación y ajuste',
+        priceUSD: 320,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por mes',
+        body: 'Los modelos de IA cambian, los precios cambian y los procesos del negocio también. Este plan mantiene todo funcionando y aprovechando lo que va saliendo.',
+        includesLabel: 'Cada mes incluye',
+        includes: [
+          'Monitoreo de que las automatizaciones sigan corriendo y dando buenos resultados',
+          'Control del gasto en modelos, con aviso si algo se sale de lo previsto',
+          'Ajuste de instrucciones cuando el resultado se desvía de lo esperado',
+          'Migración a modelos nuevos cuando conviene por costo o por calidad',
+          'Reporte mensual: cuánto corrió, cuánto costó, cuánto tiempo ahorró',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: '¿Hay algo que automatizar?',
+    yesLabel: 'Funciona muy bien si',
+    yes: [
+      'Alguien de tu equipo pasa horas copiando datos de un lado a otro',
+      'Recibes información en papel, PDF o fotos que hay que cargar a un sistema',
+      'Se responden las mismas preguntas o los mismos mensajes todos los días',
+      'Tienes datos acumulados que nadie alcanza a revisar',
+    ],
+    noLabel: 'No es prioridad si',
+    no: [
+      'El proceso cambia de reglas cada semana: primero conviene estabilizarlo',
+      'El volumen es bajo — automatizar algo que pasa dos veces por mes rara vez se paga',
+      'Buscas reemplazar personas: esto funciona mejor sacándoles el trabajo mecánico, no sustituyéndolas',
+    ],
+  },
+
+  faq: {
+    label: 'Lo que preocupa de la IA',
+    items: [
+      {
+        q: '¿Cuánto cuesta automatizar un proceso?',
+        a: 'El diagnóstico arranca en $600 USD y cada automatización desde $2.800 USD, según qué tan complejo sea el proceso y con cuántos sistemas tenga que hablar. Aparte está el costo de uso de los modelos de IA, que se paga por consumo y estimamos en el diagnóstico.',
+      },
+      {
+        q: '¿Qué modelos de IA usan?',
+        a: 'Claude para tareas de razonamiento y asistentes con herramientas, Gemini para lectura de documentos e imágenes por su relación costo-calidad, y modelos de generación de imagen como FLUX cuando hace falta producir material visual. Elegimos según la tarea y el presupuesto, no por moda.',
+      },
+      {
+        q: '¿Usan n8n, Make o Zapier?',
+        a: 'No. Construimos con código propio. Esas plataformas son buenas para prototipos, pero cobran por ejecución, se vuelven caras al escalar y dejan la lógica de tu negocio dentro de un servicio de terceros. Lo que construimos vive en tu infraestructura y el código es tuyo.',
+      },
+      {
+        q: '¿Y si la IA se equivoca?',
+        a: 'Se diseña asumiendo que va a pasar. Los procesos que tocan dinero o comunicación con clientes llevan aprobación humana antes de ejecutarse; los que solo leen o clasifican corren solos con registro de todo. En el diagnóstico definimos dónde va cada control.',
+      },
+      {
+        q: '¿Cuánto cuesta operar esto por mes?',
+        a: 'Depende del volumen. En Menius, la lectura de un menú completo desde foto cuesta centavos de dólar por uso. Un asistente conversacional con acceso a datos cuesta más. En el diagnóstico te damos un rango estimado y construimos con límites de uso para que no haya sorpresas.',
+      },
+      {
+        q: '¿Se integra con lo que ya uso?',
+        a: 'Si tu sistema tiene API, sí. Si no la tiene, se puede trabajar sobre la base de datos o construir la integración. Lo revisamos en el diagnóstico antes de prometer nada — es la parte donde más se subestima el trabajo.',
+      },
+      {
+        q: '¿Mis datos se usan para entrenar modelos?',
+        a: 'No. Usamos las APIs comerciales de los proveedores, que no entrenan con los datos enviados por ese canal. Además, sanitizamos lo que entra a los modelos y aplicamos protecciones contra manipulación de instrucciones, igual que en Menius.',
+      },
+      {
+        /* Reemplaza "¿Trabajan fuera de Colombia?" (2026-08-11) — ver nota en
+           web-platforms. Acá la objeción real es la obsolescencia: los modelos
+           se discontinúan cada pocos meses. */
+        q: '¿Qué pasa cuando el modelo que usamos quede obsoleto?',
+        a: 'Va a pasar: los modelos se discontinúan cada pocos meses. Por eso el código no habla directo con un proveedor, sino con una capa propia que permite cambiarlo sin rehacer la automatización. En Menius conviven modelos de tres proveedores distintos con reemplazo en cascada cuando uno falla — es la misma arquitectura que aplicamos en proyectos de cliente.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Cuéntanos qué tarea te está comiendo el tiempo.',
+    emailLabel: 'Escribir a info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Automatización con IA para negocios | SCUART"
+  description="Automatizaciones con IA construidas a medida: lectura de documentos e imágenes, asistentes que ejecutan acciones reales y tareas programadas. Diagnóstico desde $600 USD."
+  canonicalURL={`${SITE_URL}/es/servicios/ai-automation`}
+  alternates={alternates}
+/>

@@ -1,0 +1,184 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'en';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/ordering-booking', 'servicios/ordering-booking');
+
+/* Native EN copy. P4 — backed by TWO systems built and running in production:
+   Etnia Braids (custom bookings with Stripe deposit, per-service duration and
+   price, automatic confirmation) and Menius (real-time orders, QR menu, Stripe
+   with no per-order commission, subdomain per restaurant). */
+const data: GeoServiceData = {
+  kicker: 'SERVICE N°06 — ORDERING · BOOKING · WORKFLOWS',
+  heading: 'Bookings and orders that run themselves.',
+  tagline:
+    'Running the calendar over WhatsApp works until it works too well. After that it starts costing customers: missed slots, gaps nobody fills, and someone answering messages instead of working.',
+  cta: "Let's talk about your operation",
+
+  shift: {
+    label: 'What handling it by hand costs',
+    body: "Every booking by message takes three to five exchanges: check availability, propose a time, confirm, remind. Multiplied across a week of customers, that is a full working day nobody is billing for. And the bigger cost is not that: it is the customer who writes on a Sunday night, gets no reply until Monday, and has booked somewhere else by then.",
+    stats: [
+      { num: '30%', note: 'of every order goes to delivery app commissions — the problem Menius was built to solve' },
+      { num: '24/7', note: 'your own system takes bookings while the business is closed, which is when many people decide' },
+      { num: '0%', note: 'commission per transaction: with Stripe you pay the card fee, not a percentage to a middleman' },
+    ],
+    sourceNote:
+      'Both systems are built and running: bookings at Etnia Braids (Queens, NY) and ordering in Menius, our own product.',
+  },
+
+  whatIs: {
+    label: 'How a booking works',
+    body: 'The system your customer uses to book a slot, place an order or start a request — built around how your business actually works. Every service with its real duration and price, availability based on your actual calendar, a deposit or full payment where it makes sense, and automatic confirmation for both sides. We also build the internal processes that live in a spreadsheet today: order tracking, statuses, notifications.',
+  },
+
+  whyNot: {
+    label: 'Where the money leaks today',
+    items: [
+      {
+        title: 'Time disappears into coordinating by message.',
+        body: 'Five messages back and forth for every booking. The Etnia Braids system replaced that: the customer picks a service, day and time, pays the deposit, and the appointment is confirmed and on the calendar without anyone stepping in.',
+      },
+      {
+        title: 'Customers do not show up and the slot is lost.',
+        body: "An empty slot never comes back. Charging a deposit up front changes the customer's commitment, and if they still do not come, the business does not lose the whole hour. That is the difference between a full calendar and one with gaps.",
+      },
+      {
+        title: 'Middlemen take the margin.',
+        body: 'Delivery and booking platforms take a percentage of every transaction, and they keep the relationship with your customer too. With your own system, the customer is yours and the commission does not exist: you pay the card fee and nothing else.',
+      },
+    ],
+  },
+
+  how: {
+    label: 'Scaled to what it must do',
+    tiers: [
+      {
+        num: '01',
+        name: 'Bookings or ordering',
+        priceUSD: 2200,
+        pricePrefix: 'From',
+        priceSuffix: 'per project',
+        body: 'The complete system, integrated into your current site or one we build. This is what runs at Etnia Braids today.',
+        includesLabel: 'Includes',
+        includes: [
+          'A catalogue of services or products, each with its duration, price and conditions',
+          'A calendar with your real availability: hours, closed days, blocks',
+          'Deposit, retainer or full payment through Stripe',
+          'Automatic confirmation by email to the customer and the business',
+          'A panel to see, move and cancel bookings without phoning anyone',
+          'Works properly on a phone, which is where most of it will come from',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Full operation',
+        priceUSD: 4800,
+        pricePrefix: 'From',
+        priceSuffix: 'per project',
+        body: 'When there are several people, several locations or a flow with statuses. This is the architecture Menius uses to serve multiple restaurants at once.',
+        includesLabel: 'Everything above, plus',
+        includes: [
+          'Multiple staff or locations, each with their own calendar and services',
+          'Real-time order statuses: received, in preparation, ready',
+          'Role-based access: who sees what and who can change what',
+          'Data separated per location or per client if the system serves several businesses',
+          'Menu or catalogue by QR code, with nothing to install',
+          'Reports: what gets ordered most, which slots fill, what gets cancelled',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Operation and support',
+        priceUSD: 250,
+        pricePrefix: 'From',
+        priceSuffix: 'per month',
+        body: 'A system that takes money cannot be down. This plan keeps it running and keeps it improving.',
+        includesLabel: 'Every month includes',
+        includes: [
+          'Monitoring with alerts if something fails, before your customer notices',
+          'Adjustments to services, prices and hours as the business changes',
+          'Security updates and verified backups',
+          'Support for your team when they have questions about the panel',
+          'One improvement a month, guided by actual usage data',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: 'Does your operation call for it?',
+    yesLabel: 'It works well if',
+    yes: [
+      'You work with appointments or orders and coordinate them by message or phone today',
+      'It costs you money when a customer books and does not show',
+      'A platform takes a commission on every sale you make',
+      'You have multiple staff, locations, or a catalogue that changes often',
+    ],
+    noLabel: 'It is not a priority if',
+    no: [
+      'You take few bookings a week and handling them by hand costs you no time',
+      'You already use a tool that works well and its commission does not bother you',
+      'Your operation changes its rules constantly and there is no stable process to systematise yet',
+    ],
+  },
+
+  faq: {
+    label: 'Before you change your operation',
+    items: [
+      {
+        q: 'What does a booking or ordering system cost?',
+        a: 'A booking or ordering system starts at $2,200 USD, and a multi-location or multi-status operation from $4,800 USD. The price depends on how many services you run, whether there are multiple staff, and how particular your availability rules are.',
+      },
+      {
+        q: 'How soon can I take my first booking?',
+        a: 'Four to eight weeks depending on scope. What matters most is how clear the business rules are: how long each service takes, how far ahead people can book, what happens with cancellations. We define that together at the start.',
+      },
+      {
+        q: 'Do you charge commission per booking?',
+        a: 'No. We charge for the build and, if you take it, the monthly operation plan. The only deduction per transaction is the Stripe card processing fee, which goes to Stripe, not to us.',
+      },
+      {
+        q: 'Does it integrate with Google Calendar?',
+        a: 'The system has its own calendar and panel. Syncing with Google Calendar is possible and gets quoted as part of the project — tell us if you need it so it goes into the scope from the start.',
+      },
+      {
+        q: 'What happens when a customer cancels?',
+        a: 'You define the rules: how late cancellation is allowed, whether the deposit is refunded, whether it becomes credit. The system applies them automatically and consistently — which is exactly what gets lost when every case is settled by hand over WhatsApp.',
+      },
+      {
+        q: 'Can I use it with my current site?',
+        a: 'Yes, if your site allows linking to a new section or adding a page. If the current site is too limited we will say so plainly and look at what makes sense: integrating anyway, or rebuilding the site alongside the system.',
+      },
+      {
+        q: 'Do my customers have to install anything?',
+        a: 'No. Everything runs in the phone browser. For menus or catalogues, the customer scans a QR code and is looking at it — nothing to download, no account to create.',
+      },
+      {
+        /* Replaces the "outside Colombia" question — see the ES file. */
+        q: 'What if the system fails during peak hours?',
+        a: 'There is monitoring with automatic alerts: if something goes down, we know before your customer does. Menius runs health checks every ten minutes for exactly that reason. And the system is built to degrade without blocking: if online payment fails, the order can still be taken and charged on delivery.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Tell us how your operation works today.',
+    emailLabel: 'Email info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Custom booking and ordering systems | SCUART"
+  description="Bookings with deposits, real-time ordering and custom workflows, with Stripe payments and no commission per transaction. From $2,200 USD."
+  canonicalURL={`${SITE_URL}/en/services/ordering-booking`}
+  alternates={alternates}
+/>

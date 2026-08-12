@@ -1,0 +1,189 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'es';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/ordering-booking', 'servicios/ordering-booking');
+
+/* Copy neutro LATAM, sin voseo (convención es.ts).
+   P4 — respaldado por DOS sistemas construidos y en producción:
+     · Etnia Braids → reservas a medida (servicio/día/hora) con depósito por
+       Stripe, duración y precio por servicio, confirmación automática.
+     · Menius → pedidos en tiempo real, menú por QR, Stripe sin comisión por
+       pedido, subdominio por restaurante.
+   El 30% de comisión de las apps de delivery está tomado del caso Menius. */
+const data: GeoServiceData = {
+  kicker: 'SERVICIO N°06 — ORDERING · BOOKING · WORKFLOWS',
+  heading: 'Pedidos y reservas que se manejan solos.',
+  tagline:
+    'La agenda por WhatsApp funciona hasta que funciona demasiado. Después empieza a costar clientes: turnos perdidos, huecos sin llenar, y alguien contestando mensajes en vez de trabajar.',
+  cta: 'Conversemos tu operación',
+
+  shift: {
+    label: 'Lo que cuesta manejarlo a mano',
+    body: 'Cada reserva por mensaje son entre tres y cinco intercambios: consultar disponibilidad, proponer horario, confirmar, recordar. Multiplicado por la cantidad de clientes de una semana, es una jornada de trabajo que nadie está facturando. Y el costo mayor no es ese: es el cliente que escribe un domingo a la noche, no recibe respuesta hasta el lunes, y para entonces ya reservó en otro lado.',
+    stats: [
+      { num: '30%', note: 'de cada pedido se llevan las apps de delivery en comisiones — el problema que dio origen a Menius' },
+      { num: '24/7', note: 'un sistema propio toma reservas mientras el negocio está cerrado, que es cuando mucha gente decide' },
+      { num: '0%', note: 'de comisión por transacción: con Stripe pagas la tarifa de la tarjeta, no un porcentaje a un intermediario' },
+    ],
+    sourceNote:
+      'Ambos sistemas están construidos y en producción: reservas en Etnia Braids (Queens, NY) y pedidos en Menius, producto propio.',
+  },
+
+  whatIs: {
+    label: '¿Cómo funciona una reserva?',
+    body: 'El sistema por el que tu cliente reserva un turno, hace un pedido o inicia un trámite — hecho a la medida de cómo trabaja tu negocio. Cada servicio con su duración y su precio real, la disponibilidad según tu agenda de verdad, el cobro de seña o del total si conviene, y la confirmación automática para ambas partes. También construimos los procesos internos que hoy viven en una planilla: seguimiento de pedidos, estados, avisos.',
+  },
+
+  whyNot: {
+    label: 'Dónde se pierde el dinero hoy',
+    items: [
+      {
+        title: 'Se pierde tiempo coordinando por mensaje.',
+        body: 'Un ida y vuelta de cinco mensajes por cada reserva. El sistema de Etnia Braids reemplazó eso: el cliente elige servicio, día y hora, paga el depósito, y la cita queda confirmada y en agenda sin que nadie intervenga.',
+      },
+      {
+        title: 'Los clientes no aparecen y el turno se pierde.',
+        body: 'Un turno vacío no se recupera. Cobrar un depósito por adelantado cambia el compromiso del cliente y, si igual no viene, el negocio no pierde la hora completa. Es la diferencia entre una agenda llena y una agenda con huecos.',
+      },
+      {
+        title: 'Los intermediarios se llevan el margen.',
+        body: 'Las plataformas de delivery y de reservas cobran un porcentaje de cada transacción, y además se quedan con la relación con tu cliente. Con un sistema propio, el cliente es tuyo y la comisión no existe: pagas la tarifa de la tarjeta y nada más.',
+      },
+    ],
+  },
+
+  how: {
+    label: 'Según cuánto tenga que hacer',
+    tiers: [
+      {
+        num: '01',
+        name: 'Reservas o pedidos',
+        priceUSD: 2200,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por proyecto',
+        body: 'El sistema completo, integrado a tu sitio actual o al que construyamos. Es lo que corre hoy en Etnia Braids.',
+        includesLabel: 'Incluye',
+        includes: [
+          'Catálogo de servicios o productos, cada uno con su duración, precio y condiciones',
+          'Calendario con tu disponibilidad real: horarios, días cerrados, bloqueos',
+          'Cobro de depósito, seña o total con Stripe',
+          'Confirmación automática por correo al cliente y al negocio',
+          'Panel para ver, mover y cancelar reservas sin llamar a nadie',
+          'Funciona bien desde el teléfono, que es de donde va a llegar la mayoría',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Operación completa',
+        priceUSD: 4800,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por proyecto',
+        body: 'Cuando hay varias personas, varias sedes o un flujo con estados. Es la arquitectura que usa Menius para servir a varios restaurantes a la vez.',
+        includesLabel: 'Todo lo anterior, más',
+        includes: [
+          'Varios profesionales o sedes, cada uno con su agenda y sus servicios',
+          'Estados del pedido en tiempo real: recibido, en preparación, listo',
+          'Accesos por rol: quién ve qué y quién puede cambiar qué',
+          'Datos separados por sede o por cliente si el sistema sirve a varios negocios',
+          'Menú o catálogo por código QR, sin instalar nada',
+          'Reportes: qué se pide más, qué horarios se llenan, qué se cancela',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Operación y soporte',
+        priceUSD: 250,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por mes',
+        body: 'Un sistema que cobra dinero no puede estar caído. Este plan es para que siga funcionando y siga mejorando.',
+        includesLabel: 'Cada mes incluye',
+        includes: [
+          'Monitoreo con aviso si algo falla, antes de que lo note tu cliente',
+          'Ajustes de servicios, precios y horarios cuando el negocio cambia',
+          'Actualizaciones de seguridad y copias de seguridad verificadas',
+          'Soporte para dudas de tu equipo al usar el panel',
+          'Una mejora por mes según lo que muestren los datos de uso',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: '¿Tu operación lo pide?',
+    yesLabel: 'Funciona muy bien si',
+    yes: [
+      'Trabajas con turnos, citas o pedidos y hoy los coordinas por mensaje o teléfono',
+      'Te cuesta dinero que un cliente reserve y no aparezca',
+      'Una plataforma se lleva una comisión de cada venta que haces',
+      'Tienes varios profesionales, sedes o un catálogo que cambia seguido',
+    ],
+    noLabel: 'No es prioridad si',
+    no: [
+      'Recibes pocas reservas por semana y coordinarlas a mano no te quita tiempo',
+      'Ya usas una herramienta que funciona bien y su comisión no te molesta',
+      'Tu operación cambia de reglas constantemente y todavía no hay un proceso estable que sistematizar',
+    ],
+  },
+
+  faq: {
+    label: 'Antes de cambiar tu operación',
+    items: [
+      {
+        q: '¿Cuánto cuesta un sistema de reservas o pedidos?',
+        a: 'Un sistema de reservas o pedidos arranca en $2.200 USD, y una operación con varias sedes o estados desde $4.800 USD. El precio depende de cuántos servicios manejes, si hay varios profesionales, y qué tan particulares sean tus reglas de disponibilidad.',
+      },
+      {
+        q: '¿En cuánto tiempo puedo tomar la primera reserva?',
+        a: 'Entre 4 y 8 semanas según el alcance. Lo que más influye es cuán claras estén las reglas del negocio: cuánto dura cada servicio, con cuánta anticipación se puede reservar, qué pasa con las cancelaciones. Esa parte la definimos juntos al principio.',
+      },
+      {
+        q: '¿Cobra comisión por reserva?',
+        a: 'No. Nosotros cobramos el desarrollo y, si lo contratas, el plan mensual de operación. De cada transacción solo se descuenta la tarifa de Stripe por procesar la tarjeta, que va a Stripe, no a nosotros.',
+      },
+      {
+        q: '¿Se integra con Google Calendar?',
+        a: 'El sistema tiene su propio calendario y panel. Una sincronización con Google Calendar es posible y se cotiza como parte del proyecto — dinos si la necesitas para incluirla en el alcance desde el principio.',
+      },
+      {
+        q: '¿Qué pasa si un cliente cancela?',
+        a: 'Las reglas las defines tú: hasta cuándo se puede cancelar, si el depósito se devuelve, si queda como crédito. El sistema las aplica de forma automática y consistente, que es justamente lo que se pierde cuando cada caso se resuelve a mano por WhatsApp.',
+      },
+      {
+        q: '¿Puedo usarlo con mi sitio actual?',
+        a: 'Sí, si tu sitio permite enlazar a una sección nueva o agregar una página. Si el sitio actual está muy limitado te lo decimos con honestidad y evaluamos qué conviene: integrarlo igual o rehacer el sitio junto con el sistema.',
+      },
+      {
+        q: '¿Mis clientes tienen que instalar algo?',
+        a: 'No. Todo funciona desde el navegador del teléfono. En el caso de menús o catálogos, el cliente escanea un código QR y ya está viendo la carta — sin descargar nada ni crear una cuenta.',
+      },
+      {
+        /* Reemplaza "¿Trabajan fuera de Colombia?" (2026-08-11) — ver nota en
+           web-platforms. En un sistema que toma pedidos, la pregunta real del
+           dueño es qué pasa un sábado a las 9 de la noche si algo falla. */
+        q: '¿Y si el sistema falla en plena hora pico?',
+        a: 'Hay monitoreo con alerta automática: si algo se cae, nos enteramos antes que tu cliente. En Menius corren revisiones de estado cada diez minutos por esa razón. Y el sistema está pensado para degradarse sin bloquear: si falla el cobro en línea, el pedido se puede seguir tomando y cobrar al entregar.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Cuéntanos cómo funciona hoy tu operación.',
+    emailLabel: 'Escribir a info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Sistemas de reservas y pedidos a medida | SCUART"
+  description="Reservas con depósito, pedidos en tiempo real y flujos de trabajo a medida, con cobros por Stripe y sin comisión por transacción. Desde $2.200 USD."
+  canonicalURL={`${SITE_URL}/es/servicios/ordering-booking`}
+  alternates={alternates}
+/>

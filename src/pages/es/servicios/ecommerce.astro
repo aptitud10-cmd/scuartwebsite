@@ -1,0 +1,197 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'es';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/ecommerce', 'servicios/ecommerce');
+
+/* Copy neutro LATAM, sin voseo (convención es.ts).
+   P4 — TODO lo afirmado está construido y corriendo en Menius (verificado en
+   código 2026-08-11):
+     · Carrito y checkout propios → components/public/CartPanel, CheckoutPageClient
+     · Cotización de carrito con envío y mínimo → api/cart/quote
+     · Cupones con validación server-side → api/orders/validate-promo
+     · Control de stock → api/products/stock + migration-inventory.sql
+     · Tres pasarelas: Stripe Connect, MercadoPago, Wompi (llaves cifradas)
+     · Variantes, extras y modificadores condicionales → lib/conditional-modifiers
+     · Fidelidad con referidos, pedidos programados, propinas, reembolsos
+     · Tests reales de pricing y checkout → src/__tests__/ + e2e/checkout.spec.ts
+   NO se afirma experiencia con Shopify/WooCommerce — la respuesta de la FAQ lo
+   dice de frente (decisión: no vender lo que no está probado). */
+const data: GeoServiceData = {
+  kicker: 'SERVICIO N°05 — E-COMMERCE',
+  heading: 'Una tienda propia, sin comisión por venta.',
+  tagline:
+    'Las plataformas cobran un porcentaje de cada venta y se quedan con la relación con tu cliente. Una tienda a medida cuesta una vez y después es tuya.',
+  cta: 'Conversemos tu tienda',
+
+  shift: {
+    label: 'Lo que cuesta la comodidad',
+    body: 'Empezar en una plataforma es fácil, y por un tiempo tiene sentido. El problema aparece cuando el volumen crece: la comisión que era chica sobre pocas ventas se vuelve un costo fijo importante, y el catálogo, los clientes y el historial viven en un sistema que no controlas. La cuenta cambia según cuánto vendas — vale la pena hacerla con números antes de decidir.',
+    stats: [
+      { num: '0%', note: 'de comisión sobre tus ventas: pagas la tarifa de la tarjeta al procesador, nada a nosotros' },
+      { num: '3 pasarelas', note: 'Stripe, MercadoPago y Wompi ya integradas — se elige según el país y cómo paga tu cliente' },
+      { num: 'Tu dominio', note: 'la tienda, los datos de tus clientes y su historial de compra son tuyos, no de una plataforma' },
+    ],
+    sourceNote:
+      'Las tres pasarelas están implementadas y en producción en Menius, con llaves propias por negocio cifradas en la base de datos.',
+  },
+
+  whatIs: {
+    label: '¿Qué lleva una tienda propia?',
+    body: 'Una tienda hecha a la medida de cómo vendes: el catálogo con sus variantes y opciones, el carrito, el checkout, los cobros, los cupones, el control de stock y el panel para operar todo. No es una plantilla configurada: la lógica de precios, envíos y descuentos se construye según las reglas reales del negocio. Y si vendes algo que no encaja en el molde de las plataformas —con opciones que dependen unas de otras, o preparación por encargo— eso es precisamente donde una tienda propia gana.',
+  },
+
+  whyNot: {
+    label: 'Lo que te cobra la plataforma',
+    items: [
+      {
+        title: 'La comisión se lleva el margen.',
+        body: 'Un porcentaje sobre cada venta más la tarifa del procesador. Menius nació de este problema en restaurantes, donde las apps de delivery se llevan hasta el 30% de cada pedido. Con tienda propia, el único costo variable es lo que cobra la tarjeta.',
+      },
+      {
+        title: 'El producto no entra en el molde de la plataforma.',
+        body: 'Variantes que cambian el precio, agregados con costo, opciones que solo aparecen si elegiste otra antes, mínimos de compra por zona. En Menius eso está construido como sistema de modificadores condicionales — es la clase de regla que en una plataforma genérica se resuelve con parches.',
+      },
+      {
+        title: 'Los clientes son de la plataforma, no tuyos.',
+        body: 'El historial de compras, los datos de contacto y la posibilidad de volver a venderles quedan del otro lado. Con tienda propia tienes el CRM, la segmentación y un programa de fidelidad si lo quieres — todo eso está construido en Menius.',
+      },
+    ],
+  },
+
+  how: {
+    label: 'Según el tamaño de tu catálogo',
+    tiers: [
+      {
+        num: '01',
+        name: 'Tienda esencial',
+        priceUSD: 2800,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por proyecto',
+        body: 'Catálogo, carrito, checkout y cobros. Para vender en serio desde el primer día, sin sistemas de más.',
+        includesLabel: 'Incluye',
+        includes: [
+          'Catálogo con categorías, fotos, variantes y agregados con precio propio',
+          'Carrito y checkout diseñados para el teléfono, que es de donde llega la mayoría',
+          'Cobros con Stripe, MercadoPago o Wompi según tu país',
+          'Control de stock con aviso de bajo inventario',
+          'Cupones y descuentos con reglas: mínimo de compra, vencimiento, usos máximos',
+          'Panel para cargar productos, ver pedidos y cambiar estados',
+          'Publicada en tu dominio, con certificado y despliegue automático',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Tienda con operación',
+        priceUSD: 5500,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por proyecto',
+        body: 'Cuando la tienda tiene que sostener una operación real: envíos con reglas, clientes que vuelven, varias sedes.',
+        includesLabel: 'Todo lo anterior, más',
+        includes: [
+          'Envío calculado por distancia o zona, con mínimo de compra configurable',
+          'Seguimiento del pedido para el cliente, sin necesidad de crear cuenta',
+          'CRM con segmentación: clientes frecuentes, inactivos, en riesgo',
+          'Programa de fidelidad con puntos y referidos',
+          'Pedidos programados y opciones condicionales entre productos',
+          'Varias sedes o sucursales, cada una con su catálogo y su stock',
+          'Dos idiomas con contenido de producto traducible, no solo la interfaz',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Operación y crecimiento',
+        priceUSD: 300,
+        pricePrefix: 'Desde',
+        priceSuffix: 'por mes',
+        body: 'Una tienda que cobra dinero no puede estar caída ni desactualizada. Este plan la mantiene y la hace crecer.',
+        includesLabel: 'Cada mes incluye',
+        includes: [
+          'Monitoreo con aviso si algo falla, antes de que lo note tu cliente',
+          'Actualizaciones de seguridad y copias de seguridad verificadas',
+          'Carga y ajuste de productos, precios y promociones',
+          'Reporte de ventas: qué se vende, qué se abandona en el carrito, qué horarios rinden',
+          'Una mejora por mes decidida con los datos, no por corazonada',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: '¿Ya es momento de tienda propia?',
+    yesLabel: 'Funciona muy bien si',
+    yes: [
+      'Ya vendes y la comisión de la plataforma se volvió un costo importante',
+      'Tu producto tiene variantes, agregados u opciones que dependen unas de otras',
+      'Quieres el historial y los datos de tus clientes bajo tu control',
+      'Necesitas reglas propias de envío, mínimos o preparación por encargo',
+    ],
+    noLabel: 'No es prioridad si',
+    no: [
+      'Todavía no validaste que el producto se vende: empezar en una plataforma es más barato para probar',
+      'Vendes pocas unidades al mes — la comisión todavía cuesta menos que el desarrollo',
+      'Necesitas salir a vender la semana que viene: una tienda a medida no se construye en ese plazo',
+    ],
+  },
+
+  faq: {
+    label: 'Antes de dejar la plataforma',
+    items: [
+      {
+        q: '¿Cuánto cuesta una tienda?',
+        a: 'Una tienda esencial arranca en $2.800 USD y una con operación completa desde $5.500 USD. El precio depende del tamaño del catálogo, de qué tan particulares sean tus reglas de precio y envío, y de si necesitas varias sedes.',
+      },
+      {
+        q: '¿Trabajan con Shopify o WooCommerce?',
+        a: 'No, y preferimos decirlo de frente: construimos tiendas a medida con nuestro propio stack. Si lo que necesitas es una tienda estándar de catálogo simple, Shopify probablemente sea la mejor opción para ti y te lo vamos a decir en la primera conversación.',
+      },
+      {
+        q: '¿Cuándo conviene una tienda propia y cuándo una plataforma?',
+        a: 'La cuenta es simple: comparar la comisión anual contra el costo del desarrollo. Con ventas bajas, la plataforma gana. A partir de cierto volumen, o cuando el producto no entra en el molde estándar, la tienda propia se paga sola. En la primera conversación hacemos ese número con tus datos reales.',
+      },
+      {
+        q: '¿Qué pasarelas de pago integran?',
+        a: 'Stripe, MercadoPago y Wompi — las tres están implementadas y en producción en Menius. Se elige según el país y los medios de pago que use tu cliente. El dinero entra directo a tu cuenta del procesador, no pasa por nosotros.',
+      },
+      {
+        q: '¿Cobran comisión por venta?',
+        a: 'No. Cobramos el desarrollo y, si lo contratas, el plan mensual. De cada venta solo se descuenta la tarifa del procesador de pagos, que va a Stripe, MercadoPago o Wompi.',
+      },
+      {
+        q: '¿Puedo cargar los productos yo?',
+        a: 'Sí, para eso está el panel. Y si tienes el catálogo en papel o en PDF, podemos automatizar la carga: en Menius, una foto del menú impreso genera el catálogo completo con precios, variantes y agregados.',
+      },
+      {
+        q: '¿En cuánto tiempo puedo estar vendiendo?',
+        a: 'Una tienda esencial entre 5 y 7 semanas, y una con operación completa entre 8 y 12. Lo que más influye es el catálogo: cuántos productos hay y qué tan complejas son sus opciones.',
+      },
+      {
+        /* Reemplaza "¿Trabajan fuera de Colombia?" (2026-08-11) — ver nota en
+           web-platforms. La objeción real de quien ya vende es la migración:
+           el miedo a perder catálogo, clientes o historial al mudarse. */
+        q: '¿Puedo migrar lo que ya tengo en otra plataforma?',
+        a: 'Sí, y es parte del proyecto: catálogo, clientes e historial de compras se traen. Lo que no se migra son las reseñas, que quedan atadas a la plataforma de origen. Si vendes en varios lados, se puede mantener la tienda propia como canal principal sin cerrar los otros de golpe.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Cuéntanos qué vendes y cómo.',
+    emailLabel: 'Escribir a info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Tiendas online a medida, sin comisión por venta | SCUART"
+  description="Tiendas a medida con Stripe, MercadoPago y Wompi: catálogo con variantes, cupones, stock y CRM. Sin comisión sobre tus ventas. Desde $2.800 USD."
+  canonicalURL={`${SITE_URL}/es/servicios/ecommerce`}
+  alternates={alternates}
+/>

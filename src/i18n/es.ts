@@ -30,6 +30,9 @@ export const es: Translations = {
     portfolio: "Trabajo",
     method: "Servicios",
     contact: "Contacto",
+    /* Ver nota en en.ts — el servicio GEO estaba a dos clics de la home. */
+    geo: "AI Visibility",
+    geoHref: "/es/servicios/ai-visibility",
     langLabel: "EN",
     langHref: "/en",
   },
@@ -41,19 +44,30 @@ export const es: Translations = {
 
   /* ── Manifesto — Sección 1.5 (entre hero y portfolio) ───── */
   /*
-   * Copy aprobado por William. NO modificar.
    * Kicker: MANIFESTO en ambos idiomas — coherencia del sistema técnico.
+   *
+   * REESCRITO 2026-08-10 (aprobado por William tras la auditoría de copy).
+   * El anterior era "No hacemos webs. / Construimos ventajas competitivas."
+   * y lo contradecían CINCO lugares del propio sitio —uno de ellos ARRIBA
+   * del manifiesto—: el subhead del hero ("Webs premium…"), la meta
+   * description, el descriptor del footer ("Estudio de diseño web"), el
+   * statement de Studio ("…con webs que transmiten confianza") y el método
+   * entero, que solo describe construir un sitio. El manifiesto perdía 5 a 1.
+   *
+   * Además era el cliché fundacional del rubro ("we don't build websites,
+   * we build businesses"), o sea que fallaba el test del competidor.
+   *
+   * La versión nueva conserva la MISMA estructura tipográfica (dos líneas,
+   * un solo acento en la segunda) y es cierta: es exactamente lo que prueban
+   * Etnia Braids (reservas + depósito) y Menius (SaaS completo).
    */
   manifesto: {
     kicker: "N°·01 / MANIFESTO",
-    /* Frase de marca original — vende el reposicionamiento (no vendemos webs,
-       vendemos resultado de negocio). El hero ahora dice "DISEÑO + TECNOLOGÍA",
-       así que ya no colisiona con esta línea (2026-08-04). */
-    line1: "No hacemos webs.",
-    line2a: "Construimos ",
-    line2red: "ventajas competitivas.",
+    line1: "No entregamos una web.",
+    line2a: "Entregamos el ",
+    line2red: "sistema que la hace funcionar.",
     ariaLabel:
-      "Manifiesto — No hacemos webs. Construimos ventajas competitivas.",
+      "Manifiesto — No entregamos una web. Entregamos el sistema que la hace funcionar.",
   },
 
   /* ── Statement dark — scroll-reveal por palabra (portfolio → servicios) ── */
@@ -74,7 +88,11 @@ export const es: Translations = {
     whatWeDoLabel: "QUÉ HACEMOS",
     howWeWorkLabel: "CÓMO TRABAJAMOS",
     aboutStatement:
-      "Hacemos que tu marca se sienta memorable, con webs que transmiten confianza, no solo diseño — diseñadas con criterio, no por tendencia.",
+      /* Sincronizado 2026-08-11 con StatementSection.astro, que es donde vive
+         el copy que SÍ se renderiza. Esta clave no la consume ningún componente
+         (verificado), pero dejarla con el texto viejo hacía que el diccionario
+         contradijera a la pantalla. */
+      "Diseñamos la marca y construimos el sistema que la sostiene.",
   },
 
   /* ── Capabilities — datos conservados (reutilizados por StudioSection) ── */
@@ -89,6 +107,7 @@ export const es: Translations = {
         statement: "",
         resolves:
           "Sitios que cargan rápido, posicionan en búsqueda y convierten visitantes en clientes.",
+        href: "/es/servicios/web-platforms",
       },
       {
         num: "02",
@@ -104,33 +123,45 @@ export const es: Translations = {
         statement: "",
         resolves:
           "Productos completos — login, pagos, paneles, APIs. De cero a producción.",
+        href: "/es/servicios/saas-systems",
       },
       {
         num: "04",
         name: "AI AUTOMATION",
         statement: "",
+        /* Reescrito 2026-08-11: el anterior ("automatizamos lo repetitivo para
+           que el equipo se enfoque en lo que importa") pasaba el test del
+           competidor — cualquier agencia podía firmarlo. El nuevo nombra la
+           capacidad concreta que está construida en Menius. */
         resolves:
-          "Automatizamos lo repetitivo para que el equipo se enfoque en lo que importa.",
+          "Una foto de un menú impreso se vuelve catálogo digital. Asistentes que ejecutan, no que conversan.",
+        href: "/es/servicios/ai-automation",
       },
       {
         num: "05",
         name: "E-COMMERCE",
         statement: "",
+        /* Reescrito 2026-08-11: el anterior era genérico. El nuevo nombra el
+           argumento real —sin comisión— y las pasarelas que están integradas. */
         resolves:
-          "Tiendas hechas para vender — checkout rápido, inventario, listas para crecer.",
+          "Tienda propia sin comisión por venta. Stripe, MercadoPago y Wompi ya integrados.",
+        href: "/es/servicios/ecommerce",
       },
       {
         num: "06",
         name: "ORDERING · BOOKING · WORKFLOWS",
         statement: "",
         resolves: "Pedidos, reservas y operación sin el desorden manual.",
+        href: "/es/servicios/ordering-booking",
       },
       {
         num: "07",
         name: "BRAND IDENTITY",
         statement: "",
+        /* Reescrito 2026-08-11: el anterior pasaba el test del competidor. */
         resolves:
-          "Un sistema visual coherente en todo — no armado por accidente.",
+          "Un logo no es una marca. Tipografía, color, fotografía y voz como sistema aplicable.",
+        href: "/es/servicios/brand-identity",
       },
     ],
   },

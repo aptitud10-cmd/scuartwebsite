@@ -1,0 +1,183 @@
+---
+import GeoServiceLayout from '../../../components/GeoServiceLayout.astro';
+import type { GeoServiceData } from '../../../components/GeoServiceLayout.astro';
+import { getTranslations, getAlternatesFor, SITE_URL } from '../../../i18n/index';
+
+const lang = 'en';
+const t = getTranslations(lang);
+const alternates = getAlternatesFor('services/brand-identity', 'servicios/brand-identity');
+
+/* Native EN copy. P4 — see the ES file for the backing work and decisions.
+   Production tooling is deliberately not mentioned. Naming, trademark
+   registration and structural packaging are NOT claimed — the FAQ says so. */
+const data: GeoServiceData = {
+  kicker: 'SERVICE N°07 — BRAND IDENTITY',
+  heading: 'An identity that decides, not that decorates.',
+  tagline:
+    'A logo is not a brand. The brand is the whole system of decisions that makes everything you publish recognisably yours — and makes the business look the size it actually is.',
+  cta: "Let's talk about your brand",
+
+  shift: {
+    label: 'Why identity decides the sale',
+    body: 'Before reading a word, the customer has already decided whether the business looks trustworthy. That happens in the first second and it is purely visual: the type, the colour, the space, the quality of the photography. A business with 55 years of craft but an improvised identity competes at a disadvantage against a new one that looks serious. Identity is not decoration: it is the argument people read before the argument.',
+    stats: [
+      { num: '55 years', note: 'of tradition with no digital presence: the starting point at Jamón Casero, where the identity had to match the craft' },
+      { num: 'A system', note: 'not a loose logo: type, colour, photography treatment and voice, defined so they can be applied without us' },
+      { num: 'Beyond the site', note: 'the Jamón Casero identity later became the base for their point-of-sale material and packaging' },
+    ],
+    sourceNote:
+      'Everything on this page is applied across the three portfolio cases — you can see it working, not just described.',
+  },
+
+  whatIs: {
+    label: 'What a brand identity is',
+    body: 'The set of visual and language decisions that make your business recognisable. Which typefaces get used and for what. Which colours, in what proportion and at what contrast. How photography is treated. How much air each piece breathes. How the brand speaks: what it says, what it does not, and in what tone. A well-made system is not a pretty file: it is a set of rules anyone can apply later without the brand falling apart.',
+  },
+
+  whyNot: {
+    label: 'What happens without a system',
+    items: [
+      {
+        title: 'The business is worth more than it looks.',
+        body: 'Real craft, years of work, a product people choose — and an image that does not carry it. Jamón Casero had over half a century of family tradition and no digital presence: the work was translating that history into an identity that made it visible, with the family recipe as the selling argument rather than a footnote.',
+      },
+      {
+        title: 'Every piece looks like a different brand.',
+        body: 'The site says one thing, Instagram another, the flyer another. This happens when there is a logo but no system: each piece gets solved by someone different with no shared rules. Defining the type, the palette and the photography treatment turns loose decisions into a language.',
+      },
+      {
+        title: 'The whole category looks the same.',
+        body: 'The same colours, the same photos, the same tone. Standing out is rarely about shouting louder: at Etnia Braids the decision was to treat the work as craft rather than as a service, with an editorial aesthetic and photography carrying the weight. That decision defines the brand more than any logo.',
+      },
+    ],
+  },
+
+  how: {
+    label: 'How far the system goes',
+    tiers: [
+      {
+        num: '01',
+        name: 'Essential identity',
+        priceUSD: 900,
+        pricePrefix: 'From',
+        priceSuffix: 'per project',
+        body: 'The minimum for the business to look coherent and serious across everything it publishes. Designed to accompany a new site.',
+        includesLabel: 'Includes',
+        includes: [
+          'Primary mark and its variants: horizontal, compact, for light and dark backgrounds',
+          'Colour palette with usage proportions and contrast verified for accessibility',
+          'Type system: which face for headlines, which for reading, and at what scale',
+          'Photography direction: what kind of image serves the brand and what contradicts it',
+          'A short, practical guide written to be used — not an 80-page manual nobody opens',
+          'Files in the formats you will actually need, ready for print and screen',
+        ],
+      },
+      {
+        num: '02',
+        name: 'Brand system',
+        priceUSD: 2400,
+        pricePrefix: 'From',
+        priceSuffix: 'per project',
+        body: 'When the brand has to hold up across several formats and several hands. This is the level we worked Jamón Casero and Etnia Braids at.',
+        includesLabel: 'Everything above, plus',
+        includes: [
+          'Written positioning: what the brand promises, to whom, and why they would believe it',
+          'Voice and tone: how it speaks, with examples of what it would and would not say',
+          'Application system: social, presentations, print, point of sale',
+          'Starter pieces designed so the pattern can be copied, not just described',
+          'Composition rules: grid, air, hierarchy — what makes everything look like one family',
+          'A handover session so whoever runs the brand knows how to apply it',
+        ],
+      },
+      {
+        num: '03',
+        name: 'Brand in practice',
+        priceUSD: 350,
+        pricePrefix: 'From',
+        priceSuffix: 'per month',
+        body: 'For businesses without an in-house designer who need new pieces every month without the brand drifting.',
+        includesLabel: 'Every month includes',
+        includes: [
+          'Campaign, social or print pieces, depending on what you need',
+          'Adapting the identity to new formats as they come up',
+          'Updating the guide as the system grows',
+          'Reviewing third-party pieces before they go out',
+          'One system adjustment a month if something is not working in practice',
+        ],
+      },
+    ],
+  },
+
+  forWhom: {
+    label: 'Does your brand need this?',
+    yesLabel: 'It works well if',
+    yes: [
+      'The business already works but looks smaller or more improvised than it is',
+      'Every piece you publish looks like a different brand',
+      'You are about to build a site and want the identity to carry it from the start',
+      'You compete in a category where everyone looks alike',
+    ],
+    noLabel: 'It is not a priority if',
+    no: [
+      'It is not yet clear what you sell or to whom: that gets defined first, and it is part of the positioning work',
+      'You only need a logo for paperwork and will not use the system',
+      'You have an identity that works and just needs applying better — say so and we will work on that instead',
+    ],
+  },
+
+  faq: {
+    label: 'Questions about the process',
+    items: [
+      {
+        q: 'What does a brand identity cost?',
+        a: 'An essential identity starts at $900 USD and a full system from $2,400 USD. The difference is scope: whether it is the mark and its basic rules, or whether it also includes written positioning, voice, and the system for applying it across formats.',
+      },
+      {
+        q: 'How long does the identity process take?',
+        a: 'An essential identity takes 2 to 3 weeks. A full system, 4 to 6. The stage that varies most is the first: understanding the business and agreeing the direction. Once that is clear, the rest moves quickly.',
+      },
+      {
+        q: 'How many concepts do you present?',
+        a: 'One developed direction, not three to pick from. Presenting three options sounds generous but hands the decision to the client and usually ends in a blend that works for nobody. We agree the direction with you before designing, then refine it together — two rounds of revisions included.',
+      },
+      {
+        q: 'Do you do naming or trademark registration?',
+        a: 'No. We work with a name that already exists. Naming and legal registration are separate specialities and we would rather say so than do them halfway — if you need that, you are better off with someone dedicated to it.',
+      },
+      {
+        q: 'Is it worth it if I am not building a site with you?',
+        a: 'Yes, the identity stands on its own and the files are yours. That said, it pays off most when identity and site get built together: the Jamón Casero identity ended up as the base for their point-of-sale material and packaging, and that happens when the system is designed to leave the screen.',
+      },
+      {
+        q: 'What about photography?',
+        a: 'We define the direction: what kind of image builds the brand and what contradicts it. If the business needs professional product photography, we will say so plainly — sometimes that investment returns more than anything else we could do, and there is no point dodging it.',
+      },
+      {
+        q: 'What if I already have a logo?',
+        a: 'We can work with what exists. Sometimes the logo is fine and what is missing is everything else: type, palette, photography direction, composition rules. In the first conversation we tell you whether to keep it, adjust it or redo it, and why.',
+      },
+      {
+        /* Replaces the "outside Colombia" question — see the ES file. */
+        q: 'What if I do not like the result?',
+        a: 'That is why the direction gets agreed before we design, not after: by the time we present, you already know what to expect. Two rounds of revisions are included. If the direction still turns out to be wrong, the honest conversation is to say so early — not to keep adjusting something that started off wrong.',
+      },
+    ],
+  },
+
+  closing: {
+    statement: 'Tell us what your brand should convey.',
+    emailLabel: 'Email info@scuart.com',
+    whatsappLabel: 'WhatsApp',
+  },
+};
+---
+
+<GeoServiceLayout
+  t={t}
+  lang={lang}
+  data={data}
+  title="Brand identity for business | SCUART"
+  description="Brand identity as a system: typography, colour, photography direction, voice and application rules. Essential identity from $900 USD, full system from $2,400 USD."
+  canonicalURL={`${SITE_URL}/en/services/brand-identity`}
+  alternates={alternates}
+/>
