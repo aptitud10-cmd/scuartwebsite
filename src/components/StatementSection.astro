@@ -18,25 +18,61 @@ interface Props {
 const { t } = Astro.props;
 const lang = t === undefined ? 'en' : (t.nav.langLabel === 'EN' ? 'es' : 'en');
 
-/* Copy EXACTO del commit e1823ae (aboutStatement / whatWeDoLabel de i18n viejo) */
+/* COPY REESCRITO 2026-08-11 (elegido por William tras la auditoría de copy,
+   que calificó esta sección 2.0/10 — lo peor del sitio).
+
+   QUÉ SE FUE Y POR QUÉ:
+
+   1. statement — era "Hacemos que tu marca se sienta memorable, con webs que
+      transmiten confianza, no solo diseño — diseñadas con criterio, no por
+      tendencia." 24 palabras, 4 cláusulas, 3 negaciones, y TRES sujetos en una
+      sola oración ("hacemos que tu marca" → "webs que transmiten" → "diseñadas
+      con criterio"). Es la tipografía MÁS GRANDE del sitio, en su único momento
+      oscuro, con revelado palabra por palabra que obliga a leerla entera: el
+      máximo dispositivo dramático gastado en algo que cualquier agencia firma.
+      Además contenía "con webs", contradiciendo al Manifiesto ("No hacemos
+      webs" en su versión vieja) dos secciones más arriba.
+      Ahora: 10 palabras, un sujeto, cero negaciones. Y dice lo único que los
+      tres casos prueban JUNTOS: diseño + infraestructura.
+
+   2. mission — era "Nuestra misión es hacer que la tecnología se sienta humana,
+      diseñando productos digitales intuitivos, con propósito y significado para
+      las personas." Cuatro adjetivos de relleno seguidos; el auditor la llamó
+      "la frase más corporate-vacía del sitio" y existe idéntica en miles de
+      portafolios. Ahora dice el hecho que ninguna agencia puede copiar: que
+      atiende la misma persona que construye. Eso además desactiva el problema
+      del "nosotros" del resto del sitio: una vez dicho, se lee como voz de
+      marca y no como inflar el tamaño del estudio.
+
+   3. values — era "CLARIDAD PRIMERO, OFICIO SIEMPRE, HECHO PARA ESCALAR", una
+      tríada intercambiable ("craft always" es EL cliché de agencia 2024-2026).
+      Ahora, en el mismo espacio y el mismo tratamiento tipográfico, van cuatro
+      hechos verificables entrando a menius.app. Es la conversión más barata de
+      humo en prueba que tenía el sitio.
+
+   TODO lo afirmado acá está verificado en el código de Menius (2026-08-11):
+   SaaS propio en producción, Stripe Connect + MercadoPago + Wompi, dos apps
+   Expo (comensal y repartidor), i18n es/en en tres capas. */
 const COPY = {
   es: {
     whatWeDoLabel: 'QUÉ HACEMOS',
     statement:
-      'Hacemos que tu marca se sienta memorable, con webs que transmiten confianza, no solo diseño — diseñadas con criterio, no por tendencia.',
-    valuesLead: 'DISEÑAMOS PARA QUE DURE',
-    valuesList: 'CLARIDAD PRIMERO, OFICIO SIEMPRE, HECHO PARA ESCALAR',
+      'Diseñamos la marca y construimos el sistema que la sostiene.',
+    valuesLead: 'LO QUE HAY DETRÁS',
+    valuesList:
+      'UN SAAS PROPIO EN PRODUCCIÓN · TRES PASARELAS DE PAGO · DOS APPS NATIVAS · BILINGÜE ES/EN',
     mission:
-      'Nuestra misión es hacer que la tecnología se sienta humana, diseñando productos digitales intuitivos, con propósito y significado para las personas.',
+      'SCUART es un estudio de una persona: el que diseña es el que construye y el que responde. Sin capas intermedias, sin cuentas que administrar.',
   },
   en: {
     whatWeDoLabel: 'WHAT WE DO',
     statement:
-      'We make your brand feel unforgettable, with websites that earn trust, not just attention — designed with intent, not trend.',
-    valuesLead: 'WE DESIGN FOR LONGEVITY',
-    valuesList: 'CLARITY FIRST, CRAFT ALWAYS, BUILT TO SCALE',
+      'We design the brand and build the system that holds it up.',
+    valuesLead: 'WHAT IS BEHIND IT',
+    valuesList:
+      'OUR OWN SAAS IN PRODUCTION · THREE PAYMENT GATEWAYS · TWO NATIVE APPS · BILINGUAL EN/ES',
     mission:
-      'Our mission is to make technology feel human by designing digital products that are intuitive, purposeful, and meaningful to people.',
+      'SCUART is a one-person studio: the person who designs is the one who builds and the one who answers. No layers in between, no account managers.',
   },
 } as const;
 
@@ -88,12 +124,15 @@ const c = COPY[lang as 'es' | 'en'];
   transform: translateX(-50%);
   padding: 0; /* el aire lo pone __inner */
 
-  /* Pantalla completa (decisión de William). svh = small viewport height:
-     no se pelea con la barra dinámica de Safari en mobile. Antes esto era
-     100svh y se bajó por "mucho negro abajo" — ahora el __inner reparte el
-     alto (grilla 1fr/auto en desktop, flex centrado en mobile) así que la
-     altura completa se LLENA en vez de dejar hueco muerto. */
-  min-height: 100svh;
+  /* SIN min-height:100svh (2026-08-11, aprobado por William).
+     La sección forzaba pantalla completa y el grid repartía el sobrante como
+     hueco: los tres visual-critics midieron 45% de vacío en desktop y 65% en
+     tablet (1900px de alto con ~450px de contenido). No se leía como respiro
+     editorial sino como sección rota — fue el defecto #1 o #2 en los tres
+     viewports.
+     Ahora la sección toma el alto de su contenido y el aire lo pone el padding
+     de __inner, que es generoso a propósito. El negro sigue siendo el quiebre
+     de ritmo del sitio; lo que se va es el vacío no diseñado. */
 
   display: flex;
   align-items: stretch;
@@ -198,25 +237,39 @@ const c = COPY[lang as 'es' | 'en'];
   }
 }
 
-/* ── TABLET/DESKTOP (≥768px): frase centrada, anotaciones en esquinas.
-   La sección es 100svh (William). La grilla reparte ese alto: fila 1 (1fr)
-   con el statement centrado verticalmente, fila 2 (auto) con las notas
-   ancladas abajo. Así el viewport completo se LLENA con jerarquía —el
-   statement domina el centro, las notas cierran abajo— sin negro muerto. */
+/* ── TABLET/DESKTOP (≥768px): frase arriba, anotaciones en esquinas.
+   FILAS `auto auto`, no `1fr auto` (2026-08-11). Con el min-height:100svh
+   quitado de la sección, un `1fr` en la primera fila ya no tiene alto sobrante
+   que repartir — pero dejarlo invitaba a que el hueco volviera si alguien
+   reponía una altura fija. `auto` hace explícito que cada fila mide lo que
+   mide su contenido, y el aire entre ellas lo pone row-gap.
+   Por lo mismo el statement pasa de `align-self: center` a `start`: centrar
+   dentro de una fila que ya no tiene holgura no hacía nada, y era la regla
+   que producía la frase flotando en medio del vacío. */
 @media (min-width: 768px) {
   .stu-about__inner {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: auto auto;
     column-gap: var(--space-l);
-    row-gap: var(--space-2xl);
-    padding-top: var(--space-3xl);
-    padding-bottom: var(--space-2xl);
+    /* ESPACIADO INTERNO PROPORCIONADO (2026-08-11).
+       Medido en 1440px, el bloque tenía 200px arriba (--space-3xl) + 144px de
+       row-gap + 144px abajo = 488px de aire para 633px de contenido. Eso es lo
+       que se leía como "42% de vacío": no era hueco muerto de la grilla —el
+       min-height ya estaba quitado— sino padding desproporcionado.
+       --space-3xl está calibrado para separar SECCIONES entre sí, no para el
+       interior de una. Acá el aire tiene que respirar contra el contenido, no
+       contra la página. Con --space-2xl arriba y --space-xl en gap y abajo, el
+       aire pasa a ~320px: sigue siendo generoso y editorial (es el único
+       momento oscuro del sitio, merece respiro) sin leerse como sección rota. */
+    row-gap: var(--space-xl);
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-xl);
   }
   .stu-about__statement {
     grid-column: 1 / -1;
     grid-row: 1;
-    align-self: center;
+    align-self: start;
     margin-bottom: 0;
   }
   .stu-about__values {
@@ -269,10 +322,23 @@ const c = COPY[lang as 'es' | 'en'];
       /* aria:'none' — el texto visible ya es legible; sin esto SplitText mete
          un aria-label prohibido en el <p> (axe aria-prohibited-attr, QA 2026-07-22). */
       const split = new SplitText(statementEl, { type: 'words', autoSplit: true, aria: 'none' });
-      /* Arranca casi invisible (0.08): apenas se intuye sobre el negro. El
-         contraste con el blanco encendido hace el efecto mucho más dramático —
-         la frase "se prende" con el scroll en vez de solo aclararse. */
-      gsap.set(split.words, { opacity: 0.08 });
+      /* PISO DE OPACIDAD 0.65 (2026-08-11, aprobado por William).
+         Historia: 0.08 → 0.47 (09-ago, por accesibilidad) → 0.65 (hoy).
+
+         El 0.47 arreglaba el contraste (4.82:1, pasa AA) pero rompía el diseño:
+         los TRES visual-critics, por separado, señalaron que el momento más
+         dramático del sitio —su único fondo oscuro— se veía gris apagado en
+         reposo. El de desktop lo describió con precisión: en la misma línea
+         conviven palabras en blanco pleno y palabras en gris, y eso lee como
+         defecto, no como efecto.
+
+         0.65 = 8.45:1, que cruza AAA (7:1) con margen. Y el gesto se conserva:
+         el salto a blanco pleno sigue siendo 2.3× de contraste, suficiente para
+         que el ojo perciba el encendido —que es cambio RELATIVO, no absoluto.
+         Como el efecto es `scrub`, el usuario controla la opacidad y puede
+         quedarse en cualquier punto indefinidamente: el piso tiene que ser
+         legible por sí solo, no un estado de paso. */
+      gsap.set(split.words, { opacity: 0.65 });
 
       /* Rango de scroll DISTINTO por viewport (gsap.matchMedia):
          - Desktop: recorrido más largo (la sección es 100svh, hay scroll de sobra).
@@ -293,18 +359,26 @@ const c = COPY[lang as 'es' | 'en'];
             stagger: 0.5,
             scrollTrigger: {
               trigger: aboutEl,
-              /* ARRANQUE MÁS ABAJO (William 2026-08-05, ref. Trionn): antes era
-                 'top 90%' — las palabras empezaban a encenderse con la sección
-                 apenas asomada (10% visible), así que para cuando el usuario la
-                 miraba ya estaban casi todas blancas y el efecto no se veía.
-                 En Trionn el texto se completa cuando la sección va por la MITAD
-                 del scroll. 'top 55%' = arranca con la sección bien entrada en
-                 pantalla; el end en 'center'/'top' cierra a mitad de recorrido. */
+              /* ARRANQUE: la sección ya bien entrada en pantalla (William
+                 2026-08-05, ref. Trionn). Con 'top 90%' las palabras se
+                 encendían con la sección apenas asomada y el efecto no se veía. */
               start: isMobile ? 'top 60%' : 'top 50%',
-              /* end atado a 'bottom' (no 'center'): el recorrido cubre TODA la
-                 altura de la sección, así el encendido acompaña el scroll en
-                 vez de completarse antes de que el usuario termine de pasarla. */
-              end: isMobile ? 'bottom 75%' : 'bottom 70%',
+              /* FIN EN EL CENTRO DE LA PANTALLA (William 2026-08-11).
+                 Antes: 'bottom 70%' — el recorrido cubría TODA la altura de la
+                 sección, así que el encendido seguía activo mucho después de
+                 que la frase estuviera a la vista. Consecuencia: en casi
+                 cualquier punto del scroll la frase se veía PARTIDA EN DOS
+                 COLORES (primeras palabras en blanco, últimas en gris). El
+                 visual-critic de desktop lo marcó: "en la misma línea conviven
+                 blanco pleno y gris, y eso lee como defecto, no como efecto".
+
+                 'center 50%' = el encendido se COMPLETA cuando el centro de la
+                 sección llega al centro del viewport, que es el comportamiento
+                 de Trionn que William pidió: cuando el usuario tiene la frase
+                 enfrente, ya está toda blanca. El gesto palabra-por-palabra se
+                 conserva —es el gesto— pero ocurre durante la ENTRADA, no
+                 durante toda la permanencia en pantalla. */
+              end: isMobile ? 'center 55%' : 'center 50%',
               scrub: true,
             },
           });
@@ -314,14 +388,34 @@ const c = COPY[lang as 'es' | 'en'];
       /* (2) Anotaciones de esquina — fade-up escalonado (one-shot) */
       if (annotationEls.length) {
         gsap.set(annotationEls, { opacity: 0, y: 18 });
-        gsap.to(annotationEls, {
-          opacity: 1,
-          y: 0,
-          duration: 0.7,
-          ease: 'power3.out',
-          stagger: 0.12,
-          scrollTrigger: { trigger: aboutEl, start: 'top 45%', once: true },
+        const revealAnnotations = () => {
+          gsap.to(annotationEls, {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'power3.out',
+            stagger: 0.12,
+          });
+        };
+        const annST = ScrollTrigger.create({
+          trigger: aboutEl,
+          start: 'top 45%',
+          once: true,
+          onEnter: revealAnnotations,
         });
+
+        /* RED DE SEGURIDAD (2026-08-09). Con `once: true`, si la sección ya
+           está POR ENCIMA del punto de disparo al cargar —recargar la página a
+           media altura, un deep-link a #studio-what, restauración de scroll del
+           navegador— el onEnter no se dispara NUNCA y las anotaciones quedan en
+           opacity:0 de forma permanente.
+           ManifestoSection.astro ya tenía este mismo arreglo; nunca se propagó
+           acá. Si el trigger ya está pasado, revelamos igual: sin animación de
+           scroll, pero visible. */
+        if (annST.progress > 0) {
+          revealAnnotations();
+          annST.kill();
+        }
       }
 
     } catch (err) {

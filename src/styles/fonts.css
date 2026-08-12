@@ -47,34 +47,15 @@
   font-display: swap;
 }
 
-/* ── LEGADO: Archivo Variable ──────────────────────────────────── */
-/* Conservado para componentes no migrados. No usar en código nuevo. */
-@font-face {
-  font-family: "Archivo";
-  src: url("/fonts/archivo-variable.woff2") format("woff2-variations");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ── LEGADO: DM Sans Variable ──────────────────────────────────── */
-@font-face {
-  font-family: "DM Sans";
-  src: url("/fonts/dm-sans-variable.woff2") format("woff2-variations");
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ── LEGADO: IBM Plex Mono 400 ─────────────────────────────────── */
-@font-face {
-  font-family: "IBM Plex Mono";
-  src: url("/fonts/ibm-plex-mono-400.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* ── LEGADO: Hanken Grotesk ────────────────────────────────────── */
-/* Conservado en declaración vacía para evitar FOUT en componentes no migrados.
-   Geist Sans actúa como fallback (misma categoría grotesca). */
+/* ── FUENTES LEGADO: ELIMINADAS (auditoría 2026-08-10) ──────────────
+ * Archivo Variable, DM Sans Variable e IBM Plex Mono estaban declaradas
+ * "para componentes no migrados". La migración terminó: la búsqueda en
+ * todo src/ no encontró UN solo font-family que las nombrara.
+ *
+ * Eran ~198 KB de descarga (87 + 97 + 14) que ningún carácter del sitio
+ * usaba. Los .woff2 se borraron de /public/fonts.
+ *
+ * 'Hanken Grotesk' tampoco se re-declara: nunca tuvo @font-face ni archivo
+ * — su único consumidor era el .skip-link de Layout.astro, que ya caía al
+ * sans-serif del sistema. Ahora usa --font-body como el resto de la UI.
+ * ─────────────────────────────────────────────────────────────────── */

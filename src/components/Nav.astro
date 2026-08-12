@@ -37,6 +37,7 @@ const { lang, t } = Astro.props;
     <ul class="nav-global__links" role="list">
       <li><a href={`/${lang}#portfolio`} class="nav-global__link">{t.nav.portfolio}</a></li>
       <li><a href={`/${lang}#services`} class="nav-global__link">{t.nav.method}</a></li>
+      <li><a href={t.nav.geoHref} class="nav-global__link">{t.nav.geo}</a></li>
       <li><a href={`/${lang}#contact`} class="nav-global__link">{t.nav.contact}</a></li>
     </ul>
 
@@ -102,9 +103,17 @@ const { lang, t } = Astro.props;
         </a>
       </li>
       <li>
+        <!-- Página real, no ancla: data-panel-link igual, para que el panel
+             cierre al navegar (el handler no distingue ancla de ruta). -->
+        <a href={t.nav.geoHref} class="nav-panel__link" data-panel-link>
+          <span class="nav-panel__word">{t.nav.geo}</span>
+          <span class="nav-panel__num" aria-hidden="true">03</span>
+        </a>
+      </li>
+      <li>
         <a href={`/${lang}#contact`} class="nav-panel__link" data-panel-link>
           <span class="nav-panel__word">{t.nav.contact}</span>
-          <span class="nav-panel__num" aria-hidden="true">03</span>
+          <span class="nav-panel__num" aria-hidden="true">04</span>
         </a>
       </li>
     </ul>
@@ -269,6 +278,27 @@ const { lang, t } = Astro.props;
     padding-bottom: 2px;
   }
 
+  /* ÁREA TÁCTIL (auditoría 2026-08-11). El fix de 44px existía SOLO en
+     `@media (max-width: 767px)`, así que un iPad recibía enlaces de 16px de
+     alto — el peor caso, porque tablet es táctil igual que un teléfono.
+     El ::after ya está ocupado por el subrayado de hover, así que el área
+     va en ::before, que estaba libre. No altera la maquetación: es absoluto
+     y se centra sobre la caja real del texto. */
+  .nav-global__link::before,
+  .nav-global__logo::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 44px;
+  }
+
+  .nav-global__logo {
+    position: relative;
+  }
+
   /* Subrayado accent verde — se dibuja en hover (scaleX 0→1) */
   .nav-global__link::after {
     content: '';
@@ -329,7 +359,13 @@ const { lang, t } = Astro.props;
        área ampliada corra visualmente el texto. */
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 44px;
+    /* min-width además del alto (auditoría 2026-08-10): la etiqueta son dos
+       letras ("EN"/"ES"), así que el padding-inline de 0.5em dejaba la caja en
+       ~28px de ancho. El margin negativo compensa el ensanche para que el
+       texto no se corra respecto del separador "|". */
+    min-width: 44px;
     padding-inline: 0.5em;
     margin-inline: -0.5em;
   }
@@ -718,6 +754,21 @@ const { lang, t } = Astro.props;
       transition: none;
     }
     .nav-burger__line { transition: none; }
+
+    /* LA BARRA GLOBAL — faltaba en este bloque (fix 2026-08-09).
+       .nav-global nace en opacity:0 + translateY(-100%) y la revela el script
+       diferido (IntersectionObserver, ~línea 744). Con reduced-motion, la regla
+       global de global.css aplasta su transición de 0.4s a 0.01ms: en vez de
+       deslizarse, la barra SALTA A EXISTIR de golpe. Y como el nav está en las
+       15 páginas del sitio, ese salto ocurría en cada carga — es el "titileo en
+       toda la página".
+       Sin transición entra limpia. El opacity:0 inicial se CONSERVA a propósito:
+       en la home la barra debe estar oculta mientras el hero está en viewport,
+       que es el diseño (ver la cabecera de este archivo). */
+    .nav-global {
+      transition: none;
+      will-change: auto; /* sin transición no hay nada que preparar */
+    }
   }
 </style>
 
@@ -848,14 +899,24 @@ const { lang, t } = Astro.props;
       navGlobal?.removeAttribute('data-panel-open');
 
       document.body.style.overflow = '';
-      /* restaurar la posición: quitar overflow:hidden puede resetear el
-         scrollTop del body en algunos navegadores */
-      document.body.scrollTop = savedScroll;
 
-      /* devolver el foco al botón SOLO si el cierre fue del usuario (Escape,
-         tap en la X). Si cerró por navegar a un ancla, robar el foco acá
-         sacaría al lector de pantalla de la sección a la que acaba de saltar. */
-      if (restoreFocus) burger.focus();
+      /* CIERRE POR USUARIO (Escape, tap en la X): restaurar la posición, porque
+         quitar overflow:hidden puede resetear el scrollTop del body en algunos
+         navegadores.
+
+         CIERRE POR NAVEGACIÓN (tap en un link del panel): NO restaurar. El
+         usuario acaba de pedir ir a #portfolio; devolverlo a savedScroll compite
+         con el salto al ancla que el navegador está por hacer. Quién gana depende
+         del orden en que iOS procese ambos, así que el bug era intermitente: a
+         veces navegaba, a veces te dejaba donde estabas. (Fix 2026-08-09.)
+
+         El parámetro que distingue los dos casos ya existía para el foco. */
+      if (restoreFocus) {
+        document.body.scrollTop = savedScroll;
+        /* devolver el foco al botón. Si cerró por navegar, robar el foco acá
+           sacaría al lector de pantalla de la sección a la que acaba de saltar. */
+        burger.focus();
+      }
     };
 
     burger.addEventListener('click', () => (isOpen ? close() : open()));

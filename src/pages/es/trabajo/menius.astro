@@ -49,8 +49,14 @@ const data: CaseStudyData = {
       bg: 'var(--canvas-arena)',
     },
     {
-      label: 'El resultado',
-      body: 'Menius valida el modelo del estudio: no solo construimos sitios, construimos sistemas digitales que generan valor a largo plazo. Es la prueba técnica de SCUART — un SaaS completo, en producción, con pagos reales y clientes activos.',
+      label: 'Por qué importa',
+      /* Reescrito 2026-08-10 (auditoría de copy). Se quitó "clientes activos":
+         era el único claim del sitio sobre volumen de negocio, y no aporta —
+         lo que prueba capacidad es la arquitectura, no cuántos la usan. Todo
+         lo que queda acá es verificable entrando a menius.app.
+         También salieron "valida el modelo del estudio" (autorreferencial: el
+         caso hablaba de SCUART, no del producto) y "valor a largo plazo". */
+      body: 'Menius responde la pregunta que todo cliente hace: ¿este estudio puede construir algo de verdad? Arquitectura multi-tenant, pagos con Stripe sin comisión por pedido, pedidos en tiempo real y un subdominio por restaurante. Está en producción en menius.app. Lo que se aprende operando un producto propio es lo que después se aplica a cada proyecto.',
       // screenshot mobile (oscuro) → canvas arena para que flote nítido
       image: '/images/casos/menius-mobile.webp',
       imageAlt: 'Menius — versión mobile del landing',
@@ -59,9 +65,9 @@ const data: CaseStudyData = {
     },
   ],
   credits: [
-    { role: 'Dirección de producto', name: 'William Mora' },
-    { role: 'Diseño UX/UI', name: 'William Mora' },
-    { role: 'Arquitectura & desarrollo', name: 'William Mora' },
+    { role: 'Dirección de producto' },
+    { role: 'Diseño UX/UI' },
+    { role: 'Arquitectura & desarrollo' },
   ],
   next: {
     name: 'Etnia Braids',

@@ -255,7 +255,17 @@ const items: CapabilityService[] = t.capabilities.items;
     .svc__row {
       grid-template-columns: 3.5rem 1fr;
       column-gap: var(--space-l);
-      padding-block: var(--space-xl);
+      /* --space-xl daba 92px arriba Y abajo de cada fila: 1290px de aire en
+         una lista de 7 (medido 2026-08-11 — la sección ocupaba 2064px contra
+         1104px de desktop). El texto de cada fila mide lo mismo en los dos
+         viewports; toda la diferencia era padding.
+
+         --space-l (64px) mantiene la separación editorial y deja las filas
+         claramente agrupadas por su hairline. Se mantienen las 7 descripciones
+         visibles a propósito: desktop puede colapsarlas porque el hover las
+         revela una a una, pero una tablet no tiene puntero — sin descripción,
+         el usuario vería siete nombres sin saber qué son. */
+      padding-block: var(--space-l);
     }
     .svc__name {
       font-size: clamp(2.75rem, 6vw, 3.75rem);
@@ -373,7 +383,12 @@ const items: CapabilityService[] = t.capabilities.items;
     .svc__index-sep,
     .svc__index-total {
       font-size: var(--text-body);
-      color: var(--ink-42);
+      /* --ink-62 (5.00:1), no --ink-42 (2.70:1 — reprobaba AA). El "/ 07" del
+         contador "01 / 07" es texto INFORMATIVO, no decorativo: comunica
+         cuántos servicios hay. Sigue siendo más tenue que el numeral activo
+         en --ink pleno, así que la jerarquía del contador se conserva.
+         (auditoría 2026-08-10) */
+      color: var(--ink-62);
     }
     .svc__index-label {
       margin-left: 0.75ch;
@@ -413,7 +428,7 @@ const items: CapabilityService[] = t.capabilities.items;
     .svc__num { display: none; } /* manda el numeral gigante */
 
     .svc__name {
-      font-size: clamp(2.4rem, 3.6vw, 3.5rem);
+      font-size: var(--text-names);
       line-height: 1.04;
       transition: color 0.4s ease;
     }

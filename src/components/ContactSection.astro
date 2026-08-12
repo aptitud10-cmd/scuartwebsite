@@ -231,6 +231,12 @@ const copiedLabel = isES ? '¡Copiado!' : 'Copied!';
   border: 1px solid var(--hairline);
   border-radius: 999px;
   padding: 0.5em 0.95em;
+  /* Área táctil 44px (auditoría 2026-08-11). Acá sí va min-height y no un
+     pseudo-elemento: el botón tiene borde visible (pill), así que la caja
+     real ES el destino que el usuario ve — un área invisible más grande que
+     el borde sería un blanco fantasma. Al crecer la caja, el pill crece con
+     ella y sigue coincidiendo con lo que se toca. */
+  min-height: 44px;
   cursor: pointer;
   transition: color 0.3s ease, border-color 0.3s ease, transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
   align-self: center;
@@ -254,7 +260,11 @@ const copiedLabel = isES ? '¡Copiado!' : 'Copied!';
 
 .contact__copy-icon {
   display: inline-flex;
-  color: var(--brand);
+  /* currentColor, NO --brand (corregido 2026-08-09). El lima sobre crema daba
+     1.16:1 contra un requisito de 3:1 para componentes gráficos no textuales.
+     Heredando el color del botón, el ícono acompaña su estado: tinta-62 en
+     reposo y tinta plena cuando [data-copied], que es la señal que importa. */
+  color: currentColor;
 }
 
 /* ── N2 — Canal directo: WhatsApp ── */
@@ -277,7 +287,7 @@ const copiedLabel = isES ? '¡Copiado!' : 'Copied!';
   align-items: center;
   gap: 0.75em;
   font-family: var(--font-body);
-  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  font-size: var(--text-body);
   font-weight: 500;
   color: var(--ink);
   text-decoration: none;
@@ -318,7 +328,11 @@ const copiedLabel = isES ? '¡Copiado!' : 'Copied!';
 }
 
 .contact__wa-arrow {
-  color: var(--brand);
+  /* currentColor, NO --brand — mismo criterio que .contact__copy-icon.
+     El lima sobre crema da 1.16:1 contra el 3:1 que WCAG pide para
+     componentes gráficos. Heredando el color del enlace, la flecha
+     acompaña su estado en vez de ser un acento ilegible. */
+  color: currentColor;
   transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 

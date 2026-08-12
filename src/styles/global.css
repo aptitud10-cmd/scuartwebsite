@@ -87,6 +87,31 @@ body::after {
   background-size: 180px 180px;
 }
 
+/* ── PARPADEO EN iOS — el grano se apaga en mobile (2026-08-10) ──────
+ * REPORTADO POR WILLIAM en iPhone real: "parpadeo en toda la página" al
+ * scrollear. No lo reproduce Chromium (medido: 0 oscilaciones), por eso
+ * cinco auditorías previas no lo vieron.
+ *
+ * CAUSA: este ::after es un elemento `position: fixed` a pantalla completa
+ * con `mix-blend-mode: multiply`. Un blend sobre una capa fija obliga a
+ * WebKit a RECOMPONER todo el viewport en cada frame del scroll; como en
+ * iOS la barra de Safari colapsa/expande al scrollear, la recomposición se
+ * dispara constantemente y se percibe como parpadeo global.
+ *
+ * POR QUÉ APAGARLO Y NO REPARARLO: a opacity 0.03 el grano mueve 2-3 puntos
+ * RGB sobre #f4f2ec. En una pantalla de teléfono —brillo variable, al sol,
+ * densidad 3x— es literalmente imperceptible. Se estaba pagando un defecto
+ * visible en todos los iPhone por una textura que nadie ve.
+ *
+ * Desktop lo conserva: ahí el blend no cuesta (no hay barra que colapse) y
+ * en pantalla grande sí aporta la materialidad que buscaba el diseño.
+ * ─────────────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  body::after {
+    display: none;
+  }
+}
+
 /* ── Tipografía base ─────────────────────────────────────────────── */
 /*
  * PP Editorial New (display): solo en momentos de máxima jerarquía.

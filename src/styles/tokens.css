@@ -218,8 +218,45 @@
        es el diseño; bajarlo un punto abre la brecha. */
     --text-subhead: 1.0625rem;
 
-    /* Body 16px y mono 11px SIN CAMBIO — son correctos y accesibles.
-       (--text-body y --text-mono se heredan del :root de arriba.) */
+    /* Body 16px SIN CAMBIO — es correcto y accesible (se hereda del :root).
+
+       MONO 11px → 12.5px (William, iPhone real, 2026-08-10).
+       Reporte: "no se ven bien las letras, el texto es muy gris o pequeño".
+       Medido en 375px: 43 bloques de texto a 11px, el tamaño más repetido de
+       toda la página. El token se usa en 42 lugares de 12 componentes —
+       kickers, numerales, metadatos de proyecto, labels del nav, el pie.
+
+       El bloque mobile de este archivo trató los 7 niveles display y todo el
+       espaciado, pero dejó --text-mono heredando la curva de desktop: es el
+       ÚNICO token de texto sin decisión propia para mobile, y justo el que
+       gobierna los textos más chicos.
+
+       El contraste NO era el problema (medido: 0 fallas WCAG, 105 bloques,
+       todos ≥4.5:1). Era el TAMAÑO: 11px en uppercase con tracking abierto,
+       a 62% de tinta, cumple la norma pero se lee mal en la mano. 12.5px es
+       el piso editorial para uppercase con letter-spacing en un teléfono.
+
+       No sube a 13px+ a propósito: estos textos son metadatos y deben quedar
+       claramente por debajo del cuerpo de 16px — la jerarquía es el diseño. */
+    --text-mono: 0.78125rem; /* 12.5px */
+
+    /* ── TINTA SECUNDARIA — 62% → 72% en mobile ────────────────────
+       La otra mitad del reporte de William ("muy gris"). --ink-62 se usa en
+       47 lugares: es el color de TODO el texto secundario del sitio.
+
+       Sobre el crema #f4f2ec da 5.00:1 — pasa AA (4.5:1) pero por poco, y
+       ese margen se evapora en un teléfono: brillo automático bajo, luz del
+       sol, o el modo de ahorro de batería que atenúa la pantalla. En
+       escritorio el mismo valor se ve bien porque el entorno es estable.
+
+       0.72 → 7.05:1, que cruza AAA. El texto sigue leyéndose como secundario
+       (la jerarquía contra --ink pleno se mantiene), pero deja de depender de
+       las condiciones de luz. Solo mobile: desktop conserva el 62% original.
+
+       --ink-42 (metadatos, placeholders) sube en paralelo por la misma razón. */
+    --ink-mid: rgba(20, 19, 15, 0.72);
+    --ink-62: rgba(20, 19, 15, 0.72);
+    --ink-42: rgba(20, 19, 15, 0.55);
 
     /* ── ESPACIO — el cambio más grande ─────────────────────────────
        Todos bajan. En mobile el aire se mide contra el ALTO de pantalla

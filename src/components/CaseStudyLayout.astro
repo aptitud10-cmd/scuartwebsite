@@ -39,7 +39,8 @@ async function imgDims(src: string): Promise<{ w: number; h: number }> {
 
 interface Credit {
   role: string;
-  name: string;
+  /** Opcional: sin nombre, la ficha muestra solo el rol. */
+  name?: string;
 }
 
 interface CaseBlock {
@@ -260,8 +261,11 @@ const blockDims = await Promise.all(
       </div>
       <div class="cs-credits__col">
         <p class="cs-credits__head">{copy.role}</p>
+        {/* El nombre es OPCIONAL (2026-08-10, decisión de William: quitar
+            nombres personales de los créditos). Sin este guard, un credit sin
+            `name` renderizaba "Dirección creativa — " con un guion colgando. */}
         {data.credits.map((c) => (
-          <p class="cs-credits__val">{c.role} — {c.name}</p>
+          <p class="cs-credits__val">{c.name ? `${c.role} — ${c.name}` : c.role}</p>
         ))}
       </div>
       <div class="cs-credits__col">
@@ -330,7 +334,7 @@ const blockDims = await Promise.all(
   .cs-hero__name {
     font-family: var(--font-display);
     font-weight: 200;
-    font-size: clamp(3.5rem, 12vw, 10rem);
+    font-size: var(--text-display-name);
     line-height: 0.98;
     letter-spacing: -0.03em;
     margin: 0;
@@ -340,7 +344,7 @@ const blockDims = await Promise.all(
     font-family: var(--font-display);
     font-weight: 300;
     font-style: italic;
-    font-size: clamp(1.25rem, 3vw, 2rem);
+    font-size: var(--text-subhead);
     line-height: 1.25;
     color: var(--ink-mid, var(--ink-62));
     margin: var(--space-m) 0 0;
@@ -364,24 +368,25 @@ const blockDims = await Promise.all(
   }
   .cs-hero__visit:hover { gap: 0.9em; opacity: 0.7; }
 
-  /* Área táctil en mobile (auditoría Fase 5, 2026-08-06): el enlace medía
-     21px de alto. No se puede estirar con min-height porque el border-bottom
-     es parte del diseño (subrayado pegado al texto) y se separaría. Un
-     pseudo-elemento amplía la zona sensible al toque sin mover un pixel de
-     lo que se ve. */
-  @media (max-width: 767px) {
-    /* .cs-credits__link es el SEGUNDO "VISITAR SITIO" de la página (ficha de
-       créditos al pie) — mismo tratamiento. */
-    .cs-hero__visit,
-    .cs-credits__link {
-      position: relative;
-    }
-    .cs-hero__visit::after,
-    .cs-credits__link::after {
-      content: '';
-      position: absolute;
-      inset: -12px -8px;
-    }
+  /* Área táctil (auditoría Fase 5, 2026-08-06; alcance corregido 2026-08-11):
+     el enlace medía 21px de alto. No se puede estirar con min-height porque el
+     border-bottom es parte del diseño (subrayado pegado al texto) y se
+     separaría. Un pseudo-elemento amplía la zona sensible al toque sin mover
+     un pixel de lo que se ve.
+
+     SIN media query: estaba limitado a ≤767px y por eso un iPad —táctil igual
+     que un teléfono— seguía recibiendo un blanco de 22px. */
+  /* .cs-credits__link es el SEGUNDO "VISITAR SITIO" de la página (ficha de
+     créditos al pie) — mismo tratamiento. */
+  .cs-hero__visit,
+  .cs-credits__link {
+    position: relative;
+  }
+  .cs-hero__visit::after,
+  .cs-credits__link::after {
+    content: '';
+    position: absolute;
+    inset: -12px -8px;
   }
 
   /* ── CANVAS: el lienzo de color que abraza la imagen ──────────
@@ -496,7 +501,7 @@ const blockDims = await Promise.all(
     align-items: center;
     padding-inline: 12px;
     font-family: var(--font-body);
-    font-size: 0.75rem;
+    font-size: var(--text-mono);
     letter-spacing: 0.02em;
     line-height: 1;
     white-space: nowrap;
@@ -589,14 +594,14 @@ const blockDims = await Promise.all(
   .cs-block__label {
     font-family: var(--font-display);
     font-weight: 300;
-    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-size: var(--text-h3);
     line-height: 1.05;
     letter-spacing: -0.02em;
     margin: 0;
   }
   .cs-block__body {
     font-family: var(--font-body);
-    font-size: clamp(1rem, 1.4vw, 1.1875rem);
+    font-size: var(--text-body);
     line-height: 1.6;
     color: var(--ink-mid, var(--ink-62));
     margin: 0;
@@ -624,7 +629,7 @@ const blockDims = await Promise.all(
   }
   .cs-credits__val {
     font-family: var(--font-body);
-    font-size: 1rem;
+    font-size: var(--text-body);
     line-height: 1.5;
     color: var(--ink);
     margin: 0 0 0.35em;
@@ -669,14 +674,14 @@ const blockDims = await Promise.all(
   .cs-next__name {
     font-family: var(--font-display);
     font-weight: 200;
-    font-size: clamp(2.5rem, 8vw, 6rem);
+    font-size: var(--text-display-name);
     line-height: 1;
     letter-spacing: -0.03em;
     transition: opacity 0.3s ease;
   }
   .cs-next__arrow {
     font-family: var(--font-display);
-    font-size: clamp(2rem, 5vw, 4rem);
+    font-size: var(--text-names);
     margin-left: auto;
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }

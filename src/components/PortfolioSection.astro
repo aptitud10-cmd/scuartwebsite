@@ -113,7 +113,7 @@ const rows = projects.map((p, i) => {
   .pf-kicker {
     font-family: var(--font-body);
     font-weight: 500;
-    font-size: 0.8125rem;
+    font-size: var(--text-mono);
     letter-spacing: 0.14em;
     text-transform: uppercase;
     /* --ink-62 (62%) pasa WCAG AA 4.5:1 sobre --bg; --ink-42 daba 2.7:1 (fail) */
@@ -286,33 +286,82 @@ const rows = projects.map((p, i) => {
     object-fit: contain;
   }
 
-  /* ── Tablet (768-1023): igual stack, título más grande ────
+  /* ── Tablet (≥768): ÍNDICE EDITORIAL, no el stack de mobile ────
      Breakpoint unificado a 768px (antes 769px): con 769 el viewport de
      exactamente 768px no lo cubría ni mobile (≤767) ni tablet (≥769) —
-     quedaba con la base sin overrides. Mobile = ≤767, tablet = ≥768. */
+     quedaba con la base sin overrides. Mobile = ≤767, tablet = ≥768.
+
+     REDISEÑO 2026-08-11 — medido: la sección ocupaba 1992px en tablet contra
+     626px en desktop (3.2×) CON MÁS ANCHO DISPONIBLE. La causa era que tablet
+     heredaba la captura apilada de mobile (691px de ancho por fila) encima de
+     la estructura de índice. El resultado tenía TRES alineaciones distintas en
+     el mismo bloque —metadatos a la izquierda, nombre centrado, imagen a todo
+     el ancho— que es exactamente lo que se lee como maquetado amateur.
+
+     Tablet ahora usa el índice tipográfico de desktop: es el gesto correcto
+     para un viewport ancho. Lo que NO hereda es el hover (la imagen incrustada
+     en el nombre), porque una tablet no tiene puntero — ese bloque sigue
+     gateado por `(hover: hover)` más abajo. En tablet el nombre es el destino
+     táctil completo y la captura vive en la página del caso. */
   @media (min-width: 768px) {
+    /* La ficha va ARRIBA del nombre, no absoluta al margen. En desktop (1440px)
+       la ficha puede vivir en el margen izquierdo porque sobra ancho; a 768px
+       el nombre centrado invade esa columna y los dos textos se superponen
+       ("WEB · MARCA GASTRO · 2025" tapado por "Jamón Casero" — verificado en
+       captura). Apilada evita la colisión sin perder la lectura de índice. */
+    .pf-row__link {
+      padding-block: var(--space-l);
+      padding-inline: var(--margin);
+    }
+
+    .pf-meta {
+      position: static;
+      margin: 0 0 var(--space-xs) 0;
+      gap: 0.2em;
+    }
+
     .pf-name {
-      font-size: clamp(5rem, 10vw, 7rem);
+      font-size: clamp(3.5rem, 7.5vw, 6rem);
+      text-align: left;
     }
 
-    /* Tablet: se cancela el full-bleed de mobile — a 768px+ hay ancho de
-       sobra y la imagen contenida con margen se ve mejor que cruzando toda
-       la pantalla. */
+    /* La captura apilada desaparece: en un índice el reposo es tipográfico. */
     .pf-stack-img {
-      width: auto;
-      margin-left: 0;
-      transform: none;
-      max-width: none;
-    }
-
-    .pf-stack-img img {
-      max-width: 720px;
-      margin-inline: auto;
+      display: none;
     }
   }
 
-  /* ── Desktop (>=1024 + hover real): work index Locomotive ── */
-  @media (min-width: 1024px) and (hover: hover) {
+  /* ── Desde 1280px: ficha al margen izquierdo + nombre centrado — la
+       composición de índice completa.
+
+       EL UMBRAL ES 1280, NO 1024 (medido 2026-08-11 con el ancho real de los
+       glifos, no la caja del bloque): con la ficha absoluta a la izquierda y el
+       nombre centrado, la distancia entre el final de la ficha y la primera
+       letra del nombre es de 3px / 84px / −3px a 1024px — "Etnia Braids" pisa
+       "WEB A MEDIDA · RESERVAS · 2025". A 1440px los gaps son 118-229px y se
+       lee limpio. Entre 768 y 1279 la ficha va apilada arriba (bloque anterior).
+
+       Nota de método: medir con getBoundingClientRect() del elemento NO detecta
+       esto — un nombre centrado tiene caja ancha con los glifos al medio. Hay
+       que medir el Range del contenido. ── */
+  @media (min-width: 1280px) {
+    .pf-meta {
+      position: absolute;
+      left: var(--margin);
+      top: var(--space-l);
+      margin: 0;
+    }
+
+    .pf-name {
+      text-align: center;
+    }
+  }
+
+  /* ── Desktop (>=1280 + hover real): work index Locomotive ──
+     Umbral alineado con el bloque de maquetación de arriba (era 1024): la
+     imagen incrustada en el nombre solo tiene sentido sobre la composición
+     centrada, que recién entra a 1280px sin pisar la ficha. */
+  @media (min-width: 1280px) and (hover: hover) {
     .pf-row__link {
       padding-block: clamp(1.25rem, 1.8vw, 2rem);
       padding-inline: var(--margin);
@@ -435,7 +484,10 @@ const rows = projects.map((p, i) => {
      SOLO desktop con hover real (en mobile el nombre convive con la imagen en
      reposo, sin momento de "entrada" tipográfico). reduced-motion → no corre.
      ScrambleTextPlugin es parte de GSAP (gratis desde 2025, ya instalado). ── */
-  const canHover = window.matchMedia('(min-width: 1024px) and (hover: hover)').matches;
+  /* 1280 (no 1024): debe coincidir con el media query CSS del gesto — si el JS
+     habilitara la imagen incrustada a 1024px, correría sobre una composición
+     que a ese ancho tiene la ficha apilada y el nombre alineado a la izquierda. */
+  const canHover = window.matchMedia('(min-width: 1280px) and (hover: hover)').matches;
 
   if (!prefersReduced && canHover) {
     (async () => {

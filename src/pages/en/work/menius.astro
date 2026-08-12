@@ -46,8 +46,11 @@ const data: CaseStudyData = {
       bg: 'var(--canvas-arena)',
     },
     {
-      label: 'The result',
-      body: 'Menius validates the studio\'s model: we don\'t just build websites, we build digital systems that create long-term value. It\'s SCUART\'s technical proof — a complete SaaS, in production, with real payments and active clients.',
+      label: 'Why it matters',
+      /* Rewritten 2026-08-10 — see the ES file for the rationale. Dropped
+         "active clients" (unverifiable claim about business volume) and the
+         self-referential "validates the studio's model". */
+      body: 'Menius answers the question every client asks: can this studio actually build something? Multi-tenant architecture, Stripe payments with no per-order commission, real-time orders, and a subdomain per restaurant. It runs in production at menius.app. What you learn operating your own product is what you bring to every client project.',
       // mobile screenshot (dark) → arena canvas so it floats crisply
       image: '/images/casos/menius-mobile.webp',
       imageAlt: 'Menius — mobile version of the landing',
@@ -56,9 +59,9 @@ const data: CaseStudyData = {
     },
   ],
   credits: [
-    { role: 'Product direction', name: 'William Mora' },
-    { role: 'UX/UI design', name: 'William Mora' },
-    { role: 'Architecture & development', name: 'William Mora' },
+    { role: 'Product direction' },
+    { role: 'UX/UI design' },
+    { role: 'Architecture & development' },
   ],
   next: {
     name: 'Etnia Braids',

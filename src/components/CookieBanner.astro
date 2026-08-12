@@ -101,14 +101,14 @@ const c = copy[lang];
     padding-bottom: max(0.7rem, calc(env(safe-area-inset-bottom) + 0.35rem));
   }
   .cookie__text {
-    font-size: 0.6875rem;
+    font-size: var(--text-mono);
     line-height: 1.4;
   }
   .cookie__actions {
     gap: var(--space-s);
   }
   .cookie__btn {
-    font-size: 0.625rem;
+    font-size: var(--text-mono);
     /* En la barra compacta el target de 48px estira demasiado la franja.
        44px sigue cumpliendo WCAG 2.5.8 (target mínimo 24px) y AAA táctil. */
     min-height: 44px;
@@ -177,6 +177,24 @@ const c = copy[lang];
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-thickness: 1px;
+  /* ÁREA TÁCTIL (auditoría 2026-08-10). Medido en 375px: 54×12px — el
+     objetivo más chico del sitio, y es el primero que ve un visitante nuevo.
+     Es un link INLINE dentro de un <p>: un min-height lo convertiría en caja
+     y rompería el flujo del párrafo. El pseudo-elemento extiende el área
+     táctil a 44px de alto sin alterar la maquetación ni el subrayado —
+     mismo patrón que ya usan los links del nav. */
+  position: relative;
+}
+
+.cookie__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* centra 44px sobre la caja real del texto (~12px) */
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
 }
 
 .cookie__actions {
