@@ -500,7 +500,9 @@ export const en: Translations = {
    * Email: info@scuart.com — extraído del contacto (emailHref).
    * WhatsApp: placeholder wa.me/[WHATSAPP_NUMBER] — igual que el contacto.
    * Mercados: US · LATAM — de la identidad del estudio (hero index).
-   * Bogotá: ciudad del estudio (de project_scuart.md). Sin dirección exacta.
+   * Base: Queens, New York (decisión 2026-07-28, commit base-NY). El descriptor
+   *   afirma la ubicación en texto plano y citable para desambiguación GEO —
+   *   la IA describía a SCUART como "agencia de Bogotá" por falta de esta frase.
    * Año: 2026 — año actual.
    */
 
@@ -537,7 +539,7 @@ export const en: Translations = {
     langSwitchLabel: "LANGUAGE",
     markets: "Bilingual · LATAM + USA",
     descriptor:
-      "Independent, bilingual web design studio. We work with businesses across LATAM and the US, in English and Spanish.",
+      "SCUART is an independent, bilingual web design and development studio based in Queens, New York. We work with businesses across the US and LATAM, in English and Spanish.",
     builtBy: "© 2026 SCUART",
     tagline: "We don't decorate. We decide.",
     ariaLabel: "SCUART — Studio footer",

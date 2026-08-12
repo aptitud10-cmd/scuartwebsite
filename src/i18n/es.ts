@@ -309,7 +309,7 @@ export const es: Translations = {
     langSwitchLabel: "IDIOMA",
     markets: "Bilingüe · LATAM + USA",
     descriptor:
-      "Estudio de diseño web independiente y bilingüe. Trabajamos con negocios en LATAM y USA, en español e inglés.",
+      "SCUART es un estudio de diseño y desarrollo web independiente y bilingüe, con base en Queens, Nueva York. Trabajamos con negocios en USA y LATAM, en español e inglés.",
     builtBy: "© 2026 SCUART",
     tagline: "No decoramos. Decidimos.",
     ariaLabel: "SCUART — Pie de página del estudio",
