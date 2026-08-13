@@ -145,8 +145,41 @@ const homeUrl = `${SITE_URL}/${lang}`;
 /* Destino del CTA del hero: el ancla #geo-checker SOLO existe cuando la página
    trae bloque `checker` (hoy solo AI Visibility). En las demás páginas de
    servicio ese ancla no existe y el botón no llevaba a ningún lado — apuntamos
-   a la sección de contacto de la home, que siempre existe. */
-const heroCtaHref = data.checker ? '#geo-checker' : `${homeUrl}#contact`;
+   a la sección de contacto de la home, que siempre existe.
+
+   RUTA RELATIVA, no homeUrl (corregido 2026-08-12): homeUrl se arma con
+   SITE_URL = https://scuart.com, que es correcto para el JSON-LD del breadcrumb
+   pero NO para un href de navegación — en local y en los previews de Vercel el
+   botón expulsaba al visitante al sitio de producción. */
+const heroCtaHref = data.checker ? '#geo-checker' : `/${lang}#contact`;
+/* ── ÍNDICE DE SERVICIOS (2026-08-12) ────────────────────────────────
+   Al terminar de leer un servicio no había ningún camino hacia los otros:
+   el único cierre era email + WhatsApp, así que para ver otro servicio había
+   que volver al nav (reporte de William).
+
+   La lista NO se declara acá: se deriva de `capabilities.items`, que ya es la
+   fuente de verdad de los 7 servicios en la home (num, name, href) y existe
+   completa en ES y EN. Así, agregar un servicio al diccionario lo suma a la
+   navegación de las 7 páginas sin tocar este layout.
+
+   `current` se detecta comparando el href de cada item con la URL de la página.
+   Se normaliza la barra final porque el sitio usa trailingSlash: 'never' pero
+   Astro.url.pathname puede traerla según el contexto. */
+const allServices = (t.capabilities?.items ?? []).filter((s: any) => s.href);
+const stripSlash = (u: string) => u.replace(/\/+$/, '');
+const currentPath = stripSlash(Astro.url.pathname);
+const currentIdx = allServices.findIndex((s: any) => stripSlash(s.href) === currentPath);
+const otherServices = allServices.filter((_: any, i: number) => i !== currentIdx);
+/* El siguiente en orden circular — el destino primario, mismo gesto que el
+   "SIGUIENTE" de las páginas de caso. */
+const nextService = allServices.length > 1
+  ? allServices[(currentIdx + 1) % allServices.length]
+  : null;
+
+const navCopy = lang === 'es'
+  ? { next: 'SIGUIENTE SERVICIO', all: 'TODOS LOS SERVICIOS', other: 'OTROS SERVICIOS' }
+  : { next: 'NEXT SERVICE', all: 'ALL SERVICES', other: 'OTHER SERVICES' };
+
 const breadcrumbSchema = {
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
@@ -367,6 +400,38 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
         </a>
       </div>
     </section>
+
+    <!-- ── Siguiente servicio + índice del resto ──────────────
+         Dos niveles a propósito: el SIGUIENTE es el destino grande (mismo
+         gesto que "SIGUIENTE" en las páginas de caso) y debajo va el índice
+         completo, para quien busca un servicio concreto y no quiere recorrer
+         los 7 de a uno. -->
+    {nextService && (
+      <nav class="geo-more" aria-label={navCopy.other}>
+        <a class="geo-next" href={nextService.href}>
+          <span class="geo-next__label">{navCopy.next}</span>
+          <span class="geo-next__name">{nextService.name}</span>
+          <span class="geo-next__arrow" aria-hidden="true">→</span>
+        </a>
+
+        <div class="geo-index">
+          <p class="geo-index__label">{navCopy.other}</p>
+          <ul class="geo-index__list">
+            {otherServices.map((s: any) => (
+              <li class="geo-index__item">
+                <a class="geo-index__link" href={s.href}>
+                  <span class="geo-index__num">{s.num}</span>
+                  <span class="geo-index__name">{s.name}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a class="geo-index__all" href={`/${lang}#services`}>
+            {navCopy.all} <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </nav>
+    )}
 
   </article>
 
@@ -858,6 +923,152 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   }
 
   /* ── Cierre ───────────────────────────────────────────────── */
+  /* ── SIGUIENTE SERVICIO + ÍNDICE ─────────────────────────────
+     Cierra el callejón sin salida que tenían las páginas de servicio: se
+     terminaba de leer y el único camino era volver al nav. */
+  .geo-more {
+    max-width: 1600px;
+    margin-inline: auto;
+    border-top: 1px solid var(--ink);
+  }
+
+  /* Destino primario — mismo gesto que .cs-next en las páginas de caso */
+  .geo-next {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: clamp(0.75rem, 3vw, 2.5rem);
+    padding: clamp(2.5rem, 8vh, 5rem) var(--margin);
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .geo-next__label {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-62);
+    flex-shrink: 0;
+  }
+  .geo-next__name {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight-light);
+    font-size: var(--text-names);
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+  .geo-next__arrow {
+    font-family: var(--font-body);
+    font-size: var(--text-h3);
+    margin-left: auto;
+    transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+  .geo-next:hover .geo-next__arrow,
+  .geo-next:focus-visible .geo-next__arrow {
+    transform: translateX(0.35em);
+  }
+  .geo-next:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: -4px;
+  }
+
+  /* Índice del resto — nivel secundario, tipografía de metadatos */
+  .geo-index {
+    padding: 0 var(--margin) clamp(2.5rem, 7vh, 4.5rem);
+    border-top: 1px solid var(--hairline);
+    padding-top: clamp(1.5rem, 4vh, 2.5rem);
+  }
+  .geo-index__label {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-62);
+    margin: 0 0 var(--space-s);
+  }
+  .geo-index__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .geo-index__item + .geo-index__item {
+    border-top: 1px solid var(--hairline);
+  }
+  .geo-index__link {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-s);
+    /* 44px de área táctil: es una lista de destinos, y tablet/mobile son
+       táctiles por igual (ver Nav.astro / FooterSection.astro). */
+    min-height: 44px;
+    padding-block: 0.5rem;
+    text-decoration: none;
+    color: var(--ink);
+    transition: color 0.28s ease;
+  }
+  .geo-index__link:hover,
+  .geo-index__link:focus-visible {
+    color: var(--ink-62);
+  }
+  .geo-index__link:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .geo-index__num {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    color: var(--ink-42);
+    flex-shrink: 0;
+  }
+  .geo-index__name {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .geo-index__all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    min-height: 44px;
+    margin-top: var(--space-s);
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+  }
+
+  /* Desde tablet: el índice en dos columnas — son 6 items y en una sola
+     columna estiraba el cierre de la página sin necesidad. */
+  @media (min-width: 768px) {
+    .geo-index__list {
+      /* grid-auto-flow: column + 3 filas fijas → llena la PRIMERA columna
+         entera antes de pasar a la segunda. Con el flujo por defecto (por
+         filas) los numerales quedaban 02·03 / 04·05 / 06·07 leídos en zigzag;
+         así se leen 02·04·06 hacia abajo y luego 03·05·07, que es como se lee
+         un índice. */
+      grid-auto-flow: column;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: repeat(3, auto);
+      column-gap: var(--space-xl);
+    }
+    /* con 2 columnas, el primer item de la SEGUNDA columna (el 4º del orden)
+       no lleva borde superior: ya lo aporta el encabezado de su columna */
+    .geo-index__item:nth-child(4) {
+      border-top: none;
+    }
+  }
+
   .geo-closing {
     max-width: 1600px;
     margin-inline: auto;
