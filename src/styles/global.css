@@ -5,7 +5,13 @@
 
 @import "./fonts.css";
 @import "./tokens.css";
-@import "tailwindcss";
+
+/* Tailwind NO se importa (auditoría 2026-08-12).
+   Medido: el sitio no usa NI UNA clase utility — todas las clases del markup
+   son BEM propias (.svc__row, .pf-name, .geo-cta...). El `@import "tailwindcss"`
+   inyectaba 34.9 KB de preflight + 127 variables --tw-* que nadie consume, y su
+   reset es redundante con el que este archivo define tres líneas más abajo.
+   El plugin @tailwindcss/vite también se sacó de astro.config.mjs. */
 
 /* ── Reset base ───────────────────────────────────────────────────── */
 *,

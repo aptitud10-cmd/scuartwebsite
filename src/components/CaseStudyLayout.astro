@@ -344,7 +344,9 @@ const blockDims = await Promise.all(
     font-family: var(--font-display);
     font-weight: 300;
     font-style: italic;
-    font-size: var(--text-subhead);
+    /* --text-lead (30px): bajada del nombre del caso — mismo rol que el
+       tagline de las páginas de servicio. Ver nota en GeoServiceLayout. */
+    font-size: var(--text-lead);
     line-height: 1.25;
     color: var(--ink-mid, var(--ink-62));
     margin: var(--space-m) 0 0;

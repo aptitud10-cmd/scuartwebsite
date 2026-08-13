@@ -81,22 +81,50 @@
      Mobile-first: mínimo en 375px, máximo en ~1440px+.
      ══════════════════════════════════════════════════════════════ */
 
+  /* ─────────────────────────────────────────────────────────────
+     RE-ESPACIADO DESKTOP (auditoría 2026-08-12, aprobado William).
+
+     PROBLEMA MEDIDO en 1440px (saltos entre niveles contiguos):
+       watermark 240 ×1.52 name 158 ×1.47 h1 108 ×1.04 cta 104 ×1.29
+       h2 81 ×1.40 names 58 ×1.20 h3 48 ×2.18 subhead 22
+     Dos anomalías:
+       · h1→cta ×1.04 — ambos llevaban `7.5vw`, así que dos niveles distintos
+         de la jerarquía rendían al 4% de diferencia. El ojo no los separa,
+         pero registra que algo no cuadra. Es la raíz de la nota 5.5 en
+         jerarquía tipográfica del visual-critic.
+       · h3→subhead ×2.18 — abismo entre "titular" y "texto", sin nada en medio.
+
+     CRITERIO: ratio ~1.30 constante en el tope de 1440px+.
+       watermark 240 · name 158 · h1 120 · cta 92 · h2 71 · names 55 · h3 42
+       · lead 30 · subhead 22
+     Resultado: 1.52 · 1.32 · 1.30 · 1.30 · 1.29 · 1.31 · 1.40 · 1.36.
+
+     Los MÍNIMOS (375px) NO se tocan — el bloque mobile de más abajo los pisa
+     con valores propios decididos para teléfono. Solo cambia el término vw y
+     el tope, que es lo que gobierna desktop.
+     ───────────────────────────────────────────────────────────── */
+
   /* NIVEL 1 — Watermark/numeral gigante (404 "404", numeral de paso Studio).
      Es el nivel decorativo más grande; puede exceder el viewport a propósito. */
-  --text-display-watermark: clamp(6rem, 18vw, 15rem);
+  --text-display-watermark: clamp(6rem, 18vw, 15rem); /* → 240px */
   /* NIVEL 2 — Nombre de proyecto/caso (Portfolio, hero de caso). El protagonista
      más grande del contenido real. Peso hairline (200). */
-  --text-display-name: clamp(3.5rem, 11vw, 11rem);
+  --text-display-name: clamp(3.5rem, 11vw, 9.875rem); /* → 158px */
   /* NIVEL 3 — Hero H1 / Manifiesto / clímax de contacto (statements principales). */
-  --text-h1: clamp(1.9rem, 7.5vw, 8.5rem);
+  --text-h1: clamp(1.9rem, 8.3vw, 7.5rem); /* → 120px */
   /* NIVEL 4 — Email/CTA de contacto (grande pero por debajo del H1 del hero). */
-  --text-cta: clamp(2.5rem, 7.5vw, 6.5rem);
+  --text-cta: clamp(2.5rem, 6.4vw, 5.75rem); /* → 92px */
   /* NIVEL 5 — Statement de sección (Statement dark, footer tagline). */
-  --text-h2: clamp(2.25rem, 5.6vw, 6rem);
+  --text-h2: clamp(2.25rem, 4.9vw, 4.4375rem); /* → 71px */
   /* NIVEL 6 — Nombre de servicio / verbo de paso / statement de contacto. */
-  --text-names: clamp(1.9rem, 4vw, 4rem);
+  --text-names: clamp(1.9rem, 3.8vw, 3.4375rem); /* → 55px */
   /* NIVEL 7 — Título de bloque / label display chico. */
-  --text-h3: clamp(1.75rem, 4vw, 3rem);
+  --text-h3: clamp(1.75rem, 2.9vw, 2.625rem); /* → 42px */
+
+  /* NIVEL 8 — LEAD. Nivel nuevo (2026-08-12): cierra el salto ×2.18 que había
+     entre h3 y subhead. Es el peldaño entre titular y texto — entradilla de
+     sección, tagline de caso, bajada de hero. */
+  --text-lead: clamp(1.25rem, 2.1vw, 1.875rem); /* 20px → 30px */
 
   /* Lead/subhead */
   --text-subhead: clamp(1.125rem, 1.6vw, 1.375rem); /* 18px → 22px */

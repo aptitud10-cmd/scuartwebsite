@@ -1,5 +1,4 @@
 import { defineConfig } from 'astro/config';
-import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
 
@@ -60,7 +59,6 @@ export default defineConfig({
     },
   },
 
-  vite: {
-    plugins: [tailwindcss()],
-  },
+  /* Sin plugins de Vite: Tailwind se quitó en la auditoría 2026-08-12 (el sitio
+     no usaba ni una clase utility — todo el markup es BEM propio). */
 });

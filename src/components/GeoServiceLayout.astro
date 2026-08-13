@@ -436,7 +436,10 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
     font-family: var(--font-display);
     font-weight: 300;
     font-style: italic;
-    font-size: var(--text-subhead);
+    /* --text-lead (30px), no --text-subhead (22px): es la bajada del H1, el
+       peldaño entre titular y cuerpo. A 22px competía con el body de 16px en
+       vez de mediar entre el h1 y él. */
+    font-size: var(--text-lead);
     line-height: 1.25;
     color: var(--ink-mid, var(--ink-62));
     margin: var(--space-m) 0 0;
