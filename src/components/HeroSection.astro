@@ -94,14 +94,27 @@ const c = copy[lang];
 
 /* Capacidades — línea de texto corrido, SIN números (reemplaza el índice
    001-004 vertical que el visual-critic marcó como "ficha técnica de
-   estudio" genérica). Términos técnicos en inglés en ambos idiomas
-   (convención del sitio, igual que PORTFOLIO). */
-const capabilities = [
-  'WEB PLATFORMS',
-  'SAAS + SYSTEMS',
-  'AI AUTOMATION',
-  'ORDERING · BOOKING · WORKFLOWS',
-];
+   estudio" genérica).
+
+   TRADUCIDAS AL ESPAÑOL 2026-08-14. Antes estaban en inglés en AMBOS idiomas
+   con la nota "convención del sitio" — pero esa convención nunca se decidió,
+   se heredó del primer commit. William lo detectó: los nombres de servicio
+   salían en inglés en la versión española. Se traduce lo que tiene equivalente
+   natural y se deja en inglés solo lo que en español se dice igual (SaaS,
+   E-commerce, GEO). El cliente es un dueño de negocio, no un colega. */
+const capabilities = lang === 'es'
+  ? [
+      'PLATAFORMAS WEB',
+      'SAAS + SISTEMAS',
+      'AUTOMATIZACIÓN CON IA',
+      'PEDIDOS · RESERVAS · FLUJOS',
+    ]
+  : [
+      'WEB PLATFORMS',
+      'SAAS + SYSTEMS',
+      'AI AUTOMATION',
+      'ORDERING · BOOKING · WORKFLOWS',
+    ];
 ---
 
 <section class="hero-v3 hero" aria-label={t.hero.ariaLabel}>

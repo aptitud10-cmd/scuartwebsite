@@ -103,7 +103,7 @@ export const es: Translations = {
     items: [
       {
         num: "01",
-        name: "WEB PLATFORMS",
+        name: "PLATAFORMAS WEB",
         statement: "",
         resolves:
           "Sitios que cargan rápido, posicionan en búsqueda y convierten visitantes en clientes.",
@@ -111,7 +111,7 @@ export const es: Translations = {
       },
       {
         num: "02",
-        name: "AI VISIBILITY · GEO",
+        name: "VISIBILIDAD EN IA · GEO",
         statement: "",
         resolves:
           "Tus clientes ya le preguntan a ChatGPT. Auditamos qué dice la IA de tu negocio y hacemos que te recomiende.",
@@ -119,7 +119,7 @@ export const es: Translations = {
       },
       {
         num: "03",
-        name: "SAAS + SYSTEMS",
+        name: "SAAS + SISTEMAS",
         statement: "",
         resolves:
           "Productos completos — login, pagos, paneles, APIs. De cero a producción.",
@@ -127,7 +127,7 @@ export const es: Translations = {
       },
       {
         num: "04",
-        name: "AI AUTOMATION",
+        name: "AUTOMATIZACIÓN CON IA",
         statement: "",
         /* Reescrito 2026-08-11: el anterior ("automatizamos lo repetitivo para
            que el equipo se enfoque en lo que importa") pasaba el test del
@@ -149,14 +149,14 @@ export const es: Translations = {
       },
       {
         num: "06",
-        name: "ORDERING · BOOKING · WORKFLOWS",
+        name: "PEDIDOS · RESERVAS · FLUJOS",
         statement: "",
         resolves: "Pedidos, reservas y operación sin el desorden manual.",
         href: "/es/servicios/ordering-booking",
       },
       {
         num: "07",
-        name: "BRAND IDENTITY",
+        name: "IDENTIDAD DE MARCA",
         statement: "",
         /* Reescrito 2026-08-11: el anterior pasaba el test del competidor. */
         resolves:
@@ -230,13 +230,13 @@ export const es: Translations = {
     kicker: "MÉTODO",
     indexLabel: "TRABAJAMOS CON:",
     capabilities: [
-      "WEB PLATFORMS",
-      "AI VISIBILITY",
-      "SAAS + SYSTEMS",
-      "AI AUTOMATION",
+      "PLATAFORMAS WEB",
+      "VISIBILIDAD EN IA",
+      "SAAS + SISTEMAS",
+      "AUTOMATIZACIÓN CON IA",
       "E-COMMERCE",
       "WORKFLOWS",
-      "BRAND IDENTITY",
+      "IDENTIDAD DE MARCA",
     ],
     capabilitiesLabel: "CAPACIDADES",
     whatChangesLabel: "QUÉ CAMBIA",
