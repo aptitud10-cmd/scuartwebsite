@@ -110,12 +110,27 @@ interface Props {
 
 const { t, lang, data, title, description, canonicalURL, alternates } = Astro.props;
 
+/* Nombre del servicio para el JSON-LD, derivado del kicker.
+   BUG CORREGIDO 2026-08-14: `name` y `serviceType` estaban HARDCODEADOS como
+   "AI Visibility (GEO)" en este layout compartido, así que las SIETE páginas de
+   servicio se declaraban ante Google y los motores generativos como si todas
+   fueran el servicio de GEO — cada una con los precios de otra. En un sitio que
+   vende justamente visibilidad en IA, era el error más caro posible: el dato
+   estructurado contradecía al producto.
+
+   Se deriva del kicker ("SERVICIO N°01 — WEB PLATFORMS" → "WEB PLATFORMS") para
+   no tener que tocar las 14 páginas; si el formato del kicker cambiara, el
+   fallback es el kicker completo, nunca un nombre de otro servicio. */
+const serviceName = (data.kicker.split('—').pop() ?? data.kicker).trim();
+
 /* JSON-LD Service: declara la oferta ante buscadores y motores generativos. */
 const serviceSchema = {
   '@context': 'https://schema.org',
   '@type': 'Service',
-  name: 'AI Visibility (GEO)',
-  serviceType: 'Generative Engine Optimization',
+  name: serviceName,
+  /* serviceType solo cuando ES el servicio de GEO — es un término de industria
+     concreto, no una etiqueta genérica que aplique a los siete. */
+  ...(data.checker ? { serviceType: 'Generative Engine Optimization' } : {}),
   description,
   url: canonicalURL,
   inLanguage: lang,
@@ -186,7 +201,9 @@ const breadcrumbSchema = {
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: 'SCUART', item: homeUrl },
     { '@type': 'ListItem', position: 2, name: servicesLabel, item: `${homeUrl}#services` },
-    { '@type': 'ListItem', position: 3, name: 'AI Visibility · GEO', item: canonicalURL },
+    /* Mismo bug que en serviceSchema: estaba fijo en "AI Visibility · GEO"
+       para las 7 páginas. */
+    { '@type': 'ListItem', position: 3, name: serviceName, item: canonicalURL },
   ],
 };
 
@@ -772,76 +789,250 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
     color: var(--ink-62);
     margin: 0;
   }
+  /* Nota al pie del informe (2026-08-14: bajó del encabezado al final).
+     Arriba competía con el veredicto y empujaba lo accionable fuera de
+     pantalla; acá cierra y aclara el alcance sin robar la primera lectura. */
   :global(.geo-result__disclaimer) {
     font-family: var(--font-body);
     font-size: 0.82rem;
     line-height: 1.5;
     color: var(--ink-62);
-    margin: 0;
-    max-width: 42ch;
+    margin: 0 0 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--hairline);
+    max-width: 58ch;
   }
   :global(.geo-result__disclaimer strong) {
     color: var(--ink-92, var(--ink-62));
     font-weight: 600;
   }
 
-  :global(.geo-result__list) {
-    list-style: none;
-    margin: 0 0 1.5rem;
-    padding: 0;
-    display: grid;
-    gap: 0.85rem;
-  }
-  /* Dos columnas desde tablet: 8 checks en una sola columna obligaban a
-     scrollear para ver el resultado completo. */
-  @media (min-width: 768px) {
-    :global(.geo-result__list) {
-      grid-template-columns: 1fr 1fr;
-      gap: 1.1rem 2rem;
-    }
-  }
-  :global(.geo-result__item) {
-    display: flex;
-    gap: 0.7rem;
+  /* ── Informe (reemplaza la lista plana, 2026-08-14) ───────────
+     La jerarquía la da el ORDEN y el PESO, no el color: primero lo que hay
+     que arreglar en tamaño de lectura, después lo resuelto en un <details>
+     cerrado. Sin verde/rojo de semáforo — el sitio es crema y tinta, y un
+     rojo de alerta acá se vería como un plugin pegado encima. */
+
+  :global(.geo-report__verdict) {
     font-family: var(--font-body);
     font-size: var(--text-body);
-    line-height: 1.5;
+    line-height: 1.45;
     color: var(--ink);
-  }
-  :global(.geo-result__icon) {
-    flex-shrink: 0;
-    width: 1.2em;
-    font-weight: 600;
-  }
-  :global(.geo-result__item[data-pass='false'] .geo-result__icon) { color: var(--ink); }
-  :global(.geo-result__item[data-pass='true'] .geo-result__icon) { color: var(--ink-42); }
-  /* Lo que FALLA pesa más que lo que pasa — es lo accionable. */
-  :global(.geo-result__item[data-pass='true'] strong) { font-weight: 400; color: var(--ink-62); }
-  :global(.geo-result__detail) {
-    color: var(--ink-62);
-    font-size: var(--text-mono);
+    margin: 0;
+    /* 52ch, no 34: a 34 el veredicto partía en dos renglones cortos al lado
+       del score y dejaba media pantalla vacía a la derecha en desktop. */
+    max-width: 52ch;
+    text-wrap: balance;
   }
 
-  :global(.geo-result__prio) {
+  :global(.geo-report__group) {
     border-top: 1px solid var(--hairline);
-    padding-top: 1.25rem;
-    margin-bottom: 1.5rem;
+    padding-top: clamp(1rem, 2.5vw, 1.5rem);
+    margin-bottom: clamp(1.25rem, 3vw, 2rem);
   }
-  :global(.geo-result__prio-label) {
+  :global(.geo-report__grouplabel) {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
     font-family: var(--font-body);
     font-size: var(--text-mono);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--ink-62);
-    margin: 0 0 0.6rem;
+    margin: 0 0 1.1rem;
   }
-  :global(.geo-result__prio ol) {
+  /* El contador en un círculo de hairline: da peso de "informe" sin recurrir
+     a un badge de color. */
+  :global(.geo-report__count) {
+    display: grid;
+    place-items: center;
+    min-width: 1.7em;
+    height: 1.7em;
+    border: 1px solid var(--hairline);
+    border-radius: 50%;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  :global(.geo-report__fixes) {
+    list-style: none;
     margin: 0;
-    padding-left: 1.2em;
+    padding: 0;
+    display: grid;
+    gap: clamp(1rem, 2.5vw, 1.4rem);
+  }
+  /* Cada falla es una entrada con su barra a la izquierda. El grosor de la
+     barra codifica la severidad — más discreto que un color y funciona igual
+     en escala de grises o para alguien con daltonismo. */
+  :global(.geo-report__fix) {
+    position: relative;
+    padding-left: 1.1rem;
+  }
+  :global(.geo-report__fix)::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.35em;
+    bottom: 0.15em;
+    width: 2px;
+    background: var(--ink-42);
+  }
+  :global(.geo-report__fix[data-nivel='critico'])::before {
+    width: 4px;
+    background: var(--ink);
+  }
+  :global(.geo-report__fix[data-nivel='importante'])::before {
+    width: 3px;
+    background: var(--ink-62);
+  }
+  :global(.geo-report__tag) {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-62);
+    margin-bottom: 0.35rem;
+  }
+  :global(.geo-report__fix[data-nivel='critico'] .geo-report__tag) {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  :global(.geo-report__fixtitle) {
     font-family: var(--font-body);
     font-size: var(--text-body);
-    line-height: 1.7;
+    font-weight: 600;
+    line-height: 1.35;
     color: var(--ink);
+    margin: 0 0 0.3rem;
+    max-width: 40ch;
+  }
+  :global(.geo-report__fixdetail) {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    line-height: 1.6;
+    color: var(--ink-62);
+    margin: 0;
+    max-width: 58ch;
+  }
+
+  :global(.geo-report__perfect) {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--ink);
+    border-top: 1px solid var(--hairline);
+    padding-top: 1.25rem;
+    margin: 0 0 1.5rem;
+    max-width: 52ch;
+  }
+
+  /* Lo resuelto: colapsado por defecto. Confirma sin robarle lectura a lo
+     accionable, y quien quiera el detalle lo abre. */
+  :global(.geo-report__ok) {
+    border-top: 1px solid var(--hairline);
+    padding-top: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  :global(.geo-report__ok summary) {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-62);
+    cursor: pointer;
+    /* 44px de alto táctil sin tocar el layout visual (norma del sitio). */
+    padding-block: 0.7rem;
+    list-style: none;
+  }
+  :global(.geo-report__ok summary)::-webkit-details-marker { display: none; }
+  :global(.geo-report__ok summary)::after {
+    content: '+';
+    margin-left: 0.5em;
+    color: var(--ink-42);
+  }
+  :global(.geo-report__ok[open] summary)::after { content: '–'; }
+  :global(.geo-report__ok summary:hover) { color: var(--ink); }
+  :global(.geo-report__ok summary:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+  :global(.geo-report__okcount) {
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+  :global(.geo-report__oklist) {
+    list-style: none;
+    margin: 0.5rem 0 0.75rem;
+    padding: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  @media (min-width: 768px) {
+    :global(.geo-report__oklist) {
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7rem 2rem;
+    }
+  }
+  :global(.geo-report__oklist li) {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    line-height: 1.5;
+    color: var(--ink-62);
+  }
+  :global(.geo-report__oklist strong) {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  :global(.geo-report__okdetail) { display: block; }
+
+  /* Sin datos: ni aprobado ni falla. Se muestra en gris y sin ícono para que
+     se lea como lo que es — una zona que el checker no pudo medir. */
+  :global(.geo-report__nodata) {
+    border-top: 1px solid var(--hairline);
+    padding-top: 1rem;
+    margin-bottom: 1.25rem;
+  }
+  :global(.geo-report__nodata p) {
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    line-height: 1.6;
+    color: var(--ink-62);
+    margin: 0 0 0.5rem;
+    max-width: 58ch;
+  }
+  :global(.geo-report__nodata strong) { color: var(--ink); font-weight: 500; }
+
+  /* CTA del resultado — BUG PREEXISTENTE, arreglado 2026-08-14.
+     .geo-cta se declara arriba sin :global, así que Astro le agrega el atributo
+     de scope (data-astro-cid-…) al selector Y a los elementos del .astro. El
+     enlace del resultado lo inyecta el JS con innerHTML, o sea NO lleva ese
+     atributo: no matcheaba ninguna regla y salía como un <a> pelado —azul,
+     subrayado, con el estilo por defecto del navegador— justo en el CTA que
+     cierra la herramienta. Se replica acá con :global para el caso inyectado. */
+  :global(.geo-result .geo-cta) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    position: relative;
+    margin-top: 0;
+    font-family: var(--font-body);
+    font-size: var(--text-mono);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 0.3em;
+    transition: gap 0.3s ease, opacity 0.3s ease;
+  }
+  :global(.geo-result .geo-cta:hover) { gap: 0.9em; opacity: 0.7; }
+  /* Misma área táctil de 44px que el resto de los CTA del sitio. */
+  :global(.geo-result .geo-cta)::after {
+    content: '';
+    position: absolute;
+    inset: -12px -8px;
   }
   .geo-checker__input {
     flex: 1 1 16rem;
@@ -1022,7 +1213,11 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   .geo-index__num {
     font-family: var(--font-body);
     font-size: var(--text-mono);
-    color: var(--ink-42);
+    /* --ink-62, no --ink-42: sobre el crema el 42% da 2.7:1 y AA pide 4.5:1
+       (medido). El 42% sirve para numerales fantasma decorativos, pero acá el
+       numeral es parte del texto del enlace. Mismo fix que en el toggle de
+       idioma del pie (QA 2026-07-21). */
+    color: var(--ink-62);
     flex-shrink: 0;
   }
   .geo-index__name {
@@ -1130,10 +1325,11 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   /* ── Entrada del resultado del checker ────────────────────────
      Misma curva y duración que [data-geo-reveal] — el resultado se
      comporta como cualquier bloque del sitio, no como un widget aparte.
-     Los checks entran escalonados con un delay por índice que pone el JS
-     en --i; el score cuenta de 0 a su valor (ver script). */
-  :global(.geo-result__item),
-  :global(.geo-result__prio),
+     Los bloques del informe entran escalonados con un delay por índice que
+     pone el JS en --i; el score cuenta de 0 a su valor (ver script). */
+  :global(.geo-report__fix),
+  :global(.geo-report__ok),
+  :global(.geo-report__nodata),
   :global(.geo-result .geo-cta) {
     opacity: 0;
     transform: translateY(14px);
@@ -1146,8 +1342,9 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    :global(.geo-result__item),
-    :global(.geo-result__prio),
+    :global(.geo-report__fix),
+    :global(.geo-report__ok),
+    :global(.geo-report__nodata),
     :global(.geo-result .geo-cta) {
       animation: none;
       opacity: 1;
@@ -1274,22 +1471,89 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
           return;
         }
 
+        /* ── Informe, no lista ────────────────────────────────────────
+           Antes esto era una lista plana de 8 ítems donde un ✕ crítico pesaba
+           lo mismo que un ✓ menor, y el número suelto no decía qué hacer
+           (William: "el resultado es algo que no se entiende"). Ahora:
+             1. Veredicto en UNA frase — qué significa ese número.
+             2. Lo que hay que arreglar, con el detalle de QUÉ hacer, ordenado
+                por severidad. Es lo primero que se lee porque es lo accionable.
+             3. Lo que ya está bien, en una lista compacta y secundaria.
+             4. Lo que no se pudo medir, aparte y sin fingir veredicto. */
+        type Chk = { pass: boolean; label: string; detail: string; skipped: boolean; nivel: string };
         const nivel = data.score >= 80 ? 'alto' : data.score >= 55 ? 'medio' : 'bajo';
-        const items = data.checks
-          .map(
-            (c: { pass: boolean; label: string; detail: string }) =>
-              `<li class="geo-result__item" data-pass="${c.pass}">
-                 <span class="geo-result__icon" aria-hidden="true">${c.pass ? '✓' : '✕'}</span>
-                 <span><strong>${esc(c.label)}</strong><br><span class="geo-result__detail">${esc(c.detail)}</span></span>
-               </li>`,
-          )
-          .join('');
+        const checks: Chk[] = data.checks;
+        /* Ordenar por severidad. `data.prioridades` ya viene ordenado pero solo
+           trae 3; acá se listan TODAS las fallas, así que hay que reordenarlas
+           o salen en orden de declaración del endpoint — con el crítico
+           enterrado debajo de dos menores, que es exactamente lo contrario de
+           lo que un informe tiene que hacer. */
+        const RANGO: Record<string, number> = { critico: 0, importante: 1, menor: 2 };
+        const fallan = checks
+          .filter(c => !c.pass && !c.skipped)
+          .sort((a, b) => (RANGO[a.nivel] ?? 2) - (RANGO[b.nivel] ?? 2));
+        const pasan = checks.filter(c => c.pass && !c.skipped);
+        const sinDatos = checks.filter(c => c.skipped);
 
-        const prios = data.prioridades.length
-          ? `<div class="geo-result__prio">
-               <p class="geo-result__prio-label">${esc(form.dataset.prioLabel || 'Lo que movería la aguja primero')}</p>
-               <ol>${data.prioridades.map((p: { label: string }) => `<li>${esc(p.label)}</li>`).join('')}</ol>
+        /* El veredicto traduce el número. Un "80/100" no le dice nada a un
+           dueño de negocio; "la base está, falta lo que te hace citable" sí.
+           Los textos del informe los arma el JS, así que necesitan las dos
+           versiones: la página EN existe y sin esto salía el informe en
+           español debajo de un encabezado en inglés. */
+        const en = document.documentElement.lang.startsWith('en');
+        const VEREDICTO: Record<string, string> = en
+          ? {
+              alto: 'The technical foundation is solid. What is left are fine adjustments.',
+              medio: 'AI engines can read your site, but it is missing what makes it quotable.',
+              bajo: 'There are technical barriers stopping AI from understanding your business.',
+            }
+          : {
+              alto: 'La base técnica está sólida. Lo que queda son ajustes finos.',
+              medio: 'La IA puede leer tu sitio, pero le falta lo que lo hace citable.',
+              bajo: 'Hay barreras técnicas que le impiden a la IA entender tu negocio.',
+            };
+        const ETIQUETA: Record<string, string> = en
+          ? { critico: 'Critical', importante: 'Important', menor: 'Minor' }
+          : { critico: 'Crítico', importante: 'Importante', menor: 'Menor' };
+        const TXT = en
+          ? {
+              perfecto: 'We found no technical failures. That is uncommon — from here the work is content, not configuration.',
+              resueltos: (n: number) => `${n === 1 ? 'point' : 'points'} already solved`,
+              sinDatos: 'No data',
+            }
+          : {
+              perfecto: 'No encontramos ninguna falla técnica. Es poco común — el trabajo acá pasa a ser de contenido, no de configuración.',
+              resueltos: (n: number) => `${n === 1 ? 'punto ya resuelto' : 'puntos ya resueltos'}`,
+              sinDatos: 'Sin datos',
+            };
+
+        const bloqueFallas = fallan.length
+          ? `<div class="geo-report__group" data-tone="fix">
+               <p class="geo-report__grouplabel">
+                 ${esc(form.dataset.prioLabel || 'Lo que hay que arreglar')}
+                 <span class="geo-report__count">${fallan.length}</span>
+               </p>
+               <ol class="geo-report__fixes">${fallan.map((c, i) => `
+                 <li class="geo-report__fix" data-nivel="${esc(c.nivel)}" style="--i:${i}">
+                   <span class="geo-report__tag">${esc(ETIQUETA[c.nivel] ?? 'Menor')}</span>
+                   <p class="geo-report__fixtitle">${esc(c.label)}</p>
+                   <p class="geo-report__fixdetail">${esc(c.detail)}</p>
+                 </li>`).join('')}</ol>
              </div>`
+          : `<p class="geo-report__perfect">${esc(TXT.perfecto)}</p>`;
+
+        /* Lo que pasa va colapsado: confirma sin competir con lo accionable. */
+        const bloqueOk = pasan.length
+          ? `<details class="geo-report__ok">
+               <summary><span class="geo-report__okcount">${pasan.length}</span> ${esc(TXT.resueltos(pasan.length))}</summary>
+               <ul class="geo-report__oklist">${pasan.map(c => `
+                 <li><span aria-hidden="true">✓</span> <strong>${esc(c.label)}</strong> <span class="geo-report__okdetail">${esc(c.detail)}</span></li>`).join('')}</ul>
+             </details>`
+          : '';
+
+        const bloqueSinDatos = sinDatos.length
+          ? `<div class="geo-report__nodata">${sinDatos.map(c => `
+               <p><strong>${esc(TXT.sinDatos)} — ${esc(c.label)}.</strong> ${esc(c.detail)}</p>`).join('')}</div>`
           : '';
 
         const waMsg = `${form.dataset.waMessage ?? ''} ${data.url} (score ${data.score}/100)`;
@@ -1301,17 +1565,22 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
           `<div class="geo-result__head">
              <span class="geo-result__score" data-nivel="${nivel}"><span data-score-num>0</span><span class="geo-result__score-max">/100</span></span>
              <div class="geo-result__headtext">
-               <p class="geo-result__scorelabel">Preparación técnica · ${esc(data.host)}</p>
-               <p class="geo-result__disclaimer">Esto mide si la IA <strong>puede</strong> leerte. No mide si te <strong>menciona</strong> — eso se sabe preguntándole a los motores, y es el diagnóstico.</p>
+               <p class="geo-result__scorelabel">${en ? 'Technical readiness' : 'Preparación técnica'} · ${esc(data.host)}</p>
+               <p class="geo-report__verdict">${esc(VEREDICTO[nivel])}</p>
              </div>
            </div>
-           <ul class="geo-result__list">${items}</ul>
-           ${prios}
+           ${bloqueFallas}
+           ${bloqueOk}
+           ${bloqueSinDatos}
+           <p class="geo-result__disclaimer">${
+             en
+               ? 'This measures whether AI <strong>can</strong> read you. It does not measure whether it <strong>mentions</strong> you — that is found by asking the engines, and that is the diagnosis.'
+               : 'Esto mide si la IA <strong>puede</strong> leerte. No mide si te <strong>menciona</strong> — eso se sabe preguntándole a los motores, y es el diagnóstico.'
+           }</p>
            <a class="geo-cta" href="${waLink}" target="_blank" rel="noopener noreferrer">${esc(form.dataset.waCta || 'Hablemos del resto')} <span aria-hidden="true">↗</span></a>`;
 
-        /* Stagger: cada elemento recibe su índice; el CSS lo convierte en delay.
-           Los checks entran en secuencia, después las prioridades, después el CTA. */
-        const animables = out.querySelectorAll<HTMLElement>('.geo-result__item, .geo-result__prio, .geo-cta');
+        /* Stagger sobre los bloques del informe, no sobre 8 ítems sueltos. */
+        const animables = out.querySelectorAll<HTMLElement>('.geo-report__fix, .geo-report__ok, .geo-report__nodata, .geo-cta');
         animables.forEach((el, i) => el.style.setProperty('--i', String(i)));
 
         /* Conteo del score 0 → valor. Da la sensación de "medición" en curso.

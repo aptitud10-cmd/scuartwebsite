@@ -205,14 +205,33 @@ const capabilities = [
 /* inset:0 por defecto (relativo a .hero). En desktop (≥1280px) .hero gana
    max-width y el grain se libera a full-bleed real vía 100vw/-50vw — ver
    media query desktop más abajo. */
+/* APAGADO (2026-08-13). William reportó tres veces, con captura, que el hero
+   se veía como un bloque gris distinto del resto de la página — primero como
+   un recuadro con bordes laterales, después como una banda contra el
+   manifiesto blanco de abajo.
+
+   CAUSA: el sitio tenía DOS granos. El global (body::after en global.css,
+   opacity 0.03) cubre TODA la página; este, propio del hero, sumaba una
+   segunda capa que ninguna otra sección tiene. Estaba a opacity 0.5 —16 veces
+   el global— y bajarlo a 0.06 NO alcanzó: la diferencia seguía siendo visible
+   en pantalla real.
+
+   POR QUÉ SE APAGA EN VEZ DE SEGUIR AFINÁNDOLO: el hero ya recibe el grano
+   global como el resto del sitio, así que no pierde textura — pierde la capa
+   DUPLICADA que lo separaba visualmente. Misma decisión y mismo criterio que
+   con el grano en iOS (ver global.css): se estaba pagando un defecto visible
+   por una textura que nadie ve.
+
+   NOTA DE MÉTODO: Chromium headless NUNCA reprodujo este defecto. Medí once
+   columnas de 850px, muestreé el borde exacto entre secciones, comparé
+   desviación estándar dentro y fuera — todo dio idéntico, antes y después.
+   No confiar en la medición headless para juzgar esta capa: solo la pantalla
+   real de William lo mostró. Mismo caso que feedback_parpadeo_ios_grain.
+
+   El div .hero-grain se conserva en el markup (aria-hidden) por si se quiere
+   reactivar con otro tratamiento; hoy no pinta nada. */
 .hero-grain {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.5;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  mix-blend-mode: multiply;
+  display: none;
 }
 
 /* ─── BARRA SUPERIOR DE FIRMA ────────────────────────────── */
@@ -468,6 +487,26 @@ const capabilities = [
    (CTA full-width, orden de la banda, alineación de capacidades).
    ═══════════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
+  /* Hueco superior (auditoría 2026-08-12, reporte de William con captura).
+     Medido: 114px en mobile contra 64px en tablet y 32px en desktop — la
+     pantalla MÁS CHICA se comía el margen MÁS GRANDE, un 14% del alto del
+     iPhone antes de que empiece nada, justo en el hero.
+
+     Causa: el clamp(88px, 14vh, 120px) de la regla base. El 14vh está pensado
+     para pantallas anchas y bajas; en un teléfono alto el término vh dispara.
+     Tablet ya tenía la corrección (margin-top: 64px fijo, con el comentario
+     "evita el hueco vertical") pero se aplicó SOLO a su breakpoint — mobile
+     quedó heredando el clamp original. Mismo patrón que las áreas táctiles:
+     el fix existía, en el media query equivocado.
+
+     48px fijo + safe-area: por debajo de tablet (64px) porque hay menos alto
+     que repartir, y con max() para no comerse el notch del iPhone — el hero
+     ya aplica env(safe-area-inset-top) en su padding, así que acá el inset
+     solo actúa si el padding no alcanzó. */
+  .hero-signature {
+    margin-top: max(48px, env(safe-area-inset-top));
+  }
+
   .hero-cta {
     width: 100%;
     min-height: 56px;
@@ -598,8 +637,19 @@ const capabilities = [
        viewport. El CTA, que es el botón que convierte, no se veía en desktop
        aunque sí en mobile y tablet. Con el 1fr activo la fila central absorbe
        el aire sobrante y empuja la banda al fondo, dentro de la pantalla. */
-    max-width: 1728px;
-    margin-inline: auto;
+    /* SIN max-width en .hero (2026-08-12, reporte de William con captura).
+       El tope de 1728px vivía acá, en el CONTENEDOR: el hero medía 1728px
+       centrado y en un monitor más ancho quedaban ~131px a cada lado que
+       pertenecían al body. Aunque el color de los dos fondos es el mismo
+       (rgb(244,242,236) medido en ambos), el borde se percibía igual porque
+       el hero es lo único de la página con ancho acotado — el resto de las
+       secciones (manifesto, portfolio, services, contact, foot) ya iban a
+       0→100% del viewport, así que el corte se leía como un recuadro.
+
+       El tope pasa a los HIJOS (.hero-signature, .hero-frase, .hero-band):
+       gobierna la COMPOSICIÓN —que es lo que hay que acotar para que la
+       frase no se estire en ultrawide— mientras la superficie del hero llega
+       a los bordes como todas las demás secciones. */
     /* height fijo: el hero es una portada, ocupa exactamente una pantalla.
        Sin esto el contenido vuelve a empujar la banda fuera. Se DESCUENTA
        --cookiebar-h: con height:100vh a secas el grid reparte sobre la altura
@@ -615,13 +665,34 @@ const capabilities = [
   /* el grano/textura recupera full-bleed real: .hero ya no es 100% del
      viewport (tiene max-width:1728px centrado), así que el grain se libera
      del contenedor con el truco 100vw/-50vw. overflow-x:clip en .hero
-     (heredado, ver regla base) contiene cualquier desborde horizontal. */
-  .hero-grain {
-    left: 50%;
-    right: auto;
-    width: 100vw;
-    margin-left: -50vw;
+     (heredado, ver regla base) contiene cualquier desborde horizontal.
+
+     COSTURA LATERAL (corregido 2026-08-12, reporte de William con captura en
+     un monitor de 2000px+): el grano salía a 100vw pero el FONDO del hero se
+     quedaba en 1728px. Como el grano lleva mix-blend-mode: multiply, los
+     ~136px de cada lado quedaban levemente MÁS OSCUROS que el centro y se
+     leía un recuadro — no como decisión editorial, sino como si el sitio no
+     hubiera terminado de cargar. Los dos fondos ya eran el mismo color
+     (medido: rgb(244,242,236) en .hero y en body); el borde lo dibujaba el
+     blend, no el color.
+
+     Se arregla llevando el FONDO a full-bleed en vez de achicar el grano: el
+     tope de 1728px sigue gobernando la COMPOSICIÓN (sin él la frase se
+     estira y se pierde en ultrawide), pero la superficie pintada llega a los
+     bordes y la costura desaparece. */
+  /* El tope de composición, ahora en los hijos: cada bloque del hero se
+     centra dentro de 1728px mientras el .hero llega a los bordes. */
+  .hero-signature,
+  .hero-frase,
+  .hero-band {
+    max-width: 1728px;
+    margin-inline: auto;
+    width: 100%;
   }
+
+  /* El bloque que liberaba .hero-grain a 100vw se eliminó: el grano propio del
+     hero está apagado (ver la regla base). El grano global de body::after ya
+     es `position: fixed; inset: 0`, así que cubre el ancho completo solo. */
 
   .hero-frase {
     /* align-self:center, no start (fix 2026-08-04): con el 1fr activo la fila

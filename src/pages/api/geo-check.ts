@@ -16,9 +16,17 @@
  *   3. <title> presente y de largo razonable
  *   4. meta description presente y de largo razonable
  *   5. Un solo <h1> y jerarquía de headings
- *   6. sitemap.xml accesible
- *   7. Contenido en formato answer-first (preguntas como headings)
- *   8. Imágenes con alt
+ *   6. Sitemap (declarado en robots.txt o en las rutas convencionales)
+ *   7. Contenido en formato answer-first (headings, <summary> o FAQPage)
+ *   8. Imágenes con alt (alt="" cuenta como correcto: es decorativa)
+ *   9. Identidad verificable: tipo de negocio + ubicación + contacto en schema
+ *  10. Contenido con fecha (dateModified / datePublished / OpenGraph)
+ *
+ * TRES ESTADOS, no dos: un check puede pasar, fallar, o quedar SIN DATOS
+ * (`skipped`) cuando la evidencia no alcanza para decidir — por ejemplo un
+ * sitio que inyecta las imágenes con JavaScript. Los `skipped` salen del
+ * denominador del score: inventar un veredicto sin evidencia es peor que
+ * admitir que no se pudo medir.
  *
  * SEGURIDAD:
  * - Solo acepta http/https. Bloquea IPs privadas/localhost (anti-SSRF).
@@ -83,7 +91,7 @@ function isPrivateIp(ip: string): boolean {
   }
   // IPv4
   const p = a.split(".").map(Number);
-  if (p.length !== 4 || p.some((n) => Number.isNaN(n) || n < 0 || n > 255))
+  if (p.length !== 4 || p.some(n => Number.isNaN(n) || n < 0 || n > 255))
     return true; // malformada → bloquear por las dudas
   const [x, y] = p;
   return (
@@ -116,7 +124,7 @@ function normalizeUrl(raw: string): URL | null {
     h === "localhost" ||
     h.endsWith(".localhost") ||
     h.endsWith(".internal") ||
-    !h.includes(".") && !h.includes(":") // sin punto ni ':' = no es hostname/IP válido público
+    (!h.includes(".") && !h.includes(":")) // sin punto ni ':' = no es hostname/IP válido público
   ) {
     return null;
   }
@@ -134,7 +142,7 @@ async function hostResolvesToPublicIp(hostname: string): Promise<boolean> {
   try {
     const results = await lookup(hostname, { all: true });
     if (!results.length) return false;
-    return results.every((r) => !isPrivateIp(r.address));
+    return results.every(r => !isPrivateIp(r.address));
   } catch {
     return false; // no resuelve → no conectar
   }
@@ -215,6 +223,13 @@ interface Check {
   pass: boolean;
   detail: string;
   weight: number;
+  /* true = no se pudo medir con la información disponible. No entra en el
+     score (ni suma ni resta) y se muestra como "sin datos", no como falla.
+     Inventar un veredicto donde no hay evidencia es exactamente lo que hace
+     inútil a un checker. */
+  skipped?: boolean;
+  /* Severidad para agrupar el informe: qué tan caro es NO tener esto. */
+  nivel?: "critico" | "importante" | "menor";
 }
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
@@ -262,12 +277,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     );
   }
 
-  /* ── Descargar home, robots.txt y sitemap en paralelo ───────── */
+  /* ── Descargar home y robots.txt en paralelo ───────────────────
+     El sitemap va DESPUÉS porque su ubicación puede estar declarada dentro
+     del robots.txt (ver check 6). */
   const origin = target.origin;
-  const [home, robots, sitemap] = await Promise.all([
+  const [home, robots] = await Promise.all([
     fetchText(target.href),
     fetchText(`${origin}/robots.txt`),
-    fetchText(`${origin}/sitemap.xml`),
   ]);
 
   if (!home.ok || !home.text) {
@@ -282,7 +298,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
 
   const html = home.text;
-  const lower = html.toLowerCase();
   const checks: Check[] = [];
 
   /* 1 — robots.txt no bloquea a los bots de IA (la palanca #1) */
@@ -387,15 +402,50 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     weight: 1,
   });
 
-  /* 6 — sitemap.xml */
-  const haySitemap = sitemap.ok && /<(urlset|sitemapindex)/i.test(sitemap.text);
+  /* 6 — Sitemap
+     CORREGIDO 2026-08-14: antes solo probaba /sitemap.xml. Eso reprobaba a
+     sitios BIEN configurados por dos razones distintas:
+       · La forma canónica de declarar un sitemap es la línea `Sitemap:` del
+         robots.txt, y el archivo puede llamarse como sea y vivir donde sea.
+       · Astro con @astrojs/sitemap genera /sitemap-index.xml, NO /sitemap.xml
+         — o sea, el propio scuart.com se reprobaba a sí mismo.
+     Ahora se prueba en orden: lo declarado en robots.txt primero (es la
+     fuente de verdad), y si no hay declaración, las dos rutas convencionales. */
+  const declarados = [...robotsTxt.matchAll(/^\s*sitemap:\s*(\S+)/gim)]
+    .map(m => m[1].trim())
+    .slice(0, 3); // no seguir una lista infinita que nos mande un sitio hostil
+
+  const candidatos = declarados.length
+    ? declarados
+    : [`${origin}/sitemap-index.xml`, `${origin}/sitemap.xml`];
+
+  let sitemapUrl = "";
+  for (const c of candidatos) {
+    const r = await fetchText(c);
+    if (r.ok && /<(urlset|sitemapindex)/i.test(r.text)) {
+      sitemapUrl = c;
+      break;
+    }
+  }
+  const haySitemap = Boolean(sitemapUrl);
+  /* La ruta que se muestra, no la URL entera: en el resultado se lee mejor
+     "/sitemap-index.xml" que "https://sitio.com/sitemap-index.xml". */
+  const sitemapPath = (() => {
+    try {
+      return new URL(sitemapUrl).pathname;
+    } catch {
+      return sitemapUrl;
+    }
+  })();
   checks.push({
     id: "sitemap",
-    label: "Sitemap.xml",
+    label: "Sitemap",
     pass: haySitemap,
     detail: haySitemap
-      ? "Accesible en /sitemap.xml."
-      : "No encontramos /sitemap.xml — los crawlers tienen que descubrir tus páginas a mano.",
+      ? declarados.length
+        ? `Declarado en robots.txt y accesible en ${sitemapPath}.`
+        : `Accesible en ${sitemapPath}. Conviene además declararlo con una línea "Sitemap:" en robots.txt.`
+      : "No encontramos sitemap ni en robots.txt ni en las rutas habituales — los crawlers tienen que descubrir tus páginas a mano.",
     weight: 1,
   });
 
@@ -433,46 +483,169 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     weight: 2,
   });
 
-  /* 8 — Imágenes con alt */
+  /* 8 — Imágenes con alt
+     MATIZADO 2026-08-14: este check lee el HTML que devuelve el servidor, no
+     el DOM ya renderizado. Cuando no hay ni un <img>, hay dos causas posibles
+     y opuestas: el sitio no usa imágenes (scuart.com: todo CSS y SVG inline),
+     o las inyecta con JavaScript y no las vemos. Dar "✓ Las imágenes tienen
+     alt" en ese caso es un aprobado que no midió nada. Ahora ese caso se
+     marca aparte —no suma ni resta al score— en vez de mentir un aprobado. */
   const imgs = html.match(/<img[^>]*>/gi) ?? [];
-  const sinAlt = imgs.filter(
-    i => !/\salt\s*=\s*["'][^"']+["']/i.test(i)
+  /* alt="" NO es un alt faltante: es la forma CORRECTA de marcar una imagen
+     decorativa para que un lector de pantalla la ignore (WAI: "null alt").
+     El patrón típico es una imagen que se repite en dos variantes responsive
+     — una lleva el alt real y la duplicada lleva alt="" a propósito.
+     Contarla como falla, como se hacía antes, reprobaba justamente al sitio
+     que hizo bien las cosas: el propio scuart.com daba "3 de 6 sin alt".
+     Lo que sí es falla es NO tener el atributo. */
+  const decorativas = imgs.filter(i =>
+    /\salt\s*=\s*(["'])\s*\1/i.test(i)
   ).length;
+  const sinAlt = imgs.filter(i => !/\salt\s*=/i.test(i)).length;
+  const sinImagenes = imgs.length === 0;
   checks.push({
     id: "alt",
     label: "Imágenes descritas (alt)",
-    pass: imgs.length === 0 || sinAlt === 0,
-    detail:
-      imgs.length === 0
-        ? "No hay imágenes en el home."
-        : sinAlt === 0
-          ? `Las ${imgs.length} imágenes tienen alt.`
-          : `${sinAlt} de ${imgs.length} imágenes sin alt.`,
+    pass: sinAlt === 0,
+    /* Sin <img> en el HTML no hay nada que medir: se saca del score para que
+       ni premie ni castigue (ver cálculo del score más abajo). */
+    skipped: sinImagenes,
+    detail: sinImagenes
+      ? "No hay etiquetas <img> en el HTML del servidor. Si tu sitio muestra imágenes cargadas con JavaScript, este punto hay que revisarlo a mano."
+      : sinAlt === 0
+        ? decorativas
+          ? `Las ${imgs.length} imágenes tienen alt (${decorativas} marcada${decorativas > 1 ? "s" : ""} como decorativa con alt="", que es lo correcto).`
+          : `Las ${imgs.length} imágenes tienen alt.`
+        : `${sinAlt} de ${imgs.length} imágenes sin atributo alt. Un motor generativo no ve la foto: lee el alt.`,
     weight: 1,
   });
 
-  /* ── Score ponderado ────────────────────────────────────────── */
-  const totalPeso = checks.reduce((a, c) => a + c.weight, 0);
-  const logrado = checks.reduce((a, c) => a + (c.pass ? c.weight : 0), 0);
-  const score = Math.round((logrado / totalPeso) * 100);
+  /* 9 — Identidad verificable: ¿la IA puede saber QUIÉN sos y DÓNDE estás?
+     AGREGADO 2026-08-14. Es la diferencia real entre "el sitio está bien
+     hecho" y "el sitio está preparado para GEO". Cuando alguien le pregunta a
+     un motor "¿quién hace X en mi zona?", lo que se cita no es el sitio con el
+     <title> más lindo: es aquel del que el motor puede extraer entidad,
+     ubicación y forma de contacto sin inferir nada. Un schema de tipo
+     Organization/LocalBusiness con dirección y teléfono es exactamente eso.
+     Este check mira el JSON-LD que ya se parseó, no vuelve a descargar nada. */
+  const ldRaw = ldMatches.map(b => b.replace(/<[^>]+>/g, "")).join(" ");
+  const TIPOS_ENTIDAD = [
+    "Organization",
+    "LocalBusiness",
+    "ProfessionalService",
+    "Person",
+    "Restaurant",
+    "HairSalon",
+    "Store",
+  ];
+  const tieneEntidad = [...tipos].some(t => TIPOS_ENTIDAD.includes(t));
+  const tieneDireccion = /"(address|PostalAddress|areaServed)"/i.test(ldRaw);
+  const tieneContacto = /"(telephone|email|contactPoint|sameAs)"/i.test(ldRaw);
+  const señales = [tieneEntidad, tieneDireccion, tieneContacto].filter(
+    Boolean
+  ).length;
+  const faltan = [
+    !tieneEntidad && "el tipo de negocio",
+    !tieneDireccion && "la dirección o zona de servicio",
+    !tieneContacto && "un contacto (teléfono, email o perfiles)",
+  ].filter(Boolean);
+  checks.push({
+    id: "entidad",
+    label: "La IA sabe quién sos y dónde estás",
+    /* Con 2 de 3 alcanza: hay negocios legítimamente sin dirección física
+       (un estudio remoto) y exigir las tres reprobaría a quien no tiene local. */
+    pass: tieneEntidad && señales >= 2,
+    detail: tieneEntidad
+      ? señales === 3
+        ? "Tu schema declara qué tipo de negocio sos, dónde operás y cómo contactarte. Es lo que un motor necesita para citarte en una respuesta local."
+        : `Tu schema te identifica, pero le falta ${faltan.join(" y ")}. Sin eso, la IA no te propone cuando alguien pregunta por tu zona.`
+      : "No hay un schema de negocio (Organization, LocalBusiness o similar). La IA puede leer tu sitio pero no sabe qué entidad sos.",
+    weight: 2,
+  });
 
-  /* Las 3 fallas de mayor peso — "lo que movería la aguja primero" */
+  /* 10 — Contenido fechado
+     AGREGADO 2026-08-14. Los motores generativos priorizan lo que pueden datar:
+     ante dos fuentes que dicen lo mismo, citan la que declara cuándo se escribió.
+     Se acepta dateModified/datePublished en JSON-LD o el meta de OpenGraph.
+     Peso 1: importa, pero no arruina a un sitio institucional sin blog. */
+  const tieneFecha =
+    /"(dateModified|datePublished)"\s*:/i.test(ldRaw) ||
+    /<meta[^>]+property=["']article:(published|modified)_time["']/i.test(html);
+  checks.push({
+    id: "frescura",
+    label: "Contenido con fecha",
+    pass: tieneFecha,
+    detail: tieneFecha
+      ? "Tu contenido declara cuándo se publicó o actualizó — los motores prefieren citar fuentes que pueden datar."
+      : "Ninguna página declara fecha de publicación o actualización. Ante dos fuentes que dicen lo mismo, la IA cita la que puede fechar.",
+    weight: 1,
+  });
+
+  /* ── Severidad por check ──────────────────────────────────────
+     El peso decide cuánto mueve el score; el nivel decide cómo se AGRUPA en
+     el informe. Son cosas distintas: "no tenés schema" pesa 2 y es importante,
+     pero "robots.txt bloquea a GPTBot" invalida todo lo demás — por eso es
+     crítico aunque la diferencia de peso sea de solo un punto. */
+  const NIVELES: Record<string, Check["nivel"]> = {
+    "ai-bots": "critico",
+    entidad: "critico",
+    schema: "importante",
+    "answer-first": "importante",
+    title: "importante",
+    description: "menor",
+    h1: "menor",
+    sitemap: "menor",
+    alt: "menor",
+    frescura: "menor",
+  };
+  for (const c of checks) c.nivel = NIVELES[c.id] ?? "menor";
+
+  /* ── Score ponderado ──────────────────────────────────────────
+     Los checks `skipped` salen del denominador: si no se pudo medir, no puede
+     contar ni a favor ni en contra. Antes un sitio sin <img> sumaba un punto
+     gratis por un check que nunca corrió. */
+  const medibles = checks.filter(c => !c.skipped);
+  const totalPeso = medibles.reduce((a, c) => a + c.weight, 0);
+  const logrado = medibles.reduce((a, c) => a + (c.pass ? c.weight : 0), 0);
+  const score = totalPeso ? Math.round((logrado / totalPeso) * 100) : 0;
+
+  /* Prioridades: primero por severidad, después por peso. Un crítico va arriba
+     de un importante aunque pesen parecido. Se manda el detalle además del
+     label — el front lo necesita para que la lista diga QUÉ hacer, no solo
+     repita el nombre del check. */
+  const ORDEN = { critico: 0, importante: 1, menor: 2 } as const;
   const prioridades = checks
-    .filter(c => !c.pass)
-    .sort((a, b) => b.weight - a.weight)
+    .filter(c => !c.pass && !c.skipped)
+    .sort(
+      (a, b) =>
+        ORDEN[a.nivel ?? "menor"] - ORDEN[b.nivel ?? "menor"] ||
+        b.weight - a.weight
+    )
     .slice(0, 3)
-    .map(c => ({ label: c.label, detail: c.detail }));
+    .map(c => ({ label: c.label, detail: c.detail, nivel: c.nivel }));
+
+  /* Resumen contado, para que el encabezado del informe diga algo concreto
+     en vez de solo un número suelto. */
+  const resumen = {
+    pasan: medibles.filter(c => c.pass).length,
+    fallan: medibles.filter(c => !c.pass).length,
+    sinDatos: checks.length - medibles.length,
+    total: checks.length,
+  };
 
   return json({
     ok: true,
     url: target.href,
     host: target.hostname,
     score,
-    checks: checks.map(({ id, label, pass, detail }) => ({
+    resumen,
+    checks: checks.map(({ id, label, pass, detail, skipped, nivel }) => ({
       id,
       label,
       pass,
       detail,
+      skipped: Boolean(skipped),
+      nivel,
     })),
     prioridades,
   });
