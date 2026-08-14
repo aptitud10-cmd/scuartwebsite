@@ -17,7 +17,10 @@ const data: GeoServiceData = {
   heading: 'Aparece en las respuestas de ChatGPT, no solo en Google.',
   tagline:
     'Tus clientes ya no buscan — preguntan. Si la IA no te menciona, ese cliente nunca llega a tu puerta.',
-  cta: 'Chequear mi sitio gratis',
+  /* 2026-08-14: era "Chequear mi sitio gratis", que prometía un análisis
+     instantáneo del sitio. Ahora el bloque de abajo no analiza el sitio: le
+     pregunta a la IA por el negocio. El CTA dice lo que realmente pasa. */
+  cta: 'Ver si la IA me nombra',
   shift: {
     label: 'El comportamiento ya cambió',
     /* CORREGIDO 2026-08-14 (auditoría de transparencia). Los tres stats tenían
@@ -125,22 +128,47 @@ const data: GeoServiceData = {
       },
     ],
   },
-  checker: {
-    label: '¿Cómo está tu sitio hoy?',
-    body: 'Pega la dirección de tu sitio y lo analizamos al instante: si los motores de IA pueden leerte, si tienes schema, si tu contenido responde preguntas. Sin registro, sin email, sin espera.',
-    placeholder: 'tusitio.com',
-    inputLabel: 'Dirección de tu sitio web',
-    button: 'Analizar mi sitio',
-    note: 'El análisis es técnico y automático. Lo que la IA responde hoy sobre tu negocio lo revisamos juntos — escríbenos con el resultado.',
-    waMessage: 'Hola SCUART, analicé mi sitio con el chequeo GEO:',
-    loadingLabel: 'Analizando…',
-    /* 2026-08-14: era "Lo que movería la aguja primero", que describía un top 3.
-       Ahora el informe lista TODAS las fallas ordenadas por severidad, así que
-       el encabezado dice lo que la lista realmente es. */
-    prioLabel: 'Lo que hay que arreglar',
-    waCta: 'Hablemos de cómo arreglarlo',
-    errorLabel: 'Algo falló. Prueba de nuevo o escríbenos.',
+  /* REEMPLAZA AL CHECKER AUTOMÁTICO (2026-08-14). El anterior pedía una URL,
+     analizaba el HTML y devolvía un score técnico. Tres problemas, todos con
+     fuente — ver la nota larga en GeoServiceLayout.astro:
+       · Medía schema y llms.txt, que el estudio de Ahrefs sobre 1.885 páginas
+         mostró que NO mueven las citaciones (AI Overviews: −4,6%).
+       · Era el mismo widget white-label que venden Insites, AuditSky y Semrush
+         a cualquier agencia. Cero diferenciación y no capturaba contacto.
+       · Score automático + hallazgos genéricos + servicio de ~$250 es el patrón
+         exacto del "AI Visibility Audit Scam" documentado en may 2026.
+     Y sobre todo: el visitante llegaba preguntando "¿aparezco en ChatGPT?" y
+     recibía una auditoría de robots.txt.
+
+     Lo que hay ahora se corre A MANO. Es lento a propósito: esa fricción es lo
+     que separa una auditoría legítima de un score automático. */
+  proof: {
+    label: 'Veamos si apareces',
+    body: 'No hay forma de saberlo mirando tu sitio: hay que preguntarle a la IA. Dinos qué vendes y dónde, y le hacemos tres preguntas reales de cliente a ChatGPT, Perplexity y Gemini. Te mandamos la captura de lo que respondieron — y quién apareció si no fuiste tú.',
+    outcomes: [
+      {
+        title: 'La IA te nombra.',
+        body: 'Apareces por nombre cuando alguien pregunta por lo que vendes. Es la posición que hay que defender: la ganaste, y se puede perder.',
+      },
+      {
+        title: 'La IA usa tu información pero nombra a otro.',
+        body: 'El caso más frustrante y más común. Tu contenido alimentó la respuesta, y el cliente terminó llamando al competidor que sí quedó nombrado.',
+      },
+      {
+        title: 'No apareces.',
+        body: 'Para la IA tu negocio no existe en esa conversación. De 350.000 negocios locales analizados, ChatGPT recomendó apenas el 1,2% — contra el 35,9% que sale en el mapa de Google.',
+      },
+    ],
+    fields: [
+      { name: 'Negocio', label: 'Tu negocio', placeholder: 'Etnia Braids' },
+      { name: 'Zona', label: 'Dónde estás', placeholder: 'Queens, NY' },
+      { name: 'Rubro', label: 'Qué vendes', placeholder: 'trenzas y box braids' },
+    ],
+    button: 'Pedir la prueba',
+    note: 'Gratis y sin compromiso. Lo hacemos a mano —no es un análisis automático— así que tarda hasta 48 horas. Te llega la captura de lo que respondió cada motor.',
+    waMessage: 'Hola SCUART, quiero la prueba de 3 preguntas:',
   },
+
   forWhom: {
     label: '¿Es para tu negocio?',
     yesLabel: 'Funciona muy bien si',

@@ -16,7 +16,8 @@ const data: GeoServiceData = {
   heading: 'Show up in ChatGPT answers, not just Google.',
   tagline:
     "Your clients don't search anymore — they ask. If AI doesn't mention you, that client never reaches your door.",
-  cta: 'Check my site for free',
+  /* See the ES file: the old CTA promised an instant site scan. */
+  cta: 'See if AI names me',
   shift: {
     label: 'The behavior already changed',
     body: "This isn't a prediction — it's measurable. Two in three people already see AI-generated answers when they search, and among the generations deciding where to spend today, three in four use AI daily. Waiting \"to see if this grows\" means giving those clients away.",
@@ -114,21 +115,39 @@ const data: GeoServiceData = {
       },
     ],
   },
-  checker: {
-    label: 'How does your site stand today?',
-    body: 'Paste your website address and we analyze it instantly: whether AI engines can read you, whether you have schema, whether your content answers questions. No signup, no email, no waiting.',
-    placeholder: 'yoursite.com',
-    inputLabel: 'Your website address',
-    button: 'Analyze my site',
-    note: 'The analysis is technical and automatic. What AI actually says about your business today — that we review together. Message us with your result.',
-    waMessage: 'Hi SCUART, I ran the GEO check on my site:',
-    loadingLabel: 'Analyzing…',
-    /* 2026-08-14: was "What would move the needle first", which described a
-       top 3. The report now lists EVERY failing check ordered by severity. */
-    prioLabel: 'What needs fixing',
-    waCta: "Let's talk about fixing it",
-    errorLabel: 'Something went wrong. Try again or message us.',
+  /* Replaces the automatic checker (2026-08-14) — see the ES file and the note
+     in GeoServiceLayout.astro for the three sourced reasons. Short version: it
+     measured schema (which Ahrefs showed does not move AI citations), it was
+     the same white-label widget any agency can buy, and score + generic
+     technical findings + a ~$250 service is the documented shape of the "AI
+     Visibility Audit Scam". This one is run BY HAND, on purpose. */
+  proof: {
+    label: "Let's see if you show up",
+    body: "There is no way to know by looking at your site — you have to ask the AI. Tell us what you sell and where, and we put three real customer questions to ChatGPT, Perplexity and Gemini. We send you the screenshot of what they answered — and who showed up if it was not you.",
+    outcomes: [
+      {
+        title: 'The AI names you.',
+        body: 'You come up by name when someone asks for what you sell. That is a position to defend: you earned it, and it can be lost.',
+      },
+      {
+        title: 'The AI uses your information but names someone else.',
+        body: 'The most frustrating case, and the most common. Your content fed the answer, and the customer ended up calling the competitor who got named.',
+      },
+      {
+        title: 'You do not show up.',
+        body: 'To the AI your business does not exist in that conversation. Across 350,000 local businesses analysed, ChatGPT recommended just 1.2% — against the 35.9% that surface on Google Maps.',
+      },
+    ],
+    fields: [
+      { name: 'Business', label: 'Your business', placeholder: 'Etnia Braids' },
+      { name: 'Location', label: 'Where you are', placeholder: 'Queens, NY' },
+      { name: 'Category', label: 'What you sell', placeholder: 'braids and box braids' },
+    ],
+    button: 'Request the test',
+    note: 'Free, no strings. We run it by hand — this is not an automated scan — so it takes up to 48 hours. You get the screenshot of what each engine answered.',
+    waMessage: 'Hi SCUART, I would like the 3-question test:',
   },
+
   forWhom: {
     label: 'Is it for your business?',
     yesLabel: 'Works very well if',

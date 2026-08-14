@@ -64,25 +64,50 @@ export interface GeoServiceData {
      sección no se renderiza. */
   engines?: { label: string; body: string; primary: string[]; secondary: string };
   how: { label: string; tiers: Tier[] };
-  /* OPCIONAL — la herramienta que analiza una URL en vivo existe solo para GEO. */
-  checker?: {
+  /* OPCIONAL — "La prueba", solo en GEO.
+     REEMPLAZA AL CHECKER AUTOMÁTICO (2026-08-14). El anterior analizaba el HTML
+     del visitante y devolvía un score técnico. Se sacó por tres razones, todas
+     con fuente:
+
+     1. MEDÍA LO QUE NO FUNCIONA. Ahrefs trackeó 1.885 páginas que agregaron
+        JSON-LD (ago 2025–mar 2026) contra ~4.000 de control: ningún uplift
+        significativo, y en Google AI Overviews −4,6%. El checker le decía a la
+        gente "te falta schema" — un consejo que la evidencia de 2026 no
+        respalda. Lo que sí correlaciona son las menciones de terceros (0,664
+        contra 0,218 de los backlinks, Ahrefs sobre 75.000 marcas), y eso NO
+        vive en el HTML del propio sitio.
+
+     2. ERA COMMODITY. Insites, AuditSky, Sophyx, GoVISIBLE y Semrush venden
+        exactamente ese widget white-label a cualquier agencia. Cero
+        diferenciación, y como no pedía contacto, tampoco capturaba el lead.
+
+     3. SE PARECÍA A UNA ESTAFA CONOCIDA. El patrón documentado del "AI
+        Visibility Audit Scam" (Ritner Digital, may 2026) es: score automático
+        vago + hallazgos técnicos genéricos + informe de $100-200. Un dueño que
+        leyó sobre eso no distinguía esta página de la de un estafador.
+
+     Y sobre todo: el visitante llega preguntando "¿aparezco en ChatGPT?" y
+     recibía una auditoría de robots.txt. Ninguna agencia seria hace esto —
+     GeoAgencia no ofrece herramienta y cobra la auditoría; Ignite la regala
+     pero la hace UNA PERSONA y tarda 2-3 días. Esa fricción es justamente lo
+     que la separa del spam.
+
+     Lo que hay ahora es esa prueba manual: el visitante deja su negocio y
+     nosotros corremos los prompts a mano. Sin score, sin API, sin costo por
+     uso — y es lo que Ritner define como auditoría legítima ("live query
+     testing"). */
+  proof?: {
     label: string;
     body: string;
-    placeholder: string;
-    /** Label accesible del input — describe el propósito, no repite el placeholder */
-    inputLabel: string;
+    /** Los tres resultados posibles, en el lenguaje del dueño del negocio */
+    outcomes: { title: string; body: string }[];
+    /** Qué se pide: negocio, zona y rubro — NO una URL */
+    fields: { name: string; label: string; placeholder: string }[];
     button: string;
+    /** Qué pasa después de enviar: plazo y forma de entrega */
     note: string;
-    /** Texto del mensaje de WhatsApp; la URL del sitio se concatena al final */
+    /** Mensaje de WhatsApp; los datos del formulario se concatenan */
     waMessage: string;
-    /** Estado del botón mientras corre el análisis */
-    loadingLabel: string;
-    /** Encabezado de la lista de prioridades en el resultado */
-    prioLabel: string;
-    /** CTA a WhatsApp que aparece DEBAJO del resultado */
-    waCta: string;
-    /** Mensaje si el fetch falla */
-    errorLabel: string;
   };
   forWhom: {
     label: string;
@@ -130,7 +155,7 @@ const serviceSchema = {
   name: serviceName,
   /* serviceType solo cuando ES el servicio de GEO — es un término de industria
      concreto, no una etiqueta genérica que aplique a los siete. */
-  ...(data.checker ? { serviceType: 'Generative Engine Optimization' } : {}),
+  ...(data.proof ? { serviceType: 'Generative Engine Optimization' } : {}),
   description,
   url: canonicalURL,
   inLanguage: lang,
@@ -157,7 +182,7 @@ const faqSchema = {
 
 const servicesLabel = lang === 'es' ? 'Servicios' : 'Services';
 const homeUrl = `${SITE_URL}/${lang}`;
-/* Destino del CTA del hero: el ancla #geo-checker SOLO existe cuando la página
+/* Destino del CTA del hero: el ancla #la-prueba SOLO existe cuando la página
    trae bloque `checker` (hoy solo AI Visibility). En las demás páginas de
    servicio ese ancla no existe y el botón no llevaba a ningún lado — apuntamos
    a la sección de contacto de la home, que siempre existe.
@@ -166,7 +191,7 @@ const homeUrl = `${SITE_URL}/${lang}`;
    SITE_URL = https://scuart.com, que es correcto para el JSON-LD del breadcrumb
    pero NO para un href de navegación — en local y en los previews de Vercel el
    botón expulsaba al visitante al sitio de producción. */
-const heroCtaHref = data.checker ? '#geo-checker' : `/${lang}#contact`;
+const heroCtaHref = data.proof ? '#la-prueba' : `/${lang}#contact`;
 /* ── ÍNDICE DE SERVICIOS (2026-08-12) ────────────────────────────────
    Al terminar de leer un servicio no había ningún camino hacia los otros:
    el único cierre era email + WhatsApp, así que para ver otro servicio había
@@ -237,7 +262,7 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
       <h1 class="geo-hero__heading">{data.heading}</h1>
       <p class="geo-hero__tagline">{data.tagline}</p>
       <a class="geo-cta" href={heroCtaHref}>
-        {data.cta} <span aria-hidden="true">{data.checker ? '↓' : '→'}</span>
+        {data.cta} <span aria-hidden="true">{data.proof ? '↓' : '→'}</span>
       </a>
     </header>
 
@@ -322,40 +347,47 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
       </ol>
     </section>
 
-    <!-- ── Checker — lead magnet: URL → WhatsApp prefilled (solo GEO) ──── -->
-    {data.checker && (
-      <section class="geo-block geo-checker" id="geo-checker" data-geo-reveal>
+    <!-- ── La prueba — chequeo manual de prompts reales (solo GEO) ─────
+         Sin endpoint ni JS de análisis: el formulario arma un mensaje de
+         WhatsApp con los datos. El trabajo lo hace una persona. Ver la nota
+         larga en la interfaz `proof` para por qué reemplazó al checker. -->
+    {data.proof && (
+      <section class="geo-block geo-proof" id="la-prueba" data-geo-reveal>
         <span class="geo-num">{num()}</span>
-        <h2 class="geo-label">{data.checker.label}</h2>
+        <h2 class="geo-label">{data.proof.label}</h2>
         <div class="geo-col3">
-          <p class="geo-body">{data.checker.body}</p>
-          <form
-            class="geo-checker__form"
-            data-geo-checker
-            data-wa-message={data.checker.waMessage}
-            data-loading-label={data.checker.loadingLabel}
-            data-prio-label={data.checker.prioLabel}
-            data-wa-cta={data.checker.waCta}
-            data-error-label={data.checker.errorLabel}
-          >
-            <input
-              class="geo-checker__input"
-              type="text"
-              name="siteurl"
-              inputmode="url"
-              autocomplete="url"
-              placeholder={data.checker.placeholder}
-              aria-label={data.checker.inputLabel}
-              required
-            />
-            <button class="geo-checker__btn" type="submit">
-              {data.checker.button} <span aria-hidden="true">→</span>
+          <p class="geo-body">{data.proof.body}</p>
+
+          <!-- Los tres resultados posibles. Es el corazón de la sección: le
+               da al dueño un marco para entender su situación ANTES de pedir
+               nada, en su idioma y sin una sola palabra técnica. -->
+          <ol class="geo-proof__outcomes">
+            {data.proof.outcomes.map((o) => (
+              <li class="geo-proof__outcome">
+                <p class="geo-proof__outcome-title">{o.title}</p>
+                <p class="geo-proof__outcome-body">{o.body}</p>
+              </li>
+            ))}
+          </ol>
+
+          <form class="geo-proof__form" data-geo-proof data-wa-message={data.proof.waMessage}>
+            {data.proof.fields.map((f) => (
+              <label class="geo-proof__field">
+                <span class="geo-proof__label">{f.label}</span>
+                <input
+                  class="geo-proof__input"
+                  type="text"
+                  name={f.name}
+                  placeholder={f.placeholder}
+                  required
+                />
+              </label>
+            ))}
+            <button class="geo-proof__btn" type="submit">
+              {data.proof.button} <span aria-hidden="true">→</span>
             </button>
           </form>
-          <!-- Resultado del análisis — lo llena el JS. aria-live: un lector de
-               pantalla anuncia el score cuando llega. -->
-          <div class="geo-result" data-geo-result aria-live="polite" hidden></div>
-          <p class="geo-note">{data.checker.note}</p>
+          <p class="geo-note">{data.proof.note}</p>
         </div>
       </section>
     )}
@@ -708,206 +740,50 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
   }
   .geo-includes--no li::before { content: '✕'; font-size: 0.75em; top: 0.25em; }
 
-  /* ── Checker ──────────────────────────────────────────────── */
-  .geo-checker__form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    max-width: 40rem;
-  }
+  /* ── "La prueba" ──────────────────────────────────────────────
+     Reemplaza al bloque del checker (2026-08-14). Se fueron ~360 líneas de
+     CSS: el formulario de URL, el informe con score, las barras de severidad
+     y el contador animado. Acá no hay resultado que pintar — el resultado
+     llega por WhatsApp, escrito por una persona. */
 
-  /* ── Resultado del chequeo GEO (lo inyecta el JS) ─────────────
-     Mismo lenguaje del resto de la página: hairlines, tinta, radius 2px.
-     Sin cajas con sombra ni colores de semáforo — el ✓/✕ y el peso
-     tipográfico bastan para leer el estado. */
-  .geo-result {
-    /* Más ancho que el form (40rem): el resultado es el momento en que la
-       página entrega valor real y merece más presencia. Los checks a dos
-       columnas en desktop aprovechan el aire que sobraba a la izquierda. */
-    max-width: 52rem;
-    margin-top: clamp(1.5rem, 4vw, 2.5rem);
-    border-top: 1px solid var(--hairline);
-    padding-top: clamp(1.25rem, 3vw, 2rem);
-  }
-  .geo-result[hidden] { display: none; }
-  .geo-result:focus { outline: none; }
-
-  :global(.geo-result__loading),
-  :global(.geo-result__error) {
-    font-family: var(--font-body);
-    font-size: var(--text-body);
-    color: var(--ink-62);
-    margin: 0 0 1rem;
-  }
-
-  :global(.geo-result__head) {
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-  }
-  :global(.geo-result__score) {
-    font-family: var(--font-display);
-    font-size: var(--text-h2);
-    line-height: 1;
-    color: var(--ink);
-    font-variant-numeric: tabular-nums;
-    position: relative;
-  }
-  /* La barra lima marca el score alto — mismo acento que el resto del sitio.
-     Sobre claro el lima no contrasta como TEXTO, solo como subrayado. */
-  :global(.geo-result__score[data-nivel='alto'])::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 1.8em; bottom: 0.08em;
-    height: 0.08em;
-    background: var(--brand);
-  }
-  :global(.geo-result__score-max) {
-    font-size: 0.3em;
-    color: var(--ink-42);
-    margin-left: 0.1em;
-  }
-  :global(.geo-result__host) {
-    font-family: var(--font-body);
-    font-size: var(--text-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-62);
-    margin: 0;
-  }
-  :global(.geo-result__headtext) {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-  :global(.geo-result__scorelabel) {
-    font-family: var(--font-body);
-    font-size: var(--text-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-62);
-    margin: 0;
-  }
-  /* Nota al pie del informe (2026-08-14: bajó del encabezado al final).
-     Arriba competía con el veredicto y empujaba lo accionable fuera de
-     pantalla; acá cierra y aclara el alcance sin robar la primera lectura. */
-  :global(.geo-result__disclaimer) {
-    font-family: var(--font-body);
-    font-size: 0.82rem;
-    line-height: 1.5;
-    color: var(--ink-62);
-    margin: 0 0 1.25rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--hairline);
-    max-width: 58ch;
-  }
-  :global(.geo-result__disclaimer strong) {
-    color: var(--ink-92, var(--ink-62));
-    font-weight: 600;
-  }
-
-  /* ── Informe (reemplaza la lista plana, 2026-08-14) ───────────
-     La jerarquía la da el ORDEN y el PESO, no el color: primero lo que hay
-     que arreglar en tamaño de lectura, después lo resuelto en un <details>
-     cerrado. Sin verde/rojo de semáforo — el sitio es crema y tinta, y un
-     rojo de alerta acá se vería como un plugin pegado encima. */
-
-  :global(.geo-report__verdict) {
-    font-family: var(--font-body);
-    font-size: var(--text-body);
-    line-height: 1.45;
-    color: var(--ink);
-    margin: 0;
-    /* 52ch, no 34: a 34 el veredicto partía en dos renglones cortos al lado
-       del score y dejaba media pantalla vacía a la derecha en desktop. */
-    max-width: 52ch;
-    text-wrap: balance;
-  }
-
-  :global(.geo-report__group) {
-    border-top: 1px solid var(--hairline);
-    padding-top: clamp(1rem, 2.5vw, 1.5rem);
-    margin-bottom: clamp(1.25rem, 3vw, 2rem);
-  }
-  :global(.geo-report__grouplabel) {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-family: var(--font-body);
-    font-size: var(--text-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--ink-62);
-    margin: 0 0 1.1rem;
-  }
-  /* El contador en un círculo de hairline: da peso de "informe" sin recurrir
-     a un badge de color. */
-  :global(.geo-report__count) {
-    display: grid;
-    place-items: center;
-    min-width: 1.7em;
-    height: 1.7em;
-    border: 1px solid var(--hairline);
-    border-radius: 50%;
-    font-variant-numeric: tabular-nums;
-    color: var(--ink);
-  }
-
-  :global(.geo-report__fixes) {
+  /* Los tres resultados posibles. Numerados con el mismo índice angosto que
+     usa el resto de la página, para que se lea como parte del documento y no
+     como una caja de widget. */
+  .geo-proof__outcomes {
     list-style: none;
-    margin: 0;
+    margin: var(--space-m) 0 var(--space-l);
     padding: 0;
     display: grid;
-    gap: clamp(1rem, 2.5vw, 1.4rem);
+    gap: clamp(1rem, 2.5vw, 1.5rem);
+    max-width: 52rem;
+    counter-reset: outcome;
   }
-  /* Cada falla es una entrada con su barra a la izquierda. El grosor de la
-     barra codifica la severidad — más discreto que un color y funciona igual
-     en escala de grises o para alguien con daltonismo. */
-  :global(.geo-report__fix) {
+  .geo-proof__outcome {
     position: relative;
-    padding-left: 1.1rem;
+    padding-left: 2.4rem;
+    counter-increment: outcome;
   }
-  :global(.geo-report__fix)::before {
-    content: '';
+  .geo-proof__outcome::before {
+    content: counter(outcome, decimal-leading-zero);
     position: absolute;
     left: 0;
-    top: 0.35em;
-    bottom: 0.15em;
-    width: 2px;
-    background: var(--ink-42);
-  }
-  :global(.geo-report__fix[data-nivel='critico'])::before {
-    width: 4px;
-    background: var(--ink);
-  }
-  :global(.geo-report__fix[data-nivel='importante'])::before {
-    width: 3px;
-    background: var(--ink-62);
-  }
-  :global(.geo-report__tag) {
-    display: inline-block;
+    top: 0.1em;
     font-family: var(--font-body);
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--ink-62);
-    margin-bottom: 0.35rem;
+    font-size: var(--text-mono);
+    letter-spacing: 0.08em;
+    color: var(--ink-42);
+    font-variant-numeric: tabular-nums;
   }
-  :global(.geo-report__fix[data-nivel='critico'] .geo-report__tag) {
-    color: var(--ink);
-    font-weight: 600;
-  }
-  :global(.geo-report__fixtitle) {
+  .geo-proof__outcome-title {
     font-family: var(--font-body);
     font-size: var(--text-body);
     font-weight: 600;
     line-height: 1.35;
     color: var(--ink);
     margin: 0 0 0.3rem;
-    max-width: 40ch;
+    max-width: 44ch;
   }
-  :global(.geo-report__fixdetail) {
+  .geo-proof__outcome-body {
     font-family: var(--font-body);
     font-size: var(--text-mono);
     line-height: 1.6;
@@ -916,163 +792,73 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
     max-width: 58ch;
   }
 
-  :global(.geo-report__perfect) {
-    font-family: var(--font-body);
-    font-size: var(--text-body);
-    line-height: 1.6;
-    color: var(--ink);
-    border-top: 1px solid var(--hairline);
-    padding-top: 1.25rem;
-    margin: 0 0 1.5rem;
-    max-width: 52ch;
+  /* Tres campos cortos en una fila desde tablet; apilados en mobile. Pedir
+     negocio/zona/rubro y NO una URL es el cambio de fondo: se pregunta por el
+     negocio, no por el HTML. */
+  .geo-proof__form {
+    display: grid;
+    gap: 1rem;
+    max-width: 46rem;
+    margin-top: var(--space-m);
   }
-
-  /* Lo resuelto: colapsado por defecto. Confirma sin robarle lectura a lo
-     accionable, y quien quiera el detalle lo abre. */
-  :global(.geo-report__ok) {
-    border-top: 1px solid var(--hairline);
-    padding-top: 1rem;
-    margin-bottom: 1.25rem;
+  @media (min-width: 700px) {
+    .geo-proof__form {
+      grid-template-columns: repeat(3, 1fr);
+      align-items: end;
+    }
+    .geo-proof__btn { grid-column: 1 / -1; justify-self: start; }
   }
-  :global(.geo-report__ok summary) {
+  .geo-proof__field {
+    display: grid;
+    gap: 0.4rem;
+  }
+  .geo-proof__label {
     font-family: var(--font-body);
     font-size: var(--text-mono);
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--ink-62);
-    cursor: pointer;
-    /* 44px de alto táctil sin tocar el layout visual (norma del sitio). */
-    padding-block: 0.7rem;
-    list-style: none;
   }
-  :global(.geo-report__ok summary)::-webkit-details-marker { display: none; }
-  :global(.geo-report__ok summary)::after {
-    content: '+';
-    margin-left: 0.5em;
-    color: var(--ink-42);
-  }
-  :global(.geo-report__ok[open] summary)::after { content: '–'; }
-  :global(.geo-report__ok summary:hover) { color: var(--ink); }
-  :global(.geo-report__ok summary:focus-visible) {
-    outline: 2px solid var(--ink);
-    outline-offset: 3px;
-  }
-  :global(.geo-report__okcount) {
-    font-variant-numeric: tabular-nums;
-    color: var(--ink);
-  }
-  :global(.geo-report__oklist) {
-    list-style: none;
-    margin: 0.5rem 0 0.75rem;
-    padding: 0;
-    display: grid;
-    gap: 0.55rem;
-  }
-  @media (min-width: 768px) {
-    :global(.geo-report__oklist) {
-      grid-template-columns: 1fr 1fr;
-      gap: 0.7rem 2rem;
-    }
-  }
-  :global(.geo-report__oklist li) {
-    font-family: var(--font-body);
-    font-size: var(--text-mono);
-    line-height: 1.5;
-    color: var(--ink-62);
-  }
-  :global(.geo-report__oklist strong) {
-    color: var(--ink);
-    font-weight: 500;
-  }
-  :global(.geo-report__okdetail) { display: block; }
-
-  /* Sin datos: ni aprobado ni falla. Se muestra en gris y sin ícono para que
-     se lea como lo que es — una zona que el checker no pudo medir. */
-  :global(.geo-report__nodata) {
-    border-top: 1px solid var(--hairline);
-    padding-top: 1rem;
-    margin-bottom: 1.25rem;
-  }
-  :global(.geo-report__nodata p) {
-    font-family: var(--font-body);
-    font-size: var(--text-mono);
-    line-height: 1.6;
-    color: var(--ink-62);
-    margin: 0 0 0.5rem;
-    max-width: 58ch;
-  }
-  :global(.geo-report__nodata strong) { color: var(--ink); font-weight: 500; }
-
-  /* CTA del resultado — BUG PREEXISTENTE, arreglado 2026-08-14.
-     .geo-cta se declara arriba sin :global, así que Astro le agrega el atributo
-     de scope (data-astro-cid-…) al selector Y a los elementos del .astro. El
-     enlace del resultado lo inyecta el JS con innerHTML, o sea NO lleva ese
-     atributo: no matcheaba ninguna regla y salía como un <a> pelado —azul,
-     subrayado, con el estilo por defecto del navegador— justo en el CTA que
-     cierra la herramienta. Se replica acá con :global para el caso inyectado. */
-  :global(.geo-result .geo-cta) {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-    position: relative;
-    margin-top: 0;
-    font-family: var(--font-body);
-    font-size: var(--text-mono);
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink);
-    text-decoration: none;
-    border-bottom: 1px solid var(--ink);
-    padding-bottom: 0.3em;
-    transition: gap 0.3s ease, opacity 0.3s ease;
-  }
-  :global(.geo-result .geo-cta:hover) { gap: 0.9em; opacity: 0.7; }
-  /* Misma área táctil de 44px que el resto de los CTA del sitio. */
-  :global(.geo-result .geo-cta)::after {
-    content: '';
-    position: absolute;
-    inset: -12px -8px;
-  }
-  .geo-checker__input {
-    flex: 1 1 16rem;
+  .geo-proof__input {
     font-family: var(--font-body);
     font-size: var(--text-body);
     color: var(--ink);
     background: transparent;
     border: 1px solid var(--hairline);
     border-radius: 2px;
-    padding: 0.9em 1em;
-    min-width: 0;
+    /* 0.85rem vertical deja el campo en ~48px de alto: por encima del mínimo
+       táctil de 44px que el sitio se fijó como norma. */
+    padding: 0.85rem 1rem;
+    width: 100%;
   }
-  .geo-checker__input::placeholder { color: var(--ink-62); }
-  .geo-checker__input:focus {
-    outline: none;
-    border-color: var(--ink);
+  .geo-proof__input::placeholder { color: var(--ink-42); }
+  .geo-proof__input:focus {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+    border-color: transparent;
   }
-  .geo-checker__btn {
+  .geo-proof__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
     font-family: var(--font-body);
     font-size: var(--text-mono);
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--bg);
+    color: var(--paper, #f4f2ed);
     background: var(--ink);
-    border: 1px solid var(--ink);
+    border: none;
     border-radius: 2px;
-    padding: 0.9em 1.6em;
+    padding: 0.95rem 1.6rem;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-    /* 44px de alto táctil: es el botón que dispara el análisis, el control
-       más importante de la página (auditoría Fase 5, 2026-08-06 — medía 38px
-       porque el padding en em sobre --text-mono de 11px no alcanza). */
-    min-height: 44px;
-    justify-content: center;
     transition: gap 0.3s ease, opacity 0.3s ease;
   }
-  .geo-checker__btn:hover { gap: 0.9em; opacity: 0.85; }
+  .geo-proof__btn:hover { gap: 0.9em; opacity: 0.85; }
+  .geo-proof__btn:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
 
   /* ── Para quién ───────────────────────────────────────────── */
   .geo-forwhom {
@@ -1322,34 +1108,6 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
     .geo-tier > .geo-includes { grid-column: 2; }
   }
 
-  /* ── Entrada del resultado del checker ────────────────────────
-     Misma curva y duración que [data-geo-reveal] — el resultado se
-     comporta como cualquier bloque del sitio, no como un widget aparte.
-     Los bloques del informe entran escalonados con un delay por índice que
-     pone el JS en --i; el score cuenta de 0 a su valor (ver script). */
-  :global(.geo-report__fix),
-  :global(.geo-report__ok),
-  :global(.geo-report__nodata),
-  :global(.geo-result .geo-cta) {
-    opacity: 0;
-    transform: translateY(14px);
-    animation: geo-result-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    animation-delay: calc(var(--i, 0) * 55ms);
-  }
-
-  @keyframes geo-result-in {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    :global(.geo-report__fix),
-    :global(.geo-report__ok),
-    :global(.geo-report__nodata),
-    :global(.geo-result .geo-cta) {
-      animation: none;
-      opacity: 1;
-      transform: none;
-    }
   }
 
   /* ── Reveal (mismo patrón del sitio) ──────────────────────── */
@@ -1425,190 +1183,35 @@ const usd = (v: number) => `$${v.toLocaleString('en-US')} USD`;
     }
   } catch { /* sin hint — la página funciona igual en USD */ }
 
-  /* ── Checker GEO v2: análisis técnico REAL en /api/geo-check ─────
-     v1 mandaba la URL a WhatsApp sin analizar nada — el input con botón
-     parecía una herramienta y no lo era (William 2026-08-05). Ahora el
-     endpoint descarga el sitio y corre checks verificables (robots.txt vs
-     bots de IA, schema, headings, sitemap…) y devuelve un score con las 3
-     prioridades. El contacto por WhatsApp queda DESPUÉS del resultado, ya
-     con el diagnóstico en la mano. */
-  const form = document.querySelector<HTMLFormElement>('[data-geo-checker]');
-  const waBase = document.querySelector<HTMLElement>('[data-wa-base]')?.dataset.waBase;
-  const out = document.querySelector<HTMLElement>('[data-geo-result]');
+  /* ── "La prueba": el formulario arma un WhatsApp, no llama a una API ───
+     Antes acá vivía el checker: 180 renglones que pegaban a /api/geo-check,
+     pintaban un informe con score y animaban un contador. Se fue entero junto
+     con el endpoint (ver la nota en la interfaz `proof` para las tres razones
+     con fuente).
 
-  if (form && out) {
-    const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
-    const btnHtml = btn?.innerHTML ?? '';
-    const esc = (s: string) =>
-      s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string);
+     Lo que queda es deliberadamente tonto: junta los campos, arma un mensaje
+     y abre WhatsApp. El análisis lo hace una persona corriendo los prompts a
+     mano. Sin costo por uso, sin superficie de abuso, sin endpoint que
+     mantener — y es lo que la industria define como auditoría legítima
+     ("live query testing") en vez de un score automático. */
+  const proofForm = document.querySelector<HTMLFormElement>('[data-geo-proof]');
+  const proofWaBase = document.querySelector<HTMLElement>('[data-wa-base]')?.dataset.waBase;
 
-    form.addEventListener('submit', async (e) => {
+  if (proofForm) {
+    proofForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const input = form.querySelector<HTMLInputElement>('input[name="siteurl"]');
-      const url = input?.value.trim();
-      if (!url) return;
+      const datos = [...new FormData(proofForm).entries()]
+        .map(([k, v]) => `${k}: ${String(v).trim()}`)
+        .filter((s) => !s.endsWith(': '))
+        .join(' · ');
 
-      if (btn) { btn.disabled = true; btn.textContent = form.dataset.loadingLabel || 'Analizando…'; }
-      out.hidden = false;
-      out.innerHTML = `<p class="geo-result__loading">${esc(form.dataset.loadingLabel || 'Analizando…')}</p>`;
-
-      try {
-        const res = await fetch('/api/geo-check', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url }),
-        });
-        const data = await res.json();
-
-        if (!data.ok) {
-          const waMsg = `${form.dataset.waMessage ?? ''} ${url}`;
-          const waLink = waBase
-            ? `${waBase}?text=${encodeURIComponent(waMsg)}`
-            : `mailto:info@scuart.com?subject=${encodeURIComponent('Chequeo GEO')}&body=${encodeURIComponent(waMsg)}`;
-          out.innerHTML =
-            `<p class="geo-result__error">${esc(data.message || 'No pudimos analizar ese sitio.')}</p>` +
-            `<a class="geo-cta" href="${waLink}" target="_blank" rel="noopener noreferrer">${esc(form.dataset.waCta || 'Escribinos y lo vemos a mano')} <span aria-hidden="true">↗</span></a>`;
-          return;
-        }
-
-        /* ── Informe, no lista ────────────────────────────────────────
-           Antes esto era una lista plana de 8 ítems donde un ✕ crítico pesaba
-           lo mismo que un ✓ menor, y el número suelto no decía qué hacer
-           (William: "el resultado es algo que no se entiende"). Ahora:
-             1. Veredicto en UNA frase — qué significa ese número.
-             2. Lo que hay que arreglar, con el detalle de QUÉ hacer, ordenado
-                por severidad. Es lo primero que se lee porque es lo accionable.
-             3. Lo que ya está bien, en una lista compacta y secundaria.
-             4. Lo que no se pudo medir, aparte y sin fingir veredicto. */
-        type Chk = { pass: boolean; label: string; detail: string; skipped: boolean; nivel: string };
-        const nivel = data.score >= 80 ? 'alto' : data.score >= 55 ? 'medio' : 'bajo';
-        const checks: Chk[] = data.checks;
-        /* Ordenar por severidad. `data.prioridades` ya viene ordenado pero solo
-           trae 3; acá se listan TODAS las fallas, así que hay que reordenarlas
-           o salen en orden de declaración del endpoint — con el crítico
-           enterrado debajo de dos menores, que es exactamente lo contrario de
-           lo que un informe tiene que hacer. */
-        const RANGO: Record<string, number> = { critico: 0, importante: 1, menor: 2 };
-        const fallan = checks
-          .filter(c => !c.pass && !c.skipped)
-          .sort((a, b) => (RANGO[a.nivel] ?? 2) - (RANGO[b.nivel] ?? 2));
-        const pasan = checks.filter(c => c.pass && !c.skipped);
-        const sinDatos = checks.filter(c => c.skipped);
-
-        /* El veredicto traduce el número. Un "80/100" no le dice nada a un
-           dueño de negocio; "la base está, falta lo que te hace citable" sí.
-           Los textos del informe los arma el JS, así que necesitan las dos
-           versiones: la página EN existe y sin esto salía el informe en
-           español debajo de un encabezado en inglés. */
-        const en = document.documentElement.lang.startsWith('en');
-        const VEREDICTO: Record<string, string> = en
-          ? {
-              alto: 'The technical foundation is solid. What is left are fine adjustments.',
-              medio: 'AI engines can read your site, but it is missing what makes it quotable.',
-              bajo: 'There are technical barriers stopping AI from understanding your business.',
-            }
-          : {
-              alto: 'La base técnica está sólida. Lo que queda son ajustes finos.',
-              medio: 'La IA puede leer tu sitio, pero le falta lo que lo hace citable.',
-              bajo: 'Hay barreras técnicas que le impiden a la IA entender tu negocio.',
-            };
-        const ETIQUETA: Record<string, string> = en
-          ? { critico: 'Critical', importante: 'Important', menor: 'Minor' }
-          : { critico: 'Crítico', importante: 'Importante', menor: 'Menor' };
-        const TXT = en
-          ? {
-              perfecto: 'We found no technical failures. That is uncommon — from here the work is content, not configuration.',
-              resueltos: (n: number) => `${n === 1 ? 'point' : 'points'} already solved`,
-              sinDatos: 'No data',
-            }
-          : {
-              perfecto: 'No encontramos ninguna falla técnica. Es poco común — el trabajo acá pasa a ser de contenido, no de configuración.',
-              resueltos: (n: number) => `${n === 1 ? 'punto ya resuelto' : 'puntos ya resueltos'}`,
-              sinDatos: 'Sin datos',
-            };
-
-        const bloqueFallas = fallan.length
-          ? `<div class="geo-report__group" data-tone="fix">
-               <p class="geo-report__grouplabel">
-                 ${esc(form.dataset.prioLabel || 'Lo que hay que arreglar')}
-                 <span class="geo-report__count">${fallan.length}</span>
-               </p>
-               <ol class="geo-report__fixes">${fallan.map((c, i) => `
-                 <li class="geo-report__fix" data-nivel="${esc(c.nivel)}" style="--i:${i}">
-                   <span class="geo-report__tag">${esc(ETIQUETA[c.nivel] ?? 'Menor')}</span>
-                   <p class="geo-report__fixtitle">${esc(c.label)}</p>
-                   <p class="geo-report__fixdetail">${esc(c.detail)}</p>
-                 </li>`).join('')}</ol>
-             </div>`
-          : `<p class="geo-report__perfect">${esc(TXT.perfecto)}</p>`;
-
-        /* Lo que pasa va colapsado: confirma sin competir con lo accionable. */
-        const bloqueOk = pasan.length
-          ? `<details class="geo-report__ok">
-               <summary><span class="geo-report__okcount">${pasan.length}</span> ${esc(TXT.resueltos(pasan.length))}</summary>
-               <ul class="geo-report__oklist">${pasan.map(c => `
-                 <li><span aria-hidden="true">✓</span> <strong>${esc(c.label)}</strong> <span class="geo-report__okdetail">${esc(c.detail)}</span></li>`).join('')}</ul>
-             </details>`
-          : '';
-
-        const bloqueSinDatos = sinDatos.length
-          ? `<div class="geo-report__nodata">${sinDatos.map(c => `
-               <p><strong>${esc(TXT.sinDatos)} — ${esc(c.label)}.</strong> ${esc(c.detail)}</p>`).join('')}</div>`
-          : '';
-
-        const waMsg = `${form.dataset.waMessage ?? ''} ${data.url} (score ${data.score}/100)`;
-        const waLink = waBase
-          ? `${waBase}?text=${encodeURIComponent(waMsg)}`
-          : `mailto:info@scuart.com?subject=${encodeURIComponent('Chequeo GEO')}&body=${encodeURIComponent(waMsg)}`;
-
-        out.innerHTML =
-          `<div class="geo-result__head">
-             <span class="geo-result__score" data-nivel="${nivel}"><span data-score-num>0</span><span class="geo-result__score-max">/100</span></span>
-             <div class="geo-result__headtext">
-               <p class="geo-result__scorelabel">${en ? 'Technical readiness' : 'Preparación técnica'} · ${esc(data.host)}</p>
-               <p class="geo-report__verdict">${esc(VEREDICTO[nivel])}</p>
-             </div>
-           </div>
-           ${bloqueFallas}
-           ${bloqueOk}
-           ${bloqueSinDatos}
-           <p class="geo-result__disclaimer">${
-             en
-               ? 'This measures whether AI <strong>can</strong> read you. It does not measure whether it <strong>mentions</strong> you — that is found by asking the engines, and that is the diagnosis.'
-               : 'Esto mide si la IA <strong>puede</strong> leerte. No mide si te <strong>menciona</strong> — eso se sabe preguntándole a los motores, y es el diagnóstico.'
-           }</p>
-           <a class="geo-cta" href="${waLink}" target="_blank" rel="noopener noreferrer">${esc(form.dataset.waCta || 'Hablemos del resto')} <span aria-hidden="true">↗</span></a>`;
-
-        /* Stagger sobre los bloques del informe, no sobre 8 ítems sueltos. */
-        const animables = out.querySelectorAll<HTMLElement>('.geo-report__fix, .geo-report__ok, .geo-report__nodata, .geo-cta');
-        animables.forEach((el, i) => el.style.setProperty('--i', String(i)));
-
-        /* Conteo del score 0 → valor. Da la sensación de "medición" en curso.
-           Se salta si el visitante pidió menos movimiento. */
-        const numEl = out.querySelector<HTMLElement>('[data-score-num]');
-        const quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (numEl && !quieto && data.score > 0) {
-          const dur = 900;
-          const t0 = performance.now();
-          const tick = (t: number) => {
-            const p = Math.min(1, (t - t0) / dur);
-            /* easeOutExpo — arranca rápido y frena, como un contador real */
-            const e = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
-            numEl.textContent = String(Math.round(data.score * e));
-            if (p < 1) requestAnimationFrame(tick);
-          };
-          requestAnimationFrame(tick);
-        } else if (numEl) {
-          numEl.textContent = String(data.score);
-        }
-
-        out.setAttribute('tabindex', '-1');
-        out.focus({ preventScroll: true });
-      } catch {
-        out.innerHTML = `<p class="geo-result__error">${esc(form.dataset.errorLabel || 'Algo falló. Probá de nuevo o escribinos.')}</p>`;
-      } finally {
-        if (btn) { btn.disabled = false; btn.innerHTML = btnHtml; }
-      }
+      const msg = `${proofForm.dataset.waMessage ?? ''} ${datos}`.trim();
+      /* Sin WhatsApp configurado se cae a mailto: el formulario nunca queda
+         muerto, que es lo que pasaría si dependiera solo del número. */
+      const url = proofWaBase
+        ? `${proofWaBase}?text=${encodeURIComponent(msg)}`
+        : `mailto:info@scuart.com?subject=${encodeURIComponent('Prueba de 3 preguntas')}&body=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
     });
   }
 </script>
