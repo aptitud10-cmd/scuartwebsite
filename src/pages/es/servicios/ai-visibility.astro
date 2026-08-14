@@ -78,7 +78,13 @@ const data: GeoServiceData = {
       {
         num: '01',
         name: 'Diagnóstico',
-        priceUSD: 249,
+        /* $690, no $249 (2026-08-14). Dos razones, las dos de la investigación
+           de mercado: el piso del diagnóstico GEO es $500 (LLM Pulse) y llega
+           a $1.500-5.000 (DemandLocal); GeoAgencia cobra 890 EUR. A $249
+           estábamos debajo de todo. Y peor: el patrón documentado del "AI
+           Visibility Audit Scam" (Ritner, may 2026) es informe de $100-200 —
+           un precio muy bajo acá RESTA credibilidad en vez de sumar. */
+        priceUSD: 690,
         priceSuffix: 'pago único',
         body: 'La foto completa de tu presencia en IA: dónde apareces, quién se está llevando a tus clientes y qué información errada circula sobre tu negocio.',
         includesLabel: 'Incluye',
@@ -113,7 +119,10 @@ const data: GeoServiceData = {
       {
         num: '03',
         name: 'Mantenimiento',
-        priceUSD: 250,
+        /* $450, no $250 (2026-08-14). El piso de mercado para monitoreo es
+           $500/mes. Además empareja con los retainers de e-commerce y marca
+           ($450), que es coherente: el trabajo mensual es comparable. */
+        priceUSD: 450,
         pricePrefix: 'Desde',
         priceSuffix: 'por mes',
         body: 'La visibilidad en IA no es un logro, es una posición — y se defiende trabajando, no mirando. Cada mes hacemos algo por tu presencia, y te mostramos el resultado.',
@@ -135,8 +144,9 @@ const data: GeoServiceData = {
          mostró que NO mueven las citaciones (AI Overviews: −4,6%).
        · Era el mismo widget white-label que venden Insites, AuditSky y Semrush
          a cualquier agencia. Cero diferenciación y no capturaba contacto.
-       · Score automático + hallazgos genéricos + servicio de ~$250 es el patrón
-         exacto del "AI Visibility Audit Scam" documentado en may 2026.
+       · Score automático + hallazgos genéricos + un servicio barato es el
+         patrón exacto del "AI Visibility Audit Scam" documentado en may 2026.
+         (El diagnóstico estaba a $249 entonces; ver la nota del precio arriba.)
      Y sobre todo: el visitante llegaba preguntando "¿aparezco en ChatGPT?" y
      recibía una auditoría de robots.txt.
 
@@ -194,7 +204,7 @@ const data: GeoServiceData = {
     items: [
       {
         q: '¿Cuánto cuesta el servicio GEO?',
-        a: 'El diagnóstico cuesta $249 USD (pago único, y se abona al arreglo si continúas), el arreglo desde $1.500 USD según el tamaño de tu presencia digital, y el mantenimiento mensual desde $250 USD. Facturamos en dólares y aceptamos pagos internacionales; en Colombia también en pesos.',
+        a: 'El diagnóstico cuesta $690 USD (pago único, y se abona al arreglo si continúas), el arreglo desde $1.500 USD según el tamaño de tu presencia digital, y el mantenimiento mensual desde $450 USD. Facturamos en dólares y aceptamos pagos internacionales; en Colombia también en pesos.',
       },
       {
         q: '¿Cuánto tarda en verse el resultado?',
@@ -247,7 +257,7 @@ const data: GeoServiceData = {
   lang={lang}
   data={data}
   title="AI Visibility (GEO) — Aparece en ChatGPT | SCUART"
-  description="Servicio GEO en español para LATAM, USA y España: auditamos qué dicen ChatGPT, Perplexity y Gemini de tu negocio y hacemos que te recomienden. Diagnóstico $249 USD."
+  description="Servicio GEO en español para LATAM, USA y España: auditamos qué dicen ChatGPT, Perplexity y Gemini de tu negocio y hacemos que te recomienden. Diagnóstico $690 USD."
   canonicalURL={`${SITE_URL}/es/servicios/ai-visibility`}
   alternates={alternates}
 />

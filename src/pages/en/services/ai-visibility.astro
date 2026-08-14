@@ -65,7 +65,9 @@ const data: GeoServiceData = {
       {
         num: '01',
         name: 'Audit',
-        priceUSD: 249,
+        /* $690, not $249 — see the ES file. Market floor is $500 and a price
+           this low reads as the documented audit-scam pattern, not as a deal. */
+        priceUSD: 690,
         priceSuffix: 'one time',
         body: 'The full picture of your AI presence: where you show up, who is taking your clients, and what wrong information is circulating about your business.',
         includesLabel: 'Includes',
@@ -100,7 +102,8 @@ const data: GeoServiceData = {
       {
         num: '03',
         name: 'Upkeep',
-        priceUSD: 250,
+        /* $450, not $250 — market floor for monitoring is $500/mo. */
+        priceUSD: 450,
         pricePrefix: 'From',
         priceSuffix: 'per month',
         body: "AI visibility isn't an achievement, it's a position — and positions get defended by working, not watching. Every month we do something for your presence, and show you the result.",
@@ -119,7 +122,7 @@ const data: GeoServiceData = {
      in GeoServiceLayout.astro for the three sourced reasons. Short version: it
      measured schema (which Ahrefs showed does not move AI citations), it was
      the same white-label widget any agency can buy, and score + generic
-     technical findings + a ~$250 service is the documented shape of the "AI
+     technical findings + a cheap service is the documented shape of the "AI
      Visibility Audit Scam". This one is run BY HAND, on purpose. */
   proof: {
     label: "Let's see if you show up",
@@ -173,7 +176,7 @@ const data: GeoServiceData = {
     items: [
       {
         q: 'How much does the GEO service cost?',
-        a: 'The audit is $249 USD (one time, credited toward the fix if you continue), the fix starts at $1,500 USD depending on the size of your digital presence, and monthly upkeep starts at $250 USD. We bill in US dollars and accept international payments.',
+        a: 'The audit is $690 USD (one time, credited toward the fix if you continue), the fix starts at $1,500 USD depending on the size of your digital presence, and monthly upkeep starts at $450 USD. We bill in US dollars and accept international payments.',
       },
       {
         q: 'How long until I see results?',
@@ -223,7 +226,7 @@ const data: GeoServiceData = {
   lang={lang}
   data={data}
   title="AI Visibility (GEO) — Show up in ChatGPT | SCUART"
-  description="GEO service for the US, Latin America and Spain: we audit what ChatGPT, Perplexity and Gemini say about your business and make them recommend you. Audit $249."
+  description="GEO service for the US, Latin America and Spain: we audit what ChatGPT, Perplexity and Gemini say about your business and make them recommend you. Audit $690."
   canonicalURL={`${SITE_URL}/en/services/ai-visibility`}
   alternates={alternates}
 />
