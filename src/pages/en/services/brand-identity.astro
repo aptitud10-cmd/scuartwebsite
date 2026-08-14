@@ -61,16 +61,19 @@ const data: GeoServiceData = {
     tiers: [
       {
         num: '01',
-        name: 'Essential identity',
-        priceUSD: 900,
+        /* Renamed and reordered 2026-08-14 — see the note in the ES file: led
+           with the logo, so the whole tier read as "just some logos" and the
+           work that justifies the price read as an afterthought. */
+        name: 'Essential visual system',
+        priceUSD: 1500,
         pricePrefix: 'From',
         priceSuffix: 'per project',
-        body: 'The minimum for the business to look coherent and serious across everything it publishes. Designed to accompany a new site.',
+        body: 'The set of rules that makes everything you publish look like the same family: type, colour, image and mark. The minimum for the business to look coherent and serious across everything it does. Designed to accompany a new site.',
         includesLabel: 'Includes',
         includes: [
-          'Primary mark and its variants: horizontal, compact, for light and dark backgrounds',
-          'Colour palette with usage proportions and contrast verified for accessibility',
           'Type system: which face for headlines, which for reading, and at what scale',
+          'Colour palette with usage proportions and contrast verified for accessibility',
+          'Primary mark and its variants: horizontal, compact, for light and dark backgrounds',
           'Photography direction: what kind of image serves the brand and what contradicts it',
           'A short, practical guide written to be used — not an 80-page manual nobody opens',
           'Files in the formats you will actually need, ready for print and screen',
@@ -79,7 +82,7 @@ const data: GeoServiceData = {
       {
         num: '02',
         name: 'Brand system',
-        priceUSD: 2400,
+        priceUSD: 4200,
         pricePrefix: 'From',
         priceSuffix: 'per project',
         body: 'When the brand has to hold up across several formats and several hands. This is the level we worked Jamón Casero and Etnia Braids at.',
@@ -96,7 +99,7 @@ const data: GeoServiceData = {
       {
         num: '03',
         name: 'Brand in practice',
-        priceUSD: 350,
+        priceUSD: 450,
         pricePrefix: 'From',
         priceSuffix: 'per month',
         body: 'For businesses without an in-house designer who need new pieces every month without the brand drifting.',
@@ -134,11 +137,11 @@ const data: GeoServiceData = {
     items: [
       {
         q: 'What does a brand identity cost?',
-        a: 'An essential identity starts at $900 USD and a full system from $2,400 USD. The difference is scope: whether it is the mark and its basic rules, or whether it also includes written positioning, voice, and the system for applying it across formats.',
+        a: 'An essential visual system starts at $1,500 USD and a full brand system from $4,200 USD. The difference is scope: whether it is the visual rules — type, colour, mark, image —, or whether it also includes written positioning, voice, and the system for applying it across formats.',
       },
       {
         q: 'How long does the identity process take?',
-        a: 'An essential identity takes 2 to 3 weeks. A full system, 4 to 6. The stage that varies most is the first: understanding the business and agreeing the direction. Once that is clear, the rest moves quickly.',
+        a: 'An essential visual system takes 2 to 3 weeks. A full system, 4 to 6. The stage that varies most is the first: understanding the business and agreeing the direction. Once that is clear, the rest moves quickly.',
       },
       {
         q: 'How many concepts do you present?',
@@ -183,7 +186,7 @@ const data: GeoServiceData = {
   lang={lang}
   data={data}
   title="Brand identity for business | SCUART"
-  description="Brand identity as a system: typography, colour, photography direction, voice and application rules. Essential identity from $900 USD, full system from $2,400 USD."
+  description="Brand identity as a system: typography, colour, photography direction, voice and application rules. Essential visual system from $1,500 USD, full brand system from $4,200 USD."
   canonicalURL={`${SITE_URL}/en/services/brand-identity`}
   alternates={alternates}
 />

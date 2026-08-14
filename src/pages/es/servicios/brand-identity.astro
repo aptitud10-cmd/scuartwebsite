@@ -76,16 +76,24 @@ const data: GeoServiceData = {
     tiers: [
       {
         num: '01',
-        name: 'Identidad esencial',
-        priceUSD: 900,
+        /* RENOMBRADO Y REORDENADO 2026-08-14. Se llamaba "Identidad esencial" y
+           abría con "Marca principal y sus variantes". Resultado: la página se
+           leía como "unos logos" —la reacción textual de William al ver el
+           precio— y todo lo que justifica el número (sistema tipográfico,
+           contraste accesible, archivos de imprenta) quedaba como accesorio.
+           Mismo trabajo y mismo precio; lo que cambia es qué se lee primero.
+           El logo pasa al tercer lugar: es un componente del sistema, no el
+           producto. */
+        name: 'Sistema visual esencial',
+        priceUSD: 1500,
         pricePrefix: 'Desde',
         priceSuffix: 'por proyecto',
-        body: 'Lo mínimo para que el negocio se vea coherente y serio en todo lo que publica. Pensada para acompañar un sitio nuevo.',
+        body: 'El conjunto de reglas que hace que todo lo que publiques se vea de la misma familia: tipografía, color, imagen y marca. Lo mínimo para que el negocio se vea coherente y serio en todo lo que hace. Pensado para acompañar un sitio nuevo.',
         includesLabel: 'Incluye',
         includes: [
-          'Marca principal y sus variantes: horizontal, compacta, para fondo claro y oscuro',
-          'Paleta de color con proporciones de uso y contraste verificado para accesibilidad',
           'Sistema tipográfico: qué fuente para titulares, cuál para lectura y en qué escala',
+          'Paleta de color con proporciones de uso y contraste verificado para accesibilidad',
+          'Marca principal y sus variantes: horizontal, compacta, para fondo claro y oscuro',
           'Criterio de fotografía: qué tipo de imagen sirve a la marca y cuál la contradice',
           'Guía breve y práctica, escrita para usarse — no un manual de 80 páginas que nadie abre',
           'Archivos en los formatos que vas a necesitar, listos para imprenta y pantalla',
@@ -94,7 +102,7 @@ const data: GeoServiceData = {
       {
         num: '02',
         name: 'Sistema de marca',
-        priceUSD: 2400,
+        priceUSD: 4200,
         pricePrefix: 'Desde',
         priceSuffix: 'por proyecto',
         body: 'Cuando la marca tiene que sostener varios formatos y varias manos. Es el nivel al que trabajamos Jamón Casero y Etnia Braids.',
@@ -111,7 +119,7 @@ const data: GeoServiceData = {
       {
         num: '03',
         name: 'Marca aplicada',
-        priceUSD: 350,
+        priceUSD: 450,
         pricePrefix: 'Desde',
         priceSuffix: 'por mes',
         body: 'Para negocios sin diseñador propio que necesitan piezas nuevas cada mes sin que la marca se desarme.',
@@ -149,11 +157,11 @@ const data: GeoServiceData = {
     items: [
       {
         q: '¿Cuánto cuesta una identidad de marca?',
-        a: 'Una identidad esencial arranca en $900 USD y un sistema completo desde $2.400 USD. La diferencia está en el alcance: si es la marca y sus reglas básicas, o si además incluye posicionamiento escrito, voz, y el sistema de aplicación a varios formatos.',
+        a: 'Un sistema visual esencial arranca en $1.500 USD y un sistema de marca completo desde $4.200 USD. La diferencia está en el alcance: si son las reglas visuales —tipografía, color, marca, imagen—, o si además incluye posicionamiento escrito, voz, y el sistema de aplicación a varios formatos.',
       },
       {
         q: '¿Cuánto tarda el proceso de identidad?',
-        a: 'Una identidad esencial entre 2 y 3 semanas. Un sistema completo entre 4 y 6. La etapa que más varía es la primera: entender el negocio y acordar la dirección. Cuando eso está claro, lo demás avanza rápido.',
+        a: 'Un sistema visual esencial entre 2 y 3 semanas. Un sistema completo entre 4 y 6. La etapa que más varía es la primera: entender el negocio y acordar la dirección. Cuando eso está claro, lo demás avanza rápido.',
       },
       {
         q: '¿Cuántas propuestas presentan?',
@@ -200,7 +208,7 @@ const data: GeoServiceData = {
   lang={lang}
   data={data}
   title="Identidad de marca para negocios | SCUART"
-  description="Identidad de marca como sistema: tipografía, color, criterio de fotografía, voz y reglas de aplicación. Identidad esencial desde $900 USD, sistema completo desde $2.400 USD."
+  description="Identidad de marca como sistema: tipografía, color, criterio de fotografía, voz y reglas de aplicación. Sistema visual esencial desde $1.500 USD, sistema de marca completo desde $4.200 USD."
   canonicalURL={`${SITE_URL}/es/servicios/brand-identity`}
   alternates={alternates}
 />
