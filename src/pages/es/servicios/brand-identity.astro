@@ -10,7 +10,9 @@ const alternates = getAlternatesFor('services/brand-identity', 'servicios/brand-
 /* Copy neutro LATAM, sin voseo (convención es.ts).
    P4 — respaldado por identidad real construida en los tres casos:
      · Jamón Casero → identidad digital para marca de 55 años sin presencia
-       online; la identidad sirvió DESPUÉS de base para punto de venta y empaque
+       online. ⚠️ NO afirmar que la identidad sirvió para punto de venta ni
+       empaque: William lo desmintió el 2026-08-14. Tampoco hay repo de este
+       proyecto, así que lo único verificable es el sitio en vivo.
      · Etnia Braids → estética editorial premium, la fotografía como peso de
        marca, voz definida ("nosotras")
      · Menius → sistema de marca de producto propio
@@ -32,7 +34,15 @@ const data: GeoServiceData = {
     stats: [
       { num: '55 años', note: 'de tradición sin presencia digital: el punto de partida de Jamón Casero, donde la identidad tenía que estar a la altura del oficio' },
       { num: 'Un sistema', note: 'no un logo suelto: tipografía, color, uso de fotografía y voz, definidos para que se apliquen sin nosotros' },
-      { num: 'Fuera del sitio', note: 'la identidad de Jamón Casero sirvió después como base del material de punto de venta y del empaque' },
+      /* CORREGIDO 2026-08-14. Este stat decía que la identidad de Jamón Casero
+         "sirvió después como base del material de punto de venta y del empaque".
+         NO ES CIERTO — confirmado por William. Era una afirmación sobre el
+         negocio del cliente que nadie podía verificar y que él mismo desmintió.
+         Se reemplaza por algo comprobable entrando a los sitios: la identidad
+         de Etnia Braids se aplica sola en piezas que genera el sistema (emails
+         de confirmación, comprobante de depósito) sin que nadie las diseñe una
+         por una. Eso SÍ está en el código (lib/email/ en etniabraids-next). */
+      { num: 'Se aplica solo', note: 'en Etnia Braids la identidad vive dentro del sistema: los emails que el sitio manda salen con la paleta de la marca, sin diseñar cada pieza a mano' },
     ],
     sourceNote:
       'Todo lo de esta página está aplicado en los tres casos del portafolio — se puede ver funcionando, no solo descrito.',
@@ -155,7 +165,9 @@ const data: GeoServiceData = {
       },
       {
         q: '¿Sirve si no voy a hacer un sitio con ustedes?',
-        a: 'Sí, la identidad es un trabajo que se sostiene solo y los archivos son tuyos. Dicho eso, donde más rinde es cuando identidad y sitio se construyen juntos: la identidad de Jamón Casero terminó sirviendo de base para su material de punto de venta y su empaque, y eso pasa cuando el sistema está pensado para salir de la pantalla.',
+        /* Corregido 2026-08-14: la afirmación sobre punto de venta y empaque de
+           Jamón Casero no era cierta (confirmado por William). */
+        a: 'Sí, la identidad es un trabajo que se sostiene solo y los archivos son tuyos. Dicho eso, donde más rinde es cuando identidad y sitio se construyen juntos: en Etnia Braids la paleta y la tipografía no viven solo en la web, están dentro del sistema — los emails que salen de las reservas ya llevan la marca puesta, sin que nadie arme cada pieza.',
       },
       {
         q: '¿Qué pasa con las fotos?',

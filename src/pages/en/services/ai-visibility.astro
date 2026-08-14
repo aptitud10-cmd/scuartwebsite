@@ -20,12 +20,16 @@ const data: GeoServiceData = {
   shift: {
     label: 'The behavior already changed',
     body: "This isn't a prediction — it's measurable. Two in three people already see AI-generated answers when they search, and among the generations deciding where to spend today, three in four use AI daily. Waiting \"to see if this grows\" means giving those clients away.",
+    /* Fixed 2026-08-14 — see the note in the ES file for the full reasoning:
+       Pew is Oct 2025 (not 2026) and 65% includes "sometimes"; Deloitte measures
+       AI use at WORK; and the Gartner figure was a Feb-2024 forecast about 2026
+       that did not pan out — cited here precisely because it missed. */
     stats: [
-      { num: '65%', note: 'of adults already see AI summaries in their search results (Pew Research, 2026)' },
-      { num: '74%', note: 'of Gen Z and Millennials use AI in their daily lives — the generations making buying decisions today (Deloitte, 2026)' },
-      { num: '−25%', note: 'is how much Gartner projects traditional search will drop by 2026, as users shift to AI' },
+      { num: '65%', note: 'of US adults run into AI summaries when they search — 45% see them often (Pew Research, Oct 2025)' },
+      { num: '74%', note: 'of Gen Z and Millennials already use AI in their daily work, up from ~56% the year before (Deloitte, 2026)' },
+      { num: '2024', note: 'Gartner predicted a 25% drop in traditional search by 2026. It did not happen at that scale: Google answered with AI Overviews. The shift is real, but it is about format — you did not stop appearing, you stopped getting the click' },
     ],
-    sourceNote: 'Verifiable primary sources: Pew Research Center (AI use in search, 2026); Deloitte Gen Z & Millennial Survey 2026; Gartner (search volume forecast). Full links on request.',
+    sourceNote: 'Primary sources: Pew Research Center, October 2025 (encountering AI summaries in search); Deloitte Gen Z & Millennial Survey 2026 (AI use at work); Gartner, February 2024 (search volume forecast, cited here precisely because it did not pan out). Full links on request.',
   },
   whatIs: {
     label: 'What is GEO?',
@@ -119,7 +123,9 @@ const data: GeoServiceData = {
     note: 'The analysis is technical and automatic. What AI actually says about your business today — that we review together. Message us with your result.',
     waMessage: 'Hi SCUART, I ran the GEO check on my site:',
     loadingLabel: 'Analyzing…',
-    prioLabel: 'What would move the needle first',
+    /* 2026-08-14: was "What would move the needle first", which described a
+       top 3. The report now lists EVERY failing check ordered by severity. */
+    prioLabel: 'What needs fixing',
     waCta: "Let's talk about fixing it",
     errorLabel: 'Something went wrong. Try again or message us.',
   },

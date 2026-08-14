@@ -24,7 +24,8 @@ const data: GeoServiceData = {
     stats: [
       { num: '53 tables', note: 'with 187 row-level security policies and a daily automated check that none of them drift' },
       { num: '3 gateways', note: 'Stripe Connect, MercadoPago and Wompi — each business collects into its own account, with encrypted keys' },
-      { num: '2 native apps', note: 'iOS and Android in React Native: one for the diner, one for the driver with background GPS' },
+      /* See the note in the ES page: "2 native apps" was removed 2026-08-13. */
+      { num: '17 automated jobs', note: 'payments that retry, reservations that expire, trial-ending notices and a daily security check — running without anyone triggering them' },
     ],
     sourceNote:
       'Verifiable at menius.app. It is SCUART\'s own product, not client work — which is why we can show how it is built inside.',
@@ -101,7 +102,7 @@ const data: GeoServiceData = {
         includes: [
           'Monitoring: if something goes down, we know before your users do',
           'Security and dependency updates',
-          'Verified backups — we test that they can actually be restored',
+          'Automated daily backups of the whole database',
           'Development hours for new features, agreed each month',
           'Usage report: what gets used, what does not, where users get stuck',
         ],
@@ -151,9 +152,14 @@ const data: GeoServiceData = {
       },
       {
         q: 'Do you build mobile apps?',
-        /* Corrected 2026-08-11 — see the ES file. The previous answer claimed we
-           don't build native apps, which is false: Menius ships two Expo apps. */
-        a: 'Yes. We build native iOS and Android apps with React Native and Expo: push notifications, camera, background location and biometric access. Menius has two — one for the diner, one for the driver — currently distributed as internal builds. If your product needs to ship on the App Store and Google Play, that process is part of the project scope.',
+        /* Rewritten 2026-08-13 (William: 100% transparency). The previous answer
+           listed "biometric access" and "background location" as things we ship.
+           Audit of the repos: expo-local-authentication and expo-location are in
+           package.json but have ZERO imports in the diner app. Background GPS IS
+           real, but only in the driver app (react-native-background-geolocation,
+           used in lib/location-service.ts). The answer now claims only what has
+           verified imports, and states the actual maturity of each app. */
+        a: 'Yes, with React Native and Expo. What is running today in Menius: push notifications and live order tracking on a map in the diner app, and QR scanning, background GPS and delivery photo in the driver app. Both are internal builds, not published to the stores — the diner app is a working prototype and the driver app is at an earlier stage. If your product needs to ship on the App Store and Google Play, that process is part of the project scope.',
       },
       {
         q: 'Can I start with just the definition?',

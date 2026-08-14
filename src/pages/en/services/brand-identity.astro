@@ -23,7 +23,11 @@ const data: GeoServiceData = {
     stats: [
       { num: '55 years', note: 'of tradition with no digital presence: the starting point at Jamón Casero, where the identity had to match the craft' },
       { num: 'A system', note: 'not a loose logo: type, colour, photography treatment and voice, defined so they can be applied without us' },
-      { num: 'Beyond the site', note: 'the Jamón Casero identity later became the base for their point-of-sale material and packaging' },
+      /* Fixed 2026-08-14 — see the ES file: the Jamón Casero point-of-sale and
+         packaging claim was not true (confirmed by William). Replaced with
+         something verifiable in code (lib/email/send.ts in etniabraids-next
+         hardcodes the brand palette). */
+      { num: 'Applies itself', note: 'at Etnia Braids the identity lives inside the system: the emails the site sends go out in the brand palette, with no piece designed by hand' },
     ],
     sourceNote:
       'Everything on this page is applied across the three portfolio cases — you can see it working, not just described.',
@@ -146,7 +150,9 @@ const data: GeoServiceData = {
       },
       {
         q: 'Is it worth it if I am not building a site with you?',
-        a: 'Yes, the identity stands on its own and the files are yours. That said, it pays off most when identity and site get built together: the Jamón Casero identity ended up as the base for their point-of-sale material and packaging, and that happens when the system is designed to leave the screen.',
+        /* Fixed 2026-08-14 — the Jamón Casero point-of-sale/packaging claim was
+           not true (confirmed by William). */
+        a: 'Yes, the identity stands on its own and the files are yours. That said, it pays off most when identity and site get built together: at Etnia Braids the palette and type do not just live on the web, they live inside the system — the emails that come out of a booking already carry the brand, with nobody assembling each piece.',
       },
       {
         q: 'What about photography?',

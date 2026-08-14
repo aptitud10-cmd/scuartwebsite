@@ -20,13 +20,27 @@ const data: GeoServiceData = {
   cta: 'Chequear mi sitio gratis',
   shift: {
     label: 'El comportamiento ya cambió',
-    body: 'No es una predicción: es medible. Dos de cada tres personas ya ven respuestas generadas por IA cuando buscan, y en las generaciones que hoy deciden dónde gastar, tres de cada cuatro usan IA a diario. El que espera "a ver si esto crece" está regalando esos clientes.',
+    /* CORREGIDO 2026-08-14 (auditoría de transparencia). Los tres stats tenían
+       problemas y eran los únicos datos del sitio que dependen de terceros:
+       · Pew: la cifra es correcta pero es de OCTUBRE 2025, no 2026. Y el 65%
+         incluye "algunas veces"; solo 45% los ve seguido.
+       · Deloitte: mide uso de IA EN EL TRABAJO ("day-to-day work"). Decir "en su
+         día a día" y enlazarlo a decisiones de compra cambiaba el sentido.
+       · Gartner: era un pronóstico de FEBRERO 2024 sobre 2026, presentado en
+         presente ("proyecta") estando ya en 2026 — y no se cumplió: Google
+         mantiene 90%+ de share vía AI Overviews. Citar una predicción fallida
+         como prueba de que "el comportamiento ya cambió" era el punto más
+         reclamable del sitio, y encima contradecía al propio body, que abre con
+         "No es una predicción: es medible".
+       El reemplazo dice la verdad y es MÁS fuerte: el problema no es que la
+       gente dejara Google, es que Google dejó de mandar clics. */
+    body: 'No es una predicción: es medible. Dos de cada tres personas ya se cruzan con respuestas generadas por IA cuando buscan, y entre quienes hoy deciden dónde gastar, tres de cada cuatro ya trabajan con IA todos los días. El que espera "a ver si esto crece" está regalando esos clientes.',
     stats: [
-      { num: '65%', note: 'de los adultos ya ve resúmenes de IA en sus búsquedas (Pew Research, 2026)' },
-      { num: '74%', note: 'de Gen Z y Millennials usan IA en su día a día — las generaciones que deciden compras hoy (Deloitte, 2026)' },
-      { num: '−25%', note: 'proyecta Gartner que caerá la búsqueda tradicional para 2026, a medida que los usuarios migran a la IA' },
+      { num: '65%', note: 'de los adultos en EE.UU. se cruza con resúmenes de IA al buscar — 45% los ve seguido (Pew Research, oct. 2025)' },
+      { num: '74%', note: 'de Gen Z y Millennials ya usa IA en su trabajo diario, contra ~56% el año anterior (Deloitte, 2026)' },
+      { num: '2024', note: 'Gartner predijo una caída del 25% en búsqueda tradicional para 2026. No se cumplió a esa escala: Google respondió con AI Overviews. El cambio es real, pero es de formato — no dejaste de aparecer, dejaste de recibir el clic' },
     ],
-    sourceNote: 'Fuentes primarias verificables: Pew Research Center (uso de IA en búsqueda, 2026); Deloitte Gen Z & Millennial Survey 2026; Gartner (predicción de volumen de búsqueda). Links completos a pedido.',
+    sourceNote: 'Fuentes primarias: Pew Research Center, octubre 2025 (encuentro con resúmenes de IA en búsqueda); Deloitte Gen Z & Millennial Survey 2026 (uso de IA en el trabajo); Gartner, febrero 2024 (predicción de volumen de búsqueda, citada acá justamente porque no se cumplió). Links completos a pedido.',
   },
   whatIs: {
     label: '¿Qué es GEO?',
@@ -120,7 +134,10 @@ const data: GeoServiceData = {
     note: 'El análisis es técnico y automático. Lo que la IA responde hoy sobre tu negocio lo revisamos juntos — escríbenos con el resultado.',
     waMessage: 'Hola SCUART, analicé mi sitio con el chequeo GEO:',
     loadingLabel: 'Analizando…',
-    prioLabel: 'Lo que movería la aguja primero',
+    /* 2026-08-14: era "Lo que movería la aguja primero", que describía un top 3.
+       Ahora el informe lista TODAS las fallas ordenadas por severidad, así que
+       el encabezado dice lo que la lista realmente es. */
+    prioLabel: 'Lo que hay que arreglar',
     waCta: 'Hablemos de cómo arreglarlo',
     errorLabel: 'Algo falló. Prueba de nuevo o escríbenos.',
   },

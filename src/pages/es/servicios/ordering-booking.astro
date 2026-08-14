@@ -43,7 +43,19 @@ const data: GeoServiceData = {
     items: [
       {
         title: 'Se pierde tiempo coordinando por mensaje.',
-        body: 'Un ida y vuelta de cinco mensajes por cada reserva. El sistema de Etnia Braids reemplazó eso: el cliente elige servicio, día y hora, paga el depósito, y la cita queda confirmada y en agenda sin que nadie intervenga.',
+        /* CORREGIDO 2026-08-14 (auditoría de transparencia). Antes decía que la
+           cita "queda confirmada y en agenda SIN QUE NADIE INTERVENGA". Es falso
+           y el código lo dice explícito: en etniabraids-next la reserva NACE
+           'pendiente' y el comentario de lib/booking/create.ts:196 aclara que
+           "Erika la revisa contra sus citas telefónicas —que memoriza, no
+           anota— y la confirma o rechaza desde el panel. Es el pedido literal:
+           que nadie cierre una cita sin que ella verifique disponibilidad
+           real." El depósito se cobra DESPUÉS de que ella acepta (deposit.ts:7).
+           Vender como self-service instantáneo un flujo con compuerta humana
+           deliberada era lo más reclamable del sitio. La versión nueva dice la
+           verdad y además convierte el control en argumento, que es lo que
+           realmente pidió la clienta. */
+        body: 'Un ida y vuelta de cinco mensajes por cada reserva. El sistema de Etnia Braids reemplazó eso: el cliente elige servicio, día y hora y deja la solicitud. Vos confirmás con un toque desde el panel — y a partir de ahí todo corre solo: se cobra el depósito, sale la confirmación y la cita entra en agenda. Ese control existe a propósito: la dueña cruza las citas que entran por teléfono antes de cerrar el turno, y ningún sistema puede saber eso por ella.',
       },
       {
         title: 'Los clientes no aparecen y el turno se pierde.',
@@ -72,7 +84,7 @@ const data: GeoServiceData = {
           'Calendario con tu disponibilidad real: horarios, días cerrados, bloqueos',
           'Cobro de depósito, seña o total con Stripe',
           'Confirmación automática por correo al cliente y al negocio',
-          'Panel para ver, mover y cancelar reservas sin llamar a nadie',
+          'Panel para ver, confirmar y cancelar reservas sin llamar a nadie',
           'Funciona bien desde el teléfono, que es de donde va a llegar la mayoría',
         ],
       },
@@ -85,7 +97,7 @@ const data: GeoServiceData = {
         body: 'Cuando hay varias personas, varias sedes o un flujo con estados. Es la arquitectura que usa Menius para servir a varios restaurantes a la vez.',
         includesLabel: 'Todo lo anterior, más',
         includes: [
-          'Varios profesionales o sedes, cada uno con su agenda y sus servicios',
+          'Varias sedes, cada una con su catálogo y su operación (la arquitectura de Menius). Agenda separada por profesional se construye a medida: hoy no viene de fábrica',
           'Estados del pedido en tiempo real: recibido, en preparación, listo',
           'Accesos por rol: quién ve qué y quién puede cambiar qué',
           'Datos separados por sede o por cliente si el sistema sirve a varios negocios',
@@ -104,7 +116,7 @@ const data: GeoServiceData = {
         includes: [
           'Monitoreo con aviso si algo falla, antes de que lo note tu cliente',
           'Ajustes de servicios, precios y horarios cuando el negocio cambia',
-          'Actualizaciones de seguridad y copias de seguridad verificadas',
+          'Actualizaciones de seguridad y copias de seguridad automáticas diarias',
           'Soporte para dudas de tu equipo al usar el panel',
           'Una mejora por mes según lo que muestren los datos de uso',
         ],

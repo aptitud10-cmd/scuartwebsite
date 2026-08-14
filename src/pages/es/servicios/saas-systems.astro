@@ -27,7 +27,12 @@ const data: GeoServiceData = {
     stats: [
       { num: '53 tablas', note: 'con 187 políticas de seguridad a nivel de fila y una tarea automática que verifica cada día que ninguna se degrade' },
       { num: '3 pasarelas', note: 'Stripe Connect, MercadoPago y Wompi — cada negocio cobra en su propia cuenta, con sus llaves cifradas' },
-      { num: '2 apps nativas', note: 'iOS y Android con React Native: una para el comensal, otra para el repartidor con GPS en segundo plano' },
+      /* Antes acá decía "2 apps nativas". Se quitó el 2026-08-13 (William:
+         100% transparencia): la app del comensal son 24 commits en 3 días y
+         la del repartidor UN commit que dice "scaffold inicial". Se reemplaza
+         por un dato contado en vercel.json, que además prueba mejor el punto
+         de esta página: el sistema se mantiene solo. */
+      { num: '17 tareas automáticas', note: 'cobros que reintentan, reservas que expiran, avisos de fin de prueba y un chequeo diario de seguridad — corriendo sin que nadie las dispare' },
     ],
     sourceNote:
       'Verificable en menius.app. Es producto propio de SCUART, no trabajo de cliente — por eso podemos mostrar cómo está hecho por dentro.',
@@ -104,7 +109,7 @@ const data: GeoServiceData = {
         includes: [
           'Monitoreo: si algo se cae, nos enteramos antes que tus usuarios',
           'Actualizaciones de seguridad y de dependencias',
-          'Copias de seguridad verificadas — probamos que se puedan restaurar',
+          'Copias de seguridad automáticas diarias de toda la base',
           'Horas de desarrollo para funciones nuevas, acordadas cada mes',
           'Reporte de uso: qué se usa, qué no, dónde se traban los usuarios',
         ],
@@ -154,12 +159,16 @@ const data: GeoServiceData = {
       },
       {
         q: '¿Hacen aplicaciones móviles?',
-        /* Corregido 2026-08-11: la versión anterior decía que NO hacíamos apps
-           nativas. Es falso — Menius tiene dos apps Expo/React Native con push,
-           cámara, GPS en segundo plano y biometría. Se aclara lo de las tiendas
-           porque hoy se distribuyen como builds internos (eas.json: distribution
-           "internal", buildType "apk", submit vacío). */
-        a: 'Sí. Construimos aplicaciones nativas para iOS y Android con React Native y Expo: notificaciones push, cámara, ubicación en segundo plano y acceso por biometría. Menius tiene dos —una para el comensal y otra para el repartidor—, hoy distribuidas como builds internos. Si tu producto necesita publicarse en App Store y Google Play, ese trámite entra en el alcance del proyecto.',
+        /* Reescrito 2026-08-13 (William: 100% transparencia). La versión
+           anterior afirmaba "acceso por biometría" y "ubicación en segundo
+           plano" como cosas que entregamos. Auditoría de los repos:
+           expo-local-authentication y expo-location están en package.json pero
+           NO se importan en ningún archivo de la app del comensal. El GPS en
+           segundo plano SÍ es real, pero solo en la app del repartidor
+           (react-native-background-geolocation en lib/location-service.ts).
+           La respuesta ahora solo afirma lo que tiene import verificado, y dice
+           en qué estado está cada app en vez de presentarlas como equivalentes. */
+        a: 'Sí, con React Native y Expo. Lo que hoy corre en Menius: notificaciones push y seguimiento del pedido en un mapa en la app del comensal, y escaneo de QR, GPS en segundo plano y foto de entrega en la del repartidor. Las dos son builds internos, sin publicar en las tiendas — la del comensal es un prototipo funcional y la del repartidor está en una etapa más temprana. Si tu producto necesita publicarse en App Store y Google Play, ese trámite entra en el alcance del proyecto.',
       },
       {
         q: '¿Puedo empezar solo con la definición?',

@@ -89,10 +89,22 @@ const data: GeoServiceData = {
         includes: [
           'Reservas o pedidos a medida del negocio — no un plugin genérico adaptado a la fuerza',
           'Cobros con Stripe: depósito, pago total o seña, según cómo trabajes',
-          'Panel para administrar el contenido sin depender de nosotros',
+          /* CORREGIDO 2026-08-14 (auditoría de transparencia). Este bloque dice
+             "Es lo que construimos para Etnia Braids" y después listaba cosas
+             que ESE proyecto no tiene:
+              · "administrar el contenido sin depender de nosotros" — el cliente
+                edita galería, horarios, contacto y color, pero NO servicios ni
+                precios (viven en migraciones SQL). Cambiar un precio requiere
+                un desarrollador, o sea lo contrario de lo que prometía.
+              · "dos idiomas" — Etnia Braids es solo español, sin i18n.
+              · "medición configurada" — lib/legal.ts:266 dice literal
+                "VERIFICADO: el sitio NO carga analytics, ni píxeles".
+             Se deja lo que el proyecto SÍ tiene, y lo demás pasa a ser opcional
+             declarado como tal en vez de venir implícito en el precio. */
+          'Panel para administrar lo que cambia seguido: galería, horarios, datos de contacto y textos editables',
           'Correos automáticos de confirmación al cliente y al negocio',
-          'Dos idiomas si tu mercado lo necesita, con URLs propias para cada uno',
-          'Medición configurada para saber qué páginas traen consultas reales',
+          'Segundo idioma con URLs propias, si tu mercado lo pide',
+          'Medición de tráfico instalada, si querés saber qué páginas traen consultas',
         ],
       },
       {
