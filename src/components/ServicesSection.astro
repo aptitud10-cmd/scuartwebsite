@@ -416,10 +416,20 @@ const items: CapabilityService[] = t.capabilities.items;
       display: block;
       border: none;
       padding-block: clamp(0.5rem, 1.1vh, 1rem);
-      /* atenuado por defecto (patrón Monolog) — 0.4 mantiene legibilidad
-         ambiental: los inactivos se LEEN, no son fantasmas (fix critic
-         2026-08-04: 0.24 los dejaba casi invisibles en reposo). */
-      opacity: 0.4;
+      /* atenuado por defecto (patrón Monolog) — los inactivos se LEEN, no son
+         fantasmas (fix critic 2026-08-04: 0.24 los dejaba casi invisibles).
+
+         0.55, NO 0.4 (2026-08-14): el primer test de accesibilidad automático
+         lo detectó como violación WCAG AA, y es real. A 0.4 la tinta sobre el
+         crema da #9a9994 = 2.54:1, y el mínimo para texto grande es 3:1.
+         No es un estado transitorio que se pueda eximir: es el estado POR
+         DEFECTO de seis de las siete filas, y en un dispositivo táctil —donde
+         no hay hover— las seis se quedan así de forma permanente.
+
+         Medido: 0.50 es el primer valor que pasa (3.41:1). Se usa 0.55
+         (3.98:1) para tener margen sobre el umbral sin perder el contraste
+         con la fila activa, que sigue a opacidad plena. */
+      opacity: 0.55;
       transition: opacity 0.5s ease;
       cursor: default;
     }
