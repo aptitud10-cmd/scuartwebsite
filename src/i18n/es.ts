@@ -8,13 +8,30 @@ import type { Translations } from "./en";
 
 export const es: Translations = {
   /* ── SEO / metadata ─────────────────────────────────────── */
+  /* REESCRITO 2026-08-18 (investigación de keywords). El title decía "SCUART —
+     Estudio Bilingüe de Diseño y Tecnología" y tenía dos problemas medidos:
+
+     · La palabra "agencia" NO aparecía ni una vez en todo el HTML del sitio, y
+       es la que usa el mercado en los cuatro países. "Estudio" no apareció en
+       ningún resultado de búsqueda revisado — describe algo que nadie busca.
+     · No mencionaba Queens ni Nueva York. La proximidad local es la única
+       ventaja defendible frente a los competidores hispanos nacionales, y 9 de
+       cada 10 búsquedas locales del rubro muestran el mapa de Google arriba de
+       los resultados orgánicos (Ahrefs, ago 2026).
+
+     La marca va al final: nadie busca "SCUART" todavía. Delante va lo que la
+     persona escribe.
+
+     NO se apunta a "agencia de diseño web" a secas (dificultad 81-91, dominio
+     de 6 meses sin backlinks) sino al cruce bilingüe + local, que es donde hay
+     hueco real. Ver la memoria del proyecto para el detalle. */
   meta: {
-    title: "SCUART — Estudio Bilingüe de Diseño y Tecnología",
+    title: "Agencia de diseño web bilingüe en Queens NY | SCUART",
     description:
-      "Estudio bilingüe que construye webs premium, plataformas y sistemas digitales para negocios ambiciosos en USA y LATAM.",
-    ogTitle: "SCUART — Estudio Bilingüe de Diseño y Tecnología",
+      "Diseñamos y desarrollamos páginas web, tiendas online y sistemas a medida, en español e inglés. Agencia con base en Queens, Nueva York, para negocios en Estados Unidos, México, Colombia y LATAM. Desde $2.500 USD.",
+    ogTitle: "Agencia de diseño web bilingüe — Queens, Nueva York",
     ogDescription:
-      "Diseño web premium y sistemas digitales para negocios en USA y LATAM.",
+      "Páginas web, tiendas online y sistemas a medida en español e inglés, para negocios en USA y LATAM.",
   },
 
   /* ── Nav ──────────────────────────────────────────────────

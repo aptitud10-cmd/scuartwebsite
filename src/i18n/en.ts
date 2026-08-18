@@ -239,13 +239,18 @@ export interface Translations {
 
 export const en: Translations = {
   /* ── SEO / metadata ─────────────────────────────────────── */
+  /* Rewritten 2026-08-18 — see the ES file for the full reasoning. Short
+     version: "studio" is not what the market searches for, and the title never
+     mentioned Queens or New York, which is the only defensible local edge.
+     "near me" queries in this niche carry the highest CPC ($14-16 vs $8.70 for
+     the generic term), so local intent is where the buyers are. */
   meta: {
-    title: "SCUART — Bilingual Design & Tech Studio",
+    title: "Bilingual web design agency in Queens, NY | SCUART",
     description:
-      "A bilingual studio building premium websites, platforms and digital systems for ambitious businesses across the US and LATAM.",
-    ogTitle: "SCUART — Bilingual Design & Tech Studio",
+      "We design and build websites, online stores and custom systems in English and Spanish. Agency based in Queens, New York, serving businesses across the US and Latin America. From $2,500 USD.",
+    ogTitle: "Bilingual web design agency — Queens, New York",
     ogDescription:
-      "Premium web design and digital systems for businesses in the US and LATAM.",
+      "Websites, online stores and custom systems in English and Spanish, for businesses across the US and Latin America.",
   },
 
   /* ── Nav ──────────────────────────────────────────────────

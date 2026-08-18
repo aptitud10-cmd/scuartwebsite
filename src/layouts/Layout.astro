@@ -66,15 +66,28 @@ const orgSchema = {
       email: 'info@scuart.com',
       telephone: '+13478489720',
       knowsLanguage: ['en', 'es'],
+      /* "Queens" y no "New York" a secas (2026-08-18). Sigue SIN domicilio real
+         — Queens es el borough, no una dirección, y el domicilio vive solo en
+         el panel privado de Google Business Profile (Service Area Business).
+         El motivo es de búsqueda: 9 de cada 10 consultas locales de este rubro
+         muestran el mapa de Google arriba de los resultados orgánicos (Ahrefs,
+         ago 2026), y la proximidad es la única ventaja defendible frente a los
+         competidores hispanos que operan a nivel nacional. */
       address: {
         '@type': 'PostalAddress',
-        addressLocality: 'New York',
+        addressLocality: 'Queens',
         addressRegion: 'NY',
         addressCountry: 'US',
       },
+      /* México y España se agregaron el 2026-08-18: las páginas de servicio ya
+         los mencionaban en el copy, pero el schema declaraba solo USA, Colombia
+         y LATAM. Era una inconsistencia entre lo que el sitio dice y lo que le
+         declara a los buscadores. */
       areaServed: [
         { '@type': 'Country', name: 'United States' },
+        { '@type': 'Country', name: 'Mexico' },
         { '@type': 'Country', name: 'Colombia' },
+        { '@type': 'Country', name: 'Spain' },
         { '@type': 'Place', name: 'Latin America' },
       ],
       knowsAbout: [
@@ -84,6 +97,13 @@ const orgSchema = {
         'E-commerce',
         'Booking systems',
         'Brand identity',
+        /* Términos en español: el schema también lo leen los motores
+           generativos, y el cliente objetivo busca en español. */
+        'Diseño web',
+        'Desarrollo web',
+        'Páginas web bilingües',
+        'Tiendas online',
+        'Posicionamiento en IA',
       ],
     },
     {

@@ -19,6 +19,20 @@ export function getTranslations(lang: Lang) {
 }
 
 /**
+ * x-default: a donde va un visitante cuyo idioma Google no puede resolver.
+ *
+ * ES, no EN (2026-08-18). Apuntaba a /en, lo que mandaba a ingles a todo
+ * visitante ambiguo — incluidos Mexico, Colombia y el resto de LATAM, que son
+ * tres de los cuatro mercados del sitio, y el publico hispano de EE.UU. que es
+ * el cliente objetivo real (53% de los adultos hispanos en EE.UU. buscan sitios
+ * con opcion en espanol al comprar — ThinkNow, marzo 2025).
+ *
+ * El ingles sigue sirviendose por hreflang="en" a quien lo tenga configurado;
+ * lo que cambia es solo el caso ambiguo, que ahora cae del lado mayoritario.
+ */
+const X_DEFAULT_LANG: Lang = "es";
+
+/**
  * Devuelve las URLs canonicas para hreflang dado el path base.
  * Para las paginas de index ('/en', '/es') el path seria ''.
  */
@@ -26,7 +40,7 @@ export function getAlternates(basePath: string = "") {
   return {
     en: `${SITE_URL}/en${basePath}`,
     es: `${SITE_URL}/es${basePath}`,
-    xDefault: `${SITE_URL}/en${basePath}`,
+    xDefault: `${SITE_URL}/${X_DEFAULT_LANG}${basePath}`,
   };
 }
 
@@ -40,9 +54,12 @@ export function getAlternates(basePath: string = "") {
  */
 export function getAlternatesFor(enPath: string, esPath: string) {
   const clean = (p: string) => p.replace(/^\/+/, "");
+  const en_ = `${SITE_URL}/en/${clean(enPath)}`;
+  const es_ = `${SITE_URL}/es/${clean(esPath)}`;
   return {
-    en: `${SITE_URL}/en/${clean(enPath)}`,
-    es: `${SITE_URL}/es/${clean(esPath)}`,
-    xDefault: `${SITE_URL}/en/${clean(enPath)}`,
+    en: en_,
+    es: es_,
+    /* Ver la nota de X_DEFAULT_LANG arriba: el caso ambiguo cae en espanol. */
+    xDefault: X_DEFAULT_LANG === "es" ? es_ : en_,
   };
 }
