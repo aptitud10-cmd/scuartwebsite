@@ -6,13 +6,17 @@ export default defineConfig({
   site: 'https://scuart.com',
 
   /*
-   * Redirect HTTP real de / → /en.
+   * Redirect HTTP real de / → /es.
    * Con el adaptador Vercel, Astro emite esto como una route de redirect
    * en .vercel/output/config.json (status 308) — NO como meta-refresh.
    * Reemplaza el src/pages/index.astro que generaba el meta-refresh con delay.
+   *
+   * Apunta a /es para coincidir con el hreflang x-default (X_DEFAULT_LANG en
+   * src/i18n/index.ts). Si uno cambia, cambiar el otro: si no, la raíz y el
+   * x-default le dan a Google dos señales opuestas.
    */
   redirects: {
-    '/': '/en',
+    '/': '/es',
   },
 
   integrations: [
@@ -56,6 +60,9 @@ export default defineConfig({
     locales: ['en', 'es'],
     routing: {
       prefixDefaultLocale: true,
+      // Sin esto Astro genera un dist/index.html con meta-refresh a /en
+      // (el defaultLocale), que contradice el redirect de / → /es de arriba.
+      redirectToDefaultLocale: false,
     },
   },
 
