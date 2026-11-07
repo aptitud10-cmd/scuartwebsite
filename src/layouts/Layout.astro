@@ -42,7 +42,7 @@ const {
    si no, el og.jpg genérico del estudio. Mejora el preview al compartir un caso.
    ?v= rompe la caché de WhatsApp/Facebook/LinkedIn, que guardan la imagen por
    URL: subir el número cada vez que se reemplace public/og.jpg. */
-const DEFAULT_OG = `${SITE_URL}/og.jpg?v=3`;
+const DEFAULT_OG = `${SITE_URL}/og.jpg?v=4`;
 const resolvedOgImage = ogImage
   ? (ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`)
   : DEFAULT_OG;
@@ -143,8 +143,10 @@ const resolvedOgDesc = ogDescription ?? description;
     <meta property="og:locale" content={lang === 'es' ? 'es_419' : 'en_US'} />
     <meta property="og:site_name" content="SCUART" />
     <meta property="og:image" content={resolvedOgImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    {/* og.jpg se exporta a 1600×840 (más nítido tras la recompresión de
+        WhatsApp); las imágenes de caso conservan el 1200×630 de siempre. */}
+    <meta property="og:image:width" content={ogImage ? '1200' : '1600'} />
+    <meta property="og:image:height" content={ogImage ? '630' : '840'} />
     <meta property="og:image:alt" content={resolvedOgTitle} />
 
     <!-- Twitter / X Card -->
